@@ -7,6 +7,19 @@ bullet00 	= $300
 bullet01	= $304
 bullet02	= $308
 
+;;; player bullet struct
+; byte 0 : x pos
+; byte 1 : y pos
+
+; bullets are sprites #$03 - #$07 
+;;; bullet directions
+; 03   9 o'clock
+; 04  10 o'clock
+; 05   8 o'clock
+; 06  11 o'clock
+; 07   7 o'clock
+
+
 player_bullets_init:
 	lda #bullet_cooldown_length
         sta bullet_cooldown
@@ -34,8 +47,10 @@ player_bullets_update: subroutine
         ; bullet y
         lda bullet00 + 1
         sta $210
+        ; sprite
         lda #$79
         sta $210 + 1
+        ; palette
         lda #$03
         sta $210 + 2
         rts

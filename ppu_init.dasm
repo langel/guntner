@@ -2,7 +2,7 @@ PPU_init:
 ; CLEAR PPU RAM
 	ldx #$00
 ; set default clearing value here
-        lda #$00
+        lda #$20
         sta bg_tile_default
 	PPU_SETADDR $2000
 PPU_init_clear_2000:

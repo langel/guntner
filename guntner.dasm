@@ -27,6 +27,15 @@ starfield_tile	byte
 starfield_col0	byte
 starfield_col1	byte
 bullet_cooldown byte ; count frames until next bullet
+collision_0_x	byte
+collision_0_y	byte
+collision_0_w	byte
+collision_0_h	byte
+collision_1_x	byte
+collision_1_y	byte
+collision_1_w	byte
+collision_1_h	byte
+
 
 	org $380
 enemy_x		byte
@@ -36,6 +45,28 @@ spin_y		byte
 trans_x		byte
 trans_y		byte
 enemy_frame	byte
+
+;;; enemy data struct
+; type 0 = no enemy
+; health
+; x_base
+; y_base
+; pattern_counter
+; animation_frame
+; 7 and 8 bytes unassigned
+birb_x		byte
+birb_y		byte
+birb_patt	byte
+birb_anim	byte
+skully_x	byte
+skully_y	byte
+skully_patt	byte
+skully_anim	byte
+maggs_x		byte
+maggs_y		byte
+maggs_patt	byte
+maggs_anim	byte
+
 
 
 ;;;;; NES CARTRIDGE HEADER
@@ -87,10 +118,29 @@ RAM_init_clear:
 	lda #$28
         sta enemy_x
         sta enemy_y
-        lda #$80
+        lda #$40
         sta spin_x
         lda #$00
         sta spin_y
+; set birb stuff
+	lda #$19
+        sta birb_x
+        sta birb_y
+        sta birb_patt
+        sta birb_anim
+; set skully stuff
+	lda #$80
+        sta skully_x
+        sta skully_y
+        lda #$10
+        sta skully_patt
+        sta skully_anim
+; set maggs stuff
+	lda #$20
+        sta maggs_x
+        sta maggs_y
+        sta maggs_patt
+        sta maggs_anim
 ; activate PPU graphics       
 	; enable rendering
         lda #MASK_BG|MASK_SPR
@@ -99,7 +149,7 @@ RAM_init_clear:
         ; enable NMI
         lda #$00
         sta nmi_lockout
-        lda #CTRL_NMI
+        lda #CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL	
 .endless
 	jmp .endless	; endless loop
@@ -150,7 +200,7 @@ set_player_sprite: subroutine
         dex 
         stx $209
         lda #$40
-0 ; attributes
+; attributes
         sta $206
         sta $20a
      	; work towards demo target
@@ -194,80 +244,8 @@ set_player_demo_y:
 	jmp set_player_demo_y_done
         
         
-        
-update_enemies: subroutine
-	; update position
-	inc spin_x
-        ldx spin_x
-        lda sine_table,x
-        lsr
-        lsr
-        clc
-        adc enemy_x
-        sta trans_x
-	inc spin_y
-	inc spin_y
-        ldx spin_y
-        lda sine_table,x
-        lsr
-        lsr
-        clc
-        adc enemy_y
-        sta trans_y
-        ; top-left sprite
-        lda trans_x
-        sta $283
-        sta $28b
-        adc #$08
-        sta $287
-        sta $28f
-        lda trans_y
-        sta $280
-        sta $284
-        adc #$08
-        sta $288
-        sta $28c
-        ; tiles
-        ldx enemy_frame
-        cpx #$00
-        bne .adjust_frame
-        ldx #$40
-        stx enemy_frame
-.adjust_frame
-	dex
-        stx enemy_frame
-        txa
-        and #$20
-        bne .frame1
-.frame0
-        lda #$0c
-        sta $281
-        lda #$0d
-        sta $285
-        lda #$1c
-        sta $289
-        lda #$1d
-        sta $28d
-        jmp .frame_done
-.frame1
-        lda #$0e
-        sta $281
-        lda #$0f
-        sta $285
-        lda #$1e
-        sta $289
-        lda #$1f
-        sta $28d
-.frame_done
-        ; palette
-        lda #$03
-        sta $282
-        sta $286
-        sta $28a
-        sta $28e
-        
-	
-	rts
+	include "enemy_handler.dasm"
+
         
         
         
@@ -305,7 +283,7 @@ NMIHandler: subroutine
 	sta scroll_y
 	lda scroll_page
         and #$01
-        ora #CTRL_NMI
+        ora #CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
 ; TOP SCROLL
 	bit PPU_STATUS
@@ -336,7 +314,7 @@ NMIHandler: subroutine
         lda #$08
         sta PPU_SCROLL
 ; disable page 2 for HUD
-        ora #CTRL_NMI
+        ora #CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
         lda #$00
         sta nmi_lockout
@@ -365,8 +343,8 @@ Palette00:
         hex 02113c00	;background 2
         hex 0b1a3b1d	;background 3
         hex 19293900	;sprite 0
-        hex 1a2a3a00	;sprite 1
-        hex 1b2b3b00	;sprite 2
+        hex 13213000	;sprite 1
+        hex 07172700	;sprite 2
         hex 013530	;sprite 3
         
 	include "ppu_init.dasm"
@@ -387,4 +365,4 @@ Palette00:
 
 ;;;;; GRAPHX
 	org $10000
-	incbin "grafx2.chr"
+	incbin "grafx3.chr"

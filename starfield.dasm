@@ -1,6 +1,6 @@
 ;;;; Constants
 
-STARFIELD_MASK		= $1f
+STARFIELD_MASK		= $1f ; star probability against %00001111
 STARFIELD_COL0_START	= $00
 STARFIELD_COL1_START	= $08
 
@@ -8,6 +8,8 @@ STARFIELD_COL1_START	= $08
 starfield_init: subroutine
 ; set bg tile palette attributes
 ; $23c0 and $27c0
+	lda #$0f
+        sta starfield_tile
         ldx #$c0
 	PPU_SETADDR $23c0
 	lda #%00010100
@@ -52,7 +54,7 @@ starfield_init: subroutine
         ldx starfield_tile
         jmp .starfield_plot_done
 .starfield_plot_clear
-	ldx #$00
+	ldx #$20
 .starfield_plot_done
 	stx PPU_DATA	; store byte to PPU data
         ENDM
@@ -93,8 +95,8 @@ starfield_update: subroutine
 
 	; XXX hook this up with tile changing later
         ; probably hearts after killing a boss
-	lda #$7f
-        sta starfield_tile
+	;lda #$7f
+        ;sta starfield_tile
 
         lda rng0
         jsr NextRandom

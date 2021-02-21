@@ -20,19 +20,19 @@ attr_shit_loop
 tile_ram_clear:
 	PPU_SETADDR $2000
         ldy #$0
-        lda #$32
+        lda #$9e
 .tile_ram_clear_loop
         sta PPU_DATA
         iny
         bne .tile_ram_clear_loop
 	PPU_SETADDR $2260
-        lda #$ef
+        lda #$8f
 .tile_ram_clear_loop2
         sta PPU_DATA
         iny
         bne .tile_ram_clear_loop2
 	PPU_SETADDR $2660
-        lda #$ef
+        lda #$8f
 .tile_ram_clear_loop3
         sta PPU_DATA
         iny
@@ -68,8 +68,6 @@ tile_ram_clear:
 	ldy #$0		; set Y counter to 0
 .loop2:
 	lda msg_hud_bar,y	; get next character
-        clc
-        adc #$60
         beq .end2	; is 0? exit loop
 	sta PPU_DATA	; store+advance PPU
         iny		; next character
@@ -79,8 +77,6 @@ tile_ram_clear:
 	ldy #$0		; set Y counter to 0
 .loop3:
 	lda msg_hud_text1,y	; get next character
-        clc
-        adc #$60
         beq .end3	; is 0? exit loop
 	sta PPU_DATA	; store+advance PPU
         iny		; next character
@@ -90,8 +86,6 @@ tile_ram_clear:
 	ldy #$0		; set Y counter to 0
 .loop4:
 	lda msg_hud_text2,y	; get next character
-        clc
-        adc #$60
         beq .end4	; is 0? exit loop
 	sta PPU_DATA	; store+advance PPU
         iny		; next character
@@ -101,8 +95,6 @@ tile_ram_clear:
 	ldy #$0		; set Y counter to 0
 .loop5:
 	lda msg_hud_bar,y	; get next character
-        clc
-        adc #$60
         beq .end5	; is 0? exit loop
 	sta PPU_DATA	; store+advance PPU
         iny		; next character
@@ -116,10 +108,10 @@ PleaseStart_msg:
         
 msg_hud_bar:
 	.byte "                          "
-        .byte #$a0
+        .byte #$00
 msg_hud_text1:
 	.byte " I AM A Heads Up Display  "
-        .byte #$a0
+        .byte #$00
 msg_hud_text2:
 	.byte "     BUTT i am beloW      "
-        .byte #$a0
+        .byte #$00
