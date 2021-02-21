@@ -1,0 +1,125 @@
+
+
+
+; fill video RAM with "Please START" msg
+PleaseStart_plot: subroutine
+
+
+; set color attributes
+	PPU_SETADDR $23e0
+	lda #%10111110
+        sta PPU_DATA
+        ldy #$e0
+attr_shit_loop
+        sta PPU_DATA
+        iny
+        bne attr_shit_loop
+
+
+; fills in the bg tiles
+tile_ram_clear:
+	PPU_SETADDR $2000
+        ldy #$0
+        lda #$32
+.tile_ram_clear_loop
+        sta PPU_DATA
+        iny
+        bne .tile_ram_clear_loop
+	PPU_SETADDR $2260
+        lda #$ef
+.tile_ram_clear_loop2
+        sta PPU_DATA
+        iny
+        bne .tile_ram_clear_loop2
+	PPU_SETADDR $2660
+        lda #$ef
+.tile_ram_clear_loop3
+        sta PPU_DATA
+        iny
+        bne .tile_ram_clear_loop3
+;        rts
+
+
+
+; set PPU address to name table A (row 1, col 1)
+	PPU_SETADDR $2042
+	ldy #$0		; set Y counter to 0
+.loop:
+	lda PleaseStart_msg,y	; get next character
+        clc
+        adc #$60
+        beq .end	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .loop	; loop
+.end
+	PPU_SETADDR $20b1
+	ldy #$0		; set Y counter to 0
+.loopb:
+	lda PleaseStart_msg,y	; get next character
+        clc
+        adc #$60
+        beq .endb	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .loopb	; loop
+.endb
+	PPU_SETADDR $22a3
+	ldy #$0		; set Y counter to 0
+.loop2:
+	lda msg_hud_bar,y	; get next character
+        clc
+        adc #$60
+        beq .end2	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .loop2	; loop
+.end2
+	PPU_SETADDR $22c3
+	ldy #$0		; set Y counter to 0
+.loop3:
+	lda msg_hud_text1,y	; get next character
+        clc
+        adc #$60
+        beq .end3	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .loop3	; loop
+.end3
+	PPU_SETADDR $22e3
+	ldy #$0		; set Y counter to 0
+.loop4:
+	lda msg_hud_text2,y	; get next character
+        clc
+        adc #$60
+        beq .end4	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .loop4	; loop
+.end4
+	PPU_SETADDR $2303
+	ldy #$0		; set Y counter to 0
+.loop5:
+	lda msg_hud_bar,y	; get next character
+        clc
+        adc #$60
+        beq .end5	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .loop5	; loop
+.end5
+        rts		; return to caller
+        
+PleaseStart_msg:
+	.byte " Please START "
+        .byte #$a0
+        
+msg_hud_bar:
+	.byte "                          "
+        .byte #$a0
+msg_hud_text1:
+	.byte " I AM A Heads Up Display  "
+        .byte #$a0
+msg_hud_text2:
+	.byte "     BUTT i am beloW      "
+        .byte #$a0

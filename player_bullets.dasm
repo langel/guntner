@@ -1,0 +1,42 @@
+
+;;;;;; Constants
+
+bullet_cooldown_length	= $14
+
+bullet00 	= $300
+bullet01	= $304
+bullet02	= $308
+
+player_bullets_init:
+	lda #bullet_cooldown_length
+        sta bullet_cooldown
+        rts
+        
+
+player_bullets_update: subroutine
+	lda bullet00
+	sec
+        sbc #$7
+        sta bullet00
+        bcs .whatever
+        ; spawn next bullet
+        lda player_x
+        sta bullet00
+        lda player_y
+        clc
+        adc #$04
+        sta bullet00 + 1   
+.whatever
+;transfer bullet data to OAM
+	; bullet x
+	lda bullet00
+        sta $210 + 3
+        ; bullet y
+        lda bullet00 + 1
+        sta $210
+        lda #$79
+        sta $210 + 1
+        lda #$03
+        sta $210 + 2
+        rts
+        

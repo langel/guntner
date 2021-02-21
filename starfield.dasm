@@ -1,0 +1,177 @@
+;;;; Constants
+
+STARFIELD_MASK		= $1f
+STARFIELD_COL0_START	= $00
+STARFIELD_COL1_START	= $08
+
+
+starfield_init: subroutine
+; set bg tile palette attributes
+; $23c0 and $27c0
+        ldx #$c0
+	PPU_SETADDR $23c0
+	lda #%00010100
+        ;sta $1c
+.23c0_loop
+        sta PPU_DATA
+        inx
+        stx $1a
+        bne .23c0_loop
+        ldx #$c0
+	PPU_SETADDR $27c0
+	lda #%00010100
+.27c0_loop
+        sta PPU_DATA
+        inx
+        stx $1b
+        bne .27c0_loop
+        sta $19
+; reset star palette twinkles
+	lda #STARFIELD_COL0_START
+        sta starfield_col0
+        lda #STARFIELD_COL1_START
+        sta starfield_col1
+	rts
+
+
+;;;;; STARFIELD_PLOT_POS
+;;;;; #{1} : page pos offest
+;;;;; #{2} : number to check against rng
+
+	MAC STARFIELD_PLOT_POS
+	lda starfield_page
+        sta PPU_ADDR
+	lda starfield_col
+        clc
+        adc #{1}
+        sta PPU_ADDR
+        lda starfield_rng
+        cmp #{2}
+        bne .starfield_plot_clear
+.starfield_plot_star
+        ldx starfield_tile
+        jmp .starfield_plot_done
+.starfield_plot_clear
+	ldx #$00
+.starfield_plot_done
+	stx PPU_DATA	; store byte to PPU data
+        ENDM
+
+
+starfield_update: subroutine
+	
+        ; twinkle them stars
+        PPU_SETADDR $3f01
+        lda starfield_col0
+        sta PPU_DATA
+        adc #$21
+        sta PPU_DATA
+        adc #$0d
+        sta PPU_DATA
+        inc starfield_col0
+        lda starfield_col0
+        cmp #$0d
+        bne .col0_no_reset
+        lda STARFIELD_COL0_START
+        sta starfield_col0
+.col0_no_reset:
+        PPU_SETADDR $3f05
+        lda starfield_col1
+        sta PPU_DATA
+        adc #$20
+        sta PPU_DATA
+        adc #$0f
+        sta PPU_DATA
+        inc starfield_col1
+        lda starfield_col1
+        cmp #$0d
+        bne .col1_no_reset
+        lda STARFIELD_COL0_START
+        sta starfield_col1
+.col1_no_reset:
+        
+
+	; XXX hook this up with tile changing later
+        ; probably hearts after killing a boss
+	lda #$7f
+        sta starfield_tile
+
+        lda rng0
+        jsr NextRandom
+        sta rng0
+        and #STARFIELD_MASK
+        sta starfield_rng
+        
+	lda scroll_y
+        lsr
+        lsr
+        lsr
+        sta starfield_col
+        dec starfield_col
+        
+        lda scroll_page
+        and #$01
+        cmp #$00
+        bne .scroll_page
+        lda #$20
+        sta starfield_page
+   	jmp .scroll_page_done
+.scroll_page
+	lda #$24
+        sta starfield_page
+.scroll_page_done
+        
+        
+        ; row 0
+        STARFIELD_PLOT_POS $00,$00
+	; row 1       
+        STARFIELD_PLOT_POS $20,$01
+	; row 2       
+        STARFIELD_PLOT_POS $40,$02
+	; row 3
+        STARFIELD_PLOT_POS $60,$03
+	; row 4
+        STARFIELD_PLOT_POS $80,$04
+	; row 5
+        STARFIELD_PLOT_POS $a0,$05
+	; row 6
+        STARFIELD_PLOT_POS $c0,$06
+	; row 7
+        STARFIELD_PLOT_POS $e0,$07
+     
+; next page of starfield
+        inc starfield_page
+        
+	; row 8
+        STARFIELD_PLOT_POS $00,$08
+	; row 9       
+        STARFIELD_PLOT_POS $20,$09
+	; row a       
+        STARFIELD_PLOT_POS $40,$0a
+	; row b
+        STARFIELD_PLOT_POS $60,$0b
+	; row c
+        STARFIELD_PLOT_POS $80,$0c
+	; row d
+        STARFIELD_PLOT_POS $a0,$0d
+	; row e
+        STARFIELD_PLOT_POS $c0,$0e
+	; row f
+        STARFIELD_PLOT_POS $e0,$0f
+        
+; next page of starfield
+        inc starfield_page
+        lda rng0
+        jsr NextRandom
+        sta rng0
+        and #STARFIELD_MASK
+        sta starfield_rng
+        
+	; row 8
+        STARFIELD_PLOT_POS $00,$01
+	; row 9       
+        STARFIELD_PLOT_POS $20,$02
+	; row a       
+        STARFIELD_PLOT_POS $40,$04
+  
+	rts
