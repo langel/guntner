@@ -29,7 +29,7 @@ player_bullets_init:
 player_bullets_update: subroutine
 	lda bullet00
 	sec
-        sbc #$7
+        sbc #$2
         sta bullet00
         bcs .whatever
         ; spawn next bullet

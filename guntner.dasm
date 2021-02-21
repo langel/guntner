@@ -348,7 +348,9 @@ Palette00:
         hex 013530	;sprite 3
         
 	include "ppu_init.dasm"
-
+        
+        
+	include "collision_detection.dasm"
 	include "player_bullets.dasm"
 	include "please_start_screen.dasm"
 	include "starfield.dasm"

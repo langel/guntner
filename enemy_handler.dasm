@@ -38,6 +38,8 @@ update_enemies: subroutine
         lsr
         clc
         adc enemy_x
+        ; stash it in collision detector
+        sta collision_0_x
         ;sta trans_x
         ; top-left sprite
         ;lda trans_x
@@ -55,6 +57,8 @@ update_enemies: subroutine
         lsr
         clc
         adc enemy_y
+        ; stash it in collision detector
+        sta collision_0_y
         ;sta trans_y
         ;lda trans_y
         sta $280
@@ -100,6 +104,28 @@ update_enemies: subroutine
         sta $286
         sta $28a
         sta $28e
+; shot by bullet?
+	lda #$10
+        sta collision_0_w
+        sta collision_0_h
+        ; load bullet data into collision detector
+	lda bullet00
+        sta collision_1_x
+        lda bullet00 + 1
+        sta collision_1_y
+        lda #$04
+        sta collision_1_w
+        sta collision_1_h
+        jsr detect_collision
+        cmp #$00
+        beq .nothing
+        ; palette
+        lda #$00
+        sta $282
+        sta $286
+        sta $28a
+        sta $28e
+.nothing
     
     
 ;;;; HANDLING BIRB

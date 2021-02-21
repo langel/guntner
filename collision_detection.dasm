@@ -1,0 +1,50 @@
+
+;;;; COLLISION DETECTOR
+;	
+;	works by putting object data into the following 0 page variables
+;
+;	collision_0_x	byte
+;	collision_0_y	byte
+;	collision_0_w	byte
+;	collision_0_h	byte
+;	collision_1_x	byte
+;	collision_1_y	byte
+;	collision_1_w	byte
+;	collision_1_h	byte
+;
+;	returns 1 (true) or 0 (false) in accumulator
+
+;int is_collision(void)
+;
+;   return x1 + width1 > x2
+;       && x2 + width2 > x1
+;       && y1 + height1 > y2
+;       && y2 + height2 > y1;
+;}
+
+detect_collision: subroutine
+	clc
+        lda collision_0_x
+        adc collision_0_w
+        cmp collision_1_x
+        bmi .no_collision
+        clc
+        lda collision_1_x
+        adc collision_1_w
+        cmp collision_0_x
+        bmi .no_collision
+        clc
+        lda collision_0_y
+        adc collision_0_h
+        cmp collision_1_y
+        bmi .no_collision
+        clc 
+        lda collision_1_y
+        adc collision_1_h
+        cmp collision_0_y
+        bmi .no_collision
+        lda #$ff
+        rts
+.no_collision
+	lda #$00
+        rts
