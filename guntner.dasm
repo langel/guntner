@@ -283,4 +283,4 @@ Palette00:
 
 ;;;;; GRAPHX
 	org $10000
-	incbin "guntner.chr"
+	incbin "grafx.chr"
