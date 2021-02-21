@@ -28,6 +28,15 @@ starfield_col0	byte
 starfield_col1	byte
 bullet_cooldown byte ; count frames until next bullet
 
+	org $380
+enemy_x		byte
+enemy_y		byte
+spin_x		byte
+spin_y		byte
+trans_x		byte
+trans_y		byte
+
+
 ;;;;; NES CARTRIDGE HEADER
 
 	NES_HEADER 0,1,1,NES_MIRR_VERT ; mapper 0, 1 PRGs, 1 CHR
@@ -73,6 +82,14 @@ RAM_init_clear:
 	lda #$70
         sta player_y
         sta player_demo_y
+; set enemy position
+	lda #$28
+        sta enemy_x
+        sta enemy_y
+        lda #$80
+        sta spin_x
+        lda #$00
+        sta spin_y
 ; activate PPU graphics       
 	; enable rendering
         lda #MASK_BG|MASK_SPR
@@ -175,9 +192,66 @@ set_player_demo_y:
         sta player_demo_y
 	jmp set_player_demo_y_done
         
+        
+        
+update_enemies:
+	; update position
+	inc spin_x
+        ldx spin_x
+        lda sine_table,x
+        lsr
+        lsr
+        clc
+        adc enemy_x
+        sta trans_x
+	inc spin_y
+	inc spin_y
+        ldx spin_y
+        lda sine_table,x
+        lsr
+        lsr
+        clc
+        adc enemy_y
+        sta trans_y
+        ; top-left sprite
+        lda trans_x
+        sta $283
+        sta $28b
+        adc #$08
+        sta $287
+        sta $28f
+        lda trans_y
+        sta $280
+        sta $284
+        adc #$08
+        sta $288
+        sta $28c
+        ; tiles
+        lda #$20
+        sta $281
+        lda #$21
+        sta $285
+        lda #$30
+        sta $289
+        lda #$31
+        sta $28d
+        ; palette
+        lda #$03
+        sta $282
+        sta $286
+        sta $28a
+        sta $28e
+        
+	
+	rts
+        
+        
+        
+        
 ;;;;; COMMON SUBROUTINES
 
 	include "nesppu.dasm"
+
 
 ;;;;; INTERRUPT HANDLERS
 
@@ -187,6 +261,11 @@ NMIHandler: subroutine
         cmp #$00
         bne .NMI_end
         inc nmi_lockout
+; load sprites
+	lda #$02
+        sta PPU_OAM_DMA
+        ; wait for sprite 0
+; AFTER GETTING EVERYTHING INTO THE PPU : ::: 
 ; STARFIELD TIME!!!
 	jsr player_bullets_update
 	jsr starfield_update
@@ -213,10 +292,8 @@ NMIHandler: subroutine
 ; SPRITES TIME!!
         jsr SetSprite0
         jsr set_player_sprite
-; load sprites
-	lda #$02
-        sta PPU_OAM_DMA
-        ; wait for sprite 0
+        jsr update_enemies
+        
 ; SPRITE 0 WAIT TIME!!!
 .wait0	bit PPU_STATUS
         bvs .wait0
@@ -266,7 +343,7 @@ Palette00:
         hex 19293900	;sprite 0
         hex 1a2a3a00	;sprite 1
         hex 1b2b3b00	;sprite 2
-        hex 1c2c3c	;sprite 3
+        hex 013530	;sprite 3
         
 	include "ppu_init.dasm"
 
@@ -274,6 +351,9 @@ Palette00:
 	include "please_start_screen.dasm"
 	include "starfield.dasm"
         
+        org $f800
+	include "sine.dasm"
+
 
 
 
