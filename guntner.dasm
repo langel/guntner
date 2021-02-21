@@ -35,6 +35,7 @@ spin_x		byte
 spin_y		byte
 trans_x		byte
 trans_y		byte
+enemy_frame	byte
 
 
 ;;;;; NES CARTRIDGE HEADER
@@ -194,7 +195,7 @@ set_player_demo_y:
         
         
         
-update_enemies:
+update_enemies: subroutine
 	; update position
 	inc spin_x
         ldx spin_x
@@ -227,14 +228,37 @@ update_enemies:
         sta $288
         sta $28c
         ; tiles
-        lda #$20
+        ldx enemy_frame
+        cpx #$00
+        bne .adjust_frame
+        ldx #$40
+        stx enemy_frame
+.adjust_frame
+	dex
+        stx enemy_frame
+        txa
+        and #$20
+        bne .frame1
+.frame0
+        lda #$0c
         sta $281
-        lda #$21
+        lda #$0d
         sta $285
-        lda #$30
+        lda #$1c
         sta $289
-        lda #$31
+        lda #$1d
         sta $28d
+        jmp .frame_done
+.frame1
+        lda #$0e
+        sta $281
+        lda #$0f
+        sta $285
+        lda #$1e
+        sta $289
+        lda #$1f
+        sta $28d
+.frame_done
         ; palette
         lda #$03
         sta $282
