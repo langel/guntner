@@ -108,15 +108,7 @@ update_enemies: subroutine
 	lda #$10
         sta collision_0_w
         sta collision_0_h
-        ; load bullet data into collision detector
-	lda bullet00
-        sta collision_1_x
-        lda bullet00 + 1
-        sta collision_1_y
-        lda #$04
-        sta collision_1_w
-        sta collision_1_h
-        jsr detect_collision
+        jsr player_bullet_collision_handler
         cmp #$00
         beq .nothing
         ; palette
@@ -256,12 +248,6 @@ update_enemies: subroutine
         sta $2a0 + 1
         adc #$01
         sta $29c + 1
-        ; palette
-        lda #$43
-        sta $294 + 2
-        sta $298 + 2
-        sta $29c + 2
-        sta $2a0 + 2
 	jmp .skully_sprites_done
 .skully_sprites_done
         ; x pos
@@ -284,6 +270,28 @@ update_enemies: subroutine
         adc skully_anim
         sta skully_anim
         inc skully_x
+        ; stash it in collision detector
+        lda skully_x
+        sta collision_0_x
+        lda skully_y
+        sta collision_0_y
+        lda #$10
+        sta collision_0_w
+        sta collision_0_h
+; shot by bullet?
+	lda #$10
+        sta collision_0_w
+        sta collision_0_h
+        jsr player_bullet_collision_handler
+        cmp #$00
+        beq .skully_nothing
+        ; palette
+        lda #$00
+        sta $282
+        sta $286
+        sta $28a
+        sta $28e
+.skully_nothing
         
 
 ;;;; HANDLING maggs

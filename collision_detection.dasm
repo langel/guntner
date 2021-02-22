@@ -12,15 +12,7 @@
 ;	collision_1_w	byte
 ;	collision_1_h	byte
 ;
-;	returns 1 (true) or 0 (false) in accumulator
-
-;int is_collision(void)
-;
-;   return x1 + width1 > x2
-;       && x2 + width2 > x1
-;       && y1 + height1 > y2
-;       && y2 + height2 > y1;
-;}
+;	returns ff (true) or 00 (false) in accumulator
 
 detect_collision: subroutine
 	clc
