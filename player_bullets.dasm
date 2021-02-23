@@ -3,9 +3,6 @@
 
 bullet_cooldown_length	= $14
 
-bullet00 	= $300
-bullet01	= $304
-bullet02	= $308
 
 bullet0		= $020c
 bullet1		= $0210
@@ -52,8 +49,8 @@ player_bullet_collision_handler: subroutine
         sta collision_1_w
         sta collision_1_h
         
-        ; accumulate number of bullets colliding in y register
-        ldy #$00
+        ; accumulate number of bullets colliding in x register
+        ldx #$00
         
         lda bullet0 + 3
         cmp #$00
@@ -64,7 +61,7 @@ player_bullet_collision_handler: subroutine
         jsr detect_collision
         cmp #$00
         beq .bullet0_skip
-        iny
+        inx
         jsr bullet0_despawn
 .bullet0_skip        
 
@@ -77,7 +74,7 @@ player_bullet_collision_handler: subroutine
         jsr detect_collision
         cmp #$00
         beq .bullet1_skip
-        iny
+        inx
         jsr bullet1_despawn
 .bullet1_skip
 
@@ -90,7 +87,7 @@ player_bullet_collision_handler: subroutine
         jsr detect_collision
         cmp #$00
         beq .bullet2_skip
-        iny
+        inx
         jsr bullet2_despawn
 .bullet2_skip
 
@@ -103,7 +100,7 @@ player_bullet_collision_handler: subroutine
         jsr detect_collision
         cmp #$00
         beq .bullet3_skip
-        iny
+        inx
         jsr bullet3_despawn
 .bullet3_skip
 
@@ -116,12 +113,12 @@ player_bullet_collision_handler: subroutine
         jsr detect_collision
         cmp #$00
         beq .bullet4_skip
-        iny
+        inx
         jsr bullet4_despawn
 .bullet4_skip
 
 	; send number of hits back to caller
-	tya
+	txa
 	rts
         
 bullet0_despawn: subroutine

@@ -46,8 +46,6 @@ tile_ram_clear:
 	ldy #$0		; set Y counter to 0
 .loop:
 	lda PleaseStart_msg,y	; get next character
-        clc
-        adc #$60
         beq .end	; is 0? exit loop
 	sta PPU_DATA	; store+advance PPU
         iny		; next character
@@ -57,8 +55,6 @@ tile_ram_clear:
 	ldy #$0		; set Y counter to 0
 .loopb:
 	lda PleaseStart_msg,y	; get next character
-        clc
-        adc #$60
         beq .endb	; is 0? exit loop
 	sta PPU_DATA	; store+advance PPU
         iny		; next character
@@ -104,7 +100,7 @@ tile_ram_clear:
         
 PleaseStart_msg:
 	.byte " Please START "
-        .byte #$a0
+        .byte #$00
         
 msg_hud_bar:
 	.byte "                          "

@@ -36,8 +36,10 @@ collision_1_y	byte
 collision_1_w	byte
 collision_1_h	byte
 
+enemy_handler_pos	byte
 
-	org $380
+
+	org $0700
 enemy_x		byte
 enemy_y		byte
 spin_x		byte
@@ -101,6 +103,7 @@ RAM_init_clear:
         jsr player_bullets_init
 	jsr starfield_init
         jsr PleaseStart_plot
+        jsr enemy_init
      	; setup rng
         lda #$01
         sta rng0
@@ -354,6 +357,8 @@ Palette00:
 	include "player_bullets.dasm"
 	include "please_start_screen.dasm"
 	include "starfield.dasm"
+        
+        nop	; how much prg space we using?
         
         org $f800
 	include "sine.dasm"
