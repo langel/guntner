@@ -18,6 +18,7 @@ detect_collision: subroutine
 	clc
         lda collision_0_x
         adc collision_0_w
+        bcs .no_collision ; make sure x+w is not less than x
         cmp collision_1_x
         bmi .no_collision
         clc

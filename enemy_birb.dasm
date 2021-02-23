@@ -1,0 +1,137 @@
+;;;; HANDLING BIRB
+
+birb_spawn: subroutine
+	; x is set by enemy spawner
+	lda #$02
+        sta $0300,x ; enemy type
+        sta $0303,x ; pattern counter
+        sta $0304,x ; animation counter
+        lda #$00
+        sta $0301,x ; x pos
+        lda rng0
+        lsr
+        sta $0302,x ; y pos
+        lda #$01
+        sta $0305,x ; health
+        clc
+        txa
+        lsr
+        adc #$20
+        sta $0307,x ; OAM ref
+        
+   	rts
+       
+       
+
+        
+birb_cycle: subroutine
+	ldx enemy_handler_pos
+        ; update pattern
+        lda ENEMY_RAM+3,x
+        inc ENEMY_RAM+3,x
+        inc ENEMY_RAM+3,x
+        lda ENEMY_RAM+3,x
+        
+        ; set x position
+        ; get x pattern position
+        ; add it to base x position
+        ; save that to OAM x position
+	ldx enemy_handler_pos
+        lda ENEMY_RAM+3,x
+        tax
+        lda sine_table,x
+        lsr
+        lsr
+        lsr
+	ldx enemy_handler_pos
+        inc ENEMY_RAM+1,x
+        clc
+        adc ENEMY_RAM+1,x
+        tay
+        ; temp OAM $02d0
+	ldx enemy_handler_pos
+        lda ENEMY_RAM+7,x
+        tax
+        tya
+        sta $0203,x
+        sta collision_0_x
+        
+        ; set y position
+	ldx enemy_handler_pos
+        lda ENEMY_RAM+3,x
+        clc 
+        adc #$40
+        tax
+        lda sine_table,x
+        lsr
+        lsr
+        lsr
+	ldx enemy_handler_pos
+        clc
+        adc ENEMY_RAM+2,x
+        tay
+        ; temp OAM $02d0
+	ldx enemy_handler_pos
+        lda ENEMY_RAM+7,x
+        tax
+        tya
+        sta $0200,x
+        sta collision_0_y
+        
+        ; current sprite
+	ldx enemy_handler_pos
+        lda ENEMY_RAM+4,x
+        clc
+        adc #$14
+        sta ENEMY_RAM+4,x
+        lsr
+        lsr
+        lsr
+        lsr
+        lsr
+        lsr
+        clc 
+        adc #$2c
+        tay
+        sta $02d1
+	ldx enemy_handler_pos
+        lda ENEMY_RAM+7,x
+        tax
+        tya
+        sta $0201,x
+        
+        lda #$08
+        sta collision_0_w
+        lda #$05
+        sta collision_0_h
+; shot by bullet?
+        jsr player_bullet_collision_handler
+        cmp #$00
+        beq .birb_not_hit
+        ; decrease health
+	ldx enemy_handler_pos
+        dec ENEMY_RAM+5,x
+        lda ENEMY_RAM+5,x
+        cmp #$00
+        bne .birb_not_dead
+        ; change it into crossbones!
+        lda #$01
+        sta ENEMY_RAM+0,x
+.birb_not_dead
+        ; palette
+	ldx enemy_handler_pos
+        lda ENEMY_RAM+7,x
+        tax
+        lda #$00
+        sta $0202,x
+        jmp .birb_done
+.birb_not_hit
+        ; palette
+	ldx enemy_handler_pos
+        lda ENEMY_RAM+7,x
+        tax
+        lda #$01
+        sta $0202,x
+.birb_done
+        
+	jmp update_enemies_handler_next
