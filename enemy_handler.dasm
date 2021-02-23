@@ -1,17 +1,9 @@
 ;;;; Constants
 
 ENEMY_RAM	= $0300
+ENEMY_METHODS_LOOKUP_TABLE	= $f000
 
-;;;;; ENEMY_TYPE_SWITCH
-;;;;; #{1} : enemy type
-;;;;; #{2} : enemy subroutine
 
-	MAC ENEMY_TYPE_SWITCH
-        cmp #{1}
-        bne .exit
-        jsr {2}
-.exit
-        ENDM
 
 ;;;; enemy types
 ;	0 = [nothing]
@@ -22,48 +14,25 @@ ENEMY_RAM	= $0300
 ;	5 = bullet0	1x1
 
 
-enemy_init: subroutine
-
-	lda #$01
-        sta $0310 ; enemy type
-        sta $0313 ; pattern counter
-        sta $0314 ; animation counter
-        lda #$00
-        sta $0311 ; x pos
-        lda rng0
-        lsr
-        ;da #$60
-        sta $0312 ; y pos
-        lda #$01
-        sta $0315 ; health
-        lda #$20
-        sta $0317 ; OAM ref
-        
-	lda #$02
-        sta $0320 ; enemy type
-        sta $0323 ; pattern counter
-        sta $0324 ; animation counter
-        lda #$20
-        sta $0321 ; x pos
-        sta $0322 ; y pos
-        lda #$20
-        sta $0325 ; health
-	rts
-        
-
         
 enemy_spawn: subroutine
 	jsr get_enemy_slot_1_sprite
         cmp #$ff
-        beq .no_spawn
+        beq .no_birb_spawn
         tax
         jsr birb_spawn
-.no_spawn
+.no_birb_spawn
+	jsr get_enemy_slot_2_sprite
+        cmp #$ff
+        beq .no_maggs_spawn
+        tax
+        jsr maggs_spawn
+.no_maggs_spawn
 	rts
         
 birb_spawn: subroutine
 	; x is set by enemy spawner
-	lda #$01
+	lda #$02
         sta $0300,x ; enemy type
         sta $0303,x ; pattern counter
         sta $0304,x ; animation counter
@@ -78,6 +47,32 @@ birb_spawn: subroutine
         txa
         lsr
         adc #$20
+        sta $0307,x ; OAM ref
+        
+   	rts
+        
+maggs_spawn: subroutine
+	; x is set by enemy spawner
+	lda #$03
+        sta $0300,x ; enemy type
+        sta $0303,x ; pattern counter
+        sta $0304,x ; animation counter
+        lda #$00
+        sta $0301,x ; x pos
+        lda rng0
+        lsr
+        clc
+        adc #$08
+        sta $0302,x ; y pos
+        lda #$04
+        sta $0305,x ; health
+        txa
+        sec
+        sbc #$80
+        ;sl
+        ;asl
+        clc
+        adc #$60
         sta $0307,x ; OAM ref
         
    	rts
@@ -102,33 +97,42 @@ enemy_death: subroutine
         sta ENEMY_RAM+5,x
         sta ENEMY_RAM+6,x
         sta ENEMY_RAM+7,x
-        jsr enemy_init
         rts
         
         
 update_enemies: subroutine
 
 	lda #$00
-.handler_loop
         sta enemy_handler_pos
+.handler_loop
 	; get enemy type
         ldx enemy_handler_pos
         lda ENEMY_RAM,x
         ; not defined go next slot
         cmp #$00
         beq .handler_next
-        ENEMY_TYPE_SWITCH $01,birb_circle
+        asl
+        tax
+        lda ENEMY_METHODS_LOOKUP_TABLE,x
+        sta enemy_temp_addr_lo
+        inx
+        lda ENEMY_METHODS_LOOKUP_TABLE,x
+        sta enemy_temp_addr_hi
+        jmp (enemy_temp_addr_lo)
+        ;ENEMY_TYPE_SWITCH $01,birb_cycle
+update_enemies_handler_next:
 .handler_next
         ; go to next enemy slot
 	lda #$08
         clc
         adc enemy_handler_pos
         bcs .handler_core_end
+        sta enemy_handler_pos
         jmp .handler_loop
 .handler_core_end
-	;rts
         
 	jsr enemy_spawn
+	;rts
 
 ;;; HANDLING STARGLASSES
 	; update position
@@ -221,53 +225,6 @@ update_enemies: subroutine
         sta $28e
 .nothing
     
-    
-;;;; HANDLING BIRB
-	; sprite
-	lda #$2c
-        lda birb_anim
-        lsr
-        lsr
-        lsr
-        clc
-        adc #$2c
-        
-        sta $290 + 1
-        ; x pos
-        ldx birb_patt
-        lda sine_table,x
-        lsr 
-        lsr
-        lsr 
-        clc
-        adc birb_x
-	sta $290 + 3
-        ; y pos
-        lda birb_patt
-        clc
-        adc #$40
-        tax
-        lda sine_table,x
-        lsr
-        lsr
-        lsr
-        clc 
-        adc birb_y
-        sta $290
-        ; palette
-        lda #$01
-        sta $290 + 2
-        ; update pattern
-        inc birb_patt
-        inc birb_patt
-        ; update animation
-        ldx birb_anim
-        cpx #$00
-        bne .birb_frame
-        ldx #$20
-        stx birb_anim
-.birb_frame
-        dec birb_anim
         
         
 ;;;; HANDLING SKULLY
@@ -398,12 +355,36 @@ update_enemies: subroutine
         sta $29c + 2
         sta $2a0 + 2
 .skully_done
+	rts
+        
+        
+crossbones_cycle: subroutine
+	ldx enemy_handler_pos
+        lda ENEMY_RAM+2,x
+        sec
+        sbc ENEMY_RAM+5,x
+        inc ENEMY_RAM+5,x
+        bcc .crossbones_death
+        sta ENEMY_RAM+2,x
+        tay
+        lda ENEMY_RAM+7,x
+        tax
+        tya
+        sta $0200,x
+        lda #$0b
+        sta $0201,x
+        jmp .crossbones_done
+.crossbones_death
+        jsr enemy_death
+.crossbones_done
+	jmp update_enemies_handler_next
         
 
 ;;;; HANDLING maggs
+maggs_cycle: subroutine
+	ldx enemy_handler_pos
 	; sprite
-	lda #$2c
-        lda maggs_anim
+        lda ENEMY_RAM+4,x
         lsr
         lsr
         lsr
@@ -411,57 +392,123 @@ update_enemies: subroutine
         asl
         clc
         adc #$3c
-        sta $2a4 + 1
-        adc #$01
-        sta $2a8 + 1
-        ; x pos
-        ldx maggs_patt
-        lda sine_table,x
-        lsr 
-        lsr
-        lsr 
-        clc
-        adc maggs_x
-	sta $2a4 + 3
-        adc #$08
-        sta $2a8 + 3
-        ; y pos
-        lda maggs_patt
-        clc
-        adc #$40
+        tay
+        lda ENEMY_RAM+7,x
         tax
-        lda sine_table,x
-        lsr
-        lsr
-        lsr
-        clc 
-        adc maggs_y
-        sta $2a4
-        sta $2a8
+        tya
+        sta $0201+0,x
+        iny
+        tya
+        sta $0201+4,x
+        
+        ; x pos
+	ldx enemy_handler_pos
+        lda ENEMY_RAM+1,x
+        sta collision_0_x
+        tay
+        lda ENEMY_RAM+7,x
+        tax
+        tya
+        sta $0203+0,x
+        clc
+        adc #$08
+        sta $0203+4,x
+        
+        ; y pos
+	ldx enemy_handler_pos
+        ;lda ENEMY_RAM+3,x
+        ;clc
+        ;adc #$40
+        ;tax
+        ;lda sine_table,x
+        ;lsr
+        ;lsr
+        ;lsr
+        ;lsr
+        ;lsr
+        ;clc
+        ;adc ENEMY_RAM+2,x
+        lda ENEMY_RAM+2,x
+        sta collision_0_y
+        tay
+        ldx enemy_handler_pos
+        lda ENEMY_RAM+7,x
+        tax
+        tya
+        sta $0200+0,x
+        sta $0200+4,x
+        
         ; palette
         lda #$02
-        sta $2a4 + 2
-        sta $2a8 + 2
-        ; update pattern
-        inc maggs_patt
-        inc maggs_patt
-        ; update animation
-        ldx maggs_anim
-        cpx #$00
-        bne .maggs_frame
-        ldx #$20
-        stx maggs_anim
-.maggs_frame
-        dec maggs_anim
-        inc maggs_x
+        sta $0202+0,x
+        sta $0202+4,x
         
-	rts
+        ; update pattern
+	ldx enemy_handler_pos
+        inc ENEMY_RAM+3,x
+        inc ENEMY_RAM+3,x
+        ; move forward
+        inc ENEMY_RAM+1,x
+        ; update animation
+        lda ENEMY_RAM+4,x
+        cmp #$00
+        bne .maggs_frame
+        lda #$20
+        sta ENEMY_RAM+4,x
+.maggs_frame
+        dec ENEMY_RAM+4,x
+        
+        lda #$10
+        sta collision_0_w
+        lda #$05
+        sta collision_0_h
+; shot by bullet?
+        jsr player_bullet_collision_handler
+        cmp #$00
+        beq .not_hit
+        ; decrease health
+	ldx enemy_handler_pos
+        dec ENEMY_RAM+5,x
+        lda ENEMY_RAM+5,x
+        cmp #$00
+        bne .not_dead
+        ; DEAD
+        ; change it into crossbones!
+        lda #$01
+        sta ENEMY_RAM+0,x
+        lda ENEMY_RAM+7,x
+        tax
+        lda #$ff
+        sta $0203+4,x
+        lda $0203+0,x
+        clc
+        adc #$07
+        sta $0203+0,x
+        ;jsr enemy_death
+.not_dead
+        ; palette
+	ldx enemy_handler_pos
+        lda ENEMY_RAM+7,x
+        tax
+        lda #$00
+        sta $0202,x
+        sta $0206,x
+        jmp .done
+.not_hit
+        ; palette
+	;ldx enemy_handler_pos
+        ;lda ENEMY_RAM+7,x
+        ;tax
+        ;lda #$01
+        ;sta $0202,x
+.done
+	jmp update_enemies_handler_next
         
         
         
 ;;;; HANDLING BIRB
         
-birb_circle: subroutine
+birb_cycle: subroutine
 	ldx enemy_handler_pos
         ; update pattern
         lda ENEMY_RAM+3,x
@@ -551,7 +598,9 @@ birb_circle: subroutine
         lda ENEMY_RAM+5,x
         cmp #$00
         bne .birb_not_dead
-        jsr enemy_death
+        ; change it into crossbones!
+        lda #$01
+        sta ENEMY_RAM+0,x
 .birb_not_dead
         ; palette
 	ldx enemy_handler_pos
@@ -569,7 +618,7 @@ birb_circle: subroutine
         sta $0202,x
 .birb_done
         
-        rts
+	jmp update_enemies_handler_next
         
         
         
@@ -676,3 +725,101 @@ get_enemy_slot_1_sprite: subroutine
 	lda #$ff
 .found_slot
 	rts
+        
+        
+get_enemy_slot_2_sprite: subroutine
+.slot0
+	lda $0380
+        cmp #$00
+        bne .slot1
+        lda #$80
+        jmp .found_slot
+.slot1
+	lda $0388
+        cmp #$00
+        bne .slot2
+        lda #$88
+        jmp .found_slot
+.slot2
+	lda $0390
+        cmp #$00
+        bne .slot3
+        lda #$90
+        jmp .found_slot
+.slot3
+	lda $0398
+        cmp #$00
+        bne .slot_wtf_no
+        lda #$98
+        jmp .found_slot
+.slot_wtf_no
+;return #$ff for FALSE
+	lda #$ff
+.found_slot
+	rts
+        
+get_enemy_slot_4_sprite: subroutine
+.slot0
+	lda $03a0
+        cmp #$00
+        bne .slot1
+        lda #$a0
+        jmp .found_slot
+.slot1
+	lda $03a8
+        cmp #$00
+        bne .slot2
+        lda #$a8
+        jmp .found_slot
+.slot2
+	lda $03b0
+        cmp #$00
+        bne .slot3
+        lda #$90
+        jmp .found_slot
+.slot3
+	lda $03b8
+        cmp #$00
+        bne .slot4
+        lda #$98
+        jmp .found_slot
+.slot4
+	lda $03c0
+        cmp #$00
+        bne .slot5
+        lda #$a0
+        jmp .found_slot
+.slot5
+	lda $03c8
+        cmp #$00
+        bne .slot6
+        lda #$a8
+        jmp .found_slot
+.slot6
+	lda $03c0
+        cmp #$00
+        bne .slot7
+        lda #$90
+        jmp .found_slot
+.slot7
+	lda $03c8
+        cmp #$00
+        bne .slot_wtf_no
+        lda #$98
+        jmp .found_slot
+.slot_wtf_no
+;return #$ff for FALSE
+	lda #$ff
+.found_slot
+	rts
+        
+        
+
+        
+        org $f000
+ENEMY_METHODS_LOOKUP_TABLE:
+        hex 0000
+        word crossbones_cycle
+        word birb_cycle
+        word maggs_cycle
+        

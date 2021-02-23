@@ -8,6 +8,7 @@
 	org $0
 
 nmi_lockout	byte
+sprite_0_y	byte
 scroll_x	byte
 scroll_page	byte
 scroll_y	byte
@@ -36,6 +37,9 @@ collision_1_y	byte
 collision_1_w	byte
 collision_1_h	byte
 
+enemy_temp_addr_lo	byte
+enemy_temp_addr_hi	byte
+
 enemy_handler_pos	byte
 
 
@@ -48,18 +52,6 @@ trans_x		byte
 trans_y		byte
 enemy_frame	byte
 
-;;; enemy data struct
-; type 0 = no enemy
-; health
-; x_base
-; y_base
-; pattern_counter
-; animation_frame
-; 7 and 8 bytes unassigned
-birb_x		byte
-birb_y		byte
-birb_patt	byte
-birb_anim	byte
 skully_x	byte
 skully_y	byte
 skully_patt	byte
@@ -103,7 +95,9 @@ RAM_init_clear:
         jsr player_bullets_init
 	jsr starfield_init
         jsr PleaseStart_plot
-        jsr enemy_init
+        ; set hud y pos
+        lda #158
+        sta sprite_0_y
      	; setup rng
         lda #$01
         sta rng0
@@ -125,12 +119,6 @@ RAM_init_clear:
         sta spin_x
         lda #$00
         sta spin_y
-; set birb stuff
-	lda #$19
-        sta birb_x
-        sta birb_y
-        sta birb_patt
-        sta birb_anim
 ; set skully stuff
 	lda #$80
         sta skully_x
@@ -179,7 +167,7 @@ SetPalette: subroutine
         
         ; set sprite 0
 SetSprite0: subroutine
-        lda #158	;y
+        lda sprite_0_y	;y
 	sta $200
         lda #$f0	;tile
         sta $201
@@ -188,6 +176,8 @@ SetSprite0: subroutine
         lda #$01	;xpos
         sta $203
 	rts
+        
+        
         
 set_player_sprite: subroutine
 	lda player_y
@@ -246,8 +236,6 @@ set_player_demo_y:
         sta player_demo_y
 	jmp set_player_demo_y_done
         
-        
-	include "enemy_handler.dasm"
 
         
         
@@ -357,6 +345,11 @@ Palette00:
 	include "player_bullets.dasm"
 	include "please_start_screen.dasm"
 	include "starfield.dasm"
+        
+        
+        nop	; how much prg space we using?
+        
+	include "enemy_handler.dasm"
         
         nop	; how much prg space we using?
         

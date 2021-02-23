@@ -183,7 +183,8 @@ player_bullets_update: subroutine
         ; update x
         lda bullet0 + 3
         sec
-        sbc #$07
+        ;sbc #$07
+        sbc #$04
         sta bullet0 + 3
         ; despawn if less than 0
         bcc .bullet0_despawn
@@ -219,7 +220,8 @@ player_bullets_update: subroutine
         ; update x
         lda bullet1 + 3
         sec
-        sbc #$06
+        ;sbc #$06
+        sbc #$03
         sta bullet1 + 3
         ; despawn if less than 0
         bcc .bullet1_despawn
@@ -227,7 +229,8 @@ player_bullets_update: subroutine
         ; update y
         lda bullet1 + 0
         sec
-        sbc #$03
+        sbc #$02
+        ;sbc #$03
         sta bullet1 + 0
         ; despawn if less than 0
         bcc .bullet1_despawn
@@ -267,7 +270,8 @@ player_bullets_update: subroutine
         ; update x
         lda bullet2 + 3
         sec
-        sbc #$06
+        ;sbc #$06
+        sbc #$03
         sta bullet2 + 3
         ; despawn if less than 0
         bcc .bullet2_despawn
@@ -275,9 +279,11 @@ player_bullets_update: subroutine
         ; update y
         lda bullet2 + 0
         clc
-        adc #$03
+        ;adc #$03
+        adc #$01
         sta bullet2 + 0
-        ; despawn if less than 0
+        cmp sprite_0_y	;y
+        ; despawn if lower than hud pos
         bcs .bullet2_despawn
         ; sprite
         lda #$79
@@ -315,7 +321,8 @@ player_bullets_update: subroutine
         ; update x
         lda bullet3 + 3
         sec
-        sbc #$03
+        ;sbc #$03
+        sbc #$01
         sta bullet3 + 3
         ; despawn if less than 0
         bcc .bullet3_despawn
@@ -323,7 +330,8 @@ player_bullets_update: subroutine
         ; update y
         lda bullet3 + 0
         sec
-        sbc #$06
+        ;sbc #$06
+        sbc #$03
         sta bullet3 + 0
         ; despawn if less than 0
         bcc .bullet3_despawn
@@ -363,7 +371,8 @@ player_bullets_update: subroutine
         ; update x
         lda bullet4 + 3
         sec
-        sbc #$03
+        ;sbc #$03
+        sbc #$01
         sta bullet4 + 3
         ; despawn if less than 0
         bcc .bullet4_despawn
@@ -371,9 +380,11 @@ player_bullets_update: subroutine
         ; update y
         lda bullet4 + 0
         clc
-        adc #$06
+        ;adc #$06
+        adc #$04
         sta bullet4 + 0
-        ; despawn if less than 0
+        cmp sprite_0_y	;y
+        ; despawn if lower than hud pos
         bcs .bullet4_despawn
         ; sprite
         lda #$79
