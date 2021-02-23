@@ -1,0 +1,64 @@
+
+
+RAM MAP - 2kb is so much!!
+
+$0000 - zero page
+$0100 - 
+$0200 - OAM reference (sprite data)
+$0300 - enemy data
+$0400 -
+$0500 -
+$0600 -
+$0700 -
+
+
+SPRITE MAP - 64 wow :) / but over 8 on scanline bad :(
+
+#$00      - sprite zero for splitting the screen
+#$01..#$02 - player's spaceship
+#$03..#$07 - 5 player bullets
+#$08..#$3f - enemy sprites? (56)
+
+                                 ENEMY_RAM   OAM_REF
+16 1x1 enemies (bullets)  (16)     $0300      $0220
+ 4 2x1 enemies            ( 8)     $0380      $0260
+ 8 2x2 enemies            (32)     $03a0      $0280
+
+get_enemy_slot_{x}_sprites: subroutine
+	returns slot id if available
+	returns #$ff if none available
+
+
+ENEMY SPRITE TYPES
+
+4 sprites
+2 sprites
+1 sprite
+
+enemy x,y coordinates are held at OAM ref
+but those are only visual coordinates
+
+0) type
+1) x base
+2) y base
+3) pattern counter
+4) animation counter
+5) health
+6) bitwise attributes
+	7   : left/right quadrant?
+	1-0 : 3 frames of hit pallete?
+7) OAM_REF base address
+
+
+sprite configurations
+1x1 : birb
+2x1 : maggs
+2x2 : starglasses, skully
+
+
+;;; enemy bullet struc
+; x_pos
+; y_pos
+; direction
+; type
+; enemy bullet is just another type of enemy

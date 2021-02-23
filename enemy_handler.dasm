@@ -626,95 +626,108 @@ birb_cycle: subroutine
 
 ;;; HANDLING STARGLASSES
 starglasses_cycle:
-	; update position
-        ; X POS
-	inc spin_x
-        ldx spin_x
-        lda sine_table,x
-        lsr
-        lsr
-        clc
-        adc enemy_x
-        ; stash it in collision detector
-        sta collision_0_x
-        ;sta trans_x
-        ; top-left sprite
-        ;lda trans_x
-        sta $283
-        sta $28b
-        adc #$08
-        sta $287
-        sta $28f
-        ; Y POS
-	inc spin_y
-	inc spin_y
-        ldx spin_y
-        lda sine_table,x
-        lsr
-        lsr
-        clc
-        adc enemy_y
-        ; stash it in collision detector
-        sta collision_0_y
-        ;sta trans_y
-        ;lda trans_y
-        sta $280
-        sta $284
-        adc #$08
-        sta $288
-        sta $28c
-        ; tiles
-        ldx enemy_frame
-        cpx #$00
-        bne .adjust_frame
-        ldx #$40
-        stx enemy_frame
-.adjust_frame
-	dex
-        stx enemy_frame
-        txa
-        and #$20
-        bne .frame1
+
+	ldx enemy_handler_pos
+	; using pattern_counter for x sin
+	inc ENEMY_RAM+3,x
+	; using anim_counter for y sin
+	inc ENEMY_RAM+4,x
+	inc ENEMY_RAM+4,x
+
+	; calc x
+	lda ENEMY_RAM+3,x
+	lax
+	lda sine_table,x
+	lsr
+	lsr
+	ldx enemy_handler_pos
+	clc
+	adc ENEMY_RAM+1,x
+	sta collision_0_x
+	tay
+	lda ENEMY_RAM+7,x
+	tax
+	tya
+	sta $0203,x
+	sta $020b,x
+	clc
+	adc #$08
+	sta $0207,x
+	sta $020f,x
+
+	; calc y
+	ldx enemy_handler_pos
+	lda sine_table,x
+	lsr
+	lsr
+	clc
+	ldx enemy_handler_pos
+	adc ENEMY_RAM+2,x
+	sta collision_0_y
+	tay
+	lda ENEMY_RAM+7,x
+	tax
+	tya
+	sta $0200,x
+	sta $0204,x
+	clc
+	adc #$08
+	sta $0208,x
+	sta $020c,x
+
+	; tiles
+	ldx enemy_handler_pos
+	lda ENEMY_RAM+4,x
+	bit #$20
+	beq .frame1
 .frame0
-        lda #$0c
-        sta $281
-        lda #$0d
-        sta $285
-        lda #$1c
-        sta $289
-        lda #$1d
-        sta $28d
-        jmp .frame_done
+	lda ENEMY_RAM+7,x
+	tax
+	lda #$0c
+	sta $0201,x
+	lda #$0d
+	sta $0205,x
+	lda #$1c
+	sta $0209,x
+	lda #$1d
+	sta $020d,x
+	jmp .frame_done
 .frame1
-        lda #$0e
-        sta $281
-        lda #$0f
-        sta $285
-        lda #$1e
-        sta $289
-        lda #$1f
-        sta $28d
+	lda ENEMY_RAM+7,x
+	tax
+	lda #$0e
+	sta $0201,x
+	lda #$0f
+	sta $0205,x
+	lda #$1e
+	sta $0209,x
+	lda #$1f
+	sta $020d,x
 .frame_done
-        ; palette
-        lda #$03
-        sta $282
-        sta $286
-        sta $28a
-        sta $28e
+	; palette
+	lda #$03
+	sta $0202,x
+	sta $0206,x
+	sta $020a,x
+	sta $020e,x
 ; shot by bullet?
 	lda #$10
-        sta collision_0_w
-        sta collision_0_h
-        jsr player_bullet_collision_handler
-        cmp #$00
-        beq .nothing
-        ; palette
-        lda #$00
-        sta $282
-        sta $286
-        sta $28a
-        sta $28e
+	sta collision_0_w
+	sta collision_0_h
+	jsr player_bullet_collision_handler
+	cmp #$00
+	beq .nothing
+	; palette
+	ldx enemy_handler_pos
+	lda ENEMY_RAM+7,x
+	tax
+	lda #$00
+	sta $0202,x
+	sta $0206,x
+	sta $020a,x
+	sta $020e,x
 .nothing
+	jmp update_enemies_handler_next
         
         
         
