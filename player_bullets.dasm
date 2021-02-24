@@ -15,6 +15,77 @@ player_bullet_sprite	= #$79
 controller_input	= #$ff
 player_power		= #$ff
 
+        
+player_demo_init: subroutine
+; set player position
+	lda #$d0
+        sta player_x
+        sta player_demo_x
+	lda #$70
+        sta player_y
+        sta player_demo_y
+        rts
+        
+        
+set_player_sprite: subroutine
+	lda player_y
+        sta $204
+        sta $208
+        lda player_x
+        sta $207
+        clc
+        adc #$08
+        sta $20b
+        ldx #$e7 ; set tiles
+        stx $205
+        dex 
+        stx $209
+        lda #$40
+; attributes
+        sta $206
+        sta $20a
+     	; work towards demo target
+        lda player_x
+        cmp player_demo_x
+        beq set_player_demo_x
+        bcs set_player_demo_x_dec
+        inc player_x
+        jmp set_player_demo_x_done
+set_player_demo_x_dec:
+	dec player_x
+set_player_demo_x_done:
+        lda player_y
+        cmp player_demo_y
+        beq set_player_demo_y
+        bcs set_player_demo_y_dec
+        inc player_y
+        jmp set_player_demo_y_done
+set_player_demo_y_dec:
+	dec player_y
+set_player_demo_y_done:
+	rts
+        
+set_player_demo_x:
+	lda rng0
+        jsr NextRandom
+        sta rng0
+        lsr
+        clc
+        adc #$70
+        sta player_demo_x
+        jmp set_player_demo_x_done
+set_player_demo_y:
+	lda rng0
+        jsr NextRandom
+        sta rng0
+        lsr
+        clc
+        adc #$10
+        sta player_demo_y
+	jmp set_player_demo_y_done
+        
+        
+
 ;;; player bullet struct
 ; byte 0 : x pos
 ; byte 1 : y pos

@@ -41,26 +41,8 @@ enemy_temp_addr_lo	byte
 enemy_temp_addr_hi	byte
 enemy_temp_oam_x	byte
 enemy_temp_palette	byte
+enemy_temp_temp		byte
 enemy_handler_pos	byte
-
-
-	org $0700
-enemy_x		byte
-enemy_y		byte
-spin_x		byte
-spin_y		byte
-trans_x		byte
-trans_y		byte
-enemy_frame	byte
-
-skully_x	byte
-skully_y	byte
-skully_patt	byte
-skully_anim	byte
-maggs_x		byte
-maggs_y		byte
-maggs_patt	byte
-maggs_anim	byte
 
 
 
@@ -93,9 +75,11 @@ RAM_init_clear:
 
 ; MY SETUP
         jsr SetPalette 
+        jsr player_demo_init
         jsr player_bullets_init
 	jsr starfield_init
         jsr PleaseStart_plot
+        
         
         ; set hud y pos
         lda #158
@@ -106,26 +90,8 @@ RAM_init_clear:
         sta rng1
         lda #$ff
         sta rng2
-; set player position
-	lda #$d0
-        sta player_x
-        sta player_demo_x
-	lda #$70
-        sta player_y
-        sta player_demo_y
-; set skully stuff
-	lda #$80
-        sta skully_x
-        sta skully_y
-        lda #$10
-        sta skully_patt
-        sta skully_anim
-; set maggs stuff
-	lda #$20
-        sta maggs_x
-        sta maggs_y
-        sta maggs_patt
-        sta maggs_anim
+        
+        
 ; activate PPU graphics       
 	; enable rendering
         lda #MASK_BG|MASK_SPR
@@ -154,8 +120,7 @@ SetPalette: subroutine
 	bne .loop	; not yet, loop
         rts		; return to caller
        
-        
-
+       
  
 ; SPRITE HANDLINGS
         
@@ -171,69 +136,7 @@ SetSprite0: subroutine
         sta $203
 	rts
         
-        
-        
-set_player_sprite: subroutine
-	lda player_y
-        sta $204
-        sta $208
-        lda player_x
-        sta $207
-        clc
-        adc #$08
-        sta $20b
-        ldx #$e7 ; set tiles
-        stx $205
-        dex 
-        stx $209
-        lda #$40
-; attributes
-        sta $206
-        sta $20a
-     	; work towards demo target
-        lda player_x
-        cmp player_demo_x
-        beq set_player_demo_x
-        bcs set_player_demo_x_dec
-        inc player_x
-        jmp set_player_demo_x_done
-set_player_demo_x_dec:
-	dec player_x
-set_player_demo_x_done:
-        lda player_y
-        cmp player_demo_y
-        beq set_player_demo_y
-        bcs set_player_demo_y_dec
-        inc player_y
-        jmp set_player_demo_y_done
-set_player_demo_y_dec:
-	dec player_y
-set_player_demo_y_done:
-	rts
-        
-set_player_demo_x:
-	lda rng0
-        jsr NextRandom
-        sta rng0
-        lsr
-        clc
-        adc #$70
-        sta player_demo_x
-        jmp set_player_demo_x_done
-set_player_demo_y:
-	lda rng0
-        jsr NextRandom
-        sta rng0
-        lsr
-        clc
-        adc #$10
-        sta player_demo_y
-	jmp set_player_demo_y_done
-        
 
-        
-        
-        
         
 ;;;;; COMMON SUBROUTINES
 
@@ -342,6 +245,7 @@ Palette00:
         
         
         nop	; how much prg space we using?
+        nop
         
 	include "enemy_handler.dasm"
         
