@@ -30,6 +30,19 @@ enemy_spawn: subroutine
         tax
         jsr maggs_spawn
 .no_maggs_spawn
+	jsr get_enemy_slot_4_sprite
+        cmp #$ff
+        beq .no_bigs_spawn
+        tax
+        lda rng0
+        and #$01
+        cmp #$00
+        beq .spawn_starglasses
+        ;jsr skully_spawn
+        jmp .no_bigs_spawn
+.spawn_starglasses
+        jsr starglasses_spawn
+.no_bigs_spawn
 	rts
         
 birb_spawn: subroutine
@@ -71,14 +84,62 @@ maggs_spawn: subroutine
         txa
         sec
         sbc #$80
-        ;sl
-        ;asl
         clc
         adc #$60
         sta $0307,x ; OAM ref
         
    	rts
         
+                
+starglasses_spawn: subroutine
+	; x is set by enemy spawner
+	lda #$04
+        sta $0300,x ; enemy type
+        lda rng0
+        sta $0303,x ; pattern counter
+        sta $0304,x ; animation counter
+        lda #$00
+        sta $0301,x ; x pos
+        lda rng0
+        lsr
+        lsr
+        sta $0302,x ; y pos
+        lda #$20
+        sta $0305,x ; health
+        txa
+        sec
+        sbc #$a0
+        asl
+        clc
+        adc #$80
+        sta $0307,x ; OAM ref
+        
+   	rts
+                       
+skully_spawn: subroutine
+	; x is set by enemy spawner
+	lda #$05
+        sta $0300,x ; enemy type
+        lda rng0
+        sta $0303,x ; pattern counter
+        sta $0304,x ; animation counter
+        lda #$00
+        sta $0301,x ; x pos
+        lda rng0
+        lsr
+        lsr
+        sta $0302,x ; y pos
+        lda #$20
+        sta $0305,x ; health
+        txa
+        sec
+        sbc #$a0
+        asl
+        clc
+        adc #$a0
+        sta $0307,x ; OAM ref
+        
+   	rts
         
 enemy_death: subroutine
         ; clear OAM data
@@ -90,6 +151,7 @@ enemy_death: subroutine
         sta $0200+1,x
         sta $0200+2,x
         sta $0200+3,x
+        ; clear enemy data
 	ldx enemy_handler_pos
         sta ENEMY_RAM,x
         sta ENEMY_RAM+1,x
@@ -107,8 +169,11 @@ update_enemies: subroutine
 	lda #$00
         sta enemy_handler_pos
 .handler_loop
-	; get enemy type
         ldx enemy_handler_pos
+	; set OAM position in zero page
+        lda ENEMY_RAM+7,x
+        sta enemy_temp_oam_x
+	; get enemy type
         lda ENEMY_RAM,x
         ; not defined go next slot
         cmp #$00
@@ -132,109 +197,19 @@ update_enemies_handler_next:
         sta enemy_handler_pos
         jmp .handler_loop
 .handler_core_end
-        
 	jsr enemy_spawn
 	rts
 
-;;; HANDLING STARGLASSES
-	; update position
-        ; X POS
-	inc spin_x
-        ldx spin_x
-        lda sine_table,x
-        lsr
-        lsr
-        clc
-        adc enemy_x
-        ; stash it in collision detector
-        sta collision_0_x
-        ;sta trans_x
-        ; top-left sprite
-        ;lda trans_x
-        sta $283
-        sta $28b
-        adc #$08
-        sta $287
-        sta $28f
-        ; Y POS
-	inc spin_y
-	inc spin_y
-        ldx spin_y
-        lda sine_table,x
-        lsr
-        lsr
-        clc
-        adc enemy_y
-        ; stash it in collision detector
-        sta collision_0_y
-        ;sta trans_y
-        ;lda trans_y
-        sta $280
-        sta $284
-        adc #$08
-        sta $288
-        sta $28c
-        ; tiles
-        ldx enemy_frame
-        cpx #$00
-        bne .adjust_frame
-        ldx #$40
-        stx enemy_frame
-.adjust_frame
-	dex
-        stx enemy_frame
-        txa
-        and #$20
-        bne .frame1
-.frame0
-        lda #$0c
-        sta $281
-        lda #$0d
-        sta $285
-        lda #$1c
-        sta $289
-        lda #$1d
-        sta $28d
-        jmp .frame_done
-.frame1
-        lda #$0e
-        sta $281
-        lda #$0f
-        sta $285
-        lda #$1e
-        sta $289
-        lda #$1f
-        sta $28d
-.frame_done
-        ; palette
-        lda #$03
-        sta $282
-        sta $286
-        sta $28a
-        sta $28e
-; shot by bullet?
-	lda #$10
-        sta collision_0_w
-        sta collision_0_h
-        jsr player_bullet_collision_handler
-        cmp #$00
-        beq .nothing
-        ; palette
-        lda #$00
-        sta $282
-        sta $286
-        sta $28a
-        sta $28e
-.nothing
-    
-        
-        
+
 ;;;; HANDLING SKULLY
+skully_cycle: subroutine
 	; store palette in y register
         ; so we can apply flip horizontal if needed
-        ldy #$03
+        lda #$03
+        sta enemy_temp_palette
         ;sprite
-        lda skully_anim
+        ldx enemy_handler_pos
+        lda ENEMY_RAM+4,x
         lsr
         lsr
         lsr
@@ -250,89 +225,101 @@ update_enemies_handler_next:
         cpx #$0e
         beq .skully_sprite_7
 .skully_normal_frames
+	ldx enemy_temp_oam_x
         clc
-        sta $294 + 1
+        ; stash them sprites
+        sta $0201,x
         adc #$01
-        sta $298 + 1
+        sta $0205,x
         adc #$0f
-        sta $29c + 1
+        sta $020d,x
         adc #$01
-        sta $2a0 + 1
-	sty $21
+        sta $0209,x
         jmp .skully_sprites_done
 .skully_sprite_5
+	ldx enemy_temp_oam_x
 	lda #$06
         clc
-        sta $298 + 1
+        ; stash them sprites
+        sta $0201,x
         adc #$01
-        sta $294 + 1
+        sta $0205,x
         adc #$0f
-        sta $2a0 + 1
+        sta $020d,x
         adc #$01
-        sta $29c + 1
+        sta $0209,x
         ; palette
-        tya
+        lda enemy_temp_palette
         ora #$40
-        tay
-	sty $21
+	sta enemy_temp_palette
 	jmp .skully_sprites_done
 .skully_sprite_6
+	ldx enemy_temp_oam_x
 	lda #$04
         clc
-        sta $298 + 1
+        ; stash them sprites
+        sta $0201,x
         adc #$01
-        sta $294 + 1
+        sta $0205,x
         adc #$0f
-        sta $2a0 + 1
+        sta $020d,x
         adc #$01
-        sta $29c + 1
+        sta $0209,x
         ; palette
-        tya
+        lda enemy_temp_palette
         ora #$40
-        tay
-	sty $21
+	sta enemy_temp_palette
 	jmp .skully_sprites_done
 .skully_sprite_7
+	ldx enemy_temp_oam_x
 	lda #$02
         clc
-        sta $298 + 1
+        ; stash them sprites
+        sta $0201,x
         adc #$01
-        sta $294 + 1
+        sta $0205,x
         adc #$0f
-        sta $2a0 + 1
+        sta $020d,x
         adc #$01
-        sta $29c + 1
+        sta $0209,x
         ; palette
-        tya
+        lda enemy_temp_palette
         ora #$40
-        tay
-	sty $21
+	sta enemy_temp_palette
 	jmp .skully_sprites_done
 .skully_sprites_done
         ; x pos
-        lda skully_x
-        sta $294 + 3
-        sta $29c + 3
+        ldx enemy_handler_pos
+        lda ENEMY_RAM+1,x
+	ldx enemy_temp_oam_x
+        sta $0203,x
+        sta $020d,x
+        clc
         adc #$08
-        sta $298 + 3
-        sta $2a0 + 3
+        sta $0207,x
+        sta $020f,x
         ; y pos
-        lda skully_y
-        sta $294 + 0
-        sta $298 + 0
+        ldx enemy_handler_pos
+        lda ENEMY_RAM+2,x
+	ldx enemy_temp_oam_x
+        sta $0200,x
+        sta $0204,x
+        clc
         adc #$08
-        sta $29c + 0
-        sta $2a0 + 0
+        sta $0208,x
+        sta $020c,x
 .skully_frame
+	; update spinning counter
+        ldx enemy_handler_pos
 	lda #$07
         clc
-        adc skully_anim
-        sta skully_anim
-        inc skully_x
+        adc ENEMY_RAM+4,x
+        sta ENEMY_RAM+4,x
+        inc ENEMY_RAM+1,x
         ; stash it in collision detector
-        lda skully_x
+        lda ENEMY_RAM+1,x
         sta collision_0_x
-        lda skully_y
+        lda ENEMY_RAM+2,x
         sta collision_0_y
         lda #$10
         sta collision_0_w
@@ -342,44 +329,51 @@ update_enemies_handler_next:
         cmp #$00
         beq .skully_not_hit
         ; palette
-        dey
-        tya
-        sta $294 + 2
-        sta $298 + 2
-        sta $29c + 2
-        sta $2a0 + 2
+        dec enemy_temp_palette
+        lda enemy_temp_palette
+        ldx enemy_temp_oam_x
+        sta $0202,x
+        sta $0206,x
+        sta $020a,x
+        sta $020e,x
         jmp .skully_done
 .skully_not_hit
         ; palette
-        tya 
-        sta $294 + 2
-        sta $298 + 2
-        sta $29c + 2
-        sta $2a0 + 2
+        lda enemy_temp_palette 
+        sta $0202,x
+        sta $0206,x
+        sta $020a,x
+        sta $020e,x
 .skully_done
-	rts
+	jmp update_enemies_handler_next
+        
         
         
 crossbones_cycle: subroutine
 	ldx enemy_handler_pos
+        inc ENEMY_RAM+5,x
+        lda ENEMY_RAM+5,x
+        lsr
+        lsr
+        lsr
+        sta ENEMY_RAM+3,x
         lda ENEMY_RAM+2,x
         sec
-        sbc ENEMY_RAM+5,x
-        inc ENEMY_RAM+5,x
+        sbc ENEMY_RAM+3,x
         bcc .crossbones_death
         sta ENEMY_RAM+2,x
-        tay
-        lda ENEMY_RAM+7,x
-        tax
-        tya
+	ldx enemy_temp_oam_x
         sta $0200,x
         lda #$0b
         sta $0201,x
+        lda #$03
+        sta $0202,x
         jmp .crossbones_done
 .crossbones_death
         jsr enemy_death
 .crossbones_done
 	jmp update_enemies_handler_next
+        
         
 
 ;;;; HANDLING maggs
@@ -395,9 +389,7 @@ maggs_cycle: subroutine
         clc
         adc #$3c
         tay
-        lda ENEMY_RAM+7,x
-        tax
-        tya
+	ldx enemy_temp_oam_x
         sta $0201+0,x
         iny
         tya
@@ -407,10 +399,7 @@ maggs_cycle: subroutine
 	ldx enemy_handler_pos
         lda ENEMY_RAM+1,x
         sta collision_0_x
-        tay
-        lda ENEMY_RAM+7,x
-        tax
-        tya
+	ldx enemy_temp_oam_x
         sta $0203+0,x
         clc
         adc #$08
@@ -432,11 +421,7 @@ maggs_cycle: subroutine
         ;adc ENEMY_RAM+2,x
         lda ENEMY_RAM+2,x
         sta collision_0_y
-        tay
-        ldx enemy_handler_pos
-        lda ENEMY_RAM+7,x
-        tax
-        tya
+	ldx enemy_temp_oam_x
         sta $0200+0,x
         sta $0200+4,x
         
@@ -478,8 +463,7 @@ maggs_cycle: subroutine
         ; change it into crossbones!
         lda #$01
         sta ENEMY_RAM+0,x
-        lda ENEMY_RAM+7,x
-        tax
+	ldx enemy_temp_oam_x
         lda #$ff
         sta $0203+4,x
         lda $0203+0,x
@@ -489,9 +473,7 @@ maggs_cycle: subroutine
         ;jsr enemy_death
 .not_dead
         ; palette
-	ldx enemy_handler_pos
-        lda ENEMY_RAM+7,x
-        tax
+	ldx enemy_temp_oam_x
         lda #$00
         sta $0202,x
         sta $0206,x
@@ -535,10 +517,7 @@ birb_cycle: subroutine
         adc ENEMY_RAM+1,x
         tay
         ; temp OAM $02d0
-	ldx enemy_handler_pos
-        lda ENEMY_RAM+7,x
-        tax
-        tya
+	ldx enemy_temp_oam_x
         sta $0203,x
         sta collision_0_x
         
@@ -555,12 +534,7 @@ birb_cycle: subroutine
 	ldx enemy_handler_pos
         clc
         adc ENEMY_RAM+2,x
-        tay
-        ; temp OAM $02d0
-	ldx enemy_handler_pos
-        lda ENEMY_RAM+7,x
-        tax
-        tya
+	ldx enemy_temp_oam_x
         sta $0200,x
         sta collision_0_y
         
@@ -578,12 +552,7 @@ birb_cycle: subroutine
         lsr
         clc 
         adc #$2c
-        tay
-        sta $02d1
-	ldx enemy_handler_pos
-        lda ENEMY_RAM+7,x
-        tax
-        tya
+	ldx enemy_temp_oam_x
         sta $0201,x
         
         lda #$08
@@ -605,17 +574,13 @@ birb_cycle: subroutine
         sta ENEMY_RAM+0,x
 .birb_not_dead
         ; palette
-	ldx enemy_handler_pos
-        lda ENEMY_RAM+7,x
-        tax
+	ldx enemy_temp_oam_x
         lda #$00
         sta $0202,x
         jmp .birb_done
 .birb_not_hit
         ; palette
-	ldx enemy_handler_pos
-        lda ENEMY_RAM+7,x
-        tax
+	ldx enemy_temp_oam_x
         lda #$01
         sta $0202,x
 .birb_done
@@ -636,7 +601,7 @@ starglasses_cycle:
 
 	; calc x
 	lda ENEMY_RAM+3,x
-	lax
+        tax
 	lda sine_table,x
 	lsr
 	lsr
@@ -644,10 +609,7 @@ starglasses_cycle:
 	clc
 	adc ENEMY_RAM+1,x
 	sta collision_0_x
-	tay
-	lda ENEMY_RAM+7,x
-	tax
-	tya
+	ldx enemy_temp_oam_x
 	sta $0203,x
 	sta $020b,x
 	clc
@@ -657,6 +619,8 @@ starglasses_cycle:
 
 	; calc y
 	ldx enemy_handler_pos
+        lda ENEMY_RAM+4,x
+        tax
 	lda sine_table,x
 	lsr
 	lsr
@@ -664,10 +628,7 @@ starglasses_cycle:
 	ldx enemy_handler_pos
 	adc ENEMY_RAM+2,x
 	sta collision_0_y
-	tay
-	lda ENEMY_RAM+7,x
-	tax
-	tya
+        ldx enemy_temp_oam_x
 	sta $0200,x
 	sta $0204,x
 	clc
@@ -678,11 +639,10 @@ starglasses_cycle:
 	; tiles
 	ldx enemy_handler_pos
 	lda ENEMY_RAM+4,x
-	bit #$20
+	cmp #$20
 	beq .frame1
 .frame0
-	lda ENEMY_RAM+7,x
-	tax
+	ldx enemy_temp_oam_x
 	lda #$0c
 	sta $0201,x
 	lda #$0d
@@ -693,8 +653,7 @@ starglasses_cycle:
 	sta $020d,x
 	jmp .frame_done
 .frame1
-	lda ENEMY_RAM+7,x
-	tax
+	ldx enemy_temp_oam_x
 	lda #$0e
 	sta $0201,x
 	lda #$0f
@@ -718,14 +677,14 @@ starglasses_cycle:
 	cmp #$00
 	beq .nothing
 	; palette
-	ldx enemy_handler_pos
-	lda ENEMY_RAM+7,x
-	tax
+	ldx enemy_temp_oam_x
 	lda #$00
 	sta $0202,x
 	sta $0206,x
 	sta $020a,x
 	sta $020e,x
+	ldx enemy_handler_pos
+        dec ENEMY_RAM+5,x
 .nothing
 	jmp update_enemies_handler_next
         
@@ -866,6 +825,7 @@ get_enemy_slot_2_sprite: subroutine
 .found_slot
 	rts
         
+        
 get_enemy_slot_4_sprite: subroutine
 .slot0
 	lda $03a0
@@ -883,37 +843,37 @@ get_enemy_slot_4_sprite: subroutine
 	lda $03b0
         cmp #$00
         bne .slot3
-        lda #$90
+        lda #$b0
         jmp .found_slot
 .slot3
 	lda $03b8
         cmp #$00
         bne .slot4
-        lda #$98
+        lda #$b8
         jmp .found_slot
 .slot4
 	lda $03c0
         cmp #$00
         bne .slot5
-        lda #$a0
+        lda #$c0
         jmp .found_slot
 .slot5
 	lda $03c8
         cmp #$00
         bne .slot6
-        lda #$a8
+        lda #$c8
         jmp .found_slot
 .slot6
-	lda $03c0
+	lda $03d0
         cmp #$00
         bne .slot7
-        lda #$90
+        lda #$d0
         jmp .found_slot
 .slot7
-	lda $03c8
+	lda $03d8
         cmp #$00
         bne .slot_wtf_no
-        lda #$98
+        lda #$d8
         jmp .found_slot
 .slot_wtf_no
 ;return #$ff for FALSE
@@ -931,4 +891,5 @@ ENEMY_METHODS_LOOKUP_TABLE:
         word birb_cycle
         word maggs_cycle
         word starglasses_cycle
+        word skully_cycle
         

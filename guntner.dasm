@@ -1,6 +1,6 @@
 
 	include "nesdefs.dasm"
-        
+
 
 ;;;;; VARIABLES
 
@@ -39,7 +39,8 @@ collision_1_h	byte
 
 enemy_temp_addr_lo	byte
 enemy_temp_addr_hi	byte
-
+enemy_temp_oam_x	byte
+enemy_temp_palette	byte
 enemy_handler_pos	byte
 
 
@@ -95,6 +96,7 @@ RAM_init_clear:
         jsr player_bullets_init
 	jsr starfield_init
         jsr PleaseStart_plot
+        
         ; set hud y pos
         lda #158
         sta sprite_0_y
@@ -111,14 +113,6 @@ RAM_init_clear:
 	lda #$70
         sta player_y
         sta player_demo_y
-; set enemy position
-	lda #$28
-        sta enemy_x
-        sta enemy_y
-        lda #$40
-        sta spin_x
-        lda #$00
-        sta spin_y
 ; set skully stuff
 	lda #$80
         sta skully_x

@@ -35,15 +35,13 @@ player_bullets_init:
         
         
 player_bullet_collision_handler: subroutine
-	;lda bullet00
-        ;sta collision_1_x
-        ;lda bullet00 + 1
-        ;sta collision_1_y
-        ;lda #$04
-        ;sta collision_1_w
-        ;sta collision_1_h
-        ;jsr detect_collision
-        
+	clc
+        lda collision_0_x
+        adc collision_0_w
+        bcc .in_bounds; make sure x+w is not less than x
+        lda #$00
+        rts
+.in_bounds        
         ; bullet dimensiosn don't change
         lda #$04
         sta collision_1_w
