@@ -1,0 +1,10 @@
+
+
+ENEMY_METHODS_LOOKUP_TABLE:
+        hex 0000
+        word crossbones_cycle
+        word birb_cycle
+        word maggs_cycle
+        word starglasses_cycle
+        word skully_cycle
+        

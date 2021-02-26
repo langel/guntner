@@ -21,6 +21,16 @@ player_demo_init: subroutine
 	lda #$00
         sta player_death_flag
         sta you_dead_counter
+        sta score_00
+        sta score_00__
+        sta score_00____
+        sta score_00______
+	sta timer_frames_1s	
+	sta timer_frames_10s	
+	sta timer_seconds_1s	
+	sta timer_seconds_10s	
+	sta timer_minutes_1s	
+	sta timer_minutes_10s	
 	lda #$d0
         sta player_x
         sta player_demo_x
@@ -43,19 +53,6 @@ player_demo_init: subroutine
         stx $209
         rts
         
-        
-player_add_points: subroutine
-; point amount in Accumulator
-	clc
-        adc score_00
-        sta score_00
-        sec 
-        sbc #$64
-        bcc .done_00
-        inc score_00__
-        sta score_00
-.done_00
-	rts
         
         
 player_update_colors: subroutine
@@ -146,6 +143,12 @@ set_player_sprite: subroutine
 ; attributes
         sta $206
         sta $20a
+; demo flight
+	jsr set_player_demo_target
+        rts
+        
+; XXX original DEMO player movement code
+; looks a little nicer like an actual player
      	; work towards demo target
         lda player_x
         cmp player_demo_x
@@ -185,6 +188,62 @@ set_player_demo_y:
         adc #$10
         sta player_demo_y
 	jmp set_player_demo_y_done
+        
+        
+set_player_demo_target: subroutine
+        ; set flags in y register
+        ldy #$00
+; check x coordinate
+        lda player_x
+        cmp player_demo_x
+        beq .player_x_equal
+        bcs .player_x_greater
+.player_x_lesser
+        inc player_x
+        jmp .player_x_done
+.player_x_greater
+	dec player_x
+        jmp .player_x_done
+.player_x_equal
+	iny
+.player_x_done
+; check y coordinate
+        lda player_y
+        cmp player_demo_y
+        beq .player_y_equal
+        bcs .player_y_greater
+.player_y_lesser
+        inc player_y
+        jmp .player_y_done
+.player_y_greater
+	dec player_y
+        jmp .player_y_done
+.player_y_equal
+	iny
+.player_y_done
+; check if both coordinates are met
+	cpy #$02
+        beq .set_player_demo_new_target
+        jmp .done
+.set_player_demo_new_target
+	; set x target
+	lda rng0
+        jsr NextRandom
+        sta rng0
+        lsr
+        clc
+        adc #$70
+        sta player_demo_x
+	lda rng0
+        jsr NextRandom
+        sta rng0
+        lsr
+        clc
+        adc #$10
+        sta player_demo_y
+.done
+	rts
+
         
         
 

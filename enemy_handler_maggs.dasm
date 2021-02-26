@@ -1,0 +1,144 @@
+
+
+        
+        
+maggs_spawn: subroutine
+	; x is set by enemy spawner
+	lda #$03
+        sta $0300,x ; enemy type
+        lda #$00
+        sta $0301,x ; x pos
+        sta $0304,x ; animation counter
+        lda rng0
+        sta $0303,x ; pattern counter
+        lsr
+        clc
+        adc #$08
+        sta $0302,x ; y pos
+        lda #$04
+        sta $0305,x ; health
+        txa
+        sec
+        sbc #$80
+        clc
+        adc #$60
+        sta $0307,x ; OAM ref
+        
+   	rts
+        
+        
+        
+        
+;;;; HANDLING maggs
+maggs_cycle: subroutine
+	ldx enemy_handler_pos
+	; sprite
+        lda ENEMY_RAM+4,x
+        lsr
+        lsr
+        lsr
+        lsr
+        asl
+        clc
+        adc #$3c
+	ldy enemy_temp_oam_x
+        sta $0201+0,y
+        adc #$01
+        sta $0201+4,y
+        
+        ; x pos
+        lda ENEMY_RAM+1,x
+        sta collision_0_x
+        sta $0203+0,y
+        clc
+        adc #$08
+        sta $0203+4,y
+        
+        ; y pos
+	ldx enemy_handler_pos
+        lda ENEMY_RAM+3,x
+        lsr
+        tay
+        lda sine_15_max_128_length,y
+        clc
+        adc ENEMY_RAM+2,x
+        sta collision_0_y
+	ldy enemy_temp_oam_x
+        sta $0200+0,y
+        sta $0200+4,y
+        
+        ; update pattern
+        inc ENEMY_RAM+3,x
+        inc ENEMY_RAM+3,x
+        ; move forward
+        inc ENEMY_RAM+1,x
+        ; update animation
+        lda ENEMY_RAM+4,x
+        cmp #$00
+        bne .maggs_frame
+        lda #$20
+        sta ENEMY_RAM+4,x
+.maggs_frame
+        dec ENEMY_RAM+4,x
+        
+        lda #$10
+        sta collision_0_w
+        lda #$05
+        sta collision_0_h
+; shot by bullet?
+        jsr player_bullet_collision_handler
+        cmp #$00
+        beq .not_hit
+        ; decrease health
+        dec ENEMY_RAM+5,x
+        lda ENEMY_RAM+5,x
+        cmp #$00
+        bne .not_dead
+.dead
+        ; DEAD
+	; give points
+        lda #55
+        jsr player_add_points_00
+        ; change it into crossbones!
+        lda #$01
+        sta ENEMY_RAM+0,x
+        lda #$ff
+        sta $0203+4,y
+        lda $0203+0,y
+        clc
+        adc #$07
+        sta $0203+0,y
+        ;jsr enemy_death
+.not_dead
+        lda ENEMY_RAM+6,x
+        ora #ENEMY_HIT_PALETTE_FRAMES
+        sta ENEMY_RAM+6,x
+        jmp .palette
+.not_hit
+        ; palette
+	;ldx enemy_handler_pos
+        ;lda ENEMY_RAM+7,x
+        ;tax
+        ;lda #$01
+        ;sta $0202,x
+.palette
+        ; palette
+        lda ENEMY_RAM+6,x
+        and #$07
+        sta $400,y
+        cmp #$00
+        beq .normal_colors
+.hit_colors
+	dec ENEMY_RAM+6,x
+        lda #$00
+        sta $0202,y
+        sta $0206,y
+        jmp .done
+.normal_colors	
+        lda #$02
+        sta $0202,y
+        sta $0206,y
+.done
+	jsr player_collision_detect
+	jmp update_enemies_handler_next
+        

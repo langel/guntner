@@ -1,0 +1,145 @@
+
+                
+starglasses_spawn: subroutine
+	; x is set by enemy spawner
+	lda #$04
+        sta $0300,x ; enemy type
+        lda rng0
+        sta $0303,x ; pattern counter
+        sta $0304,x ; animation counter
+        lda #$00
+        sta $0301,x ; x pos
+        lda rng0
+        lsr
+        lsr
+        sta $0302,x ; y pos
+        lda #$04
+        sta $0305,x ; health
+        txa
+        sec
+        sbc #$a0
+        asl
+        clc
+        adc #$80
+        sta $0307,x ; OAM ref
+   	rts
+        
+           
+
+;;; HANDLING STARGLASSES
+starglasses_cycle: subroutine
+	ldy enemy_temp_oam_x
+
+	ldx enemy_handler_pos
+	; using pattern_counter for x sin
+	inc ENEMY_RAM+3,x
+	; using anim_counter for y sin
+	inc ENEMY_RAM+4,x
+	inc ENEMY_RAM+4,x
+
+	; calc x
+	lda ENEMY_RAM+3,x
+        tax
+	lda sine_table,x
+	lsr
+	lsr
+	ldx enemy_handler_pos
+	clc
+	adc ENEMY_RAM+1,x
+	sta collision_0_x
+	sta $0203,y
+	sta $020b,y
+	clc
+	adc #$08
+	sta $0207,y
+	sta $020f,y
+
+	; calc y
+	ldx enemy_handler_pos
+        lda ENEMY_RAM+4,x
+        tax
+	lda sine_table,x
+	lsr
+	lsr
+	clc
+	ldx enemy_handler_pos
+	adc ENEMY_RAM+2,x
+	sta collision_0_y
+	sta $0200,y
+	sta $0204,y
+	clc
+	adc #$08
+	sta $0208,y
+	sta $020c,y
+
+	; tiles
+	ldx enemy_handler_pos
+	lda ENEMY_RAM+4,x
+	and #$40
+	beq .frame1
+.frame0
+	lda #$0c
+	sta $0201,y
+	lda #$0d
+	sta $0205,y
+	lda #$1c
+	sta $0209,y
+	lda #$1d
+	sta $020d,y
+	jmp .frame_done
+.frame1
+	lda #$0e
+	sta $0201,y
+	lda #$0f
+	sta $0205,y
+	lda #$1e
+	sta $0209,y
+	lda #$1f
+	sta $020d,y
+.frame_done
+; shot by bullet?
+	lda #$10
+	sta collision_0_w
+	sta collision_0_h
+	jsr player_bullet_collision_handler
+	cmp #$00
+	beq .palette_check
+.takes_damage
+	sta enemy_temp_temp
+        lda ENEMY_RAM+5,x
+        sec
+        sbc enemy_temp_temp
+        bcc .dead
+        jmp .not_dead
+.dead
+	lda #$01
+        sta ENEMY_RAM,x
+        jmp sprite_4_cleanup_for_next
+.not_dead
+	sta ENEMY_RAM+5,x
+	lda ENEMY_RAM+6,x
+        ora ENEMY_HIT_PALETTE_FRAMES
+	sta ENEMY_RAM+6,x
+.palette_check
+	lda ENEMY_RAM+6,x
+        and ENEMY_HIT_PALETTE_FRAMES
+        cmp #$00
+        beq .palette_not_hit
+.palette_hit
+        dec ENEMY_RAM+6,x
+	lda #$00
+	sta $0202,y
+	sta $0206,y
+	sta $020a,y
+	sta $020e,y
+        jmp .done
+.palette_not_hit
+	lda #$03
+	sta $0202,y
+	sta $0206,y
+	sta $020a,y
+	sta $020e,y
+.done
+	jsr player_collision_detect
+	jmp update_enemies_handler_next
+        

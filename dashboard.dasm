@@ -1,7 +1,7 @@
 ;;; constants
 
 life_bar_addr		= $2308
-score_addr		= $234a
+score_addr		= $234b
 timer_addr		= $2356
 tile_empty		= $05
 
@@ -83,12 +83,12 @@ dashboard_bg_tiles:
         hex b31011783035b21d
         ; row 2
 	hex 1d1d1d1d1d1d1dc0
-        hex c1d3d1d1d1d1d1d1
+        hex c1c1d3d1d1d1d1d1
         hex d1d1d1a4c1d3d1d1
         hex c3d1d1d1d1d1d21d
         ; row 3
 	hex 1d1d1d1d1d1d1d1d
-	hex 1db01d1d1d1d1d1d
+	hex 1d1db01d1d1d1d1d
 	hex 1d1d1db21db0b1b1
 	hex b11d1d1d1db1b21d
 
@@ -200,7 +200,7 @@ dashboard_draw: subroutine
 .score
 	PPU_SETADDR score_addr
         lda #$30
-        sta PPU_DATA
+        ;sta PPU_DATA
         lda score_10000000
         sta PPU_DATA
         lda score_1000000

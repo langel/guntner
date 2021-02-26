@@ -310,6 +310,8 @@ NMIHandler: subroutine
 	include "collision_detection.dasm"
         nop	; how much prg space we using?
 	include "player_bullets.dasm"
+	include "player_points.dasm"
+
         nop	; how much prg space we using?
 	include "please_start_screen.dasm"
         nop	; how much prg space we using?
@@ -320,7 +322,18 @@ NMIHandler: subroutine
 
         
 	include "enemy_handler.dasm"
+	include "enemy_handler_birb.dasm"
+	include "enemy_handler_maggs.dasm"
+	include "enemy_handler_skully.dasm"
+	include "enemy_handler_starglasses.dasm"
+
         nop	; how much prg space we using?
+        
+                
+        org $f000
+	include "enemy_tables.dasm"
+        nop	; how much prg space we using?
+
         
 ; LOOKUP TABLES AT TOP OF RAM
         org $f800

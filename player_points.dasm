@@ -1,0 +1,65 @@
+
+        
+player_add_points_00: subroutine
+; point amount in Accumulator
+	clc
+        adc score_00
+        sta score_00
+	jmp player_check_points_00
+        
+                
+player_add_points_00__: subroutine
+; point amount in Accumulator
+	clc
+        adc score_00__
+        sta score_00__
+	jmp player_check_points_00__
+        
+        
+player_add_points_00____: subroutine
+; point amount in Accumulator
+	clc
+        adc score_00____
+        sta score_00____
+	jmp player_check_points_00____
+        
+        
+player_add_points_00______: subroutine
+; point amount in Accumulator
+	clc
+        adc score_00______
+        sta score_00______
+        rts
+        
+        
+player_check_points_00: subroutine
+	lda score_00
+        sec
+        sbc #$64
+        bcc .done
+        inc score_00__
+        sta score_00
+.done
+	jmp player_check_points_00__
+        
+        
+player_check_points_00__: subroutine
+	lda score_00__
+        sec
+        sbc #$64
+        bcc .done
+        inc score_00____
+        sta score_00__
+.done
+	jmp player_check_points_00____
+        
+        
+player_check_points_00____: subroutine
+	lda score_00____
+        sec
+        sbc #$64
+        bcc .done
+        inc score_00______
+        sta score_00____
+.done
+	rts
