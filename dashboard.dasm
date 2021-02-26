@@ -1,5 +1,6 @@
 ;;; constants
 
+speed_addr		= $2306
 life_bar_addr		= $2308
 score_addr		= $234b
 timer_addr		= $2356
@@ -43,6 +44,7 @@ dashboard_init: subroutine
         bne .27f0_loop
         
         ; set tiles of dash
+; fill nametable 1 dash top tile
 	PPU_SETADDR $22c0
         lda #$04
         ldy #$20
@@ -51,8 +53,8 @@ dashboard_init: subroutine
         dey
         bne .set_top_bar
 
+; fill nametable 1 rest of dash tiles
         lda #$1d
-        ldy #$10
         ldx #$00
 .tile_dash_set_page1
 	lda dashboard_bg_tiles,x
@@ -60,7 +62,7 @@ dashboard_init: subroutine
         inx
         bne .tile_dash_set_page1
         
-; setup page 2 for sprite 0 detection
+; fill nametable 2 dash area with dash top bar tile
 	PPU_SETADDR $26c0
         lda #$04
         ldy #$20
@@ -72,17 +74,17 @@ dashboard_init: subroutine
         
 dashboard_bg_tiles:
 	; row 0
-	hex 1d1d1d1d1d1d1da0
+	hex 1da0a1a1a1a1a1a3
         hex a1a1a1a1a1a1a1a1
         hex a1a1a1a1a1a1a1a1
         hex a3a1a1a1a1a1a21d
         ; row 1
-	hex 1d1d1d1d1d1d1db0
+	hex 1db0a5a6a7a8b1b3
 	hex b1b1b1b1b1b1b1b1
         hex b1b1b1b1b1b1b1b1
         hex b31011783035b21d
         ; row 2
-	hex 1d1d1d1d1d1d1dc0
+	hex 1dc0c1c1c1c1c1c4
         hex c1c1d3d1d1d1d1d1
         hex d1d1d1a4c1d3d1d1
         hex c3d1d1d1d1d1d21d
@@ -130,6 +132,14 @@ dashboard_you_dead: subroutine
 
 ; RENDER DASH STATS TO SCREEN
 dashboard_draw: subroutine
+
+.speed
+	PPU_SETADDR speed_addr
+        lda player_speed
+        clc
+        adc #$31
+        sta PPU_DATA
+        
 
 .lifebarf
 	PPU_SETADDR life_bar_addr

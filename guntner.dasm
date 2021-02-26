@@ -17,10 +17,20 @@ scroll_speed	byte
 scroll_speed_m	byte
 bg_tile_default	byte
 player_health	byte
-player_x	byte
-player_y	byte
 player_demo_x	byte
 player_demo_y	byte
+
+player_x	byte
+player_y	byte
+
+player_x_hi	byte
+player_x_lo	byte
+player_y_hi	byte
+player_y_lo	byte
+player_speed	byte ; 2 bit value 0..3 translates to 1..4
+player_controls	byte
+player_dir_bits	byte ; matches controller
+
 rng0		byte
 rng1		byte
 rng2		byte
@@ -276,6 +286,7 @@ NMIHandler: subroutine
         cmp #$00
         bne .skip_dashboard_update
 	jsr dashboard_update
+        jsr player_controls_read
 .skip_dashboard_update
 ; disable NMI lockout
         lda #$00
@@ -309,8 +320,14 @@ NMIHandler: subroutine
 
 	include "collision_detection.dasm"
         nop	; how much prg space we using?
+        
+        
+	include "player_main.dasm"
 	include "player_bullets.dasm"
+	include "player_controls.dasm"
+	include "player_movement.dasm"
 	include "player_points.dasm"
+
 
         nop	; how much prg space we using?
 	include "please_start_screen.dasm"

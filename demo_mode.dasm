@@ -34,6 +34,7 @@ demo_mode: subroutine
 .still_dead
 	rts
         
+        
 demo_scroll_speed:
         lda scroll_speed
         cmp #$00
@@ -47,3 +48,88 @@ demo_scroll_speed:
         sta scroll_speed
         ; slow down stars
 .scroll_slow_done
+
+
+        
+        
+        
+run_player_demo: subroutine
+	; clear player directions
+        lda #$00
+        sta player_dir_bits
+        ; set flags in y register
+        ldy #$00
+; check x coordinate
+        lda player_x_hi
+        cmp player_demo_x
+        beq .player_x_equal
+        bcs .player_x_greater
+.player_x_lesser
+	; go right
+        lda #%00000001
+        ora player_dir_bits
+        sta player_dir_bits
+        ;inc player_x_hi
+        jmp .player_x_done
+.player_x_greater
+	; go left
+        lda #%00000010
+        ora player_dir_bits
+        sta player_dir_bits
+	;dec player_x_hi
+        jmp .player_x_done
+.player_x_equal
+	iny
+.player_x_done
+; check y coordinate
+        lda player_y_hi
+        cmp player_demo_y
+        beq .player_y_equal
+        bcs .player_y_greater
+.player_y_lesser
+	; go down
+        lda #%00000100
+        ora player_dir_bits
+        sta player_dir_bits
+        ;inc player_y_hi
+        jmp .player_y_done
+.player_y_greater
+	; go up
+        lda #%00001000
+        ora player_dir_bits
+        sta player_dir_bits
+	;dec player_y_hi
+        jmp .player_y_done
+.player_y_equal
+	iny
+.player_y_done
+; check if both coordinates are met
+	cpy #$02
+        beq .set_demo_new_target
+        jmp .done
+.set_demo_new_target
+	; set x target
+	lda rng0
+        jsr NextRandom
+        sta rng0
+        lsr
+        clc
+        adc #$60
+        sta player_demo_x
+	lda rng0
+        jsr NextRandom
+        sta rng0
+        lsr
+        clc
+        adc #$10
+        sta player_demo_y
+.done
+	lda #%0000110
+        ;sta player_dir_bits
+	jsr player_move_position
+	rts
+
+        
+        
+
+

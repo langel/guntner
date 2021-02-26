@@ -1,0 +1,135 @@
+
+        
+player_demo_init: subroutine
+; set player position
+	lda #$00
+        sta player_death_flag
+        sta you_dead_counter
+        sta score_00
+        sta score_00__
+        sta score_00____
+        sta score_00______
+	sta timer_frames_1s	
+	sta timer_frames_10s	
+	sta timer_seconds_1s	
+	sta timer_seconds_10s	
+	sta timer_minutes_1s	
+	sta timer_minutes_10s	
+        lda #$01
+        sta player_speed
+	lda #$d0
+        sta player_x_hi
+        sta player_demo_x
+	lda #$70
+        sta player_y_hi
+        sta player_demo_y
+        lda #$ff
+        sta player_health
+  ; SCROLL SPEED
+  	lda #$07
+        sta scroll_speed
+        asl
+        asl
+        asl
+        sta scroll_speed_m
+        
+        ldx #$8f ; set tiles
+        stx $205
+        dex 
+        stx $209
+        rts
+        
+        
+        
+player_update_colors: subroutine
+	PPU_SETADDR $3f0d
+	lda player_color0
+        sta PPU_DATA
+	lda player_color1
+        sta PPU_DATA
+	lda player_color2
+        sta PPU_DATA
+	PPU_SETADDR $3f11
+	lda player_color2
+        sta PPU_DATA
+	lda player_color1
+        sta PPU_DATA
+	lda player_color0
+        sta PPU_DATA
+	rts
+        
+        
+; set palette colors
+; set PPU address to palette start
+	PPU_SETADDR $3f00
+        ldy #0
+.loop:
+	lda Palette00,y	; lookup byte in ROM
+	sta PPU_DATA	; store byte to PPU data
+        iny		; Y = Y + 1
+        cpy #32		; is Y equal to 32?
+	bne .loop	; not yet, loop
+        rts		; return to caller
+        
+        
+        
+player_take_damage: subroutine
+; damage amount in player_damage
+	lda player_health
+        sec
+        sbc player_damage
+        bcc .player_dead
+        sta player_health
+        rts
+.player_dead
+	; player_health 00 means DEATH
+	lda #$00
+        sta player_health
+        ; change sprite
+	ldx #$0a
+        stx $205
+        stx $209
+        rts
+        
+        
+player_collision_detect: subroutine
+	lda player_x_hi
+        sta collision_1_x
+        lda player_y_hi
+        clc
+        adc #$02
+        sta collision_1_y
+        lda #$10
+        sta collision_1_w
+        lda #$06
+        sta collision_1_h
+        jsr detect_collision
+        cmp #$00
+        beq .done
+        ; XXX this number is sus
+        ; player sprites don't always change at death
+        lda #$04
+        sta player_damage
+        jsr player_take_damage
+.done
+        rts
+        
+        
+set_player_sprite: subroutine
+	lda player_y_hi
+        sta $204
+        sta $208
+        lda player_x_hi
+        sta $207
+        clc
+        adc #$08
+        sta $20b
+        
+        lda #$40
+; attributes
+        sta $206
+        sta $20a
+; demo flight
+	jsr run_player_demo
+        rts
+        

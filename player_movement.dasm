@@ -1,0 +1,358 @@
+
+
+;      straight/ diag
+;speed 1  0.75 / 0.53
+;speed 2  1.00 / 0.7071
+;speed 3  2.25 / 1.5909
+;speed 4  3.50 / 2.4748
+
+; 1/ 256 = 0.00390625
+
+; controllers
+; 8) bit 3 up
+; 4) bit 2 down
+; 2) bit 1 left
+; 1) bit 0 right
+
+; a then thats up + left
+; 5 then thats down + right
+
+player_direction_speed_table:
+	; lo byte then hi byte
+        ; straight value then diagonal value
+        ; speed 1
+        byte #191,#0,#135,#0
+        ; speed 2
+        byte #0,#1,#181,#0
+        ; speed 3
+        byte #64,#2,#151,#1
+        ; speed 4
+        byte #128,#3,#122,#2
+        
+        
+        
+
+; playfield = 256 x 192
+; player coordinates should be bound from 16 x 16 to 240 x 176
+player_move_position: subroutine
+	jsr player_direction_handler
+        lda player_x_hi
+        cmp #16
+        bcs .right_enuff
+        lda #16
+        sta player_x_hi
+.right_enuff
+        lda player_x_hi
+        cmp #232
+        bcc .left_enuff
+        lda #232
+        sta player_x_hi
+.left_enuff
+        lda player_y_hi
+        cmp #16
+        bcs .down_enuff
+        lda #16
+        sta player_y_hi
+.down_enuff
+        lda player_y_hi
+        cmp #160
+        bcc .up_enuff
+        lda #160
+        sta player_y_hi
+.up_enuff
+	rts
+
+
+player_direction_handler: subroutine
+	lda player_dir_bits
+        and #%00001111
+        sta player_dir_bits
+        sta $80
+        cmp #$00
+        bne .dir_pressed
+	rts
+.dir_pressed
+	lda player_dir_bits
+        cmp #%00001000
+        bne .not_up
+        jmp player_move_up
+.not_up
+	lda player_dir_bits
+        cmp #%00001001
+        bne .not_up_right
+        jmp player_move_up_right
+.not_up_right
+	lda player_dir_bits
+        cmp #%00000001
+        bne .not_right
+        jmp player_move_right
+.not_right
+	lda player_dir_bits
+        cmp #%00000101
+        bne .not_down_right
+        jmp player_move_down_right
+.not_down_right
+	lda player_dir_bits
+        cmp #%00000100
+        bne .not_down
+        jmp player_move_down
+.not_down
+	lda player_dir_bits
+        cmp #%00000110
+        bne .not_down_left
+        jmp player_move_down_left
+.not_down_left
+	lda player_dir_bits
+        cmp #%0000010
+        bne .not_left
+        jmp player_move_left
+.not_left
+	lda player_dir_bits
+        cmp #%00001010
+        bne .not_up_left
+        jmp player_move_up_left
+.not_up_left
+	rts
+
+
+
+player_move_up: subroutine
+	lda player_speed
+        asl
+        asl
+        tay
+        ; do y
+        lda player_y_lo
+        sec
+        sbc player_direction_speed_table,y
+        sta player_y_lo
+        bcs .no_y_hi_rollover
+        dec player_y_hi
+.no_y_hi_rollover
+	lda player_y_hi
+        iny
+        sec
+        sbc player_direction_speed_table,y
+        sta player_y_hi
+	lda #$ff
+        sta $81
+	rts
+        
+player_move_up_right: subroutine
+	lda player_speed
+        asl
+        asl
+        tax
+        inx
+        inx
+        txa
+        tay
+        sta $85
+        ; do x
+        lda player_x_lo
+        clc
+        adc player_direction_speed_table,x
+        sta player_x_lo
+        bcc .no_x_hi_rollover
+        inc player_x_hi
+.no_x_hi_rollover
+	lda player_x_hi
+        inx
+        clc
+        adc player_direction_speed_table,x
+        sta player_x_hi
+	; do y
+        lda player_y_lo
+        sec
+        sbc player_direction_speed_table,y
+        sta player_y_lo
+        bcs .no_y_hi_rollover
+        dec player_y_hi
+.no_y_hi_rollover
+	lda player_y_hi
+        iny
+        sec
+        sbc player_direction_speed_table,y
+        sta player_y_hi
+	rts
+        
+player_move_right: subroutine
+	lda player_speed
+        asl
+        asl
+        tax
+        ; do x
+        lda player_x_lo
+        clc
+        adc player_direction_speed_table,x
+        sta player_x_lo
+        bcc .no_x_hi_rollover
+        inc player_x_hi
+.no_x_hi_rollover
+        inx
+	lda player_x_hi
+        clc
+        adc player_direction_speed_table,x
+        sta player_x_hi
+.no_x_rollover
+	rts
+        
+player_move_down_right: subroutine
+	lda player_speed
+        asl
+        asl
+        tax
+        inx
+        inx
+        txa
+        tay
+        ; do x
+        lda player_x_lo
+        clc
+        adc player_direction_speed_table,x
+        sta player_x_lo
+        bcc .no_x_hi_rollover
+        inc player_x_hi
+.no_x_hi_rollover
+	lda player_x_hi
+        inx
+        clc
+        adc player_direction_speed_table,x
+        sta player_x_hi
+	; do y
+        lda player_y_lo
+        clc
+        adc player_direction_speed_table,y
+        sta player_y_lo
+        bcc .no_y_hi_rollover
+        inc player_y_hi
+.no_y_hi_rollover
+	lda player_y_hi
+        iny
+        clc
+        adc player_direction_speed_table,y
+        sta player_y_hi
+	rts
+        
+player_move_down: subroutine
+	lda player_speed
+        asl
+        asl
+        tax
+        tay
+	; do y
+        lda player_y_lo
+        clc
+        adc player_direction_speed_table,y
+        sta player_y_lo
+        bcc .no_y_hi_rollover
+        inc player_y_hi
+.no_y_hi_rollover
+	lda player_y_hi
+        iny
+        clc
+        adc player_direction_speed_table,y
+        sta player_y_hi
+        bcs .no_y_rollover
+.no_y_rollover
+	rts
+        
+player_move_down_left: subroutine
+	lda player_speed
+        asl
+        asl
+        tax
+        inx
+        inx
+        txa
+        tay
+        ; do x
+        lda player_x_lo
+        sec
+        sbc player_direction_speed_table,x
+        sta player_x_lo
+        bcs .no_x_hi_rollover
+        dec player_x_hi
+.no_x_hi_rollover
+	lda player_x_hi
+        inx
+        sec
+        sbc player_direction_speed_table,x
+        sta player_x_hi
+        bcc .no_x_rollover
+.no_x_rollover
+	; do y
+        lda player_y_lo
+        clc
+        adc player_direction_speed_table,y
+        sta player_y_lo
+        bcc .no_y_hi_rollover
+        inc player_y_hi
+.no_y_hi_rollover
+	lda player_y_hi
+        iny
+        clc
+        adc player_direction_speed_table,y
+        sta player_y_hi
+        bcs .no_y_rollover
+.no_y_rollover
+	rts
+        
+player_move_left: subroutine
+	lda player_speed
+        asl
+        asl
+        tax
+        ; do x
+        lda player_x_lo
+        sec
+        sbc player_direction_speed_table,x
+        sta player_x_lo
+        bcs .no_x_hi_rollover
+        dec player_x_hi
+.no_x_hi_rollover
+	lda player_x_hi
+        inx
+        sec
+        sbc player_direction_speed_table,x
+        sta player_x_hi
+        bcc .no_x_rollover
+.no_x_rollover
+	rts
+        
+player_move_up_left: subroutine
+	lda player_speed
+        asl
+        asl
+        tax
+        inx
+        inx
+        txa
+        tay
+        ; do x
+        lda player_x_lo
+        sec
+        sbc player_direction_speed_table,x
+        sta player_x_lo
+        bcs .no_x_hi_rollover
+        dec player_x_hi
+.no_x_hi_rollover
+	lda player_x_hi
+        inx
+        sec
+        sbc player_direction_speed_table,x
+        sta player_x_hi
+	; do y
+        lda player_y_lo
+        sec
+        sbc player_direction_speed_table,y
+        sta player_y_lo
+        bcs .no_y_hi_rollover
+        dec player_y_hi
+.no_y_hi_rollover
+	lda player_y_hi
+        iny
+        sec
+        sbc player_direction_speed_table,y
+        sta player_y_hi
+	rts

@@ -1,0 +1,30 @@
+
+
+; reading joypad gives us a byte
+; bit 7 a button
+; bit 6 b button
+; bit 5 select
+; bit 4 start
+; bit 3 up
+; bit 2 down
+; bit 1 left
+; bit 0 right
+
+
+player_controls_read:
+	jsr ReadJoypad0
+        
+        ; checking for select
+        ; need a debouncer!!
+        and #%00100000
+        cmp #$20
+        bne .no_select
+        inc player_speed
+        lda player_speed
+        cmp #$04
+        bne .no_select
+        lda #$00
+        sta player_speed
+.no_select
+        ;sta player_controls
+        rts
