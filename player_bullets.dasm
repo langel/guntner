@@ -18,12 +18,117 @@ player_power		= #$ff
         
 player_demo_init: subroutine
 ; set player position
+	lda #$00
+        sta player_death_flag
+        sta you_dead_counter
 	lda #$d0
         sta player_x
         sta player_demo_x
 	lda #$70
         sta player_y
         sta player_demo_y
+        lda #$ff
+        sta player_health
+  ; SCROLL SPEED
+  	lda #$07
+        sta scroll_speed
+        asl
+        asl
+        asl
+        sta scroll_speed_m
+        
+        ldx #$8f ; set tiles
+        stx $205
+        dex 
+        stx $209
+        rts
+        
+        
+player_add_points: subroutine
+; point amount in Accumulator
+	clc
+        adc score_00
+        sta score_00
+        sec 
+        sbc #$64
+        bcc .done_00
+        inc score_00__
+        sta score_00
+.done_00
+	rts
+        
+        
+player_update_colors: subroutine
+	PPU_SETADDR $3f0d
+	lda player_color0
+        sta PPU_DATA
+	lda player_color1
+        sta PPU_DATA
+	lda player_color2
+        sta PPU_DATA
+	PPU_SETADDR $3f11
+	lda player_color2
+        sta PPU_DATA
+	lda player_color1
+        sta PPU_DATA
+	lda player_color0
+        sta PPU_DATA
+	rts
+        
+        
+; set palette colors
+; set PPU address to palette start
+	PPU_SETADDR $3f00
+        ldy #0
+.loop:
+	lda Palette00,y	; lookup byte in ROM
+	sta PPU_DATA	; store byte to PPU data
+        iny		; Y = Y + 1
+        cpy #32		; is Y equal to 32?
+	bne .loop	; not yet, loop
+        rts		; return to caller
+        
+        
+        
+player_take_damage: subroutine
+; damage amount in player_damage
+	lda player_health
+        sec
+        sbc player_damage
+        bcc .player_dead
+        sta player_health
+        rts
+.player_dead
+	; player_health 00 means DEATH
+	lda #$00
+        sta player_health
+        ; change sprite
+	ldx #$0a
+        stx $205
+        stx $209
+        rts
+        
+        
+player_collision_detect: subroutine
+	lda player_x
+        sta collision_1_x
+        lda player_y
+        clc
+        adc #$02
+        sta collision_1_y
+        lda #$10
+        sta collision_1_w
+        lda #$06
+        sta collision_1_h
+        jsr detect_collision
+        cmp #$00
+        beq .done
+        ; XXX this number is sus
+        ; player sprites don't always change at death
+        lda #$04
+        sta player_damage
+        jsr player_take_damage
+.done
         rts
         
         
@@ -36,10 +141,7 @@ set_player_sprite: subroutine
         clc
         adc #$08
         sta $20b
-        ldx #$e7 ; set tiles
-        stx $205
-        dex 
-        stx $209
+        
         lda #$40
 ; attributes
         sta $206
@@ -106,6 +208,7 @@ player_bullets_init:
         
         
 player_bullet_collision_handler: subroutine
+	stx player_bullet_collision_temp_x
 	clc
         lda collision_0_x
         adc collision_0_w
@@ -188,7 +291,9 @@ player_bullet_collision_handler: subroutine
 
 	; send number of hits back to caller
 	txa
+        ldx player_bullet_collision_temp_x
 	rts
+        
         
 bullet0_despawn: subroutine
 	lda #$00
@@ -227,9 +332,18 @@ bullet4_despawn: subroutine
         rts
 
 
+; temp solution unti
+player_bullets_despawn:
+	jsr bullet0_despawn
+	jsr bullet1_despawn
+	jsr bullet2_despawn
+	jsr bullet3_despawn
+	jsr bullet4_despawn
+        rts
+
 
 player_bullets_update: subroutine
-        
+
 	; bullet 0
         ; check if fire is pressed
         ; XXX not implemented

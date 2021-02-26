@@ -12,8 +12,11 @@ sprite_0_y	byte
 scroll_x	byte
 scroll_page	byte
 scroll_y	byte
-Temp		byte
+wtf		byte
+scroll_speed	byte
+scroll_speed_m	byte
 bg_tile_default	byte
+player_health	byte
 player_x	byte
 player_y	byte
 player_demo_x	byte
@@ -37,12 +40,62 @@ collision_1_y	byte
 collision_1_w	byte
 collision_1_h	byte
 
+score_lo_byte	byte
+score_hi_byte	byte
+score_1		byte
+score_10	byte
+score_100	byte
+score_1000	byte
+score_10000	byte
+score_100000	byte
+score_1000000	byte
+score_10000000	byte
+score_00	byte
+score_00__	byte
+score_00____	byte
+score_00______	byte
+
+lifebar0	byte
+lifebar1	byte
+lifebar2	byte
+lifebar3	byte
+lifebar4	byte
+lifebar5	byte
+lifebar6	byte
+lifebar7	byte
+lifebar8	byte
+lifebar9	byte
+lifebara	byte
+lifebarb	byte
+lifebarc	byte
+lifebard	byte
+lifebare	byte
+lifebarf	byte
+
+
+timer_frames_1s		byte
+timer_frames_10s	byte
+timer_seconds_1s	byte
+timer_seconds_10s	byte
+timer_minutes_1s	byte
+timer_minutes_10s	byte
+
 enemy_temp_addr_lo	byte
 enemy_temp_addr_hi	byte
 enemy_temp_oam_x	byte
 enemy_temp_palette	byte
 enemy_temp_temp		byte
 enemy_handler_pos	byte
+
+player_color0	byte
+player_color1	byte
+player_color2	byte
+player_damage		byte
+player_death_flag	byte
+
+player_bullet_collision_temp_x	byte
+
+you_dead_counter	byte
 
 
 
@@ -77,12 +130,22 @@ RAM_init_clear:
         jsr SetPalette 
         jsr player_demo_init
         jsr player_bullets_init
-	jsr starfield_init
         jsr PleaseStart_plot
+	jsr starfield_init
+        jsr dashboard_init
+        
+; set default player colors
+	lda #$14
+        sta player_color0
+	lda #$21
+        sta player_color1
+	lda #$37
+        sta player_color2
+	jsr player_update_colors
         
         
         ; set hud y pos
-        lda #158
+        lda #182
         sta sprite_0_y
      	; setup rng
         lda #$01
@@ -95,7 +158,6 @@ RAM_init_clear:
 ; activate PPU graphics       
 	; enable rendering
         lda #MASK_BG|MASK_SPR
-        lda #$1e
         sta PPU_MASK	
         ; enable NMI
         lda #$00
@@ -147,6 +209,7 @@ SetSprite0: subroutine
 
 NMIHandler: subroutine
 	SAVE_REGS
+; enable NMI lockout
 	lda nmi_lockout
         cmp #$00
         bne .NMI_end
@@ -157,14 +220,16 @@ NMIHandler: subroutine
         ; wait for sprite 0
 ; AFTER GETTING EVERYTHING INTO THE PPU : ::: 
 ; STARFIELD TIME!!!
-	jsr player_bullets_update
 	jsr starfield_update
+        jsr dashboard_draw
+        
+        
+        
 ; update scroll pos
 	lda scroll_y
         sec
-        
   ; SCROLL SPEED
-        sbc #$07
+        sbc scroll_speed
         bcs .samepage
         inc scroll_page
 .samepage
@@ -181,8 +246,9 @@ NMIHandler: subroutine
         sta PPU_SCROLL
 ; SPRITES TIME!!
         jsr SetSprite0
-        jsr set_player_sprite
-        jsr update_enemies
+        
+        jsr demo_mode
+
         
 ; SPRITE 0 WAIT TIME!!!
 .wait0	bit PPU_STATUS
@@ -204,9 +270,20 @@ NMIHandler: subroutine
 ; disable page 2 for HUD
         ora #CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
+; HUD prepare for next draw
+					; this should only happen during gameplay
+        lda player_death_flag
+        cmp #$00
+        bne .skip_dashboard_update
+	jsr dashboard_update
+.skip_dashboard_update
+; disable NMI lockout
         lda #$00
         sta nmi_lockout
 ; rng updates
+	lda rng0
+        jsr NextRandom
+        sta rng0
 	lda rng1
         jsr PrevRandom
         sta rng1
@@ -224,6 +301,35 @@ NMIHandler: subroutine
         
         
         
+	include "ppu_init.dasm"
+        nop	; how much prg space we using?
+        
+        
+	include "demo_mode.dasm"
+
+	include "collision_detection.dasm"
+        nop	; how much prg space we using?
+	include "player_bullets.dasm"
+        nop	; how much prg space we using?
+	include "please_start_screen.dasm"
+        nop	; how much prg space we using?
+	include "starfield.dasm"
+        nop	; how much prg space we using?
+	include "dashboard.dasm"
+        nop	; how much prg space we using?
+
+        
+	include "enemy_handler.dasm"
+        nop	; how much prg space we using?
+        
+; LOOKUP TABLES AT TOP OF RAM
+        org $f800
+	include "sine.dasm"
+	include "decimal_table.dasm"
+
+        nop	; how much prg space we using?
+
+        
 Palette00:
 	hex 1f		;screen color
 	hex 02283000	;background 0
@@ -235,25 +341,7 @@ Palette00:
         hex 07172700	;sprite 2
         hex 013530	;sprite 3
         
-	include "ppu_init.dasm"
-        
-        
-	include "collision_detection.dasm"
-	include "player_bullets.dasm"
-	include "please_start_screen.dasm"
-	include "starfield.dasm"
-        
-        
         nop	; how much prg space we using?
-        nop
-        
-	include "enemy_handler.dasm"
-        
-        nop	; how much prg space we using?
-        
-        org $f800
-	include "sine.dasm"
-
 
 
 

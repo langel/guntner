@@ -1,0 +1,49 @@
+
+demo_mode: subroutine
+	; MOCKUP DEATH SEQUENCE
+        lda player_health
+        cmp #$00
+        bne .player_not_dead
+.player_dead
+	jmp .player_dead_anim
+.player_not_dead
+        jsr set_player_sprite
+	jsr player_bullets_update
+        jsr update_enemies
+        lda #$04
+        sta player_damage
+        ;jsr player_take_damage
+        rts
+.player_dead_anim
+	jsr player_bullets_despawn
+	;jsr player_bullets_update
+	jsr enemy_handler_player_dead
+        jsr demo_scroll_speed
+        lda player_death_flag
+        cmp #$00
+        bne .death_already_set
+        lda #$01
+        sta player_death_flag
+        jsr dashboard_you_dead
+.death_already_set
+	inc you_dead_counter
+        lda you_dead_counter
+        cmp #120
+        bne .still_dead
+        jsr player_demo_init
+.still_dead
+	rts
+        
+demo_scroll_speed:
+        lda scroll_speed
+        cmp #$00
+        beq .scroll_slow_done
+        dec scroll_speed
+	dec scroll_speed_m
+        lda scroll_speed_m
+        lsr
+        lsr
+        lsr
+        sta scroll_speed
+        ; slow down stars
+.scroll_slow_done

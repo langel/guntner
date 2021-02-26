@@ -1,33 +1,36 @@
 ;;;; Constants
 
-STARFIELD_MASK		= $1f ; star probability against %00001111
-STARFIELD_COL0_START	= $00
-STARFIELD_COL1_START	= $08
+STARFIELD_MASK		= #$1f ; star probability against %00001111
+STARFIELD_COL0_START	= #$00
+STARFIELD_COL1_START	= #$08
 
 
 starfield_init: subroutine
-; set bg tile palette attributes
+; set bg tile palette attributes / colors
 ; $23c0 and $27c0
 	lda #$0f
         sta starfield_tile
-        ldx #$c0
+        
 	PPU_SETADDR $23c0
 	lda #%00010100
+        ldx #$c0
         ;sta $1c
 .23c0_loop
         sta PPU_DATA
         inx
-        stx $1a
+        ;stx $1a
         bne .23c0_loop
         ldx #$c0
+        
 	PPU_SETADDR $27c0
 	lda #%00010100
+        ldx #$c0
 .27c0_loop
         sta PPU_DATA
         inx
-        stx $1b
+        ;stx $1b
         bne .27c0_loop
-        sta $19
+        ;sta $19
 ; reset star palette twinkles
 	lda #STARFIELD_COL0_START
         sta starfield_col0
@@ -98,11 +101,10 @@ starfield_update: subroutine
 	;lda #$7f
         ;sta starfield_tile
 
-        lda rng0
+        lda starfield_rng
         jsr NextRandom
-        sta rng0
-        and #STARFIELD_MASK
         sta starfield_rng
+        and #STARFIELD_MASK
         
 	lda scroll_y
         lsr
@@ -169,11 +171,16 @@ starfield_update: subroutine
         and #STARFIELD_MASK
         sta starfield_rng
         
-	; row 8
-        STARFIELD_PLOT_POS $00,$01
-	; row 9       
-        STARFIELD_PLOT_POS $20,$02
-	; row a       
-        STARFIELD_PLOT_POS $40,$04
-  
+        ; row 0
+        STARFIELD_PLOT_POS $00,$10
+	; row 1       
+        STARFIELD_PLOT_POS $20,$11
+	; row 2       
+        STARFIELD_PLOT_POS $40,$12
+	; row 3
+        STARFIELD_PLOT_POS $60,$13
+	; row 4
+        STARFIELD_PLOT_POS $80,$14
+	; row 5
+        STARFIELD_PLOT_POS $a0,$15
 	rts

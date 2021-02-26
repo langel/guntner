@@ -2,6 +2,7 @@
 
 ENEMY_RAM	= $0300
 ENEMY_METHODS_LOOKUP_TABLE	= $f000
+ENEMY_HIT_PALETTE_FRAMES	= #$03
 
 
 
@@ -49,11 +50,11 @@ birb_spawn: subroutine
 	; x is set by enemy spawner
 	lda #$02
         sta $0300,x ; enemy type
-        sta $0303,x ; pattern counter
-        sta $0304,x ; animation counter
         lda #$00
         sta $0301,x ; x pos
+        sta $0303,x ; pattern counter
         lda rng0
+        sta $0304,x ; animation counter
         lsr
         sta $0302,x ; y pos
         lda #$01
@@ -70,11 +71,11 @@ maggs_spawn: subroutine
 	; x is set by enemy spawner
 	lda #$03
         sta $0300,x ; enemy type
-        sta $0303,x ; pattern counter
-        sta $0304,x ; animation counter
         lda #$00
         sta $0301,x ; x pos
+        sta $0304,x ; animation counter
         lda rng0
+        sta $0303,x ; pattern counter
         lsr
         clc
         adc #$08
@@ -218,6 +219,48 @@ update_enemies_handler_next:
 .handler_core_end
 	jsr enemy_spawn
 	rts
+        
+        
+enemy_handler_player_dead: subroutine
+	lda player_death_flag
+        cmp #$00
+        bne .dont_init
+        lda #$10
+        sta enemy_temp_temp
+.dont_init
+	inc enemy_temp_temp
+	inc enemy_temp_temp
+	lda enemy_temp_temp
+        lsr
+        lsr
+        lsr
+        lsr
+        sta enemy_handler_pos
+        ldx #$23
+.loop
+        lda $0200,x
+        cmp #$00
+        ;beq .do_nothing
+        sec
+        sbc enemy_handler_pos
+        bmi .despawn
+        sta $0200,x
+        jmp .do_nothing
+.despawn
+	lda #$ff
+        sta $0200-3,x
+	lda #$00
+        sta $0200,x
+.do_nothing
+        inx
+        inx
+        inx
+        inx
+        cpx #$03
+        bne .loop
+        rts
+        
+        
 
 
 ;;;; HANDLING SKULLY
@@ -340,22 +383,44 @@ skully_cycle: subroutine
 ; shot by bullet?
         jsr player_bullet_collision_handler
         cmp #$00
-        beq .skully_not_hit
+        beq .decide_palette
 .skully_takes_damage
 	sta enemy_temp_temp
-        ldx enemy_handler_pos
         lda ENEMY_RAM+5,x
         sec
         sbc enemy_temp_temp
         bcc .skully_dead
         jmp .skully_not_dead
 .skully_dead
+	; give points
+        lda #
+        jsr player_add_points
 	lda #$01
         sta ENEMY_RAM,x
         jmp sprite_4_cleanup_for_next
 .skully_not_dead
+	; save current hit points
         sta ENEMY_RAM+5,x
+        ; setup hit palette counter
+	lda #ENEMY_HIT_PALETTE_FRAMES
+        sta ENEMY_RAM+6,x
+.decide_palette
+	lda ENEMY_RAM+6,x
+        cmp #$00
+        bne .hit_palette
+.normal_palette
         ; palette
+        lda enemy_temp_palette 
+        sta $0202,y
+        sta $0206,y
+        sta $020a,y
+        sta $020e,y
+        jmp .skully_done
+.hit_palette
+	dec ENEMY_RAM+6,x
+        ; palette
+        dec enemy_temp_palette
+        dec enemy_temp_palette
         dec enemy_temp_palette
         lda enemy_temp_palette
         sta $0202,y
@@ -363,14 +428,8 @@ skully_cycle: subroutine
         sta $020a,y
         sta $020e,y
         jmp .skully_done
-.skully_not_hit
-        ; palette
-        lda enemy_temp_palette 
-        sta $0202,y
-        sta $0206,y
-        sta $020a,y
-        sta $020e,y
 .skully_done
+	jsr player_collision_detect
 	jmp update_enemies_handler_next
         
         
@@ -440,11 +499,6 @@ maggs_cycle: subroutine
         sta $0200+0,y
         sta $0200+4,y
         
-        ; palette
-        lda #$02
-        sta $0202+0,y
-        sta $0202+4,y
-        
         ; update pattern
         inc ENEMY_RAM+3,x
         inc ENEMY_RAM+3,x
@@ -468,12 +522,15 @@ maggs_cycle: subroutine
         cmp #$00
         beq .not_hit
         ; decrease health
-	ldx enemy_handler_pos
         dec ENEMY_RAM+5,x
         lda ENEMY_RAM+5,x
         cmp #$00
         bne .not_dead
+.dead
         ; DEAD
+	; give points
+        lda #$05
+        jsr player_add_points
         ; change it into crossbones!
         lda #$01
         sta ENEMY_RAM+0,x
@@ -485,11 +542,10 @@ maggs_cycle: subroutine
         sta $0203+0,y
         ;jsr enemy_death
 .not_dead
-        ; palette
-        lda #$00
-        sta $0202,y
-        sta $0206,y
-        jmp .done
+        lda ENEMY_RAM+6,x
+        ora #ENEMY_HIT_PALETTE_FRAMES
+        sta ENEMY_RAM+6,x
+        jmp .palette
 .not_hit
         ; palette
 	;ldx enemy_handler_pos
@@ -497,7 +553,25 @@ maggs_cycle: subroutine
         ;tax
         ;lda #$01
         ;sta $0202,x
+.palette
+        ; palette
+        lda ENEMY_RAM+6,x
+        and #$07
+        sta $400,y
+        cmp #$00
+        beq .normal_colors
+.hit_colors
+	dec ENEMY_RAM+6,x
+        lda #$00
+        sta $0202,y
+        sta $0206,y
+        jmp .done
+.normal_colors	
+        lda #$02
+        sta $0202,y
+        sta $0206,y
 .done
+	jsr player_collision_detect
 	jmp update_enemies_handler_next
         
         
@@ -574,6 +648,9 @@ birb_cycle: subroutine
         cmp #$00
         bne .birb_not_dead
 .birb_is_dead
+	; give points
+        lda #$03
+        jsr player_add_points
         ; change it into crossbones!
         lda #$01
         sta ENEMY_RAM+0,x
@@ -587,6 +664,7 @@ birb_cycle: subroutine
         lda #$01
         sta $0202,y
 .birb_done
+	jsr player_collision_detect
 	jmp update_enemies_handler_next
         
         
@@ -662,22 +740,15 @@ starglasses_cycle:
 	lda #$1f
 	sta $020d,y
 .frame_done
-	; palette
-	lda #$03
-	sta $0202,y
-	sta $0206,y
-	sta $020a,y
-	sta $020e,y
 ; shot by bullet?
 	lda #$10
 	sta collision_0_w
 	sta collision_0_h
 	jsr player_bullet_collision_handler
 	cmp #$00
-	beq .done
+	beq .palette_check
 .takes_damage
 	sta enemy_temp_temp
-        ldx enemy_handler_pos
         lda ENEMY_RAM+5,x
         sec
         sbc enemy_temp_temp
@@ -688,16 +759,33 @@ starglasses_cycle:
         sta ENEMY_RAM,x
         jmp sprite_4_cleanup_for_next
 .not_dead
-	; palette
+	sta ENEMY_RAM+5,x
+	lda ENEMY_RAM+6,x
+        ora ENEMY_HIT_PALETTE_FRAMES
+	sta ENEMY_RAM+6,x
+.palette_check
+	lda ENEMY_RAM+6,x
+        and ENEMY_HIT_PALETTE_FRAMES
+        cmp #$00
+        beq .palette_not_hit
+.palette_hit
+        dec ENEMY_RAM+6,x
 	lda #$00
 	sta $0202,y
 	sta $0206,y
 	sta $020a,y
 	sta $020e,y
-	ldx enemy_handler_pos
-        dec ENEMY_RAM+5,x
+        jmp .done
+.palette_not_hit
+	lda #$03
+	sta $0202,y
+	sta $0206,y
+	sta $020a,y
+	sta $020e,y
 .done
+	jsr player_collision_detect
 	jmp update_enemies_handler_next
+        
         
         
 get_enemy_slot_1_sprite: subroutine
