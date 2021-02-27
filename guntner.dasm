@@ -19,6 +19,8 @@ bg_tile_default	byte
 player_health	byte
 player_demo_x	byte
 player_demo_y	byte
+player_demo_lr	byte
+player_demo_ud	byte
 
 player_x	byte
 player_y	byte
@@ -29,6 +31,8 @@ player_y_hi	byte
 player_y_lo	byte
 player_speed	byte ; 2 bit value 0..3 translates to 1..4
 player_controls	byte
+player_select	byte
+player_start	byte
 player_dir_bits	byte ; matches controller
 
 rng0		byte
@@ -307,9 +311,6 @@ NMIHandler: subroutine
         
 
 
-
-        
-        
         
         
 	include "ppu_init.dasm"
@@ -327,9 +328,8 @@ NMIHandler: subroutine
 	include "player_controls.dasm"
 	include "player_movement.dasm"
 	include "player_points.dasm"
-
-
         nop	; how much prg space we using?
+        
 	include "please_start_screen.dasm"
         nop	; how much prg space we using?
 	include "starfield.dasm"

@@ -65,6 +65,9 @@ run_player_demo: subroutine
         beq .player_x_equal
         bcs .player_x_greater
 .player_x_lesser
+	lda player_demo_lr
+        cmp #$ff
+        beq .player_x_equal
 	; go right
         lda #%00000001
         ora player_dir_bits
@@ -72,6 +75,9 @@ run_player_demo: subroutine
         ;inc player_x_hi
         jmp .player_x_done
 .player_x_greater
+	lda player_demo_lr
+        cmp #$00
+        beq .player_x_equal
 	; go left
         lda #%00000010
         ora player_dir_bits
@@ -87,6 +93,9 @@ run_player_demo: subroutine
         beq .player_y_equal
         bcs .player_y_greater
 .player_y_lesser
+	lda player_demo_ud
+        cmp #$ff
+        beq .player_y_equal
 	; go down
         lda #%00000100
         ora player_dir_bits
@@ -94,6 +103,9 @@ run_player_demo: subroutine
         ;inc player_y_hi
         jmp .player_y_done
 .player_y_greater
+	lda player_demo_ud
+        cmp #$00
+        beq .player_y_equal
 	; go up
         lda #%00001000
         ora player_dir_bits
@@ -108,6 +120,7 @@ run_player_demo: subroutine
         beq .set_demo_new_target
         jmp .done
 .set_demo_new_target
+
 	; set x target
 	lda rng0
         jsr NextRandom
@@ -116,6 +129,18 @@ run_player_demo: subroutine
         clc
         adc #$60
         sta player_demo_x
+        cmp player_x_hi
+        bcs .player_going_left
+.player_going_right
+        lda #$ff
+        sta player_demo_lr
+        jmp .player_x_dir_done
+.player_going_left
+	lda #$00
+        sta player_demo_lr
+.player_x_dir_done
+        
+        ; set y target
 	lda rng0
         jsr NextRandom
         sta rng0
@@ -123,8 +148,19 @@ run_player_demo: subroutine
         clc
         adc #$10
         sta player_demo_y
+        cmp player_y_hi
+        bcs .player_going_up
+.player_going_down
+        lda #$ff
+        sta player_demo_ud
+        jmp .player_y_dir_done
+.player_going_up
+	lda #$00
+        sta player_demo_ud
+.player_y_dir_done
+
 .done
-	lda #%0000110
+	;lda #%0000110
         ;sta player_dir_bits
 	jsr player_move_position
 	rts

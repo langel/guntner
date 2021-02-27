@@ -15,7 +15,7 @@ player_demo_init: subroutine
 	sta timer_seconds_10s	
 	sta timer_minutes_1s	
 	sta timer_minutes_10s	
-        lda #$01
+        lda #$02
         sta player_speed
 	lda #$d0
         sta player_x_hi

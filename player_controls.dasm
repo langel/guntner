@@ -13,18 +13,31 @@
 
 player_controls_read:
 	jsr ReadJoypad0
+        sta player_controls
         
-        ; checking for select
-        ; need a debouncer!!
-        and #%00100000
-        cmp #$20
-        bne .no_select
+        
+.select
+	and #%00100000
+        cmp #%00100000
+        beq .select_pressed
+        bne .select_not_pressed
+.select_pressed
+	lda player_select
+        cmp #$ff
+        beq .select_done
+        lda #$ff
+        sta player_select
+        ; update speed
         inc player_speed
         lda player_speed
         cmp #$04
-        bne .no_select
+        bne .select_done
         lda #$00
         sta player_speed
-.no_select
-        ;sta player_controls
+        jmp .select_done
+.select_not_pressed
+	lda #$00
+        sta player_select
+.select_done
         rts
+        

@@ -3,6 +3,10 @@
 ;      straight/ diag
 ;speed 1  0.75 / 0.53
 ;speed 2  1.00 / 0.7071
+;speed 3  1.75 / 1.2374
+;speed 4  2.50 / 1.7677
+
+; old version
 ;speed 3  2.25 / 1.5909
 ;speed 4  3.50 / 2.4748
 
@@ -25,8 +29,12 @@ player_direction_speed_table:
         ; speed 2
         byte #0,#1,#181,#0
         ; speed 3
-        byte #64,#2,#151,#1
+        byte #192,#1,#61,#1
         ; speed 4
+        byte #128,#2,#197,#1
+        ; old speed 3
+        byte #64,#2,#151,#1
+        ; old speed 4
         byte #128,#3,#122,#2
         
         
