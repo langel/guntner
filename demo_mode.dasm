@@ -63,7 +63,7 @@ demo_mode: subroutine
         jsr title_screen_init
 .still_dead
 .done
-	jsr player_bullets_update
+	jsr player_bullets_demo_update
         jsr update_enemies
 .done_and_paused
 	rts

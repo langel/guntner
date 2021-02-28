@@ -44,15 +44,6 @@ tile_ram_clear:
 ; set PPU address to name table A (row 1, col 1)
 
 
-	PPU_SETADDR $21a9
-	ldy #$0		; set Y counter to 0
-.title_loop:
-	lda guntner_msg,y	; get next character
-        beq .enda	; is 0? exit loop
-	sta PPU_DATA	; store+advance PPU
-        iny		; next character
-	bne .title_loop	; loop
-.enda
 
 
 
@@ -116,9 +107,6 @@ tile_ram_clear:
 
         rts		; return to caller
         
-guntner_msg:
-	.byte "G u n T n e R"
-        .byte #$00
         
 PleaseStart_msg:
 	.byte " Please START "

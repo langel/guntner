@@ -23,7 +23,19 @@ game_time: subroutine
 	jmp .player_dead_anim
         
 .player_not_dead
+	lda player_health
+        cmp #$ff
+        beq .no_heal
+        inc player_heal_c
+        lda player_heal_c
+        cmp #$40
+        bne .no_heal
+        lda #$00
+        sta player_heal_c
+        inc player_health
+.no_heal
 	jsr player_move_position
+        jsr player_bullets_check_controls
         ; spawn enemies
         jsr demo_enemy_spawn
 .dont_shoot
@@ -57,7 +69,7 @@ game_time: subroutine
         jsr title_screen_init
 .still_dead
 .done
-	jsr player_bullets_update
         jsr update_enemies
+	jsr player_bullets_update
 .done_and_paused
 	rts

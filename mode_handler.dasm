@@ -25,8 +25,9 @@ mode_handler_vblank: subroutine
 .not_game_time
 	lda game_mode
         cmp #$00
-        bne .done
+        bne .not_title_screen
         jsr title_screen_handler
+.not_title_screen
 .done
 	rts
         

@@ -127,6 +127,8 @@ dashboard_you_dead: subroutine
         sta lifebard
         lda #$44
         sta lifebare
+        lda #$20
+        sta lifebarf
         rts
 
 

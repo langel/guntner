@@ -18,6 +18,7 @@ scroll_speed	byte
 scroll_speed_m	byte
 bg_tile_default	byte
 player_health	byte
+player_heal_c	byte
 player_demo_x	byte
 player_demo_y	byte
 player_demo_lr	byte
@@ -160,7 +161,8 @@ RAM_init_clear:
 ; MY SETUP
         jsr SetPalette 
         jsr player_bullets_init
-        jsr PleaseStart_plot
+        jsr title_screen_init
+        ;jsr PleaseStart_plot
         
  	; set default speed
         lda #$01
@@ -295,6 +297,7 @@ NMIHandler: subroutine
         lda #$08
         sta PPU_SCROLL
 ; disable page 2 for HUD
+	lda #$00
         ora #CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
         
@@ -312,6 +315,7 @@ NMIHandler: subroutine
         sta nmi_lockout
         
 ; rng updates
+	inc wtf
 	lda rng0
         jsr NextRandom
         sta rng0

@@ -35,7 +35,16 @@ title_screen_init: subroutine
         sta PPU_MASK	
         jsr PPU_init
         
-        jsr PleaseStart_plot
+        ;jsr PleaseStart_plot
+	PPU_SETADDR $20e9
+	ldy #$00		; set Y counter to 0
+.title_loop:
+	lda guntner_msg,y	; get next character
+        beq .enda	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .title_loop	; loop
+.enda
         
         ldx #$00
 .clear_sprite_ram
@@ -60,3 +69,8 @@ title_screen_init: subroutine
         
         jsr timer_reset
 	rts
+        
+        
+guntner_msg:
+	.byte "G u n T n e R"
+        .byte #$00
