@@ -6,6 +6,7 @@ score_addr		= $234b
 timer_addr		= $2356
 tile_empty		= $05
 
+
 dashboard_init: subroutine
 
 	; set colors of dash
@@ -90,13 +91,12 @@ dashboard_bg_tiles:
         hex c3d1d1d1d1d1d21d
         ; row 3
 	hex 1d1d1d1d1d1d1d1d
-	hex 1d1db01d1d1d1d1d
-	hex 1d1d1db21db0b1b1
-	hex b11d1d1d1db1b21d
+	hex 1d1db0b1b1b1b1b1
+	hex b1b1b1b21db0b1b1
+	hex b1b1b1b1b1b1b21d
 
 
 dashboard_you_dead: subroutine
-	PPU_SETADDR life_bar_addr
         lda #$20
         sta lifebar0
         lda #$59
@@ -271,50 +271,85 @@ dashboard_update: subroutine
         lda decimal_table,x
         sta score_1
 
-        
-; UPDATE TIMER DIGITS
-; frames 1s
-	inc timer_frames_1s
-        lda #$0a
-        cmp timer_frames_1s
-        bne .timer_done
-        lda #$00
-        sta timer_frames_1s
-; frames 10s
-	inc timer_frames_10s
-        lda #$06
-        cmp timer_frames_10s
-        bne .timer_done
-        lda #$00
-        sta timer_frames_10s
-; seconds 1s
-	inc timer_seconds_1s
-        lda #$0a
-        cmp timer_seconds_1s
-        bne .timer_done
-        lda #$00
-        sta timer_seconds_1s
-; seconds 10s
-	inc timer_seconds_10s
-        lda #$06
-        cmp timer_seconds_10s
-        bne .timer_done
-        lda #$00
-        sta timer_seconds_10s
-; minutes 1s
-	inc timer_minutes_1s
-        lda #$0a
-        cmp timer_minutes_1s
-        bne .timer_done
-        lda #$00
-        sta timer_minutes_1s
-; minutes 10s
-	; we really checking this?
-        ; let it go into tile limbo
-	inc timer_minutes_10s
-.timer_done
 
 ; LIFEBARF
+
+	; if paused then just say P A U S E D
+        ; wait maybe it says PLEASE UNPAUSE
+        lda player_paused
+        cmp #$ff
+        beq .lifebarf_not_live
+        jmp .lifebarf_is_live
+.lifebarf_not_live
+        ; UPPERCASE
+        lda #$20 ; space
+        sta lifebar0
+        lda #$50 ; P
+        sta lifebar1
+        lda #$4c ; L
+        sta lifebar2
+        lda #$45 ; E
+        sta lifebar3
+        lda #$41 ; A
+        sta lifebar4
+        lda #$53 ; S
+        sta lifebar5
+        lda #$45 ; E
+        sta lifebar6
+        lda #$20 ; space
+        sta lifebar7
+        lda #$55 ; U
+        sta lifebar8
+        lda #$4e ; N
+        sta lifebar9
+        lda #$50 ; P
+        sta lifebara
+        lda #$41 ; A
+        sta lifebarb
+        lda #$55 ; U
+        sta lifebarc
+        lda #$53 ; S
+        sta lifebard
+        lda #$45 ; E
+        sta lifebare
+        lda #$20 ; space
+        sta lifebarf
+        ; lowercase
+        lda #$20 ; space
+        sta lifebar0
+        lda #$70 ; P
+        sta lifebar1
+        lda #$6c ; L
+        sta lifebar2
+        lda #$65 ; E
+        sta lifebar3
+        lda #$61 ; A
+        sta lifebar4
+        lda #$73 ; S
+        sta lifebar5
+        lda #$65 ; E
+        sta lifebar6
+        lda #$20 ; space
+        sta lifebar7
+        lda #$75 ; U
+        sta lifebar8
+        lda #$6e ; N
+        sta lifebar9
+        lda #$70 ; P
+        sta lifebara
+        lda #$61 ; A
+        sta lifebarb
+        lda #$75 ; U
+        sta lifebarc
+        lda #$73 ; S
+        sta lifebard
+        lda #$65 ; E
+        sta lifebare
+        lda #$20 ; space
+        sta lifebarf
+        jmp .super_done
+        
+.lifebarf_is_live
         ; 64 health lines on screen
         ; 16 tiles across
         ; 256 possible values

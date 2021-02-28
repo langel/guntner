@@ -1,6 +1,21 @@
 
         
 player_demo_init: subroutine
+; redraw playfield/hud
+	; disable rendering
+        lda #$00
+        sta PPU_MASK	
+        jsr PPU_init
+	jsr starfield_init
+        jsr dashboard_init
+        sta PPU_ADDR
+        sta PPU_ADDR	; PPU addr = $0000
+        sta PPU_SCROLL
+        sta PPU_SCROLL  ; PPU scroll = $0000
+	; enable rendering
+        lda #MASK_BG|MASK_SPR
+        sta PPU_MASK	
+        jsr timer_reset
 ; set player position
 	lda #$00
         sta player_death_flag
@@ -15,8 +30,6 @@ player_demo_init: subroutine
 	sta timer_seconds_10s	
 	sta timer_minutes_1s	
 	sta timer_minutes_10s	
-        lda #$02
-        sta player_speed
 	lda #$d0
         sta player_x_hi
         sta player_demo_x
@@ -129,7 +142,5 @@ set_player_sprite: subroutine
 ; attributes
         sta $206
         sta $20a
-; demo flight
-	jsr run_player_demo
         rts
         

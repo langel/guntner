@@ -43,39 +43,45 @@ player_direction_speed_table:
 ; playfield = 256 x 192
 ; player coordinates should be bound from 16 x 16 to 240 x 176
 player_move_position: subroutine
+
 	jsr player_direction_handler
+        
         lda player_x_hi
         cmp #16
         bcs .right_enuff
         lda #16
         sta player_x_hi
 .right_enuff
+
         lda player_x_hi
         cmp #232
         bcc .left_enuff
         lda #232
         sta player_x_hi
 .left_enuff
+
         lda player_y_hi
-        cmp #16
+        cmp #8
         bcs .down_enuff
-        lda #16
+        lda #8
         sta player_y_hi
 .down_enuff
+
         lda player_y_hi
-        cmp #160
+        cmp #174
         bcc .up_enuff
-        lda #160
+        lda #174
         sta player_y_hi
 .up_enuff
+
 	rts
+
 
 
 player_direction_handler: subroutine
 	lda player_dir_bits
         and #%00001111
         sta player_dir_bits
-        sta $80
         cmp #$00
         bne .dir_pressed
 	rts
@@ -143,7 +149,6 @@ player_move_up: subroutine
         sbc player_direction_speed_table,y
         sta player_y_hi
 	lda #$ff
-        sta $81
 	rts
         
 player_move_up_right: subroutine
@@ -155,7 +160,6 @@ player_move_up_right: subroutine
         inx
         txa
         tay
-        sta $85
         ; do x
         lda player_x_lo
         clc

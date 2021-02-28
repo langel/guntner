@@ -1,0 +1,63 @@
+
+
+
+game_time: subroutine
+	; read user controls even in demo mode!
+	jsr player_change_speed
+        
+        ; start should return to menu in demo mode
+        ; XXX normal game pause with start
+        jsr player_pause
+        ; test for paused
+        lda player_paused
+        cmp #$ff
+        bne .player_check_for_dead
+        jmp .done_and_paused
+        
+.player_check_for_dead
+	; MOCKUP DEATH SEQUENCE
+        lda player_health
+        cmp #$00
+        bne .player_not_dead
+.player_dead
+	jmp .player_dead_anim
+        
+.player_not_dead
+	jsr player_move_position
+        ; spawn enemies
+        jsr demo_enemy_spawn
+.dont_shoot
+        jsr set_player_sprite
+        lda #$04
+        sta player_damage
+        
+;; XXX FORCE QUICK DEATH
+        ;jsr player_take_damage
+        
+        jmp .done
+        
+.player_dead_anim
+	;jsr player_bullets_despawn
+        jsr demo_scroll_speed
+        lda player_death_flag
+        cmp #$00
+        bne .death_already_set
+        lda #$01
+        sta player_death_flag
+        jsr dashboard_you_dead
+        jmp .done
+.death_already_set
+	inc you_dead_counter
+        lda you_dead_counter
+        cmp #120
+        bne .still_dead
+        
+        ; GO BACK TO TITLE SCREEN 
+        ; AFTER DEATH SEQUENCE
+        jsr title_screen_init
+.still_dead
+.done
+	jsr player_bullets_update
+        jsr update_enemies
+.done_and_paused
+	rts

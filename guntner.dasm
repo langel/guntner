@@ -13,6 +13,7 @@ scroll_x	byte
 scroll_page	byte
 scroll_y	byte
 wtf		byte
+game_mode	byte
 scroll_speed	byte
 scroll_speed_m	byte
 bg_tile_default	byte
@@ -30,10 +31,26 @@ player_x_lo	byte
 player_y_hi	byte
 player_y_lo	byte
 player_speed	byte ; 2 bit value 0..3 translates to 1..4
+player_paused	byte
 player_controls	byte
+player_up	byte
+player_up_d	byte
+player_right	byte
+player_right_d	byte
+player_down	byte
+player_down_d	byte
+player_left	byte
+player_left_d	byte
 player_select	byte
+player_select_d	byte
 player_start	byte
+player_start_d	byte
+player_b	byte
+player_b_d	byte
+player_a	byte
+player_a_d	byte
 player_dir_bits	byte ; matches controller
+player_boundless	byte
 
 rng0		byte
 rng1		byte
@@ -142,11 +159,12 @@ RAM_init_clear:
 
 ; MY SETUP
         jsr SetPalette 
-        jsr player_demo_init
         jsr player_bullets_init
         jsr PleaseStart_plot
-	jsr starfield_init
-        jsr dashboard_init
+        
+ 	; set default speed
+        lda #$01
+        sta player_speed
         
 ; set default player colors
 	lda #$14
@@ -222,32 +240,24 @@ SetSprite0: subroutine
 ;;;;; INTERRUPT HANDLERS
 
 NMIHandler: subroutine
+
 	SAVE_REGS
+        
 ; enable NMI lockout
 	lda nmi_lockout
         cmp #$00
         bne .NMI_end
         inc nmi_lockout
+        
 ; load sprites
 	lda #$02
         sta PPU_OAM_DMA
-        ; wait for sprite 0
-; AFTER GETTING EVERYTHING INTO THE PPU : ::: 
-; STARFIELD TIME!!!
-	jsr starfield_update
-        jsr dashboard_draw
+        
+; main game logic
+        jsr mode_handler_vblank
         
         
         
-; update scroll pos
-	lda scroll_y
-        sec
-  ; SCROLL SPEED
-        sbc scroll_speed
-        bcs .samepage
-        inc scroll_page
-.samepage
-	sta scroll_y
 	lda scroll_page
         and #$01
         ora #CTRL_NMI|CTRL_BG_1000
@@ -258,12 +268,14 @@ NMIHandler: subroutine
         sta PPU_SCROLL
         lda #$f8
         sta PPU_SCROLL
+        
 ; SPRITES TIME!!
         jsr SetSprite0
         
-        jsr demo_mode
-
         
+; main game logic
+        jsr mode_handler_post_vblank
+               
 ; SPRITE 0 WAIT TIME!!!
 .wait0	bit PPU_STATUS
         bvs .wait0
@@ -272,6 +284,7 @@ NMIHandler: subroutine
         beq .wait1
         ; reset palette
         ;jsr SetPalette
+
 ; HUD POSITIONING
 ; set PPU_ADDR.1
         bit PPU_STATUS
@@ -284,17 +297,20 @@ NMIHandler: subroutine
 ; disable page 2 for HUD
         ora #CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
-; HUD prepare for next draw
-					; this should only happen during gameplay
-        lda player_death_flag
-        cmp #$00
-        bne .skip_dashboard_update
-	jsr dashboard_update
+        
+; read Player Controls
         jsr player_controls_read
-.skip_dashboard_update
+        
+; update global time
+	jsr timer_update
+        
+; update dashboard tiles 
+	jsr mode_handler_post_split
+
 ; disable NMI lockout
         lda #$00
         sta nmi_lockout
+        
 ; rng updates
 	lda rng0
         jsr NextRandom
@@ -305,23 +321,37 @@ NMIHandler: subroutine
 	lda rng2
         jsr NextRandom
         sta rng2
+        
 .NMI_end
 	RESTORE_REGS
 	rti
         
 
-
-        
         
 	include "ppu_init.dasm"
-        nop	; how much prg space we using?
-        
-        
-	include "demo_mode.dasm"
+        nop	; how much prg space we using?      
 
 	include "collision_detection.dasm"
         nop	; how much prg space we using?
         
+	include "dashboard.dasm"
+        nop	; how much prg space we using?
+        
+	include "demo_mode.dasm"
+        nop	; how much prg space we using?
+        
+	include "enemy_handler.dasm"
+	include "enemy_handler_birb.dasm"
+	include "enemy_handler_maggs.dasm"
+	include "enemy_handler_skully.dasm"
+	include "enemy_handler_starglasses.dasm"
+        nop	; how much prg space we using?
+        
+	include "game_mode.dasm"
+        nop	; how much prg space we using?
+        
+	include "mode_handler.dasm"
+        nop	; how much prg space we using?
         
 	include "player_main.dasm"
 	include "player_bullets.dasm"
@@ -332,21 +362,16 @@ NMIHandler: subroutine
         
 	include "please_start_screen.dasm"
         nop	; how much prg space we using?
+        
 	include "starfield.dasm"
         nop	; how much prg space we using?
-	include "dashboard.dasm"
-        nop	; how much prg space we using?
-
         
-	include "enemy_handler.dasm"
-	include "enemy_handler_birb.dasm"
-	include "enemy_handler_maggs.dasm"
-	include "enemy_handler_skully.dasm"
-	include "enemy_handler_starglasses.dasm"
-
+	include "timer_global.dasm"
         nop	; how much prg space we using?
         
-                
+	include "title_screen.dasm"
+        nop	; how much prg space we using?
+
         org $f000
 	include "enemy_tables.dasm"
         nop	; how much prg space we using?

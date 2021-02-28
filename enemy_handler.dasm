@@ -18,34 +18,6 @@ ENEMY_HIT_PALETTE_FRAMES	= #$03
 	;include "enemy_birb.dasm"
 
         
-enemy_spawn: subroutine
-	jsr get_enemy_slot_1_sprite
-        cmp #$ff
-        beq .no_birb_spawn
-        tax
-        jsr birb_spawn
-.no_birb_spawn
-	jsr get_enemy_slot_2_sprite
-        cmp #$ff
-        beq .no_maggs_spawn
-        tax
-        jsr maggs_spawn
-.no_maggs_spawn
-	jsr get_enemy_slot_4_sprite
-        cmp #$ff
-        beq .no_bigs_spawn
-        tax
-        lda rng0
-        and #$01
-        cmp #$00
-        beq .spawn_starglasses
-        jsr skully_spawn
-        jmp .no_bigs_spawn
-.spawn_starglasses
-        jsr starglasses_spawn
-.no_bigs_spawn
-	rts
-        
 
 
         
@@ -95,7 +67,11 @@ enemy_death: subroutine
         
         
 update_enemies: subroutine
-
+	; if player is dead despawn
+	lda player_health
+        cmp #$00
+        beq player_dead_enemies_despawn
+	; cycle through all the slots
 	lda #$00
         sta enemy_handler_pos
 .handler_loop
@@ -127,12 +103,11 @@ update_enemies_handler_next:
         sta enemy_handler_pos
         jmp .handler_loop
 .handler_core_end
-	jsr enemy_spawn
 	rts
         
         
         
-enemy_handler_player_dead: subroutine
+player_dead_enemies_despawn: subroutine
 	lda player_death_flag
         cmp #$00
         bne .dont_init
@@ -141,8 +116,8 @@ enemy_handler_player_dead: subroutine
 .dont_init
 	inc enemy_temp_temp
 	inc enemy_temp_temp
+	inc enemy_temp_temp
 	lda enemy_temp_temp
-        lsr
         lsr
         lsr
         lsr

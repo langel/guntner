@@ -1,23 +1,49 @@
 
+
+
 demo_mode: subroutine
+	; read user controls even in demo mode!
+	jsr player_change_speed
+        
+        ; start should return to menu in demo mode
+        lda player_start_d
+        cmp #$ff
+        bne .player_check_for_dead
+        jsr title_screen_init
+        jmp .done_and_paused
+        
+.player_check_for_dead
 	; MOCKUP DEATH SEQUENCE
         lda player_health
         cmp #$00
         bne .player_not_dead
 .player_dead
 	jmp .player_dead_anim
+        
 .player_not_dead
+	; push the shoot button
+        lda timer_frames_10s
+        and #$02
+        cmp #$02
+        bne .dont_shoot
+	lda #$ff
+        sta player_b_d
+        ; spawn enemies
+        jsr demo_enemy_spawn
+.dont_shoot
         jsr set_player_sprite
-	jsr player_bullets_update
-        jsr update_enemies
+; demo flight
+	jsr run_player_demo
         lda #$04
         sta player_damage
+        
+;; XXX FORCE QUICK DEATH
         ;jsr player_take_damage
-        rts
+        
+        jmp .done
+        
 .player_dead_anim
-	jsr player_bullets_despawn
-	;jsr player_bullets_update
-	jsr enemy_handler_player_dead
+	;jsr player_bullets_despawn
         jsr demo_scroll_speed
         lda player_death_flag
         cmp #$00
@@ -25,13 +51,51 @@ demo_mode: subroutine
         lda #$01
         sta player_death_flag
         jsr dashboard_you_dead
+        jmp .done
 .death_already_set
 	inc you_dead_counter
         lda you_dead_counter
         cmp #120
         bne .still_dead
-        jsr player_demo_init
+        
+        ; GO BACK TO TITLE SCREEN 
+        ; AFTER DEATH SEQUENCE
+        jsr title_screen_init
 .still_dead
+.done
+	jsr player_bullets_update
+        jsr update_enemies
+.done_and_paused
+	rts
+        
+        
+        
+demo_enemy_spawn: subroutine
+	jsr get_enemy_slot_1_sprite
+        cmp #$ff
+        beq .no_birb_spawn
+        tax
+        jsr birb_spawn
+.no_birb_spawn
+	jsr get_enemy_slot_2_sprite
+        cmp #$ff
+        beq .no_maggs_spawn
+        tax
+        jsr maggs_spawn
+.no_maggs_spawn
+	jsr get_enemy_slot_4_sprite
+        cmp #$ff
+        beq .no_bigs_spawn
+        tax
+        lda rng0
+        and #$01
+        cmp #$00
+        beq .spawn_starglasses
+        jsr skully_spawn
+        jmp .no_bigs_spawn
+.spawn_starglasses
+        jsr starglasses_spawn
+.no_bigs_spawn
 	rts
         
         
@@ -48,11 +112,12 @@ demo_scroll_speed:
         sta scroll_speed
         ; slow down stars
 .scroll_slow_done
+	rts
 
 
         
         
-        
+; controls player in demo mode    
 run_player_demo: subroutine
 	; clear player directions
         lda #$00

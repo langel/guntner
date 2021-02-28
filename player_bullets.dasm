@@ -183,6 +183,10 @@ player_bullets_update: subroutine
         lda bullet0 + 3
         cmp #$00
         bne .bullet0_spawned
+        lda player_b_d
+        cmp #$ff
+        bne .bullet0_done
+.bullet0_spawn
         lda player_x_hi
         sta bullet0 + 3
         lda player_y_hi
@@ -220,6 +224,10 @@ player_bullets_update: subroutine
         lda bullet1 + 3
         cmp #$00
         bne .bullet1_spawned
+        lda player_b_d
+        cmp #$ff
+        bne .bullet1_done
+.bullet1_spawn
         lda player_x_hi
         sta bullet1 + 3
         lda player_y_hi
@@ -270,6 +278,10 @@ player_bullets_update: subroutine
         lda bullet2 + 3
         cmp #$00
         bne .bullet2_spawned
+        lda player_b_d
+        cmp #$ff
+        bne .bullet2_done
+.bullet2_spawn
         lda player_x_hi
         sta bullet2 + 3
         lda player_y_hi
@@ -321,6 +333,10 @@ player_bullets_update: subroutine
         lda bullet3 + 3
         cmp #$00
         bne .bullet3_spawned
+        lda player_b_d
+        cmp #$ff
+        bne .bullet3_done
+.bullet3_spawn
         lda player_x_hi
         sta bullet3 + 3
         lda player_y_hi
@@ -371,6 +387,10 @@ player_bullets_update: subroutine
         lda bullet4 + 3
         cmp #$00
         bne .bullet4_spawned
+        lda player_b_d
+        cmp #$ff
+        bne .bullet4_done
+.bullet4_spawn
         lda player_x_hi
         sta bullet4 + 3
         lda player_y_hi

@@ -1,8 +1,8 @@
 ;;;; Constants
 
-STARFIELD_MASK		= #$1f ; star probability against %00001111
-STARFIELD_COL0_START	= #$00
-STARFIELD_COL1_START	= #$08
+STARFIELD_MASK		.byte #$1f ; star probability against %00001111
+STARFIELD_COL0_START	.byte #$00
+STARFIELD_COL1_START	.byte #$08
 
 
 starfield_init: subroutine
@@ -32,9 +32,9 @@ starfield_init: subroutine
         bne .27c0_loop
         ;sta $19
 ; reset star palette twinkles
-	lda #STARFIELD_COL0_START
+	lda STARFIELD_COL0_START
         sta starfield_col0
-        lda #STARFIELD_COL1_START
+        lda STARFIELD_COL1_START
         sta starfield_col1
 	rts
 
@@ -64,6 +64,15 @@ starfield_init: subroutine
 
 
 starfield_update: subroutine
+
+	; update scroll pos
+	lda scroll_y
+        sec
+        sbc scroll_speed
+        bcs .samepage
+        inc scroll_page
+.samepage
+	sta scroll_y
 	
         ; twinkle them stars
         PPU_SETADDR $3f01
@@ -104,7 +113,7 @@ starfield_update: subroutine
         lda starfield_rng
         jsr NextRandom
         sta starfield_rng
-        and #STARFIELD_MASK
+        and STARFIELD_MASK
         
 	lda scroll_y
         lsr
@@ -168,7 +177,7 @@ starfield_update: subroutine
         lda rng0
         jsr NextRandom
         sta rng0
-        and #STARFIELD_MASK
+        and STARFIELD_MASK
         sta starfield_rng
         
         ; row 0

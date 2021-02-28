@@ -1,0 +1,57 @@
+
+timer_update: subroutine
+        
+; UPDATE TIMER DIGITS
+; frames 1s
+	inc timer_frames_1s
+        lda #$0a
+        cmp timer_frames_1s
+        bne .timer_done
+        lda #$00
+        sta timer_frames_1s
+; frames 10s
+	inc timer_frames_10s
+        lda #$06
+        cmp timer_frames_10s
+        bne .timer_done
+        lda #$00
+        sta timer_frames_10s
+; seconds 1s
+	inc timer_seconds_1s
+        lda #$0a
+        cmp timer_seconds_1s
+        bne .timer_done
+        lda #$00
+        sta timer_seconds_1s
+; seconds 10s
+	inc timer_seconds_10s
+        lda #$06
+        cmp timer_seconds_10s
+        bne .timer_done
+        lda #$00
+        sta timer_seconds_10s
+; minutes 1s
+	inc timer_minutes_1s
+        lda #$0a
+        cmp timer_minutes_1s
+        bne .timer_done
+        lda #$00
+        sta timer_minutes_1s
+; minutes 10s
+	; we really checking this?
+        ; let it go into tile limbo
+	inc timer_minutes_10s
+.timer_done
+	rts
+        
+        
+
+timer_reset: subroutine
+	lda #$00
+        sta timer_frames_1s
+        sta timer_frames_10s
+        sta timer_seconds_1s
+        sta timer_seconds_10s
+        sta timer_minutes_1s
+        sta timer_minutes_10s
+        rts

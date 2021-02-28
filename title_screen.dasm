@@ -1,0 +1,62 @@
+
+
+title_screen_handler: subroutine
+	lda timer_seconds_1s
+        ; number of seconds before demo
+        cmp #$05
+        bne .sit_and_wait
+        lda #$10
+        sta game_mode
+        jsr player_demo_init
+.sit_and_wait
+	lda player_start_d
+        cmp #$ff
+        bne .do_nothing
+        lda #$00
+        sta player_start_d
+        lda #$11
+        sta game_mode
+        jsr player_demo_init
+.do_nothing
+	rts
+        
+        
+title_screen_init: subroutine
+	lda #$00
+        sta game_mode
+        sta scroll_y
+        sta scroll_page
+        jsr WaitSync	; wait for VSYNC
+        ;jsr WaitSync	; wait for VSYNC (and PPU warmup)
+	;jsr PPU_init
+        
+	; disable rendering
+        lda #$00
+        sta PPU_MASK	
+        jsr PPU_init
+        
+        jsr PleaseStart_plot
+        
+        ldx #$00
+.clear_sprite_ram
+	sta $200,x	; PPU OAM sprite data
+        inx
+        bne .clear_sprite_ram
+        lda #0
+        sta PPU_ADDR
+        sta PPU_ADDR	; PPU addr = $0000
+        sta PPU_SCROLL
+        sta PPU_SCROLL  ; PPU scroll = $0000
+; clear sprites
+	lda #$02
+        sta PPU_OAM_DMA
+        
+	; enable rendering
+        lda #MASK_BG|MASK_SPR
+        sta PPU_MASK	
+        
+        
+        jsr WaitSync	; wait for VSYNC
+        
+        jsr timer_reset
+	rts
