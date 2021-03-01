@@ -165,6 +165,7 @@ RAM_init_clear:
 ;        jsr ClearRAM	; clear RAM
         jsr WaitSync	; wait for VSYNC (and PPU warmup)
 	jsr PPU_init
+        jsr apu_init
 
 ; MY SETUP
         jsr SetPalette 
@@ -289,6 +290,8 @@ NMIHandler: subroutine
 ; SPRITES TIME!!
         jsr SetSprite0
         
+     
+        
         
 ; main game logic
         jsr mode_handler_post_vblank
@@ -354,6 +357,11 @@ NMIHandler: subroutine
         
 
         
+	
+	include "apu_handler.dasm"
+        
+
+        nop	; how much prg space we using?   
 
 	include "ppu_init.dasm"
         nop	; how much prg space we using?      

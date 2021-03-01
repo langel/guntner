@@ -99,7 +99,7 @@ maggs_cycle: subroutine
         ; DEAD
         inc phase_kill_count
 	; give points
-        lda #55
+        lda #56
         jsr player_add_points_00
         ; change it into crossbones!
         lda #$01

@@ -25,6 +25,8 @@ game_time: subroutine
         cmp #$ff
         beq .no_heal
         inc player_heal_c
+        inc player_heal_c
+        inc player_heal_c
         lda player_heal_c
         cmp #$40
         bne .no_heal

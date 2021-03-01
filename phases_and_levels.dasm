@@ -5,6 +5,11 @@ PHASE_MAX	.byte #$01
 
         
 phase_handler: subroutine
+	; update starfield speed
+        lda phase_current
+        clc
+        adc #$03
+        sta scroll_speed
 	; get current phase lookup table position
         lda phase_current
         asl
@@ -59,7 +64,7 @@ phase_next: subroutine
         
         
 phase01_init: subroutine
-	lda #$04
+	lda #$01
         sta enemy_temp_temp
 .phase_spawn_loop
 	jsr get_enemy_slot_1_sprite
@@ -72,15 +77,15 @@ phase01_init: subroutine
 phase01_cycle: subroutine
 	lda phase_kill_count
         sta $fa
-        cmp #$04
-        bne .not_done
+        cmp #$01
+        bCC .not_done
         jmp phase_next
 .not_done        
 	rts
         
                 
 phase02_init: subroutine
-	lda #$04
+	lda #$02
         sta enemy_temp_temp
 .phase_spawn_loop
 	jsr get_enemy_slot_2_sprite
@@ -93,7 +98,7 @@ phase02_init: subroutine
 phase02_cycle: subroutine
 	lda phase_kill_count
         sta $fa
-        cmp #$04
+        cmp #$02
         bne .not_done
         jmp phase_next
 .not_done        
@@ -120,6 +125,216 @@ phase03_cycle: subroutine
         jmp phase_next
 .not_done        
 	rts
+                
+                
+                
+phase04_init: subroutine
+	lda #$01
+        sta enemy_temp_temp
+.phase_spawn_loop
+	jsr get_enemy_slot_4_sprite
+        tax
+	jsr skully_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop
+        rts
+        
+phase04_cycle: subroutine
+	lda phase_kill_count
+        sta $fa
+        cmp #$01
+        bne .not_done
+        jmp phase_next
+.not_done        
+	rts
+        
+        
+        
+phase05_init: subroutine
+	lda #$02
+        sta enemy_temp_temp
+.phase_spawn_loop
+	jsr get_enemy_slot_4_sprite
+        tax
+	jsr starglasses_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop
+        
+	lda #$02
+        sta enemy_temp_temp
+.phase_spawn_loop2
+	jsr get_enemy_slot_2_sprite
+        tax
+	jsr maggs_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop2
+        
+	lda #$04
+        sta enemy_temp_temp
+.phase_spawn_loop3
+	jsr get_enemy_slot_1_sprite
+        tax
+	jsr birb_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop3
+        rts
+        
+phase05_cycle: subroutine
+	lda phase_kill_count
+        sta $fa
+        cmp #$08
+        bne .not_done
+        jmp phase_next
+.not_done        
+	rts
+        
+        
+        
+phase06_init: subroutine
+	lda #$08
+        sta enemy_temp_temp
+.phase_spawn_loop
+	jsr get_enemy_slot_1_sprite
+        tax
+	jsr birb_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop
+        
+	lda #$04
+        sta enemy_temp_temp
+.phase_spawn_loop2
+	jsr get_enemy_slot_2_sprite
+        tax
+	jsr maggs_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop2
+        rts
+        
+phase06_cycle: subroutine
+	lda phase_kill_count
+        sta $fa
+        cmp #$0b
+        bne .not_done
+        jmp phase_next
+.not_done        
+	rts
+        
+        
+phase07_init: subroutine
+	lda #$0c
+        sta enemy_temp_temp
+.phase_spawn_loop
+	jsr get_enemy_slot_1_sprite
+        tax
+	jsr birb_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop
+        
+	lda #$03
+        sta enemy_temp_temp
+.phase_spawn_loop2
+	jsr get_enemy_slot_4_sprite
+        tax
+	jsr skully_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop2
+        rts
+        
+phase07_cycle: subroutine
+	lda phase_kill_count
+        sta $fa
+        cmp #$0f
+        bne .not_done
+        jmp phase_next
+.not_done        
+	rts
+        
+        
+phase08_init: subroutine
+	lda #$0c
+        sta enemy_temp_temp
+.phase_spawn_loop
+	jsr get_enemy_slot_1_sprite
+        tax
+	jsr birb_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop
+        
+	lda #$01
+        sta enemy_temp_temp
+.phase_spawn_loop2
+	jsr get_enemy_slot_4_sprite
+        tax
+	jsr skully_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop2
+        
+	lda #$02
+        sta enemy_temp_temp
+.phase_spawn_loop3
+	jsr get_enemy_slot_2_sprite
+        tax
+	jsr maggs_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop3
+        rts
+        
+phase08_cycle: subroutine
+	lda phase_kill_count
+        sta $fa
+        cmp #$0f
+        bne .not_done
+        jmp phase_next
+.not_done        
+	rts
+        
+        
+phase09_init: subroutine
+	lda #$10
+        sta enemy_temp_temp
+.phase_spawn_loop
+	jsr get_enemy_slot_1_sprite
+        tax
+	jsr birb_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop
+        
+	lda #$06
+        sta enemy_temp_temp
+.phase_spawn_loop2
+	jsr get_enemy_slot_4_sprite
+        tax
+	jsr skully_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop2
+        
+	lda #$04
+        sta enemy_temp_temp
+.phase_spawn_loop3
+	jsr get_enemy_slot_2_sprite
+        tax
+	jsr maggs_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop3
+        
+	lda #$02
+        sta enemy_temp_temp
+.phase_spawn_loop4
+	jsr get_enemy_slot_4_sprite
+        tax
+	jsr starglasses_spawn
+        dec enemy_temp_temp
+        bne .phase_spawn_loop4
+        rts
+        
+phase09_cycle: subroutine
+	lda phase_kill_count
+        sta $fa
+        cmp #$1b
+        bne .not_done
+        jmp phase_next
+.not_done        
+	rts
         
         
         
@@ -129,6 +344,8 @@ phase_end_init: subroutine
         sta phase_end_game
 	rts
 phase_end_cycle: subroutine
+	; wow sound   
+        jsr apu_make_it_hum
 	; hit start to return to title screen
         lda player_start_d
         cmp #$00

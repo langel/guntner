@@ -5,11 +5,16 @@ skully_spawn: subroutine
 	lda #$05
         sta $0300,x ; enemy type
         lda rng0
-        sta $0303,x ; pattern counter
         sta $0304,x ; animation counter
         lda #$00
         sta $0301,x ; x pos
+        sta $0303,x ; pattern counter
         lda rng0
+        jsr NextRandom
+        sta rng0
+        tay
+        lda game_height_scale,y
+        sta $0302,x ; y pos
         lsr
         clc
         adc #$10
@@ -134,8 +139,10 @@ skully_cycle: subroutine
         clc
         adc ENEMY_RAM+4,x
         sta ENEMY_RAM+4,x
-        ; move skully to the right
-        inc ENEMY_RAM+1,x
+        
+        ; move skully
+        jsr skully_handle_movement
+        
         ; stash it in collision detector
         lda ENEMY_RAM+1,x
         sta collision_0_x
@@ -160,6 +167,8 @@ skully_cycle: subroutine
 	; give points
         lda #99
         jsr player_add_points_00
+        lda #99
+        jsr player_add_points_00__
 	lda #$01
         sta ENEMY_RAM,x
         jmp sprite_4_cleanup_for_next
@@ -196,3 +205,36 @@ skully_cycle: subroutine
 .skully_done
 	jsr player_collision_detect
 	jmp update_enemies_handler_next
+        
+        
+skully_handle_movement: subroutine
+	lda phase_current
+        cmp #$00
+        beq .demoshit
+        lda #$69
+        sta $f9
+        lda ENEMY_RAM+3,x
+        cmp #$40
+        bne .not_chasing
+        dec ENEMY_RAM+1,x
+        
+        rts
+.not_chasing
+        ; but we are zooming
+        lda #$20
+        sta ENEMY_RAM+3,x
+        lda #$04
+        clc
+        adc ENEMY_RAM+1,x
+        sta ENEMY_RAM+1,x
+        sta $f8
+        cmp #240
+        bcc .demoshit
+        lda #$40
+        sta ENEMY_RAM+3,x
+	rts
+.demoshit
+        ; move skully to the right
+        inc ENEMY_RAM+1,x
+	rts
+   

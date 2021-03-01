@@ -12,6 +12,10 @@ starglasses_spawn: subroutine
         lda #$00
         sta $0301,x ; x pos
         lda rng0
+        jsr NextRandom
+        jsr NextRandom
+        sta rng0
+        lsr
         lsr
         clc
         adc #$18
@@ -115,7 +119,12 @@ starglasses_cycle: subroutine
         bcc .dead
         jmp .not_dead
 .dead
+	; give points
+        lda #00
+        jsr player_add_points_00
 	inc phase_kill_count
+        lda #25
+        jsr player_add_points_00__
 	lda #$01
         sta ENEMY_RAM,x
         jmp sprite_4_cleanup_for_next

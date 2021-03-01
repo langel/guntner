@@ -23,6 +23,7 @@ player_demo_init: subroutine
 	lda #$00
         sta player_death_flag
         sta you_dead_counter
+        sta phase_current
         sta score_00
         sta score_00__
         sta score_00____
@@ -125,6 +126,7 @@ demo_mode: subroutine
         
         
         
+        
 demo_enemy_spawn: subroutine
 	jsr get_enemy_slot_1_sprite
         cmp #$ff
@@ -143,6 +145,7 @@ demo_enemy_spawn: subroutine
         beq .no_bigs_spawn
         tax
         lda rng0
+        jsr NextRandom
         and #$01
         cmp #$00
         beq .spawn_starglasses
