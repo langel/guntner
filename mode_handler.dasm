@@ -44,6 +44,7 @@ mode_handler_post_vblank: subroutine
         bne .not_game_time
         jsr game_time
 .not_game_time
+.not_title_screen
 .done
 	rts
         
@@ -58,6 +59,8 @@ mode_handler_post_split: subroutine
         ; HUD prepare for next draw
         
         ; this should only happen during gameplay
+        ; XXX this was meant to stop the timer when player dies
+        ; timer does currently stop when game over which is what we really want
         lda player_death_flag
         cmp #$00
         bne .skip_dashboard_update

@@ -1,6 +1,33 @@
 
 
+
 birb_spawn: subroutine
+	; x is set by enemy spawner
+	lda #$02
+        sta $0300,x ; enemy type
+        lda #$00
+        sta $0301,x ; x pos
+        sta $0303,x ; pattern counter
+        lda rng0
+        jsr NextRandom
+        sta rng0
+        sta $0304,x ; animation counter
+        tay
+        lda game_height_scale,y
+        sta $0302,x ; y pos
+        lda #$01
+        sta $0305,x ; health
+        clc
+        txa
+        lsr
+        adc #$20
+        sta $0307,x ; OAM ref  
+   	rts
+        
+        
+        
+
+birb_spawn_demo: subroutine
 	; x is set by enemy spawner
 	lda #$02
         sta $0300,x ; enemy type
@@ -95,6 +122,7 @@ birb_cycle: subroutine
         cmp #$00
         bne .birb_not_dead
 .birb_is_dead
+	inc phase_kill_count
 	; give points
         lda #05
         jsr player_add_points_00

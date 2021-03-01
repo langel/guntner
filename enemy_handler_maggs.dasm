@@ -10,10 +10,11 @@ maggs_spawn: subroutine
         sta $0301,x ; x pos
         sta $0304,x ; animation counter
         lda rng0
+        jsr NextRandom
+        sta rng0
         sta $0303,x ; pattern counter
-        lsr
-        clc
-        adc #$08
+        tay
+        lda game_height_scale,y
         sta $0302,x ; y pos
         lda #$04
         sta $0305,x ; health
@@ -96,6 +97,7 @@ maggs_cycle: subroutine
         bne .not_dead
 .dead
         ; DEAD
+        inc phase_kill_count
 	; give points
         lda #55
         jsr player_add_points_00

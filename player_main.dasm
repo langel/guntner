@@ -1,6 +1,6 @@
 
         
-player_demo_init: subroutine
+player_init: subroutine
 ; redraw playfield/hud
 	; disable rendering
         lda #$00
@@ -8,6 +8,7 @@ player_demo_init: subroutine
         jsr PPU_init
 	jsr starfield_init
         jsr dashboard_init
+        jsr clear_all_enemies
         sta PPU_ADDR
         sta PPU_ADDR	; PPU addr = $0000
         sta PPU_SCROLL
@@ -16,8 +17,15 @@ player_demo_init: subroutine
         lda #MASK_BG|MASK_SPR
         sta PPU_MASK	
         jsr timer_reset
+; set player lives
+	lda #$05
+        sta player_lives
 ; set player position
 	lda #$00
+        sta phase_current
+        sta phase_state
+        sta phase_kill_count
+        sta phase_end_game
         sta player_death_flag
         sta you_dead_counter
         sta score_00

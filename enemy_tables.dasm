@@ -1,7 +1,7 @@
 
 
 ENEMY_METHODS_LOOKUP_TABLE:
-        hex 0000
+        hex 0000 ; should do nothing
         word crossbones_cycle
         word birb_cycle
         word maggs_cycle

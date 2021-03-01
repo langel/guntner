@@ -5,8 +5,6 @@ game_time: subroutine
 	; read user controls even in demo mode!
 	jsr player_change_speed
         
-        ; start should return to menu in demo mode
-        ; XXX normal game pause with start
         jsr player_pause
         ; test for paused
         lda player_paused
@@ -37,7 +35,8 @@ game_time: subroutine
 	jsr player_move_position
         jsr player_bullets_check_controls
         ; spawn enemies
-        jsr demo_enemy_spawn
+; PHASE HANDLER
+        jsr phase_handler
 .dont_shoot
         jsr set_player_sprite
         lda #$04
@@ -50,23 +49,59 @@ game_time: subroutine
         
 .player_dead_anim
 	;jsr player_bullets_despawn
-        jsr demo_scroll_speed
+        jsr death_scroll_speed
         lda player_death_flag
         cmp #$00
         bne .death_already_set
         lda #$01
         sta player_death_flag
+        dec player_lives
+        lda player_lives
+        cmp #$00
+        bne .youdead
+        jsr dashboard_game_over
+        jmp .done
+.youdead
         jsr dashboard_you_dead
         jmp .done
 .death_already_set
 	inc you_dead_counter
         lda you_dead_counter
-        cmp #120
+	cmp #120
         bne .still_dead
+; next life      
+        lda player_lives
+        cmp #$00
+        bne .next_life
         
         ; GO BACK TO TITLE SCREEN 
         ; AFTER DEATH SEQUENCE
         jsr title_screen_init
+        ; reinitializing lives left
+        ; so timer will run on title screen
+        lda #$05
+        sta player_lives
+        jmp .done
+.next_life
+	; set star speed
+        lda #$07
+        sta scroll_speed
+        asl
+        asl
+        asl
+        sta scroll_speed_m
+        ; reset health
+	lda #$ff
+        sta player_health
+        ; reset death sequence timers
+        lda #$00
+        sta player_death_flag
+        sta you_dead_counter
+        ; rest player sprites
+        ldx #$8f ; set tiles
+        stx $205
+        dex 
+        stx $209
 .still_dead
 .done
         jsr update_enemies

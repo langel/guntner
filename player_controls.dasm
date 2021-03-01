@@ -33,6 +33,9 @@ player_change_speed: subroutine
         
         
 player_pause: subroutine
+	lda phase_end_game
+        cmp #$01
+        beq .read_start_done
 	lda player_start_d
         cmp #$00
         beq .read_start_done

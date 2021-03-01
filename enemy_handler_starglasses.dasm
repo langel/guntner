@@ -5,13 +5,16 @@ starglasses_spawn: subroutine
 	lda #$04
         sta $0300,x ; enemy type
         lda rng0
+        jsr NextRandom
+        sta rng0
         sta $0303,x ; pattern counter
         sta $0304,x ; animation counter
         lda #$00
         sta $0301,x ; x pos
         lda rng0
         lsr
-        lsr
+        clc
+        adc #$18
         sta $0302,x ; y pos
         lda #$04
         sta $0305,x ; health
@@ -112,6 +115,7 @@ starglasses_cycle: subroutine
         bcc .dead
         jmp .not_dead
 .dead
+	inc phase_kill_count
 	lda #$01
         sta ENEMY_RAM,x
         jmp sprite_4_cleanup_for_next

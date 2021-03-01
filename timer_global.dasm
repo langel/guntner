@@ -1,5 +1,8 @@
 
 timer_update: subroutine
+	lda player_lives
+        cmp #$00
+        beq .timer_done
         
 ; UPDATE TIMER DIGITS
 ; frames 1s

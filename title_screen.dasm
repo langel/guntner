@@ -12,11 +12,12 @@ title_screen_handler: subroutine
 	lda player_start_d
         cmp #$ff
         bne .do_nothing
+        ;; disable start_d so game doesn't instantly pause
         lda #$00
         sta player_start_d
         lda #$11
         sta game_mode
-        jsr player_demo_init
+        jsr player_init
 .do_nothing
 	rts
         
@@ -36,6 +37,16 @@ title_screen_init: subroutine
         jsr PPU_init
         
         ;jsr PleaseStart_plot
+        
+        
+        
+        
+        
+        
+        
+        
+        
+; G u n T n e R
 	PPU_SETADDR $20e9
 	ldy #$00		; set Y counter to 0
 .title_loop:
@@ -45,6 +56,153 @@ title_screen_init: subroutine
         iny		; next character
 	bne .title_loop	; loop
 .enda
+	PPU_SETADDR $2109
+	ldy #$00		; set Y counter to 0
+.title_loop2:
+	lda guntner_msg,y	; get next character
+        beq .enda2	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .title_loop2	; loop
+.enda2
+	PPU_SETADDR $2129
+	ldy #$00		; set Y counter to 0
+.title_loop3:
+	lda guntner_msg,y	; get next character
+        beq .enda3	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .title_loop3	; loop
+.enda3
+	PPU_SETADDR $2149
+	ldy #$00		; set Y counter to 0
+.title_loop4:
+	lda guntner_msg,y	; get next character
+        beq .enda4	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .title_loop4	; loop
+.enda4
+
+
+
+
+; G u n T n e R
+	PPU_SETADDR $21c1
+	ldy #$00		; set Y counter to 0
+.title_lopa:
+	lda guntner_msg,y	; get next character
+        beq ._lopaend	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .title_lopa	; loop
+._lopaend
+	PPU_SETADDR $21e1
+	ldy #$00		; set Y counter to 0
+.title_lopa2:
+	lda guntner_msg,y	; get next character
+        beq ._lopaend2	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .title_lopa2	; loop
+._lopaend2
+	PPU_SETADDR $2201
+	ldy #$00		; set Y counter to 0
+.title_lopa3:
+	lda guntner_msg,y	; get next character
+        beq ._lopaend3	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .title_lopa3	; loop
+._lopaend3
+	PPU_SETADDR $21a1
+	ldy #$00		; set Y counter to 0
+.title_lopa4:
+	lda guntner_msg,y	; get next character
+        beq ._lopaend4	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .title_lopa4	; loop
+._lopaend4
+
+        
+        
+
+
+; G u n T n e R
+	PPU_SETADDR $21d1
+	ldy #$00		; set Y counter to 0
+.title_lopaaa:
+	lda guntner_msg,y	; get next character
+        beq ._lopaaaend	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .title_lopaaa	; loop
+._lopaaaend
+	PPU_SETADDR $21f1
+	ldy #$00		; set Y counter to 0
+.title_lopaaa2:
+	lda guntner_msg,y	; get next character
+        beq ._lopaaaend2	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .title_lopaaa2	; loop
+._lopaaaend2
+	PPU_SETADDR $2211
+	ldy #$00		; set Y counter to 0
+.title_lopaaa3:
+	lda guntner_msg,y	; get next character
+        beq ._lopaaaend3	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .title_lopaaa3	; loop
+._lopaaaend3
+	PPU_SETADDR $21b1
+	ldy #$00		; set Y counter to 0
+.title_lopaaa4:
+	lda guntner_msg,y	; get next character
+        beq ._lopaaaend4	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .title_lopaaa4	; loop
+._lopaaaend4
+
+
+
+
+
+; copyright
+	PPU_SETADDR $2304
+	ldy #$00		; set Y counter to 0
+.title_loop5:
+	lda copyright,y	; get next character
+        beq .enda5	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .title_loop5	; loop
+.enda5
+
+
+
+
+; please start
+	PPU_SETADDR $2028
+	ldy #$0		; set Y counter to 0
+.loop:
+	lda PleaseStart_msg,y	; get next character
+        beq .end	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .loop	; loop
+.end
+
+	PPU_SETADDR $22c0
+        lda #$1d
+        ldy #$20
+.set_top_bar
+	sta PPU_DATA
+        dey
+        bne .set_top_bar
         
         ldx #$00
 .clear_sprite_ram
@@ -73,4 +231,8 @@ title_screen_init: subroutine
         
 guntner_msg:
 	.byte "G u n T n e R"
+        .byte #$00
+        
+copyright:
+	.byte "(c) MMXXI puke7, loblast"
         .byte #$00

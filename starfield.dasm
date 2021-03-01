@@ -37,6 +37,22 @@ starfield_init: subroutine
         lda STARFIELD_COL1_START
         sta starfield_col1
 	rts
+        
+        
+death_scroll_speed:
+        lda scroll_speed
+        cmp #$00
+        beq .scroll_slow_done
+        dec scroll_speed
+	dec scroll_speed_m
+        lda scroll_speed_m
+        lsr
+        lsr
+        lsr
+        sta scroll_speed
+        ; slow down stars
+.scroll_slow_done
+	rts
 
 
 ;;;;; STARFIELD_PLOT_POS

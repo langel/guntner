@@ -156,6 +156,7 @@ skully_cycle: subroutine
         bcc .skully_dead
         jmp .skully_not_dead
 .skully_dead
+	inc phase_kill_count
 	; give points
         lda #99
         jsr player_add_points_00

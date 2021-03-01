@@ -41,6 +41,20 @@ sprite_4_cleanup_for_next: subroutine
 	jmp update_enemies_handler_next
 	
         
+clear_all_enemies: subroutine
+	ldx #$00
+        txa
+.enemy_loop
+	sta ENEMY_RAM,x
+        inx
+        bne .enemy_loop
+	ldx #$20
+.sprite_loop
+	sta $0200,x
+        inx
+        bne .sprite_loop
+        rts
+        
         
 enemy_death: subroutine
         ; clear OAM data
@@ -76,14 +90,16 @@ update_enemies: subroutine
         sta enemy_handler_pos
 .handler_loop
         ldx enemy_handler_pos
-	; set OAM position in zero page
-        lda ENEMY_RAM+7,x
-        sta enemy_temp_oam_x
 	; get enemy type
         lda ENEMY_RAM,x
         ; not defined go next slot
         cmp #$00
         beq .handler_next
+	; set OAM position in zero page
+        lda ENEMY_RAM+7,x
+        sta enemy_temp_oam_x
+	; get enemy type
+        lda ENEMY_RAM,x
         asl
         tax
         lda ENEMY_METHODS_LOOKUP_TABLE,x

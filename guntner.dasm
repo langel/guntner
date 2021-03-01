@@ -18,6 +18,7 @@ scroll_speed	byte
 scroll_speed_m	byte
 bg_tile_default	byte
 player_health	byte
+player_lives	byte
 player_heal_c	byte
 player_demo_x	byte
 player_demo_y	byte
@@ -129,6 +130,13 @@ player_bullet_collision_temp_x	byte
 
 you_dead_counter	byte
 
+phase_kill_count	byte
+phase_current		byte
+phase_state		byte
+phase_temp_addr_lo	byte
+phase_temp_addr_hi	byte
+phase_end_game		byte
+
 
 
 ;;;;; NES CARTRIDGE HEADER
@@ -165,8 +173,16 @@ RAM_init_clear:
         ;jsr PleaseStart_plot
         
  	; set default speed
-        lda #$01
+        lda #$02
         sta player_speed
+        
+        
+        ; reinitializing lives left
+        ; so timer will run on title screen
+        ; XXX need a cleanup of this
+        ; very spaghetti
+        lda #$05
+        sta player_lives
         
 ; set default player colors
 	lda #$14
@@ -259,7 +275,6 @@ NMIHandler: subroutine
         jsr mode_handler_vblank
         
         
-        
 	lda scroll_page
         and #$01
         ora #CTRL_NMI|CTRL_BG_1000
@@ -294,21 +309,28 @@ NMIHandler: subroutine
         lda #$00
         sta PPU_SCROLL
 ; set PPU_SCROLL.2
-        lda #$08
+        lda #$00
         sta PPU_SCROLL
 ; disable page 2 for HUD
 	lda #$00
         ora #CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
         
+; update dashboard tiles 
+	jsr mode_handler_post_split
+        
 ; read Player Controls
         jsr player_controls_read
         
 ; update global time
+	lda phase_end_game
+        cmp #$01
+        bne .game_not_done
+        jsr dashboard_end_game
+        jmp .game_is_done
+.game_not_done
 	jsr timer_update
-        
-; update dashboard tiles 
-	jsr mode_handler_post_split
+.game_is_done
 
 ; disable NMI lockout
         lda #$00
@@ -332,6 +354,7 @@ NMIHandler: subroutine
         
 
         
+
 	include "ppu_init.dasm"
         nop	; how much prg space we using?      
 
@@ -356,6 +379,13 @@ NMIHandler: subroutine
         
 	include "mode_handler.dasm"
         nop	; how much prg space we using?
+        
+        
+	include "phases_and_levels.dasm"
+        nop	; how much prg space we using?
+	include "phase_table.dasm"
+        nop	; how much prg space we using?
+
         
 	include "player_main.dasm"
 	include "player_bullets.dasm"
@@ -385,6 +415,9 @@ NMIHandler: subroutine
         org $f800
 	include "sine.dasm"
 	include "decimal_table.dasm"
+        
+	include "scale_table.dasm"
+
 
         nop	; how much prg space we using?
 

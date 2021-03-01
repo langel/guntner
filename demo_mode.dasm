@@ -1,4 +1,59 @@
 
+        
+player_demo_init: subroutine
+; redraw playfield/hud
+	; disable rendering
+        lda #$00
+        sta PPU_MASK	
+        jsr PPU_init
+	jsr starfield_init
+        jsr dashboard_init
+        sta PPU_ADDR
+        sta PPU_ADDR	; PPU addr = $0000
+        sta PPU_SCROLL
+        sta PPU_SCROLL  ; PPU scroll = $0000
+	; enable rendering
+        lda #MASK_BG|MASK_SPR
+        sta PPU_MASK	
+        jsr timer_reset
+; set player lives
+	lda #$05
+        sta player_lives
+; set player position
+	lda #$00
+        sta player_death_flag
+        sta you_dead_counter
+        sta score_00
+        sta score_00__
+        sta score_00____
+        sta score_00______
+	sta timer_frames_1s	
+	sta timer_frames_10s	
+	sta timer_seconds_1s	
+	sta timer_seconds_10s	
+	sta timer_minutes_1s	
+	sta timer_minutes_10s	
+	lda #$d0
+        sta player_x_hi
+        sta player_demo_x
+	lda #$70
+        sta player_y_hi
+        sta player_demo_y
+        lda #$ff
+        sta player_health
+  ; SCROLL SPEED
+  	lda #$07
+        sta scroll_speed
+        asl
+        asl
+        asl
+        sta scroll_speed_m
+        
+        ldx #$8f ; set tiles
+        stx $205
+        dex 
+        stx $209
+        rts
 
 
 demo_mode: subroutine
@@ -34,17 +89,17 @@ demo_mode: subroutine
         jsr set_player_sprite
 ; demo flight
 	jsr run_player_demo
-        lda #$04
-        sta player_damage
         
 ;; XXX FORCE QUICK DEATH
+        lda #$04
+        sta player_damage
         ;jsr player_take_damage
         
         jmp .done
         
 .player_dead_anim
 	;jsr player_bullets_despawn
-        jsr demo_scroll_speed
+        jsr death_scroll_speed
         lda player_death_flag
         cmp #$00
         bne .death_already_set
@@ -75,7 +130,7 @@ demo_enemy_spawn: subroutine
         cmp #$ff
         beq .no_birb_spawn
         tax
-        jsr birb_spawn
+        jsr birb_spawn_demo
 .no_birb_spawn
 	jsr get_enemy_slot_2_sprite
         cmp #$ff
@@ -99,20 +154,6 @@ demo_enemy_spawn: subroutine
 	rts
         
         
-demo_scroll_speed:
-        lda scroll_speed
-        cmp #$00
-        beq .scroll_slow_done
-        dec scroll_speed
-	dec scroll_speed_m
-        lda scroll_speed_m
-        lsr
-        lsr
-        lsr
-        sta scroll_speed
-        ; slow down stars
-.scroll_slow_done
-	rts
 
 
         

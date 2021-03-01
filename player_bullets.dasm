@@ -333,7 +333,7 @@ player_bullets_update: subroutine
 	lda bullet_data+0,x
         cmp #$08
         bcc .despawn
-        ; is y > 192
+        ; is y > 180
 	lda bullet_data+1,x
         cmp #180
         bcs .despawn

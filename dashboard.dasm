@@ -2,7 +2,9 @@
 
 speed_addr		= $2306
 life_bar_addr		= $2308
-score_addr		= $234b
+lives_addr		= $231d
+phase_addr		= $2348
+score_addr		= $234c
 timer_addr		= $2356
 tile_empty		= $05
 
@@ -63,6 +65,15 @@ dashboard_init: subroutine
         inx
         bne .tile_dash_set_page1
         
+        
+	PPU_SETADDR $2000
+        lda #$04
+        ldy #$20
+.set_bottom_tiles
+	sta PPU_DATA
+        dey
+        bne .set_bottom_tiles
+        
 ; fill nametable 2 dash area with dash top bar tile
 	PPU_SETADDR $26c0
         lda #$04
@@ -74,26 +85,31 @@ dashboard_init: subroutine
 	rts
         
 dashboard_bg_tiles:
-	; row 0
+	; top row 0
 	hex 1da0a1a1a1a1a1a3
         hex a1a1a1a1a1a1a1a1
         hex a1a1a1a1a1a1a1a1
         hex a3a1a1a1a1a1a21d
-        ; row 1
+        ; health row 1
 	hex 1db0a5a6a7a8b1b3
 	hex b1b1b1b1b1b1b1b1
         hex b1b1b1b1b1b1b1b1
-        hex b31011783035b21d
-        ; row 2
-	hex 1dc0c1c1c1c1c1c4
-        hex c1c1d3d1d1d1d1d1
-        hex d1d1d1a4c1d3d1d1
+        hex b310117830b1b21d
+        ; middle row 2
+	hex 1dd0d1d1d1d1d1c3
+        hex d1d1a4d3d1d1d1d1
+        hex d1d1d1d1a4d3d1d1
         hex c3d1d1d1d1d1d21d
-        ; row 3
-	hex 1d1d1d1d1d1d1d1d
-	hex 1d1db0b1b1b1b1b1
-	hex b1b1b1b21db0b1b1
+        ; score row 3
+	hex 1db05048415345b1
+	hex b1b1b2b0b1b1b1b1
+	hex b1b1b1b2b2b0b1b1
 	hex b1b1b1b1b1b1b21d
+	; bottom 4
+	hex 1d1d1d1d1d1d1d1d
+	hex 1d1d1d1d1d1d1d1d
+	hex 1d1d1d1d1d1d1d1d
+	hex 1d1d1d1d1d1d1d1d
 
 
 dashboard_you_dead: subroutine
@@ -130,6 +146,77 @@ dashboard_you_dead: subroutine
         lda #$20
         sta lifebarf
         rts
+        
+        
+dashboard_game_over: subroutine
+        lda #$20
+        sta lifebar0
+        lda #$47
+        sta lifebar1
+        lda #$20
+        sta lifebar2
+        lda #$41
+        sta lifebar3
+        lda #$20
+        sta lifebar4
+        lda #$4d
+        sta lifebar5
+        lda #$20
+        sta lifebar6
+        lda #$45
+        sta lifebar7
+        lda #$20
+        sta lifebar8
+        lda #$4f
+        sta lifebar9
+        lda #$20
+        sta lifebara
+        lda #$56
+        sta lifebarb
+        lda #$20
+        sta lifebarc
+        lda #$45
+        sta lifebard
+        lda #$72
+        sta lifebare
+        lda #$20
+        sta lifebarf
+        rts
+        
+dashboard_end_game: subroutine
+        lda #$67
+        sta lifebar0
+        lda #$67
+        sta lifebar1
+        lda #$20
+        sta lifebar2
+        lda #$43
+        sta lifebar3
+        lda #$6f
+        sta lifebar4
+        lda #$6e
+        sta lifebar5
+        lda #$47
+        sta lifebar6
+        lda #$72
+        sta lifebar7
+        lda #$61
+        sta lifebar8
+        lda #$54
+        sta lifebar9
+        lda #$69
+        sta lifebara
+        lda #$30
+        sta lifebarb
+        lda #$4e
+        sta lifebarc
+        lda #$20
+        sta lifebard
+        lda #$67
+        sta lifebare
+        lda #$67
+        sta lifebarf
+	rts
 
 
 ; RENDER DASH STATS TO SCREEN
@@ -142,6 +229,25 @@ dashboard_draw: subroutine
         adc #$31
         sta PPU_DATA
         
+.lives
+	PPU_SETADDR lives_addr
+        lda player_lives
+        clc
+        adc #$30
+        sta PPU_DATA
+        
+.phase
+	PPU_SETADDR phase_addr
+        lda phase_current
+        clc
+        adc #$01
+        asl
+        tax
+        lda decimal_table,x
+        sta PPU_DATA
+        inx
+        lda decimal_table,x
+        sta PPU_DATA
 
 .lifebarf
 	PPU_SETADDR life_bar_addr
