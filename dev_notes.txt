@@ -1,5 +1,56 @@
 
 
+things TO DO --
+
+
+
+
+life count decrements
+
+
+title screen
+actual phase/wave handling
+options screen
+game difficulty (selection and lookup tables)
+	Kids' Gloves
+	Basic Bean
+	Mega Gooderest
+	A-OK #1 Expert
+
+HUD/dashboard phrases capslock oscillate "you dead" and "please unpause"
+player spawn sequence/animation (starfield speed up)
+
+
+different gun types
+	rapid on/off
+	cone
+	spread
+	basic gun
+	TURBO KILL YOU DEAD IF YOU USE TOO MUCH (a button attack)
+turbo attack burn up/out in hud lifebar display
+
+enemy hit palette swap frame counter subroutine
+enemy collision detection before movement
+sound effects
+music? (sheesh)
+moar enemies
+	uzi that shoots bullets
+	middle finger (boss?)
+
+
+all possible scenes --
+	title screen
+	options
+	about
+	demo mode
+	game (main) && game (endurance (playing the demo))
+		"phase world" (opening level set)
+		current phase
+		paused
+		death
+
+
+
 RAM MAP - 2kb is so much!!
 
 $0000 - zero page
@@ -56,9 +107,50 @@ sprite configurations
 2x2 : starglasses, skully
 
 
-;;; enemy bullet struc
-; x_pos
-; y_pos
-; direction
-; type
-; enemy bullet is just another type of enemy
+HUD info to include:
+	score
+	shields
+	time
+	speed (ship movement changed with select key)
+	paused? (start key)
+	current world/level/phase/wave `X-X` eg. 7-1, 1-3 etc.....
+
+
+LIFE BAR
+	256 range
+	16 tiles
+	64 lines
+	
+so for every tile thats a life range of 16 translate to 4
+so get the 16 range
+240..255
+224..239
+208..223
+192..207
+176..191
+160..175
+144..159
+128..143
+112..127
+ 96..111
+ 80.. 95
+ 64.. 79
+ 48.. 63
+ 32.. 47
+ 16.. 31 
+  0.. 15
+
+
+
+
+8bit Workship IDE problems
+
+ctrl-r refreshed but could be Redo (after ctrl-z undo)
+remember cursor position in each file (probably just needs focus / can't delete highlights but it remembers those)
+new file placeholder text doesn't go away
+various forms: enter does not submit
+file order is what? (think we know now)
+const values label overwrites var name in memory browser
+main dropdon doesn't close after clicking dropdown item
+tab makes indent -- shift-tab does not deindent
+search all code for string (undefined labels are easy to find)
