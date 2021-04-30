@@ -1,9 +1,15 @@
 
 
 title_screen_handler: subroutine
+	lda title_screen_chord_played
+        cmp #$00
+        bne .chord_played
+	inc title_screen_chord_played
+        jsr apu_trigger_title_screen_chord
+.chord_played
 	lda timer_seconds_1s
         ; number of seconds before demo
-        cmp #$01
+        cmp #$03
         bne .sit_and_wait
         lda #$10
         sta game_mode
@@ -27,6 +33,7 @@ title_screen_init: subroutine
         sta game_mode
         sta scroll_y
         sta scroll_page
+        sta title_screen_chord_played
         jsr WaitSync	; wait for VSYNC
         ;jsr WaitSync	; wait for VSYNC (and PPU warmup)
 	;jsr PPU_init
@@ -35,14 +42,6 @@ title_screen_init: subroutine
         lda #$00
         sta PPU_MASK	
         jsr PPU_init
-        
-        ;jsr PleaseStart_plot
-        
-        
-        
-        
-        
-        
         
         
         

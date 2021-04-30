@@ -113,6 +113,8 @@ timer_seconds_10s	byte
 timer_minutes_1s	byte
 timer_minutes_10s	byte
 
+title_screen_chord_played	byte
+
 enemy_temp_addr_lo	byte
 enemy_temp_addr_hi	byte
 enemy_temp_oam_x	byte
@@ -140,6 +142,8 @@ phase_end_game		byte
 audio_noise_mode	byte
 audio_noise_pitch	byte
 audio_noise_volume	byte
+audio_beat_counter      byte
+audio_root_tone         byte
 
 ;;;;; NES CARTRIDGE HEADER
 

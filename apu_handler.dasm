@@ -77,10 +77,6 @@ apu_game_frame: subroutine
 .not_player_death_sound
 	rts
         
-;$4000 / $4004	DDLC VVVV	Duty (D), envelope loop / length counter halt (L), constant volume (C), volume/envelope (V)
-;$4001 / $4005	EPPP NSSS	Sweep unit: enabled (E), period (P), negate (N), shift (S)
-;$4002 / $4006	TTTT TTTT	Timer low (T)
-;$4003 / $4007	LLLL LTTT	Length counter load (L), timer high (T)
         
 apu_trigger_pewpew: subroutine
 	; pulse 2
@@ -172,6 +168,68 @@ apu_trigger_enemy_death: subroutine
         sta $400f
 	rts
         
+;$4000 / $4004	DDLC VVVV	Duty (D), envelope loop / length counter halt (L), constant volume (C), volume/envelope (V)
+;$4001 / $4005	EPPP NSSS	Sweep unit: enabled (E), period (P), negate (N), shift (S)
+;$4002 / $4006	TTTT TTTT	Timer low (T)
+;$4003 / $4007	LLLL LTTT	Length counter load (L), timer high (T)
+        
+apu_trigger_title_screen_chord: subroutine
+	;rts
+        ; setup pulse 1
+	lda #%10001111
+        sta $4000
+        lda #$00
+        sta $4001
+        lda rng0
+        and #%00001111
+        clc
+        adc #$10
+        tax
+        lda periodTableLo,x
+        sta $4002
+        lda periodTableHi,x
+        ora #%00001000
+        sta $4003
+        ; setup pulse 2
+	lda #%10001111
+        sta $4004
+        lda #$00
+        sta $4005
+        lda rng1
+        and #%00001111
+        clc
+        adc #$08
+        tax
+        lda periodTableLo,x
+        sta $4006
+        lda periodTableHi,x
+        ora #%00001000
+        sta $4007
+        ; setup triangle
+	lda #%01111111
+        sta $4008
+        lda rng2
+        and #%00001111
+        clc
+        adc #$08
+        tax
+        lda periodTableLo,x
+        sta $400a
+        lda periodTableHi,x
+        ora #%00001000
+        sta $400b
+	rts
+        
+apu_game_music_init: subroutine
+	
+	rts
+        
+apu_game_music_frame: subroutine
+	rts
+        
+octoscale:
+	.byte $00,$02,$03,$05,$06,$08,$09,$0b
+	.byte $0c,$0e,$0f,$11,$12,$14,$15,$17
    
 periodTableLo:
   .byte $f1,$7f,$13,$ad,$4d,$f3,$9d,$4c,$00,$b8,$74,$34
