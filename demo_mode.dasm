@@ -104,6 +104,7 @@ demo_mode: subroutine
         lda player_death_flag
         cmp #$00
         bne .death_already_set
+        jsr apu_trigger_player_death
         lda #$01
         sta player_death_flag
         jsr dashboard_you_dead
@@ -121,6 +122,7 @@ demo_mode: subroutine
 .done
 	jsr player_bullets_demo_update
         jsr update_enemies
+        jsr apu_game_frame
 .done_and_paused
 	rts
         

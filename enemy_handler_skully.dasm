@@ -164,6 +164,7 @@ skully_cycle: subroutine
         jmp .skully_not_dead
 .skully_dead
 	inc phase_kill_count
+        jsr apu_trigger_enemy_death
 	; give points
         lda #99
         jsr player_add_points_00
@@ -178,6 +179,7 @@ skully_cycle: subroutine
         ; setup hit palette counter
 	lda #ENEMY_HIT_PALETTE_FRAMES
         sta ENEMY_RAM+6,x
+	jsr apu_trigger_enemy_damage
 .decide_palette
 	lda ENEMY_RAM+6,x
         cmp #$00

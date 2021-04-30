@@ -3,7 +3,7 @@
 title_screen_handler: subroutine
 	lda timer_seconds_1s
         ; number of seconds before demo
-        cmp #$05
+        cmp #$01
         bne .sit_and_wait
         lda #$10
         sta game_mode

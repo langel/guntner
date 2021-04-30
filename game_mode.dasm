@@ -61,9 +61,11 @@ game_time: subroutine
         lda player_lives
         cmp #$00
         bne .youdead
+        jsr apu_trigger_player_death
         jsr dashboard_game_over
         jmp .done
 .youdead
+        jsr apu_trigger_player_death
         jsr dashboard_you_dead
         jmp .done
 .death_already_set
@@ -108,5 +110,6 @@ game_time: subroutine
 .done
         jsr update_enemies
 	jsr player_bullets_update
+        jsr apu_game_frame
 .done_and_paused
 	rts

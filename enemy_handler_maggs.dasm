@@ -98,6 +98,7 @@ maggs_cycle: subroutine
 .dead
         ; DEAD
         inc phase_kill_count
+        jsr apu_trigger_enemy_death
 	; give points
         lda #56
         jsr player_add_points_00
@@ -112,6 +113,7 @@ maggs_cycle: subroutine
         sta $0203+0,y
         ;jsr enemy_death
 .not_dead
+	jsr apu_trigger_enemy_damage
         lda ENEMY_RAM+6,x
         ora #ENEMY_HIT_PALETTE_FRAMES
         sta ENEMY_RAM+6,x

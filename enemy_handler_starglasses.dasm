@@ -119,6 +119,7 @@ starglasses_cycle: subroutine
         bcc .dead
         jmp .not_dead
 .dead
+        jsr apu_trigger_enemy_death
 	; give points
         lda #00
         jsr player_add_points_00
@@ -133,6 +134,7 @@ starglasses_cycle: subroutine
 	lda ENEMY_RAM+6,x
         ora ENEMY_HIT_PALETTE_FRAMES
 	sta ENEMY_RAM+6,x
+	jsr apu_trigger_enemy_damage
 .palette_check
 	lda ENEMY_RAM+6,x
         and ENEMY_HIT_PALETTE_FRAMES

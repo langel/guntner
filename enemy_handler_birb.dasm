@@ -127,9 +127,11 @@ birb_cycle: subroutine
         lda #05
         jsr player_add_points_00
         ; change it into crossbones!
+        jsr apu_trigger_enemy_death
         lda #$01
         sta ENEMY_RAM+0,x
 .birb_not_dead
+	jsr apu_trigger_enemy_damage
         ; palette
         lda #$00
         sta $0202,y

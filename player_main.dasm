@@ -132,6 +132,7 @@ player_collision_detect: subroutine
         lda #$04
         sta player_damage
         jsr player_take_damage
+        jsr apu_trigger_player_damage
 .done
         rts
         

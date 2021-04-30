@@ -137,7 +137,9 @@ phase_temp_addr_lo	byte
 phase_temp_addr_hi	byte
 phase_end_game		byte
 
-
+audio_noise_mode	byte
+audio_noise_pitch	byte
+audio_noise_volume	byte
 
 ;;;;; NES CARTRIDGE HEADER
 
@@ -351,6 +353,7 @@ NMIHandler: subroutine
         jsr NextRandom
         sta rng2
         
+                
 .NMI_end
 	RESTORE_REGS
 	rti

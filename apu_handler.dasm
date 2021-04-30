@@ -14,6 +14,164 @@ apu_make_it_hum: subroutine
         sta $4007
 	rts
         
+	lda #%00001111
+        sta $400c
+        lda #%00000100
+        sta $400e
+        lda #%01111000
+        sta $400f
+        
+; enemy death*
+; enemy damage*
+; player fires*
+; player damage*
+; player death*
+        
+        
+apu_game_frame: subroutine
+	lda audio_noise_mode
+        ; enemy death sound
+        cmp #$01
+        bne .not_enemy_death_sound
+        lda audio_noise_pitch
+        sta $400e
+        lda audio_noise_volume
+        and #%00010000
+        sta $400c
+        lda #%01111000
+        sta $400f
+        dec audio_noise_pitch
+        dec audio_noise_volume
+        bne .dont_kill_enemy_death_sound
+        lda #$00
+        sta $400c
+        sta audio_noise_mode
+.dont_kill_enemy_death_sound
+	rts
+.not_enemy_death_sound
+	lda audio_noise_mode
+        cmp #$02
+        bne .not_player_death_sound
+        lda audio_noise_volume
+        lsr
+        lsr
+        lsr
+        lsr
+        and #%00010000
+        sta $400c 
+        lda audio_noise_pitch
+        lsr
+        lsr
+        lsr
+        sta $400e
+        lda #%01111000
+        sta $400f
+        inc audio_noise_pitch
+        inc audio_noise_volume
+        inc audio_noise_volume
+        bne .dont_kill_player_death_sound
+        lda #$00
+        sta $400c
+        sta audio_noise_mode
+.dont_kill_player_death_sound
+.not_player_death_sound
+	rts
+        
+;$4000 / $4004	DDLC VVVV	Duty (D), envelope loop / length counter halt (L), constant volume (C), volume/envelope (V)
+;$4001 / $4005	EPPP NSSS	Sweep unit: enabled (E), period (P), negate (N), shift (S)
+;$4002 / $4006	TTTT TTTT	Timer low (T)
+;$4003 / $4007	LLLL LTTT	Length counter load (L), timer high (T)
+        
+apu_trigger_pewpew: subroutine
+	; pulse 2
+	;rts
+	lda #%10001111
+        sta $4004
+        lda #%10000010
+        sta $4005
+        lda #$08
+        sta $4006
+        lda #%00010000
+        sta $4007
+	rts
+        
+apu_trigger_player_damage: subroutine
+	; noise
+	;rts
+        lda #%00001111
+        sta $400c
+        lda #%00001111
+        sta $400e
+        lda #%00010000
+        sta $400f
+        rts
+        
+apu_trigger_player_death: subroutine
+	; noise and?
+        ;rts
+        ; setup pulse 1
+	lda #%10001111
+        sta $4000
+        lda #%10000111
+        sta $4001
+        lda #$fc
+        sta $4002
+        lda #%00001010
+        sta $4003
+        ; setup pulse 2
+	lda #%10001111
+        sta $4004
+        lda #%10000111
+        sta $4005
+        lda #$fb
+        sta $4006
+        lda #%00001001
+        sta $4007
+        ; setup noise handler
+	lda #$02
+        sta audio_noise_mode
+        lda #$00
+        sta audio_noise_volume
+        lda #$80
+        sta audio_noise_pitch
+	rts
+        
+apu_trigger_enemy_damage: subroutine
+	; pulse 2
+	;rts
+	lda #%10001111
+        sta $4004
+        lda #%10000010
+        sta $4005
+        lda #$08
+        sta $4006
+        lda #%00010001
+        sta $4007
+	rts
+        
+;$400C	--LC VVVV	Envelope loop / length counter halt (L), constant volume (C), volume/envelope (V)
+;$400D	---- ----	Unused
+;$400E	L--- PPPP	Loop noise (L), noise period (P)
+;$400F	LLLL L---	Length counter load (L)
+        
+apu_trigger_enemy_death: subroutine
+	; noise
+	;rts
+	; enemy death is noise mode 1
+        lda #$01
+        sta audio_noise_mode
+        lda #$0f
+        sta audio_noise_pitch
+        sta audio_noise_volume
+	rts
+	lda #%00001111
+        sta $400c
+        lda #%00000100
+        sta $400e
+        lda #%01111000
+        sta $400f
+	rts
+        
    
 periodTableLo:
   .byte $f1,$7f,$13,$ad,$4d,$f3,$9d,$4c,$00,$b8,$74,$34
@@ -32,6 +190,45 @@ periodTableHi:
   .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
   .byte $00,$00,$00,$00,$00,$00,$00,$00
   
+  
+; envelope lengths
+;     |  0   1   2   3   4   5   6   7    8   9   A   B   C   D   E   F
+;-----+----------------------------------------------------------------
+;00-0F  10,254, 20,  2, 40,  4, 80,  6, 160,  8, 60, 10, 14, 12, 26, 14,
+;10-1F  12, 16, 24, 18, 48, 20, 96, 22, 192, 24, 72, 26, 16, 28, 32, 30
+
+; 00  10
+; 01 254
+; 02  20
+; 03   2
+; 04  40
+; 05   4
+; 06  80
+; 07   6
+; 08 160
+; 09   8
+; 0a  60
+; 0b  10
+; 0c  14
+; 0d  12
+; 0e  26
+; 0f  14
+; 10  12
+; 11  16
+; 12  24
+; 13  18
+; 14  48
+; 15  20
+; 16  96
+; 17  22
+; 18 192
+; 19  24
+; 1a  72
+; 1b  26
+; 1c  16
+; 1d  28
+; 1e  32
+; 1f  30
   
   
 apu_init: subroutine

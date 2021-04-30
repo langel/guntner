@@ -10,10 +10,10 @@ bullet2		= $0214
 bullet3		= $0218
 bullet4		= $021c
 
-player_bullet_sprite	= #$79
+player_bullet_sprite	.byte #$79
 
-controller_input	= #$ff
-player_power		= #$ff
+controller_input	.byte #$ff
+player_power		.byte #$ff
 
 bullet_data	= $0500
 
@@ -188,6 +188,8 @@ player_gun_normal_fire: subroutine
         ; check if bullet is spawned
         cmp #$00
         bne .next
+        ; trigger pewpew
+	jsr apu_trigger_pewpew
         lda player_x_hi
         sta bullet_data+0,x
         lda player_y_hi
@@ -231,6 +233,8 @@ player_gun_turbo_fire: subroutine
         ; check if bullet is spawned
         cmp #$00
         bne .next
+        ; trigger pewpew
+	jsr apu_trigger_pewpew
         ; set x,y position
         lda player_x_hi
         sta bullet_data+0,x
@@ -387,6 +391,7 @@ player_bullets_demo_update: subroutine
         cmp #$ff
         bne .bullet0_done
 .bullet0_spawn
+	jsr apu_trigger_pewpew
         lda player_x_hi
         sta bullet0 + 3
         lda player_y_hi
@@ -428,6 +433,7 @@ player_bullets_demo_update: subroutine
         cmp #$ff
         bne .bullet1_done
 .bullet1_spawn
+	jsr apu_trigger_pewpew
         lda player_x_hi
         sta bullet1 + 3
         lda player_y_hi
@@ -482,6 +488,7 @@ player_bullets_demo_update: subroutine
         cmp #$ff
         bne .bullet2_done
 .bullet2_spawn
+	jsr apu_trigger_pewpew
         lda player_x_hi
         sta bullet2 + 3
         lda player_y_hi
@@ -537,6 +544,7 @@ player_bullets_demo_update: subroutine
         cmp #$ff
         bne .bullet3_done
 .bullet3_spawn
+	jsr apu_trigger_pewpew
         lda player_x_hi
         sta bullet3 + 3
         lda player_y_hi
@@ -591,6 +599,7 @@ player_bullets_demo_update: subroutine
         cmp #$ff
         bne .bullet4_done
 .bullet4_spawn
+	jsr apu_trigger_pewpew
         lda player_x_hi
         sta bullet4 + 3
         lda player_y_hi
