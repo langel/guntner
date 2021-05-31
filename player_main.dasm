@@ -6,6 +6,14 @@ player_init: subroutine
         lda #$00
         sta PPU_MASK	
         jsr PPU_init
+; clear top rows
+	PPU_SETADDR $2000
+        ldy #$00
+        lda #$20
+.clear_top_rows
+	sta PPU_DATA
+        iny
+        bne .clear_top_rows
 	jsr starfield_init
         jsr dashboard_init
         jsr clear_all_enemies
@@ -58,6 +66,7 @@ player_init: subroutine
         stx $205
         dex 
         stx $209
+        jsr apu_game_music_init
         rts
         
         

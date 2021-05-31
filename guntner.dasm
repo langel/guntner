@@ -114,6 +114,8 @@ timer_minutes_1s	byte
 timer_minutes_10s	byte
 
 title_screen_chord_played	byte
+title_screen_color	byte
+title_temp	byte
 
 enemy_temp_addr_lo	byte
 enemy_temp_addr_hi	byte
@@ -142,8 +144,10 @@ phase_end_game		byte
 audio_noise_mode	byte
 audio_noise_pitch	byte
 audio_noise_volume	byte
-audio_beat_counter      byte
+audio_frame_counter     byte
 audio_root_tone         byte
+audio_pattern_pos	byte
+audio_pattern_num       byte
 
 ;;;;; NES CARTRIDGE HEADER
 
@@ -157,6 +161,7 @@ Start:	subroutine
 ; CLEAR CPU RAM
         ldx #$00
         txa
+        sta title_screen_color
 RAM_init_clear:
 	sta $000,x
 	sta $100,x
@@ -257,9 +262,6 @@ SetSprite0: subroutine
         
 
         
-;;;;; COMMON SUBROUTINES
-
-	include "nesppu.dasm"
 
 
 ;;;;; INTERRUPT HANDLERS
@@ -271,12 +273,16 @@ NMIHandler: subroutine
 ; enable NMI lockout
 	lda nmi_lockout
         cmp #$00
-        bne .NMI_end
+        beq .no_lock
+        jmp .NMI_end
+.no_lock
         inc nmi_lockout
+        
         
 ; load sprites
 	lda #$02
         sta PPU_OAM_DMA
+        
         
 ; main game logic
         jsr mode_handler_vblank
@@ -340,10 +346,6 @@ NMIHandler: subroutine
 .game_not_done
 	jsr timer_update
 .game_is_done
-
-; disable NMI lockout
-        lda #$00
-        sta nmi_lockout
         
 ; rng updates
 	inc wtf
@@ -356,23 +358,29 @@ NMIHandler: subroutine
 	lda rng2
         jsr NextRandom
         sta rng2
+
+; disable NMI lockout
+        lda #$00
+        sta nmi_lockout
         
                 
 .NMI_end
 	RESTORE_REGS
 	rti
         
-
         
+; all includes      
+
 	
 	include "apu_handler.dasm"
-        
-
         nop	; how much prg space we using?   
 
 	include "ppu_init.dasm"
         nop	; how much prg space we using?      
 
+	include "nesppu.dasm"
+        nop	; how much prg space we using?  
+        
 	include "collision_detection.dasm"
         nop	; how much prg space we using?
         
@@ -409,8 +417,8 @@ NMIHandler: subroutine
 	include "player_points.dasm"
         nop	; how much prg space we using?
         
-	include "please_start_screen.dasm"
-        nop	; how much prg space we using?
+;	include "please_start_screen.dasm"
+;        nop	; how much prg space we using?
         
 	include "starfield.dasm"
         nop	; how much prg space we using?
@@ -449,6 +457,10 @@ Palette00:
         hex 013530	;sprite 3
         
         nop	; how much prg space we using?
+        
+        
+;	include "guntner_title.dasm"
+;        nop	; how much prg space we using?
 
 
 

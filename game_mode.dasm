@@ -21,6 +21,7 @@ game_time: subroutine
 	jmp .player_dead_anim
         
 .player_not_dead
+	jsr apu_game_music_frame
 	lda player_health
         cmp #$ff
         beq .no_heal
