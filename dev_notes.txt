@@ -50,11 +50,37 @@ all possible scenes --
 		death
 
 
+music pacing 60Hz frame rate
+
+120 bpm = 30 fpb 
+150 bpm = 24 fpb
+180 bpm = 20 fpb
+
+120 bpm 8th notes = 15 fp8
+150 bpm 8th notes = 12 fp8
+180 bpm 8th notes = 10 fp8
+
+var phase_current == a value between 1 and 9 during game play
+120 increase by 18 per frame
+180 increase by 26 per frame
+
+120 bpm 16th notes = 7.5 fp16
+150 bpm 16th notes = 6.0 fp16
+180 bpm 16th notes = 5.0 fp16
+
+audio_noise_mode	byte
+audio_noise_pitch	byte
+audio_noise_volume	byte
+audio_frame_counter      byte
+audio_root_tone         byte
+audio_pattern_pos	byte
+audio_pattern_num       byte
+
 
 RAM MAP - 2kb is so much!!
 
 $0000 - zero page
-$0100 - 
+$0100 - music data?
 $0200 - OAM reference (sprite data)
 $0300 - enemy data
 $0400 -
@@ -65,7 +91,7 @@ $0700 -
 
 SPRITE MAP - 64 wow :) / but over 8 on scanline bad :(
 
-#$00      - sprite zero for splitting the screen
+#$00       - sprite zero for splitting the screen
 #$01..#$02 - player's spaceship
 #$03..#$07 - 5 player bullets
 #$08..#$3f - enemy sprites? (56)
@@ -151,6 +177,6 @@ new file placeholder text doesn't go away
 various forms: enter does not submit
 file order is what? (think we know now)
 const values label overwrites var name in memory browser
-main dropdon doesn't close after clicking dropdown item
+main dropdown doesn't close after clicking dropdown item
 tab makes indent -- shift-tab does not deindent
 search all code for string (undefined labels are easy to find)
