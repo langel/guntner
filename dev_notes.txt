@@ -1,5 +1,45 @@
 
 
+Kickstarter 100 / January 2022
+
+source:
+  - cartridge shells
+  - rom chips
+     - 8kb chr rom
+     - 16kb program rom
+  - lockout chips
+     - cic can be made from attiny13 : https://mousebitelabs.com/2020/09/11/nes-reproduction-quick-guide-custom-pcb/
+  - PCB design (gerber)
+
+Label / Promo Art Asset
+Better Logo?
+
+More Enemies
+	uzi that shoots bullets
+	middle finger (boss?)
+  - sense of bosses
+  - enemies that spawn smaller enemies
+More Levels
+Power Ups (dropped by StarGlasses which spawn periodically)
+  - Health
+  - Invincibility
+Fix Enemy Death Counter Bug
+Fix Starfield glitchiness
+Better Music Generator
+About Screen (from Title Screen)
+Options Screen (from Title Screen)
+  - set ship speed before starting game
+  - set ship colors?
+  - sound test?
+  - difficulty setting?
+player spawn sequence/animation (starfield speed up)
+
+
+
+
+
+ ===== THIS IS OLD DOWN BELOW =====
+
 things TO DO --
 
 
