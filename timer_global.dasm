@@ -1,9 +1,5 @@
 
 timer_update: subroutine
-	lda player_lives
-        cmp #$00
-        beq .timer_done
-        
 ; UPDATE TIMER DIGITS
 ; frames 1s
 	inc timer_frames_1s
@@ -43,6 +39,7 @@ timer_update: subroutine
 ; minutes 10s
 	; we really checking this?
         ; let it go into tile limbo
+        ; XXX GAME OVER at 99:59.59 !!
 	inc timer_minutes_10s
 .timer_done
 	rts

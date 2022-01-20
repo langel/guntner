@@ -126,18 +126,17 @@ starglasses_cycle: subroutine
 	inc phase_kill_count
         lda #25
         jsr player_add_points_00__
+        ; spawn crossbones
 	lda #$01
         sta ENEMY_RAM,x
         jmp sprite_4_cleanup_for_next
 .not_dead
 	sta ENEMY_RAM+5,x
-	lda ENEMY_RAM+6,x
-        ora ENEMY_HIT_PALETTE_FRAMES
+        lda #ENEMY_HIT_PALETTE_FRAMES
 	sta ENEMY_RAM+6,x
 	jsr apu_trigger_enemy_damage
 .palette_check
 	lda ENEMY_RAM+6,x
-        and ENEMY_HIT_PALETTE_FRAMES
         cmp #$00
         beq .palette_not_hit
 .palette_hit

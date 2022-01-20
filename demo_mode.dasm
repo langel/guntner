@@ -25,7 +25,7 @@ player_demo_init: subroutine
         sta PPU_MASK	
         jsr timer_reset
 ; set player lives
-	lda #$05
+	lda #$01
         sta player_lives
 ; set player position
 	lda #$00
@@ -82,6 +82,8 @@ demo_mode: subroutine
         cmp #$00
         bne .player_not_dead
 .player_dead
+	lda #$00
+        sta player_lives
 	jmp .player_dead_anim
         
 .player_not_dead

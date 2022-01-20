@@ -7,6 +7,7 @@
 ; #$10 = demo
 ; #$11 = game : normal playing
 ; #$12 = game : "phase world" display
+; #$1f = game : sandbox mode
 
 
 
@@ -44,6 +45,11 @@ mode_handler_post_vblank: subroutine
         bne .not_game_time
         jsr game_time
 .not_game_time
+	lda game_mode
+        cmp #$1f
+        bne .not_sandbox_time
+        jsr sandbox_time
+.not_sandbox_time
 .not_title_screen
 .done
 	rts
@@ -57,10 +63,7 @@ mode_handler_post_split: subroutine
         cmp #$10
         bne .no_dashboard
         ; HUD prepare for next draw
-        
-        ; this should only happen during gameplay
-        ; XXX this was meant to stop the timer when player dies
-        ; timer does currently stop when game over which is what we really want
+        ; stop updating HUD if game over
         lda player_death_flag
         cmp #$00
         bne .skip_dashboard_update

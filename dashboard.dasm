@@ -112,7 +112,7 @@ dashboard_bg_tiles:
 	hex 1d1d1d1d1d1d1d1d
 
 
-dashboard_you_dead: subroutine
+dashboard_you_dead: subroutine ;  Y 0 u   D 3 A D
         lda #$20
         sta lifebar0
         lda #$59
@@ -148,7 +148,7 @@ dashboard_you_dead: subroutine
         rts
         
         
-dashboard_game_over: subroutine
+dashboard_game_over: subroutine ;  G A M E  O V Er
         lda #$20
         sta lifebar0
         lda #$47
@@ -183,7 +183,7 @@ dashboard_game_over: subroutine
         sta lifebarf
         rts
         
-dashboard_end_game: subroutine
+dashboard_end_game: subroutine ;  gg ConGraTiON gg
         lda #$67
         sta lifebar0
         lda #$67
@@ -285,6 +285,15 @@ dashboard_draw: subroutine
         sta PPU_DATA
 
 .timer 
+	; make sure player has lives / not game over
+	lda player_lives
+        cmp #$00
+        beq .timer_done
+        ; make sure player hasn't finished the game
+	lda phase_end_game
+        cmp #$01
+        beq .timer_done
+; we good to update the visual timer
         PPU_SETADDR timer_addr
         lda timer_minutes_10s
         clc 
@@ -314,6 +323,7 @@ dashboard_draw: subroutine
         clc 
         adc #$30
         sta PPU_DATA
+.timer_done
 
 .score
 	PPU_SETADDR score_addr
@@ -381,7 +391,13 @@ dashboard_update: subroutine
 
 
 ; LIFEBARF
-
+	; check if end game
+	lda phase_end_game
+        cmp #$00
+        beq .lifebarf_not_end_game
+        jsr dashboard_end_game
+        jmp .super_done
+.lifebarf_not_end_game
 	; if paused then just say P A U S E D
         ; wait maybe it says PLEASE UNPAUSE
         lda player_paused
@@ -389,6 +405,7 @@ dashboard_update: subroutine
         beq .lifebarf_not_live
         jmp .lifebarf_is_live
 .lifebarf_not_live
+; XXX why is there two version!??!
         ; UPPERCASE
         lda #$20 ; space
         sta lifebar0

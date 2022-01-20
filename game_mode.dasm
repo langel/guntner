@@ -78,15 +78,10 @@ game_time: subroutine
         lda player_lives
         cmp #$00
         bne .next_life
+        ; no lives left game over
+        ; GO BACK TO TITLE SCREEN AFTER DEATH SEQUENCE
+        jmp title_screen_init
         
-        ; GO BACK TO TITLE SCREEN 
-        ; AFTER DEATH SEQUENCE
-        jsr title_screen_init
-        ; reinitializing lives left
-        ; so timer will run on title screen
-        lda #$05
-        sta player_lives
-        jmp .done
 .next_life
 	; set star speed
         lda #$07
@@ -102,7 +97,7 @@ game_time: subroutine
         lda #$00
         sta player_death_flag
         sta you_dead_counter
-        ; rest player sprites
+        ; reset player sprites
         ldx #$8f ; set tiles
         stx $205
         dex 

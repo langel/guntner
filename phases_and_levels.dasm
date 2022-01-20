@@ -350,8 +350,6 @@ phase_end_cycle: subroutine
         lda player_start_d
         cmp #$00
         beq .keep_flying
-        lda #$00
-        sta phase_end_game
         jsr title_screen_init
 .keep_flying
 	rts

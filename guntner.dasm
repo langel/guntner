@@ -182,7 +182,7 @@ RAM_init_clear:
         jsr SetPalette 
         jsr player_bullets_init
         jsr title_screen_init
-        ;jsr PleaseStart_plot
+        jsr sandbox_init
         
  	; set default speed
         lda #$02
@@ -302,8 +302,6 @@ NMIHandler: subroutine
 ; SPRITES TIME!!
         jsr SetSprite0
         
-     
-        
         
 ; main game logic
         jsr mode_handler_post_vblank
@@ -338,14 +336,8 @@ NMIHandler: subroutine
         jsr player_controls_read
         
 ; update global time
-	lda phase_end_game
-        cmp #$01
-        bne .game_not_done
-        jsr dashboard_end_game
-        jmp .game_is_done
-.game_not_done
-	jsr timer_update
-.game_is_done
+	jsr timer_update 
+
         
 ; rng updates
 	inc wtf
@@ -390,12 +382,22 @@ NMIHandler: subroutine
 	include "demo_mode.dasm"
         nop	; how much prg space we using?
         
+	include "enemy_tables.dasm"
+        nop	; how much prg space we using?
 	include "enemy_handler.dasm"
+        nop	; how much prg space we using?
 	include "enemy_handler_birb.dasm"
+        nop	; how much prg space we using?
 	include "enemy_handler_maggs.dasm"
+        nop	; how much prg space we using?
 	include "enemy_handler_skully.dasm"
+        nop	; how much prg space we using?
 	include "enemy_handler_starglasses.dasm"
         nop	; how much prg space we using?
+        
+	include "powerups.asm"
+        nop	; how much prg space we using?
+
         
 	include "game_mode.dasm"
         nop	; how much prg space we using?
@@ -403,6 +405,9 @@ NMIHandler: subroutine
 	include "mode_handler.dasm"
         nop	; how much prg space we using?
         
+	include "sandbox_mode.dasm"
+        nop	; how much prg space we using?
+
         
 	include "phases_and_levels.dasm"
         nop	; how much prg space we using?
@@ -411,14 +416,15 @@ NMIHandler: subroutine
 
         
 	include "player_main.dasm"
+        nop	; how much prg space we using?
 	include "player_bullets.dasm"
+        nop	; how much prg space we using?
 	include "player_controls.dasm"
+        nop	; how much prg space we using?
 	include "player_movement.dasm"
+        nop	; how much prg space we using?
 	include "player_points.dasm"
         nop	; how much prg space we using?
-        
-;	include "please_start_screen.dasm"
-;        nop	; how much prg space we using?
         
 	include "starfield.dasm"
         nop	; how much prg space we using?
@@ -429,20 +435,18 @@ NMIHandler: subroutine
 	include "title_screen.dasm"
         nop	; how much prg space we using?
 
-        org $f000
-	include "enemy_tables.dasm"
-        nop	; how much prg space we using?
 
         
 ; LOOKUP TABLES AT TOP OF RAM
-        org $f800
+        org $fa00
 	include "sine.dasm"
-	include "decimal_table.dasm"
-        
-	include "scale_table.dasm"
-
-
         nop	; how much prg space we using?
+	include "decimal_table.dasm"
+        nop	; how much prg space we using?
+	include "scale_table.dasm"
+        nop	; how much prg space we using?
+
+
 
         
 Palette00:
@@ -458,16 +462,13 @@ Palette00:
         
         nop	; how much prg space we using?
         
-        
-;	include "guntner_title.dasm"
-;        nop	; how much prg space we using?
 
 
 
 ;;;;; CPU VECTORS
-
+	org $ffff
 	NES_VECTORS
 
 ;;;;; GRAPHX
 	org $10000
-	incbin "grafx3.chr"
+	incbin "grafx4.chr"

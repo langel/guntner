@@ -14,6 +14,11 @@ source:
 Label / Promo Art Asset
 Better Logo?
 
+
+ship only self-heals when not in motion?
+
+
+
 More Enemies
 	uzi that shoots bullets
 	middle finger (boss?)
