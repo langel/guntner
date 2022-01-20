@@ -142,7 +142,7 @@ copyright_loop:
         bne .set_top_bar
         
 ; version
-	PPU_SETADDR $22da
+	PPU_SETADDR $22d6
 version_loop:
 	lda version,y	; get next character
         beq .version_end	; is 0? exit loop
@@ -189,7 +189,7 @@ copyright:
         .byte #$00
         
 version:
-	.byte " v1.2 "
+	.byte "DEMOv1.3"
         .byte #$00
         
         
