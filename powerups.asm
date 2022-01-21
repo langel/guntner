@@ -12,13 +12,16 @@ powerup_spawn:
         lsr
         adc #$20
         sta enemy_ram_oam,x ; OAM ref 
+        ; x pos
         lda #$0
         sta enemy_ram_x,x
+        ; y pos
         lda rng0
         jsr NextRandom
         sta rng0
         tay
         lda game_height_scale,y
+        sta enemy_ram_y,x
         lda #$20
         ldy enemy_ram_oam,x
         sta $0200,y
@@ -55,7 +58,24 @@ powerups_cycle: subroutine
         cmp #$80
         bcc .move_right
 .move_left
-	dec enemy_ram_x,x
+	lda enemy_ram_ac,x
+        clc
+        adc enemy_ram_pc,x
+        bcc .not1
+        dec enemy_ram_x,x
+        clc
+.not1        
+        adc enemy_ram_pc,x
+        bcc .not2
+        dec enemy_ram_x,x
+        clc
+.not2      
+        adc enemy_ram_pc,x
+        bcc .not3
+        dec enemy_ram_x,x
+        clc
+.not3      
+        sta enemy_ram_ac,x
         dec enemy_ram_pc,x
         jmp .move_done
 .move_right
