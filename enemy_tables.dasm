@@ -7,4 +7,6 @@ ENEMY_METHODS_LOOKUP_TABLE:
         word maggs_cycle
         word starglasses_cycle
         word skully_cycle
+        word powerups_cycle
+        word powerups_cycle
         

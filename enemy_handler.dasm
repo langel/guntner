@@ -3,6 +3,15 @@
 ENEMY_RAM			= $0300
 ENEMY_HIT_PALETTE_FRAMES	= #$03
 
+enemy_ram_type = $0300
+enemy_ram_x    = $0301
+enemy_ram_y    = $0302
+enemy_ram_pc   = $0303
+enemy_ram_ac   = $0304
+enemy_ram_hp   = $0305
+enemy_ram_att  = $0306
+enemy_ram_oam  = $0307
+
 
 
 ;;;; enemy types
@@ -95,10 +104,10 @@ update_enemies: subroutine
         cmp #$00
         beq .handler_next
 	; set OAM position in zero page
-        lda ENEMY_RAM+7,x
+        lda enemy_ram_oam,x
         sta enemy_temp_oam_x
 	; get enemy type
-        lda ENEMY_RAM,x
+        lda enemy_ram_type,x
         asl
         tax
         lda ENEMY_METHODS_LOOKUP_TABLE,x

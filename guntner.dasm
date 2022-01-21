@@ -179,6 +179,13 @@ RAM_init_clear:
         jsr apu_init
 
 ; MY SETUP
+     	; setup rng
+        lda #$01
+        sta rng0
+        sta rng1
+        lda #$ff
+        sta rng2
+        
         jsr SetPalette 
         jsr player_bullets_init
 ;============================== M O D E   I N I T   H E R E
@@ -197,6 +204,8 @@ RAM_init_clear:
         lda #$05
         sta player_lives
         
+        ; make sure we can write player palette
+        jsr WaitSync	; wait for VSYNC (and PPU warmup)
 ; set default player colors
 	lda #$14
         sta player_color0
@@ -210,12 +219,6 @@ RAM_init_clear:
         ; set hud y pos
         lda #182
         sta sprite_0_y
-     	; setup rng
-        lda #$01
-        sta rng0
-        sta rng1
-        lda #$ff
-        sta rng2
         
         
 ; activate PPU graphics       
@@ -380,7 +383,17 @@ NMIHandler: subroutine
 	include "dashboard.dasm"
         nop	; how much prg space we using?
         
+	include "mode_handler.dasm"
+        nop	; how much prg space we using?
 	include "demo_mode.dasm"
+        nop	; how much prg space we using?
+        
+	include "game_mode.dasm"
+        nop	; how much prg space we using?
+        
+	include "sandbox_mode.dasm"
+        nop	; how much prg space we using?
+	include "powerups.asm"
         nop	; how much prg space we using?
         
 	include "enemy_tables.dasm"
@@ -396,18 +409,7 @@ NMIHandler: subroutine
 	include "enemy_handler_starglasses.dasm"
         nop	; how much prg space we using?
         
-	include "powerups.asm"
-        nop	; how much prg space we using?
 
-        
-	include "game_mode.dasm"
-        nop	; how much prg space we using?
-        
-	include "mode_handler.dasm"
-        nop	; how much prg space we using?
-        
-	include "sandbox_mode.dasm"
-        nop	; how much prg space we using?
 
         
 	include "phases_and_levels.dasm"

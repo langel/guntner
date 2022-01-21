@@ -126,8 +126,8 @@ starglasses_cycle: subroutine
 	inc phase_kill_count
         lda #25
         jsr player_add_points_00__
-        ; spawn crossbones
-	lda #$01
+        ; spawn powerup
+	lda #$06
         sta ENEMY_RAM,x
         jmp sprite_4_cleanup_for_next
 .not_dead
