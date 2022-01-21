@@ -127,8 +127,7 @@ starglasses_cycle: subroutine
         lda #25
         jsr player_add_points_00__
         ; spawn powerup
-	lda #$06
-        sta ENEMY_RAM,x
+        jsr powerup_from_starglasses
         jmp sprite_4_cleanup_for_next
 .not_dead
 	sta ENEMY_RAM+5,x

@@ -22,29 +22,63 @@ powerup_spawn:
         lda #$20
         ldy enemy_ram_oam,x
         sta $0200,y
-       
+        
+powerup_init_velocity:
+	lda #$7f
+        sta enemy_ram_pc,x
+        rts
+        
+powerup_from_starglasses:
+	lda #$06
+        sta enemy_ram_type,x
+        ldy enemy_ram_oam,x
+        lda $0203,y
+        sta enemy_ram_x,x
+        lda $0200,y
+        sta enemy_ram_y,x
+       	jsr powerup_init_velocity
 	rts
       
         
 powerups_cycle: subroutine
         
 	ldx enemy_handler_pos
-        ldy enemy_temp_oam_x
+        ldy enemy_ram_oam,x
+        ; sprite
         lda #$c8
         sta $0201,y
-        lda $0200,y
-	sta collision_0_y
-        sta enemy_ram_y,x
-        lda $0203,y
-        sta enemy_ram_x,x
+        ; palette
+	lda #$03
+        sta $0202,y
+        ; x pos
+        lda enemy_ram_pc,x
+        cmp #$80
+        bcc .move_right
+.move_left
+	dec enemy_ram_x,x
+        dec enemy_ram_pc,x
+        jmp .move_done
+.move_right
 	inc enemy_ram_x,x
+.move_done
         lda enemy_ram_x,x
 	sta collision_0_x
         sta $0203,y
+        ; y pos
+        lda enemy_ram_y,x
+	sta collision_0_y
+        sta $0200,y
+        ; dim for collision
         lda #$08
         sta collision_0_w
         sta collision_0_h
-        ;jsr player_bullet_collision_handler
+        jsr player_bullet_collision_handler
+	cmp #$00
+        beq .no_bullet_collision
+        lda #$ff
+        sta enemy_ram_pc,x
+.no_bullet_collision
+        ; XXX need to decouple player collision detection from damage
         ; put player info into collision detector
 	lda player_x_hi
         sta collision_1_x
@@ -72,28 +106,3 @@ powerups_cycle: subroutine
 	jmp update_enemies_handler_next
         
         
-
-;crossbones_cycle: subroutine
-	ldx enemy_handler_pos
-        inc ENEMY_RAM+5,x
-        lda ENEMY_RAM+5,x
-        lsr
-        lsr
-        lsr
-        sta ENEMY_RAM+3,x
-        tay
-        ldy enemy_temp_oam_x
-        lda $0200,y
-        sec
-        sbc ENEMY_RAM+3,x
-        bcc .crossbones_death
-        sta $0200,y
-        lda #$0b
-        sta $0201,y
-        lda #$03
-        sta $0202,y
-        jmp .crossbones_done
-.crossbones_death
-        jsr enemy_death
-.crossbones_done
-	jmp update_enemies_handler_next
