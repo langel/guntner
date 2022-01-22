@@ -185,11 +185,11 @@ PleaseStart_msg:
         .byte #$00
         
 copyright:
-	.byte "(c) MMXXI puke7, LoBlast"
+	.byte "(c)MMXXII puke7, LoBlast"
         .byte #$00
         
 version:
-	.byte " v2.0 "
+	.byte " v2.01 "
         .byte #$00
         
         
