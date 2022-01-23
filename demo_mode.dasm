@@ -5,7 +5,7 @@ player_demo_init: subroutine
 	; disable rendering
         lda #$00
         sta PPU_MASK	
-        jsr PPU_init
+        jsr nametables_clear
 ; clear top rows
 	PPU_SETADDR $2000
         ldy #$00

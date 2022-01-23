@@ -169,7 +169,7 @@ Start:	subroutine
         sta title_screen_color
         jsr ClearRAM	; clear RAM
         jsr WaitSync	; wait for VSYNC (and PPU warmup)
-	jsr PPU_init
+        jsr scroll_pos_reset
         jsr apu_init
 
 ; MY SETUP
@@ -363,12 +363,9 @@ NMIHandler: subroutine
 
 	
 	include "apu_handler.dasm"
-        nop	; how much prg space we using?   
+        nop	; how much prg space we using?    
 
-	include "ppu_init.dasm"
-        nop	; how much prg space we using?      
-
-	include "nesppu.dasm"
+	include "ppu_lib.dasm"
         nop	; how much prg space we using?  
         
 	include "collision_detection.dasm"

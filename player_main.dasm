@@ -5,22 +5,13 @@ player_init: subroutine
 	; disable rendering
         lda #$00
         sta PPU_MASK	
-        jsr PPU_init
-; clear top rows
-	PPU_SETADDR $2000
-        ldy #$00
-        lda #$20
-.clear_top_rows
-	sta PPU_DATA
-        iny
-        bne .clear_top_rows
+        
+        jsr nametables_clear
+        jsr scroll_pos_reset
 	jsr starfield_init
         jsr dashboard_init
         jsr clear_all_enemies
-        sta PPU_ADDR
-        sta PPU_ADDR	; PPU addr = $0000
-        sta PPU_SCROLL
-        sta PPU_SCROLL  ; PPU scroll = $0000
+        
 	; enable rendering
         lda #MASK_BG|MASK_SPR
         sta PPU_MASK	

@@ -55,7 +55,24 @@ player_pause: subroutine
 
 
 player_controls_read: subroutine
-	jsr ReadJoypad0
+
+;;;;; CONTROLLER READING
+
+	ldy #0
+        lda #$01
+        sta JOYPAD1,y	; set strobe bit
+        lsr        	; now A is 0
+        sta JOYPAD1,y	; clear strobe bit
+        ldx #8		; read 8 bits
+.joy_read_loop:
+	pha		; save A (result)
+        lda JOYPAD1,y	; load controller state
+        lsr        	; bit 0 -> carry
+        pla		; restore A (result)
+        rol		; carry -> bit 0 of result
+        dex		; X = X - 1
+        bne .joy_read_loop	; repeat if X is 0
+        
         sta player_controls
                
                
