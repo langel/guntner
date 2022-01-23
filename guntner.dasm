@@ -149,6 +149,11 @@ audio_root_tone         byte
 audio_pattern_pos	byte
 audio_pattern_num       byte
 
+;;;;; RAM NOTES
+; $100 6502 stack
+; $200 PPU OAM sprite data
+; $300 entity data
+
 ;;;;; NES CARTRIDGE HEADER
 
 	NES_HEADER 0,1,1,NES_MIRR_VERT ; mapper 0, 1 PRGs, 1 CHR
@@ -162,18 +167,7 @@ Start:	subroutine
         ldx #$00
         txa
         sta title_screen_color
-RAM_init_clear:
-	sta $000,x
-	sta $100,x
-	sta $200,x	; PPU OAM sprite data
-	sta $300,x	; bullet / enemy data?
-	sta $400,x
-	sta $500,x
-	sta $600,x
-	sta $700,x
-        inx
-        bne RAM_init_clear
-;        jsr ClearRAM	; clear RAM
+        jsr ClearRAM	; clear RAM
         jsr WaitSync	; wait for VSYNC (and PPU warmup)
 	jsr PPU_init
         jsr apu_init
