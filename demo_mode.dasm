@@ -117,7 +117,9 @@ demo_mode: subroutine
         jsr apu_trigger_player_death
         lda #$01
         sta player_death_flag
-        jsr dashboard_you_dead
+        ; "YOU DEAD"
+        ldy #$00
+        jsr dashboard_message_set
         jmp .done
 .death_already_set
 	inc you_dead_counter

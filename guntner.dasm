@@ -371,9 +371,6 @@ NMIHandler: subroutine
 	include "collision_detection.dasm"
         nop	; how much prg space we using?
         
-	include "dashboard.dasm"
-        nop	; how much prg space we using?
-        
 	include "mode_handler.dasm"
         nop	; how much prg space we using?
 	include "demo_mode.dasm"
@@ -414,6 +411,8 @@ NMIHandler: subroutine
 	include "player_bullets.dasm"
         nop	; how much prg space we using?
 	include "player_controls.dasm"
+        nop	; how much prg space we using?
+	include "player_dashboard.dasm"
         nop	; how much prg space we using?
 	include "player_movement.dasm"
         nop	; how much prg space we using?

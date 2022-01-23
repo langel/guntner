@@ -63,11 +63,15 @@ game_time: subroutine
         cmp #$00
         bne .youdead
         jsr apu_trigger_player_death
-        jsr dashboard_game_over
+        ; "GAME OVER"
+        ldy #$10
+        jsr dashboard_message_set
         jmp .done
 .youdead
         jsr apu_trigger_player_death
-        jsr dashboard_you_dead
+        ; "YOU DEAD"
+        ldy #$00
+        jsr dashboard_message_set
         jmp .done
 .death_already_set
 	inc you_dead_counter
