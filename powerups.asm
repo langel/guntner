@@ -50,7 +50,7 @@ powerups_cycle: subroutine
 	ldx enemy_handler_pos
         ldy enemy_ram_oam,x
         ; sprite
-        lda #$c8
+        lda #$2b
         sta $0201,y
         ; palette
 	lda #$03

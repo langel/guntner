@@ -124,7 +124,7 @@ starfield_update: subroutine
         sta starfield_page
 .scroll_page_done
         
-        lda rng2
+        lda rng0
         and #STARFIELD_MASK
         sta starfield_rng
         
