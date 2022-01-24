@@ -1,3 +1,18 @@
+optimization marks:
+
+	e6aa - nop after title_screen.dasm
+
+
+get range 0..2 from 8bit value:
+lda value  ; A = 0-255
+lsr a      ;     0-127
+clc
+adc value  ; C:A = 0-383
+and #$80   ; C:A = 0, 128, or 256
+           ; R:R000 0000, want to keep the R bits
+rol a      ; R:0000 000R
+rol a      ; 0:0000 00RR
+
 
 
 Kickstarter 100 / January 2022
