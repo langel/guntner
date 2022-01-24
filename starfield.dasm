@@ -1,8 +1,8 @@
 ;;;; Constants
 
-STARFIELD_MASK		.byte #$1f ; star probability against %00001111
-STARFIELD_COL0_START	.byte #$00
-STARFIELD_COL1_START	.byte #$08
+STARFIELD_MASK		= #$1f ; star probability against %00011111
+STARFIELD_COL0_START	= #$00
+STARFIELD_COL1_START	= #$08
 
 
 starfield_init: subroutine
@@ -32,9 +32,9 @@ starfield_init: subroutine
         bne .27c0_loop
         ;sta $19
 ; reset star palette twinkles
-	lda STARFIELD_COL0_START
+	lda #STARFIELD_COL0_START
         sta starfield_col0
-        lda STARFIELD_COL1_START
+        lda #STARFIELD_COL1_START
         sta starfield_col1
 	rts
         
@@ -55,28 +55,6 @@ death_scroll_speed:
 	rts
 
 
-;;;;; STARFIELD_PLOT_POS
-;;;;; #{1} : page pos offest
-;;;;; #{2} : number to check against rng
-
-	MAC STARFIELD_PLOT_POS
-	lda starfield_page
-        sta PPU_ADDR
-	lda starfield_col
-        clc
-        adc #{1}
-        sta PPU_ADDR
-        lda starfield_rng
-        cmp #{2}
-        bne .starfield_plot_clear
-.starfield_plot_star
-        ldx starfield_tile
-        jmp .starfield_plot_done
-.starfield_plot_clear
-	ldx #$20
-.starfield_plot_done
-	stx PPU_DATA	; store byte to PPU data
-        ENDM
 
 
 starfield_update: subroutine
@@ -102,7 +80,7 @@ starfield_update: subroutine
         lda starfield_col0
         cmp #$0d
         bne .col0_no_reset
-        lda STARFIELD_COL0_START
+        lda #STARFIELD_COL0_START
         sta starfield_col0
 .col0_no_reset:
         PPU_SETADDR $3f05
@@ -116,7 +94,7 @@ starfield_update: subroutine
         lda starfield_col1
         cmp #$0d
         bne .col1_no_reset
-        lda STARFIELD_COL0_START
+        lda #STARFIELD_COL0_START
         sta starfield_col1
 .col1_no_reset:
         
@@ -126,10 +104,6 @@ starfield_update: subroutine
 	;lda #$7f
         ;sta starfield_tile
 
-        lda starfield_rng
-        jsr NextRandom
-        sta starfield_rng
-        and STARFIELD_MASK
         
 	lda scroll_y
         lsr
@@ -150,62 +124,40 @@ starfield_update: subroutine
         sta starfield_page
 .scroll_page_done
         
-        
-        ; row 0
-        STARFIELD_PLOT_POS $00,$00
-	; row 1       
-        STARFIELD_PLOT_POS $20,$01
-	; row 2       
-        STARFIELD_PLOT_POS $40,$02
-	; row 3
-        STARFIELD_PLOT_POS $60,$03
-	; row 4
-        STARFIELD_PLOT_POS $80,$04
-	; row 5
-        STARFIELD_PLOT_POS $a0,$05
-	; row 6
-        STARFIELD_PLOT_POS $c0,$06
-	; row 7
-        STARFIELD_PLOT_POS $e0,$07
-     
-; next page of starfield
-        inc starfield_page
-        
-	; row 8
-        STARFIELD_PLOT_POS $00,$08
-	; row 9       
-        STARFIELD_PLOT_POS $20,$09
-	; row a       
-        STARFIELD_PLOT_POS $40,$0a
-	; row b
-        STARFIELD_PLOT_POS $60,$0b
-	; row c
-        STARFIELD_PLOT_POS $80,$0c
-	; row d
-        STARFIELD_PLOT_POS $a0,$0d
-	; row e
-        STARFIELD_PLOT_POS $c0,$0e
-	; row f
-        STARFIELD_PLOT_POS $e0,$0f
-        
-; next page of starfield
-        inc starfield_page
-        lda rng0
-        jsr NextRandom
-        sta rng0
-        and STARFIELD_MASK
+        lda rng2
+        and #STARFIELD_MASK
         sta starfield_rng
         
-        ; row 0
-        STARFIELD_PLOT_POS $00,$10
-	; row 1       
-        STARFIELD_PLOT_POS $20,$11
-	; row 2       
-        STARFIELD_PLOT_POS $40,$12
-	; row 3
-        STARFIELD_PLOT_POS $60,$13
-	; row 4
-        STARFIELD_PLOT_POS $80,$14
-	; row 5
-        STARFIELD_PLOT_POS $a0,$15
+;update_starfield_column
+	ldy #$00
+.col_loop
+.page_loop
+	lda starfield_page
+        sta PPU_ADDR
+        lda starfield_col
+        sta PPU_ADDR
+        cpy starfield_rng
+        bne .plot_empty
+.plot_star
+	lda starfield_tile
+        jmp .plot_done
+.plot_empty
+	lda #$20
+.plot_done
+	sta PPU_DATA
+        iny
+        cpy #$16
+        beq .col_done
+        lda #$20
+        clc
+        adc starfield_col
+        sta starfield_col
+        bcs .page_done
+        jmp .page_loop
+.page_done
+        inc starfield_page
+        jmp .col_loop
+.col_done
 	rts
+        
+        

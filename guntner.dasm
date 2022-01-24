@@ -459,7 +459,7 @@ Palette00:
 
 
 ;;;;; CPU VECTORS
-	org $ffff
+	org $fffe
 	NES_VECTORS
 
 ;;;;; GRAPHX
