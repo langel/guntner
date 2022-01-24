@@ -66,13 +66,6 @@ dashboard_init: subroutine
         bne .tile_dash_set_page1
         
         
-	PPU_SETADDR $2000
-        lda #$04
-        ldy #$20
-.set_bottom_tiles
-	sta PPU_DATA
-        dey
-        bne .set_bottom_tiles
         
 ; fill nametable 2 dash area with dash top bar tile
 	PPU_SETADDR $26c0
