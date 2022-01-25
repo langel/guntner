@@ -1,7 +1,7 @@
 ;;;; Constants
 
 ENEMY_RAM			= $0300
-ENEMY_HIT_PALETTE_FRAMES	= #$03
+ENEMY_HIT_PALETTE_FRAMES	= #$05
 
 enemy_ram_type = $0300
 enemy_ram_x    = $0301

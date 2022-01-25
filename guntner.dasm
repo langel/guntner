@@ -123,6 +123,13 @@ enemy_temp_oam_x	byte
 enemy_temp_palette	byte
 enemy_temp_temp		byte
 enemy_handler_pos	byte
+boss_x		byte
+boss_y		byte
+boss_hp		byte
+boss_v0		byte
+boss_v1		byte
+boss_v2		byte
+boss_v3		byte
 
 player_color0	byte
 player_color1	byte
@@ -184,7 +191,7 @@ Start:	subroutine
         jsr player_bullets_init
 ;============================== M O D E   I N I T   H E R E
         jsr title_screen_init
-        ;jsr sandbox_init
+        jsr sandbox_init
         
  	; set default speed
         lda #$02
@@ -371,22 +378,25 @@ NMIHandler: subroutine
 	include "collision_detection.dasm"
         nop	; how much prg space we using?
         
-	include "mode_handler.dasm"
+	include "mode_handler.asm"
         nop	; how much prg space we using?
-	include "demo_mode.dasm"
+	include "mode_title_screen.asm"
+        nop	; how much prg space we using?
+	include "mode_demo.asm"
+        nop	; how much prg space we using?
+	include "mode_game.asm"
+        nop	; how much prg space we using?
+	include "mode_sandbox.asm"
         nop	; how much prg space we using?
         
-	include "game_mode.dasm"
-        nop	; how much prg space we using?
-        
-	include "sandbox_mode.dasm"
-        nop	; how much prg space we using?
 	include "powerups.asm"
         nop	; how much prg space we using?
         
 	include "enemy_tables.dasm"
         nop	; how much prg space we using?
 	include "enemy_handler.dasm"
+        nop	; how much prg space we using?
+	include "enemy_bat.asm"
         nop	; how much prg space we using?
 	include "enemy_handler_birb.dasm"
         nop	; how much prg space we using?
@@ -396,7 +406,9 @@ NMIHandler: subroutine
         nop	; how much prg space we using?
 	include "enemy_handler_starglasses.dasm"
         nop	; how much prg space we using?
-        
+	include "enemy_boss_vamp.asm"
+        nop	; how much prg space we using?
+
 
 
         
@@ -425,8 +437,6 @@ NMIHandler: subroutine
 	include "timer_global.dasm"
         nop	; how much prg space we using?
         
-	include "title_screen.dasm"
-        nop	; how much prg space we using?
 
 
         
@@ -464,4 +474,4 @@ Palette00:
 
 ;;;;; GRAPHX
 	org $10000
-	incbin "grafx4.chr"
+	incbin "char_rom.chr"

@@ -110,7 +110,6 @@ starfield_update: subroutine
         lsr
         lsr
         sta starfield_col
-        dec starfield_col
         
         lda scroll_page
         and #$01

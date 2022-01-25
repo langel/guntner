@@ -8,5 +8,8 @@ ENEMY_METHODS_LOOKUP_TABLE:
         word starglasses_cycle
         word skully_cycle
         word powerups_cycle
-        word powerups_cycle
+        word bat_cycle
+        word boss_vamp_cycle
+        word boss_vamp_bat_cycle
+        
         
