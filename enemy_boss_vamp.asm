@@ -116,7 +116,7 @@ boss_vamp_bat_cycle: subroutine
 boss_vamp_spawn: subroutine
 	lda #$08
         sta enemy_ram_type,x
-        lda #$60
+        lda #$40
         sta enemy_ram_x,x
         lda #$15
         sta enemy_ram_y,x 
@@ -128,8 +128,18 @@ boss_vamp_spawn: subroutine
         clc
         adc #$20
         sta enemy_ram_oam,x
+        PPU_SETADDR $3F15
+        lda #$12
+        sta PPU_DATA
+        PPU_SETADDR $3F19
+        lda #$15
+        sta PPU_DATA
+        lda #$00
+        sta PPU_DATA
+        lda #$37
+        sta PPU_DATA
         ; XXX not sure if we need this here
-        lda #$0a
+        lda #$0d
         sta boss_v0 ; target count of bat underlings
         lda #$00
         sta boss_v1
@@ -145,7 +155,7 @@ boss_vamp_spawn: subroutine
         tax
         lda boss_v1
         clc
-        adc #$1a
+        adc #$14
         sta boss_v1
         ldy boss_v3
         jsr boss_vamp_bat_spawn
@@ -243,7 +253,7 @@ boss_vamp_cycle: subroutine
         jmp .done
 .not_hit
         ; palette
-        lda #$01
+        lda #$02
         sta $0202,y
         sta $0206,y
         sta $020a,y
