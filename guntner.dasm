@@ -198,7 +198,7 @@ Start:	subroutine
         jsr player_bullets_init
 ;============================== M O D E   I N I T   H E R E
         jsr title_screen_init
-        jsr sandbox_init
+        ;jsr sandbox_init
         
  	; set default speed
         lda #$02
@@ -298,7 +298,12 @@ NMIHandler: subroutine
         
 ; main game logic
         jsr mode_handler_vblank
-        
+ 
+; SPRITES TIME!!
+	; XXX maybe we should only do this in game mode
+        ; it was below mode_handler_post_vblank
+        ; put it here to fix bad oam offset write glitches
+        jsr SetSprite0       
         
 	lda scroll_page
         and #$01
@@ -311,8 +316,6 @@ NMIHandler: subroutine
         lda #$f8
         sta PPU_SCROLL
         
-; SPRITES TIME!!
-        jsr SetSprite0
         
         
 ; main game logic
