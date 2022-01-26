@@ -12,7 +12,7 @@ bat_spawn: subroutine
         lda #$20
         sta enemy_ram_x,x
         sta enemy_ram_y,x 
-        tya
+        lda #$00
         sta enemy_ram_pc,x
         txa
         lsr
@@ -26,14 +26,44 @@ bat_cycle:
 	ldx enemy_handler_pos
         ldy enemy_temp_oam_x
         ; update x pos
-        lda enemy_ram_x,x
+        ldy enemy_ram_pc,x
+        lda enemy_ram_ac,x
+        tax
+        tya
+        lsr
+        lsr
+        jsr sine_of_scale
+        clc
+	ldx enemy_handler_pos
+        adc enemy_ram_x,x
+        ldy enemy_temp_oam_x
         sta $0203,y
         sta collision_0_x
         ; update y pos
-        lda enemy_ram_y,x
+        ldy enemy_ram_pc,x
+        lda enemy_ram_ac,x
+        clc
+        adc #$40
+        tax
+        tya
+        lsr
+        lsr
+        jsr sine_of_scale
+        clc
+	ldx enemy_handler_pos
+        adc enemy_ram_y,x
+        ldy enemy_temp_oam_x
         sta $0200,y
         sta collision_0_y
         ; update animation
+        lda enemy_ram_ac,x
+        cmp #$80
+        bcs .pattern_inc
+        dec enemy_ram_pc,x
+        jmp .pattern_done
+.pattern_inc
+	inc enemy_ram_pc,x
+.pattern_done
         inc enemy_ram_ac,x
         lda enemy_ram_ac,x
         lsr

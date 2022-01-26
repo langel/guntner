@@ -124,7 +124,8 @@ update_enemies_handler_next:
 	lda #$08
         clc
         adc enemy_handler_pos
-        bcs .handler_core_end
+        cmp #$e0
+        beq .handler_core_end
         sta enemy_handler_pos
         jmp .handler_loop
 .handler_core_end

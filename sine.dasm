@@ -1,6 +1,77 @@
 
-sine_table:
+sine_init: subroutine
+	ldx #$00
+        ldy #$00
+.loop
+	lda sine_table,y
+        sta $0400,x
+        lsr
+        sta $0480,x
+        lsr
+        sta $0500,x
+        lsr
+        sta $0580,x
+        lsr
+        sta $0600,x
+        lsr
+        sta $0680,x
+        lsr
+        sta $0700,x
+        lsr
+        sta $0780,x
+        inx
+        iny
+        iny
+        bne .loop
+        rts
 
+sine_of_scale: subroutine
+	; returns scaled value of sin table
+	; a = sine max
+        ; x = sine pos
+	eor #$ff
+        sta sine_scale
+        txa
+        lsr
+        tax
+        lda #$00
+        lsr sine_scale
+        bcs .not_1
+        adc $0780,x
+.not_1
+        lsr sine_scale
+        bcs .not_2
+        adc $0700,x
+.not_2
+        lsr sine_scale
+        bcs .not_4
+        adc $0680,x
+.not_4
+        lsr sine_scale
+        bcs .not_8
+        adc $0600,x
+.not_8
+        lsr sine_scale
+        bcs .not_16
+        adc $0580,x
+.not_16
+        lsr sine_scale
+        bcs .not_32
+        adc $0500,x
+.not_32
+        lsr sine_scale
+        bcs .not_64
+        adc $0480,x
+.not_64
+        lsr sine_scale
+        bcs .not_128
+        adc $0400,x
+.not_128
+	rts
+        
+        
+
+sine_table:
 	hex 808386898c8f9295
 	hex 989b9ea2a5a7aaad
 	hex b0b3b6b9bcbec1c4
@@ -35,7 +106,6 @@ sine_table:
 	hex 676a6d707376797c
         
 sine_15_max_128_length:
-
 	hex 0808080909090a0a0a0b0b0b0c0c0c0d
 	hex 0d0d0d0e0e0e0e0e0e0f0f0f0f0f0f0f
 	hex 0f0f0f0f0f0f0f0f0e0e0e0e0e0e0d0d

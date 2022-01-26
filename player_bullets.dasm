@@ -15,7 +15,7 @@ player_bullet_sprite	.byte #$79
 controller_input	.byte #$ff
 player_power		.byte #$ff
 
-bullet_data	= $0500
+bullet_data	= $03e0
 
 
         

@@ -34,6 +34,7 @@ player_y_hi	byte
 player_y_lo	byte
 player_coll_y	byte
 player_gun_str	byte
+bullet_cooldown byte ; count frames until next bullet
 player_speed	byte ; 2 bit value 0..3 translates to 1..4
 player_paused	byte
 player_controls	byte
@@ -65,7 +66,6 @@ starfield_page	byte
 starfield_tile	byte
 starfield_col0	byte
 starfield_col1	byte
-bullet_cooldown byte ; count frames until next bullet
 collision_0_x	byte
 collision_0_y	byte
 collision_0_w	byte
@@ -151,6 +151,9 @@ phase_temp_addr_lo	byte
 phase_temp_addr_hi	byte
 phase_end_game		byte
 
+sine_scale		byte
+sine_out		byte
+
 audio_noise_mode	byte
 audio_noise_pitch	byte
 audio_noise_volume	byte
@@ -190,11 +193,12 @@ Start:	subroutine
         lda #$ff
         sta rng2
         
+        jsr sine_init
         jsr SetPalette 
         jsr player_bullets_init
 ;============================== M O D E   I N I T   H E R E
         jsr title_screen_init
-        ;jsr sandbox_init
+        jsr sandbox_init
         
  	; set default speed
         lda #$02
@@ -444,7 +448,7 @@ NMIHandler: subroutine
 
         
 ; LOOKUP TABLES AT TOP OF RAM
-        org $fa00
+        org $fb00
 	include "sine.dasm"
         nop	; how much prg space we using?
 	include "decimal_table.dasm"

@@ -11,8 +11,12 @@ birb_spawn: subroutine
         lda #$00
         sta enemy_ram_x,x ; x pos
         lda rng1
+        jsr NextRandom
+        sta rng1
         sta enemy_ram_pc,x ; pattern counter
-        lda rng0
+        lda rng2
+        jsr NextRandom
+        sta rng2
         sta enemy_ram_ac,x ; animation counter
         lsr
         clc
