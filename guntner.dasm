@@ -32,6 +32,8 @@ player_x_hi	byte
 player_x_lo	byte
 player_y_hi	byte
 player_y_lo	byte
+player_coll_y	byte
+player_gun_str	byte
 player_speed	byte ; 2 bit value 0..3 translates to 1..4
 player_paused	byte
 player_controls	byte
@@ -123,6 +125,7 @@ enemy_temp_oam_x	byte
 enemy_temp_palette	byte
 enemy_temp_temp		byte
 enemy_handler_pos	byte
+enemy_dmg_accumulator	byte
 boss_x		byte
 boss_y		byte
 boss_hp		byte
@@ -191,7 +194,7 @@ Start:	subroutine
         jsr player_bullets_init
 ;============================== M O D E   I N I T   H E R E
         jsr title_screen_init
-        jsr sandbox_init
+        ;jsr sandbox_init
         
  	; set default speed
         lda #$02
@@ -398,13 +401,13 @@ NMIHandler: subroutine
         nop	; how much prg space we using?
 	include "enemy_bat.asm"
         nop	; how much prg space we using?
-	include "enemy_handler_birb.dasm"
+	include "enemy_birb.asm"
         nop	; how much prg space we using?
-	include "enemy_handler_maggs.dasm"
+	include "enemy_maggs.asm"
         nop	; how much prg space we using?
-	include "enemy_handler_skully.dasm"
+	include "enemy_skully.asm"
         nop	; how much prg space we using?
-	include "enemy_handler_starglasses.dasm"
+	include "enemy_starglasses.asm"
         nop	; how much prg space we using?
 	include "enemy_boss_vamp.asm"
         nop	; how much prg space we using?

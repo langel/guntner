@@ -43,7 +43,6 @@ player_bullets_init:
         
         
 player_bullet_collision_handler: subroutine
-	stx player_bullet_collision_temp_x
 	clc
         lda collision_0_x
         adc collision_0_w
@@ -56,9 +55,6 @@ player_bullet_collision_handler: subroutine
         sta collision_1_w
         sta collision_1_h
         
-        ; accumulate number of bullets colliding in x register
-        ldx #$00
-        
         lda bullet0 + 3
         cmp #$00
         beq .bullet0_skip
@@ -68,7 +64,10 @@ player_bullet_collision_handler: subroutine
         jsr detect_collision
         cmp #$00
         beq .bullet0_skip
-        inx
+        clc
+        lda enemy_dmg_accumulator
+        adc player_gun_str
+        sta enemy_dmg_accumulator
         jsr bullet0_despawn
 .bullet0_skip        
 
@@ -81,7 +80,10 @@ player_bullet_collision_handler: subroutine
         jsr detect_collision
         cmp #$00
         beq .bullet1_skip
-        inx
+        clc
+        lda enemy_dmg_accumulator
+        adc player_gun_str
+        sta enemy_dmg_accumulator
         jsr bullet1_despawn
 .bullet1_skip
 
@@ -94,7 +96,10 @@ player_bullet_collision_handler: subroutine
         jsr detect_collision
         cmp #$00
         beq .bullet2_skip
-        inx
+        clc
+        lda enemy_dmg_accumulator
+        adc player_gun_str
+        sta enemy_dmg_accumulator
         jsr bullet2_despawn
 .bullet2_skip
 
@@ -107,7 +112,10 @@ player_bullet_collision_handler: subroutine
         jsr detect_collision
         cmp #$00
         beq .bullet3_skip
-        inx
+        clc
+        lda enemy_dmg_accumulator
+        adc player_gun_str
+        sta enemy_dmg_accumulator
         jsr bullet3_despawn
 .bullet3_skip
 
@@ -120,13 +128,14 @@ player_bullet_collision_handler: subroutine
         jsr detect_collision
         cmp #$00
         beq .bullet4_skip
-        inx
+        clc
+        lda enemy_dmg_accumulator
+        adc player_gun_str
+        sta enemy_dmg_accumulator
         jsr bullet4_despawn
 .bullet4_skip
-
-	; send number of hits back to caller
-	txa
-        ldx player_bullet_collision_temp_x
+	; total damage is in enemy_dmg_accumulator
+        lda enemy_dmg_accumulator
 	rts
         
         

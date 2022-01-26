@@ -1,4 +1,29 @@
 
+ENEMY_HITPOINTS_TABLE:
+	byte #$00
+        byte #$00
+        byte #$02 ; birb
+        byte #$09 ; mags
+        byte #$0b ; starglasses
+        byte #$20 ; skully
+        byte #$00 ; powerups
+        byte #$06 ; bat
+        byte #$10 ; vampire
+        byte #$0a ; vamp bat
+        
+
+ENEMY_PLAYER_COLLISION_TABLE:
+	byte #$00
+        byte #$00
+        byte #$04 ; birb
+        byte #$06 ; maggs
+        byte #$40 ; starglasses
+        byte #$07 ; skully
+        byte #$00 ; powerups
+        byte #$03 ; bat
+        byte #$40 ; vampire head
+        byte #$09 ; vamp bat
+        
 
 ENEMY_METHODS_LOOKUP_TABLE:
         hex 0000 ; should do nothing

@@ -26,7 +26,8 @@ enemy_ram_oam  = $0307
 	;include "enemy_birb.dasm"
 
         
-
+sprite_1_hit_palette: subroutine
+	lda #$03
 
         
 sprite_4_cleanup_for_next: subroutine
@@ -127,6 +128,15 @@ update_enemies_handler_next:
         sta enemy_handler_pos
         jmp .handler_loop
 .handler_core_end
+	rts
+        
+        
+        
+enemy_get_damage_this_frame: subroutine
+	lda #$00
+        sta enemy_dmg_accumulator
+        jsr player_bullet_collision_handler
+	jsr player_collision_detect
 	rts
         
         

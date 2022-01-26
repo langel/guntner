@@ -8,12 +8,13 @@ boss_vamp_bat_spawn: subroutine
         sta enemy_ram_ac,x
 	lda #$09
         sta enemy_ram_type,x
+        tay
+        lda ENEMY_HITPOINTS_TABLE,y
+        sta enemy_ram_hp,x 
         lda enemy_ram_x,y
         sta enemy_ram_x,x
         lda enemy_ram_y,y
         sta enemy_ram_y,x 
-        lda #$02
-        sta enemy_ram_hp,x
         tya
         sta enemy_ram_pc,x
         txa
@@ -78,16 +79,17 @@ boss_vamp_bat_cycle: subroutine
         lda #$08
         sta collision_0_w
         sta collision_0_h
-; shot by bullet?
-        jsr player_bullet_collision_handler
+; get damage amount
+        jsr enemy_get_damage_this_frame
+        lda enemy_dmg_accumulator
         cmp #$00
         beq .not_hit
-        ; decrease health
-	ldx enemy_handler_pos
-        dec enemy_ram_hp,x
         lda enemy_ram_hp,x
-        cmp #$00
-        bne .not_dead
+        sec
+        sbc enemy_dmg_accumulator
+        bmi .is_dead
+        sta enemy_ram_hp,x
+        jmp .not_dead
 .is_dead
 	inc phase_kill_count
 	; give points
@@ -108,7 +110,6 @@ boss_vamp_bat_cycle: subroutine
         lda #$01
         sta $0202,y
 .done
-	jsr player_collision_detect
 	jmp update_enemies_handler_next
 	
 
@@ -116,13 +117,14 @@ boss_vamp_bat_cycle: subroutine
 boss_vamp_spawn: subroutine
 	lda #$08
         sta enemy_ram_type,x
+        tay
+        lda ENEMY_HITPOINTS_TABLE,y
+        sta enemy_ram_hp,x 
+        sta boss_hp
         lda #$40
         sta enemy_ram_x,x
         lda #$15
         sta enemy_ram_y,x 
-        lda #$10
-        sta boss_hp
-        sta enemy_ram_hp,x
         txa
         lsr
         clc
@@ -221,17 +223,18 @@ boss_vamp_cycle: subroutine
         lda #$0d
         sta collision_0_w
         sta collision_0_h
-; shot by bullet?
-        jsr player_bullet_collision_handler
+; get damage amount
+        jsr enemy_get_damage_this_frame
+        lda enemy_dmg_accumulator
         cmp #$00
         beq .not_hit
-        ; decrease health
-	ldx enemy_handler_pos
-        dec enemy_ram_hp,x
         lda enemy_ram_hp,x
+        sec
+        sbc enemy_dmg_accumulator
+        bmi .is_dead
+        sta enemy_ram_hp,x
         sta boss_hp
-        cmp #$00
-        bne .not_dead
+        jmp .not_dead
 .is_dead
 	inc phase_kill_count
 	; give points
@@ -259,6 +262,5 @@ boss_vamp_cycle: subroutine
         sta $020a,y
         sta $020e,y
 .done
-	jsr player_collision_detect
 	jmp update_enemies_handler_next
         

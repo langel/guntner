@@ -19,6 +19,8 @@ player_init: subroutine
 ; set player lives
 	lda #$03
         sta player_lives
+        lda #$03
+        sta player_gun_str
 ; set player position
 	lda #$00
         sta phase_current
@@ -108,33 +110,10 @@ player_take_damage: subroutine
         sta player_health
         ; change sprite
 	ldx #$0a
-        stx $205
-        stx $209
+        stx $0205
+        stx $0209
         rts
-        
-        
-player_collision_detect: subroutine
-	lda player_x_hi
-        sta collision_1_x
-        lda player_y_hi
-        clc
-        adc #$02
-        sta collision_1_y
-        lda #$10
-        sta collision_1_w
-        lda #$06
-        sta collision_1_h
-        jsr detect_collision
-        cmp #$00
-        beq .done
-        ; XXX this number is sus
-        ; player sprites don't always change at death
-        lda #$04
-        sta player_damage
-        jsr player_take_damage
-        jsr apu_trigger_player_damage
-.done
-        rts
+ 
         
         
 set_player_sprite: subroutine

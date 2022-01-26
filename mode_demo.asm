@@ -27,6 +27,9 @@ player_demo_init: subroutine
 ; set player lives
 	lda #$01
         sta player_lives
+; set player gun strength
+	lda #$03
+        sta player_gun_str
 ; set player position
 	lda #$00
         sta player_death_flag
@@ -160,7 +163,8 @@ demo_enemy_spawn: subroutine
         tax
         lda rng0
         jsr NextRandom
-        and #$01
+        sta rng0
+        and #$0f
         cmp #$00
         beq .spawn_starglasses
         jsr skully_spawn
@@ -238,6 +242,11 @@ run_player_demo: subroutine
 .player_y_equal
 	iny
 .player_y_done
+	; add 2 to y position for collision detection
+	lda player_y_hi
+        clc
+        adc #$02
+	sta player_coll_y
 ; check if both coordinates are met
 	cpy #$02
         beq .set_demo_new_target

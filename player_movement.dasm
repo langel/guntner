@@ -126,6 +126,11 @@ player_direction_handler: subroutine
         bne .not_up_left
         jmp player_move_up_left
 .not_up_left
+	; add 2 to y position for collision detection
+	lda player_y_hi
+        clc
+        adc #$02
+	sta player_coll_y
 	rts
 
 

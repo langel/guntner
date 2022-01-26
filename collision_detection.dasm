@@ -41,3 +41,43 @@ detect_collision: subroutine
 .no_collision
 	lda #$00
         rts
+        
+    
+        
+player_collision_detect: subroutine
+	clc
+        lda collision_0_x
+        adc collision_0_w
+        bcs .done ; make sure x+w is not less than x
+        cmp player_x_hi
+        bmi .done ; no collision
+        clc
+        lda player_x_hi
+        adc #$10 ; player width
+        cmp collision_0_x
+        bmi .done ; no collision
+        clc
+        lda collision_0_y
+        adc collision_0_h
+        cmp player_coll_y
+        bmi .done ; no collision
+        clc 
+        lda player_coll_y
+        adc #$06 ; player height
+        cmp collision_0_y
+        bmi .done ; no collision
+; handle player collision
+	lda enemy_dmg_accumulator
+        clc
+        adc #$02
+        sta enemy_dmg_accumulator
+        ; XXX this number is sus
+        ; player sprites don't always change at death
+        ldy enemy_ram_type,x
+        lda ENEMY_PLAYER_COLLISION_TABLE,y
+        ldy enemy_ram_oam,x
+        sta player_damage
+        jsr player_take_damage
+        jsr apu_trigger_player_damage
+.done
+        rts

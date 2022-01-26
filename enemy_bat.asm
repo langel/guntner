@@ -6,11 +6,12 @@ bat_spawn: subroutine
         ; stash boss slot in pattern counter
 	lda #$07
         sta enemy_ram_type,x
+        tay
+        lda ENEMY_HITPOINTS_TABLE,y
+        sta enemy_ram_hp,x 
         lda #$20
         sta enemy_ram_x,x
         sta enemy_ram_y,x 
-        lda #$02
-        sta enemy_ram_hp,x
         tya
         sta enemy_ram_pc,x
         txa
@@ -55,16 +56,17 @@ bat_cycle:
         lda #$08
         sta collision_0_w
         sta collision_0_h
-; shot by bullet?
-        jsr player_bullet_collision_handler
+; get damage amount
+        jsr enemy_get_damage_this_frame
+        lda enemy_dmg_accumulator
         cmp #$00
         beq .not_hit
-        ; decrease health
-	ldx enemy_handler_pos
-        dec enemy_ram_hp,x
         lda enemy_ram_hp,x
-        cmp #$00
-        bne .not_dead
+        sec
+        sbc enemy_dmg_accumulator
+        bmi .is_dead
+        sta enemy_ram_hp,x
+        jmp .not_dead
 .is_dead
 	inc phase_kill_count
 	; give points
