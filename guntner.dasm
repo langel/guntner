@@ -133,6 +133,8 @@ boss_v0		byte
 boss_v1		byte
 boss_v2		byte
 boss_v3		byte
+boss_v4		byte
+boss_v5		byte
 
 player_color0	byte
 player_color1	byte
@@ -198,7 +200,7 @@ Start:	subroutine
         jsr player_bullets_init
 ;============================== M O D E   I N I T   H E R E
         jsr title_screen_init
-        ;jsr sandbox_init
+        jsr sandbox_init
         
  	; set default speed
         lda #$02

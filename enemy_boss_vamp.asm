@@ -31,13 +31,12 @@ boss_vamp_bat_cycle: subroutine
         ; update x pos
         lda enemy_ram_ac,x
         tax
-        lda sine_table,x
-        lsr
-        lsr
+        lda boss_v4
+        jsr sine_of_scale
         clc
         adc boss_x
         sec
-        sbc #$1b
+        sbc boss_v5
 	ldx enemy_handler_pos
         sta $0203,y
         sta collision_0_x
@@ -173,6 +172,11 @@ boss_vamp_cycle: subroutine
 	ldx enemy_handler_pos
         ldy enemy_temp_oam_x
         inc enemy_ram_ac,x
+        lda #$40
+        lda boss_v0
+        sta boss_v4 ; size of bat circle
+        lsr
+        sta boss_v5 ; half of bat circle size
 	; calc x
         inc boss_v2 ; x sine
         inc boss_v2 ; x sine
