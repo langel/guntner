@@ -18,18 +18,10 @@ maggs_spawn: subroutine
         sta enemy_ram_pc,x ; pattern counter
         tay
         lda game_height_scale,y
-        sta enemy_ram_y,x ; y pos
-        txa
-        sec
-        sbc #$80
-        clc
-        adc #$60
-        sta enemy_ram_oam,x ; OAM ref
-        
+        sta enemy_ram_y,x ; y pos      
    	rts
         
-        
-        
+    
         
 ;;;; HANDLING maggs
 maggs_cycle: subroutine

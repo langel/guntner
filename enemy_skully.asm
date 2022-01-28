@@ -42,9 +42,9 @@ skully_cycle: subroutine
         ; stash OAM ADDR in y register
         ldy enemy_oam_offset
         ; stash enemy addr in x register
-        ldx enemy_handler_pos
+        ldx enemy_ram_offset
         ; let's find what frame we're on
-        lda ENEMY_RAM+4,x
+        lda enemy_ram_ac,x
         lsr
         lsr
         lsr

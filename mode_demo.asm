@@ -147,10 +147,18 @@ demo_mode: subroutine
 demo_enemy_spawn: subroutine
 	jsr get_enemy_slot_1_sprite
         cmp #$ff
-        beq .no_birb_spawn
+        beq .no_1_sprite_spawn
         tax
+        lda wtf
+        and #$01
+        cmp #$00
+        bne .spawn_bat
         jsr birb_spawn
-.no_birb_spawn
+        rts
+.spawn_bat
+	jsr bat_spawn
+        rts
+.no_1_sprite_spawn
 	jsr get_enemy_slot_2_sprite
         cmp #$ff
         beq .no_maggs_spawn

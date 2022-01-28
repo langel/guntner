@@ -122,7 +122,6 @@ enemy_ram_offset	byte
 enemy_oam_offset	byte
 ; XXX might be able to clean some of these out
 enemy_debug		byte
-enemy_temp_oam_x	byte
 enemy_temp_palette	byte
 enemy_temp_temp		byte
 enemy_handler_pos	byte

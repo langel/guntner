@@ -22,11 +22,6 @@ birb_spawn: subroutine
         clc
         adc #$0c
         sta enemy_ram_y,x ; y pos
-        clc
-        txa
-        lsr
-        adc #$20
-        sta enemy_ram_oam,x ; OAM ref  
    	rts
         
            

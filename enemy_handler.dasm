@@ -149,7 +149,6 @@ update_enemies: subroutine
         beq .handler_next
 	; set OAM position in zero page
         lda enemy_ram_oam,x
-        sta enemy_temp_oam_x
 	; get enemy type
         lda enemy_ram_type,x
         asl

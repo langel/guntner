@@ -23,13 +23,6 @@ starglasses_spawn: subroutine
         clc
         adc #$18
         sta $0302,x ; y pos
-        txa
-        sec
-        sbc #$a0
-        asl
-        clc
-        adc #$80
-        sta $0307,x ; OAM ref
    	rts
         
            

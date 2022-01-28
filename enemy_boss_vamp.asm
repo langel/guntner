@@ -190,10 +190,6 @@ boss_vamp_spawn: subroutine
 boss_vamp_cycle: subroutine
 	ldx enemy_ram_offset
         ldy enemy_oam_offset
-        inc enemy_ram_ac,x
-        
-	ldx enemy_handler_pos
-        ldy enemy_temp_oam_x
         lda oam_ram_x,y
         sta collision_0_x
         lda oam_ram_y,y
@@ -216,6 +212,7 @@ boss_vamp_cycle: subroutine
         jmp sprite_4_cleanup_for_next
                
 .not_dead    
+        inc enemy_ram_ac,x
         lda #$40
         lda boss_v0
         lda enemy_ram_ac,x
