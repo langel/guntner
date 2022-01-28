@@ -196,7 +196,7 @@ Start:	subroutine
         jsr player_bullets_init
 ;============================== M O D E   I N I T   H E R E
         jsr title_screen_init
-        jsr sandbox_init
+        ;jsr sandbox_init
         
  	; set default speed
         lda #$02

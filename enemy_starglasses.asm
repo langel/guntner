@@ -55,12 +55,7 @@ starglasses_cycle: subroutine
 	clc
 	adc enemy_ram_x,x
 	sta collision_0_x
-	sta $0203,y
-	sta $020b,y
-	clc
-	adc #$08
-	sta $0207,y
-	sta $020f,y
+        jsr sprite_4_set_x
 
 	; calc y
 	ldx enemy_handler_pos
@@ -73,12 +68,7 @@ starglasses_cycle: subroutine
 	ldx enemy_handler_pos
 	adc enemy_ram_y,x
 	sta collision_0_y
-	sta $0200,y
-	sta $0204,y
-	clc
-	adc #$08
-	sta $0208,y
-	sta $020c,y
+        jsr sprite_4_set_y
 
 	; tiles
 	ldx enemy_handler_pos
@@ -87,23 +77,11 @@ starglasses_cycle: subroutine
 	beq .frame1
 .frame0
 	lda #$0c
-	sta $0201,y
-	lda #$0d
-	sta $0205,y
-	lda #$1c
-	sta $0209,y
-	lda #$1d
-	sta $020d,y
+        jsr sprite_4_set_sprite
 	jmp .frame_done
 .frame1
 	lda #$0e
-	sta $0201,y
-	lda #$0f
-	sta $0205,y
-	lda #$1e
-	sta $0209,y
-	lda #$1f
-	sta $020d,y
+        jsr sprite_4_set_sprite
 .frame_done
 
 	lda #$10

@@ -59,15 +59,7 @@ skully_cycle: subroutine
         cmp #$0e
         beq .skully_sprite_7
 .skully_normal_frames
-        clc
-        ; stash them sprites
-        sta $0201,y
-        adc #$01
-        sta $0205,y
-        adc #$0f
-        sta $0209,y
-        adc #$01
-        sta $020d,y
+	jsr sprite_4_set_sprite
         jmp .skully_sprites_done
 .skully_sprite_5
 	lda #$06
@@ -121,21 +113,11 @@ skully_cycle: subroutine
         ; x pos
         lda enemy_ram_x,x
         sta collision_0_x
-        sta $0203,y
-        sta $020b,y
-        clc
-        adc #$08
-        sta $0207,y
-        sta $020f,y
+        jsr sprite_4_set_x
         ; y pos
         lda enemy_ram_y,x
         sta collision_0_y
-        sta $0200,y
-        sta $0204,y
-        clc
-        adc #$08
-        sta $0208,y
-        sta $020c,y
+        jsr sprite_4_set_y
 .skully_frame
 	; update spinning counter
 	lda #$07

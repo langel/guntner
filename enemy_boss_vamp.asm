@@ -245,12 +245,7 @@ boss_vamp_cycle: subroutine
         adc sine_15_max_128_length,y
         sta boss_x
         ldy enemy_temp_oam_x
-	sta oam_ram_x,y
-	sta oam_ram_x+8,y
-	clc
-	adc #$08
-	sta oam_ram_x+4,y
-	sta oam_ram_x+12,y
+        jsr sprite_4_set_x
         lda boss_x
         clc
         adc #$05 ; add half of vampire size and subtract half of bat size?
@@ -264,25 +259,14 @@ boss_vamp_cycle: subroutine
 	clc
         adc enemy_ram_y,x
         sta boss_y
-	sta oam_ram_y,y
-	sta oam_ram_y+4,y
-	clc
-	adc #$08
-	sta oam_ram_y+8,y
-	sta oam_ram_y+12,y
+        jsr sprite_4_set_y
         lda boss_y
         clc
         adc #$04 ; add half of vampire size and subtract half of bat size?
         sta boss_y
 	; tiles
         lda #$27
-	sta oam_ram_spr,y
-	lda #$28
-	sta oam_ram_spr+4,y
-	lda #$37
-	sta oam_ram_spr+8,y
-	lda #$38
-	sta oam_ram_spr+12,y
+        jsr sprite_4_set_sprite
         ; palette
         lda #$02
         jsr enemy_set_palette

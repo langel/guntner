@@ -34,6 +34,40 @@ oam_ram_x      = $0203
 sprite_1_hit_palette: subroutine
 	lda #$03
 
+sprite_4_set_sprite: subroutine
+	; a = top left tile id
+        ; y = oam ram offset
+	sta oam_ram_spr,y
+        clc
+        adc #$01
+	sta oam_ram_spr+4,y
+        adc #$0f
+	sta oam_ram_spr+8,y
+	adc #$01
+	sta oam_ram_spr+12,y
+        rts
+        
+sprite_4_set_x: subroutine
+	; a = x pos
+        ; y = oam ram offset
+	sta oam_ram_x,y
+	sta oam_ram_x+8,y
+	clc
+	adc #$08
+	sta oam_ram_x+4,y
+	sta oam_ram_x+12,y
+	rts
+        
+sprite_4_set_y: subroutine
+	; a = y pos
+        ; y = oam ram offset
+	sta oam_ram_y,y
+	sta oam_ram_y+4,y
+	clc
+	adc #$08
+	sta oam_ram_y+8,y
+	sta oam_ram_y+12,y
+	rts
         
 sprite_4_cleanup_for_next: subroutine
 	lda #$04 ; move first sprite over 4 pixels
