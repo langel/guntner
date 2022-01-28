@@ -160,10 +160,10 @@ skully_cycle: subroutine
 .skully_not_dead
         ; setup hit palette counter
 	lda #ENEMY_HIT_PALETTE_FRAMES
-        sta enemy_ram_att,x
+        sta enemy_ram_hc,x
 	jsr apu_trigger_enemy_damage
 .decide_palette
-	lda enemy_ram_att,x
+	lda enemy_ram_hc,x
         cmp #$00
         bne .hit_palette
 .normal_palette
@@ -175,8 +175,8 @@ skully_cycle: subroutine
         sta oam_ram_att+12,y
         jmp .skully_done
 .hit_palette
-	dec enemy_ram_att,x
-	dec enemy_ram_att,x
+	dec enemy_ram_hc,x
+	dec enemy_ram_hc,x
         ; palette
         dec enemy_temp_palette
         dec enemy_temp_palette

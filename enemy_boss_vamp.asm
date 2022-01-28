@@ -48,7 +48,7 @@ boss_vamp_bat_spawn: subroutine
         lsr
         clc
         adc #$20
-        sta enemy_ram_oam,x
+        sta enemy_ram_ex,x
 	rts
         
         
@@ -145,7 +145,7 @@ boss_vamp_spawn: subroutine
         lsr
         clc
         adc #$20
-        sta enemy_ram_oam,x
+        sta enemy_ram_ex,x
         PPU_SETADDR $3F15
         lda #$12
         sta PPU_DATA

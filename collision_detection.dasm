@@ -75,7 +75,7 @@ player_collision_detect: subroutine
         ; player sprites don't always change at death
         ldy enemy_ram_type,x
         lda ENEMY_PLAYER_COLLISION_TABLE,y
-        ldy enemy_ram_oam,x
+        ldy enemy_ram_ex,x
         sta player_damage
         jsr player_take_damage
         jsr apu_trigger_player_damage

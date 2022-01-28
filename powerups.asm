@@ -11,7 +11,7 @@ powerup_spawn:
         txa
         lsr
         adc #$20
-        sta enemy_ram_oam,x ; OAM ref 
+        sta enemy_ram_ex,x ; OAM ref 
         ; x pos
         lda #$0
         sta enemy_ram_x,x
@@ -23,7 +23,7 @@ powerup_spawn:
         lda game_height_scale,y
         sta enemy_ram_y,x
         lda #$20
-        ldy enemy_ram_oam,x
+        ldy enemy_ram_ex,x
         sta $0200,y
         
 powerup_init_velocity_and_hp:
