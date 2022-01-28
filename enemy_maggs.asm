@@ -73,7 +73,7 @@ maggs_cycle: subroutine
         sta oam_ram_x+4,y
         
         ; y pos
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
         lda enemy_ram_pc,x
         lsr
         tay

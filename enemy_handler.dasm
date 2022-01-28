@@ -116,7 +116,7 @@ enemy_death: subroutine
         sta $0200+3,x
         ; clear enemy data
         lda #$00
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
         sta ENEMY_RAM,x
         sta ENEMY_RAM+1,x
         sta ENEMY_RAM+2,x
@@ -136,12 +136,11 @@ update_enemies: subroutine
         beq player_dead_enemies_despawn
 	; cycle through all the slots
 	lda #$00
-        sta enemy_handler_pos
         sta enemy_ram_offset
         lda #$20
         sta enemy_oam_offset
 .handler_loop
-        ldx enemy_handler_pos
+        ldx enemy_ram_offset
 	; get enemy type
         lda ENEMY_RAM,x
         ; not defined go next slot
@@ -168,7 +167,6 @@ update_enemies_handler_next:
         adc enemy_ram_offset
         cmp #$e0
         beq .handler_core_end
-        sta enemy_handler_pos
         sta enemy_ram_offset
 .check_for_1_sprite
         ; if ram offset under $80 it is 1 sprite
@@ -211,14 +209,14 @@ player_dead_enemies_despawn: subroutine
         lsr
         lsr
         lsr
-        sta enemy_handler_pos
+        sta enemy_ram_offset
         ldx #$23
 .loop
         lda $0200,x
         cmp #$00
         ;beq .do_nothing
         sec
-        sbc enemy_handler_pos
+        sbc enemy_ram_offset
         bmi .despawn
         sta $0200,x
         jmp .do_nothing
@@ -242,7 +240,7 @@ player_dead_enemies_despawn: subroutine
         
         
 crossbones_cycle: subroutine
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
         inc ENEMY_RAM+5,x
         lda ENEMY_RAM+5,x
         lsr

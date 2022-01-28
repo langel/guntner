@@ -124,7 +124,6 @@ enemy_oam_offset	byte
 enemy_debug		byte
 enemy_temp_palette	byte
 enemy_temp_temp		byte
-enemy_handler_pos	byte
 enemy_dmg_accumulator	byte
 boss_x		byte
 boss_y		byte

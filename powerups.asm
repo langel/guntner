@@ -48,8 +48,8 @@ powerup_from_starglasses:
         
 powerups_cycle: subroutine
         
-	ldx enemy_handler_pos
-        ldy enemy_ram_oam,x
+	ldx enemy_ram_offset
+        ldy enemy_oam_offset
         ; sprite
         lda #$2b
         sta $0201,y

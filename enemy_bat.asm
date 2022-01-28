@@ -68,7 +68,7 @@ bat_cycle: subroutine
         lsr
         jsr sine_of_scale
         clc
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
         adc enemy_ram_y,x
         ldy enemy_oam_offset
         sta $0200,y
