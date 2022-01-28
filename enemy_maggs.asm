@@ -33,7 +33,32 @@ maggs_spawn: subroutine
         
 ;;;; HANDLING maggs
 maggs_cycle: subroutine
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
+        ldy enemy_oam_offset
+        lda oam_ram_x,y
+        sta collision_0_x
+        lda oam_ram_y,y
+        sta collision_0_y
+        lda #$10
+        sta collision_0_w
+        lda #$05
+        sta collision_0_h
+        jsr enemy_get_damage_this_frame_2
+        cmp #$00
+        bne .not_dead
+.is_dead
+	lda #$ff
+        sta oam_ram_y+4,y
+	inc phase_kill_count
+        lda enemy_ram_type,x
+        jsr enemy_give_points    
+        ; change it into crossbones!
+        jsr apu_trigger_enemy_death
+        lda #$01
+	ldx enemy_ram_offset
+        sta enemy_ram_type,x
+        jmp .done
+.not_dead
 	; sprite
         lda enemy_ram_ac,x
         lsr
@@ -43,18 +68,17 @@ maggs_cycle: subroutine
         asl
         clc
         adc #$3c
-	ldy enemy_temp_oam_x
-        sta $0201+0,y
+	ldy enemy_oam_offset
+        sta oam_ram_spr,y
         adc #$01
-        sta $0201+4,y
+        sta oam_ram_spr+4,y
         
         ; x pos
         lda enemy_ram_x,x
-        sta collision_0_x
-        sta $0203+0,y
+        sta oam_ram_x,y
         clc
         adc #$08
-        sta $0203+4,y
+        sta oam_ram_x+4,y
         
         ; y pos
 	ldx enemy_handler_pos
@@ -64,10 +88,9 @@ maggs_cycle: subroutine
         lda sine_15_max_128_length,y
         clc
         adc enemy_ram_y,x
-        sta collision_0_y
-	ldy enemy_temp_oam_x
-        sta $0200+0,y
-        sta $0200+4,y
+	ldy enemy_oam_offset
+        sta oam_ram_y,y
+        sta oam_ram_y+4,y
         
         ; update pattern
         inc enemy_ram_pc,x
@@ -83,68 +106,10 @@ maggs_cycle: subroutine
 .maggs_frame
         dec enemy_ram_ac,x
         
-        lda #$10
-        sta collision_0_w
-        lda #$05
-        sta collision_0_h
-; get damage amount
-        jsr enemy_get_damage_this_frame
-        lda enemy_dmg_accumulator
-        cmp #$00
-        beq .not_hit
-        lda enemy_ram_hp,x
-        sec
-        sbc enemy_dmg_accumulator
-        bmi .dead
-        sta enemy_ram_hp,x
-        jmp .not_dead
-.dead
-        ; DEAD
-        inc phase_kill_count
-        jsr apu_trigger_enemy_death
-	; give points
-        lda #56
-        jsr player_add_points_00
-        ; change it into crossbones!
-        lda #$01
-        sta enemy_ram_type,x
-        lda #$ff
-        sta $0203+4,y
-        lda $0203+0,y
-        clc
-        adc #$07
-        sta $0203+0,y
-        ;jsr enemy_death
-.not_dead
-	jsr apu_trigger_enemy_damage
-        lda enemy_ram_att,x
-        ora #ENEMY_HIT_PALETTE_FRAMES
-        sta enemy_ram_att,x
-        jmp .palette
-.not_hit
-        ; palette
-	;ldx enemy_handler_pos
-        ;lda ENEMY_RAM+7,x
-        ;tax
-        ;lda #$01
-        ;sta $0202,x
-.palette
-        ; palette
-        lda enemy_ram_att,x
-        and #$07
-        sta $400,y
-        cmp #$00
-        beq .normal_colors
-.hit_colors
-	dec enemy_ram_att,x
-        lda #$00
-        sta $0202,y
-        sta $0206,y
-        jmp .done
-.normal_colors	
         lda #$02
-        sta $0202,y
-        sta $0206,y
+        jsr enemy_set_palette
+        sta oam_ram_att+4,y
+        jmp .done
 .done
 	jmp update_enemies_handler_next
         

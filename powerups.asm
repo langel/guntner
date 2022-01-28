@@ -34,12 +34,13 @@ powerup_init_velocity_and_hp:
         rts
         
 powerup_from_starglasses:
+	ldx enemy_ram_offset
+        ldy enemy_oam_offset
 	lda #$06
         sta enemy_ram_type,x
-        ldy enemy_ram_oam,x
-        lda $0203,y
+        lda oam_ram_x,y
         sta enemy_ram_x,x
-        lda $0200,y
+        lda oam_ram_y,y
         sta enemy_ram_y,x
        	jsr powerup_init_velocity_and_hp
 	rts

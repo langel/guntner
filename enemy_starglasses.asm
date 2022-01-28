@@ -36,42 +36,59 @@ starglasses_spawn: subroutine
 
 ;;; HANDLING STARGLASSES
 starglasses_cycle: subroutine
-	ldy enemy_temp_oam_x
-
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
+	ldy enemy_oam_offset
+        lda oam_ram_x,y
+        sta collision_0_x
+        lda oam_ram_y,y
+        sta collision_0_y
+        lda #$08
+        sta collision_0_w
+        sta collision_0_h
+        jsr enemy_get_damage_this_frame_2
+        cmp #$00
+        bne .not_dead
+.is_dead
+	inc phase_kill_count
+        lda enemy_ram_type,x
+        jsr enemy_give_points
+        ; XXX maybe a different sound effect
+        jsr apu_trigger_enemy_death
+        ; spawn powerup
+        jsr powerup_from_starglasses
+        jmp sprite_4_cleanup_for_next
+        jmp .done
+.not_dead
 	; using pattern_counter for x sin
 	inc enemy_ram_pc,x
 	; using anim_counter for y sin
 	inc enemy_ram_ac,x
 	inc enemy_ram_ac,x
-
 	; calc x
 	lda enemy_ram_pc,x
         tax
 	lda sine_table,x
 	lsr
 	lsr
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
 	clc
 	adc enemy_ram_x,x
 	sta collision_0_x
         jsr sprite_4_set_x
-
 	; calc y
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
         lda enemy_ram_ac,x
         tax
 	lda sine_table,x
 	lsr
 	lsr
 	clc
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
 	adc enemy_ram_y,x
 	sta collision_0_y
         jsr sprite_4_set_y
-
 	; tiles
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
 	lda enemy_ram_ac,x
 	and #$40
 	beq .frame1
@@ -83,54 +100,11 @@ starglasses_cycle: subroutine
 	lda #$0e
         jsr sprite_4_set_sprite
 .frame_done
-
-	lda #$10
-	sta collision_0_w
-	sta collision_0_h
-; get damage amount
-        jsr enemy_get_damage_this_frame
-        lda enemy_dmg_accumulator
-        cmp #$00
-        beq .palette_check
-        lda enemy_ram_hp,x
-        sec
-        sbc enemy_dmg_accumulator
-        bcc .dead
-        sta enemy_ram_hp,x
-        jmp .not_dead
-.dead
-        jsr apu_trigger_enemy_death
-	; give points
-        lda #00
-        jsr player_add_points_00
-	inc phase_kill_count
-        lda #25
-        jsr player_add_points_00__
-        ; spawn powerup
-        jsr powerup_from_starglasses
-        jmp sprite_4_cleanup_for_next
-.not_dead
-        lda #ENEMY_HIT_PALETTE_FRAMES
-	sta enemy_ram_att,x
-	jsr apu_trigger_enemy_damage
-.palette_check
-	lda enemy_ram_att,x
-        cmp #$00
-        beq .palette_not_hit
-.palette_hit
-        dec enemy_ram_att,x
-	lda #$00
-	sta $0202,y
-	sta $0206,y
-	sta $020a,y
-	sta $020e,y
+        lda #$03
+        jsr enemy_set_palette
+        sta oam_ram_att+4,y
+        sta oam_ram_att+8,y
+        sta oam_ram_att+12,y
         jmp .done
-.palette_not_hit
-	lda #$03
-	sta $0202,y
-	sta $0206,y
-	sta $020a,y
-	sta $020e,y
 .done
 	jmp update_enemies_handler_next
-        

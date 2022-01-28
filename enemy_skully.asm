@@ -40,7 +40,7 @@ skully_cycle: subroutine
         lda #$03
         sta enemy_temp_palette
         ; stash OAM ADDR in y register
-        ldy enemy_temp_oam_x
+        ldy enemy_oam_offset
         ; stash enemy addr in x register
         ldx enemy_handler_pos
         ; let's find what frame we're on
@@ -155,7 +155,7 @@ skully_cycle: subroutine
         ; spawn crossbones
 	lda #$01
         sta enemy_ram_type,x
-	ldy enemy_temp_oam_x
+	ldy enemy_oam_offset
         jmp sprite_4_cleanup_for_next
 .skully_not_dead
         ; setup hit palette counter

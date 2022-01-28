@@ -118,6 +118,10 @@ title_temp	byte
 
 enemy_temp_addr_lo	byte
 enemy_temp_addr_hi	byte
+enemy_ram_offset	byte
+enemy_oam_offset	byte
+; XXX might be able to clean some of these out
+enemy_debug		byte
 enemy_temp_oam_x	byte
 enemy_temp_palette	byte
 enemy_temp_temp		byte
@@ -348,12 +352,12 @@ NMIHandler: subroutine
 ; read Player Controls
         jsr player_controls_read
         
+; frame counter        
+	inc wtf
 ; update global time
 	jsr timer_update 
 
-        
 ; rng updates
-	inc wtf
 	lda rng0
         jsr NextRandom
         sta rng0
@@ -418,8 +422,6 @@ NMIHandler: subroutine
         nop	; how much prg space we using?
 
 
-
-        
 	include "phases_and_levels.dasm"
         nop	; how much prg space we using?
 	include "phase_table.dasm"
@@ -446,7 +448,7 @@ NMIHandler: subroutine
         nop	; how much prg space we using?
         
 
-
+;e666 bookmark
         
 ; LOOKUP TABLES AT TOP OF RAM
         org $fb00

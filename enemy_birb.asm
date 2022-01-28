@@ -35,33 +35,52 @@ birb_spawn: subroutine
 ;;;; HANDLING BIRB
         
 birb_cycle: subroutine
-	ldx enemy_handler_pos
-        ldy enemy_temp_oam_x
+	ldx enemy_ram_offset
+        ldy enemy_oam_offset
+        lda oam_ram_x,y
+        sta collision_0_x
+        lda oam_ram_y,y
+        sta collision_0_y
+        lda #$08
+        sta collision_0_w
+        lda #$05
+        sta collision_0_h
+        jsr enemy_get_damage_this_frame_2
+        cmp #$00
+        bne .not_dead
+.is_dead
+	inc phase_kill_count
+        lda enemy_ram_type,x
+        jsr enemy_give_points    
+        ; change it into crossbones!
+        jsr apu_trigger_enemy_death
+        lda #$01
+	ldx enemy_ram_offset
+        sta enemy_ram_type,x
+        jmp .done
+.not_dead
         ; update pattern
-        lda ENEMY_RAM+3,x
-        inc ENEMY_RAM+3,x
-        inc ENEMY_RAM+3,x
-        lda ENEMY_RAM+3,x
+        inc enemy_ram_pc,x
+        inc enemy_ram_pc,x
         
         ; set x position
         ; get x pattern position
         ; add it to base x position
         ; save that to OAM x position
-        lda ENEMY_RAM+3,x
+        lda enemy_ram_pc,x
         tax
         lda sine_table,x
         lsr
         lsr
         lsr
-	ldx enemy_handler_pos
-        inc ENEMY_RAM+1,x
+	ldx enemy_ram_offset
+        inc enemy_ram_x,x
         clc
-        adc ENEMY_RAM+1,x
-        sta $0203,y
-        sta collision_0_x
+        adc enemy_ram_x,x
+        sta oam_ram_x,y
         
         ; set y position
-        lda ENEMY_RAM+3,x
+        lda enemy_ram_pc,x
         clc 
         adc #$40
         tax
@@ -69,17 +88,16 @@ birb_cycle: subroutine
         lsr
         lsr
         lsr
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
         clc
-        adc ENEMY_RAM+2,x
-        sta $0200,y
-        sta collision_0_y
+        adc enemy_ram_y,x
+        sta oam_ram_y,y
         
         ; current sprite
-        lda ENEMY_RAM+4,x
+        lda enemy_ram_ac,x
         clc
         adc #$14
-        sta ENEMY_RAM+4,x
+        sta enemy_ram_ac,x
         lsr
         lsr
         lsr
@@ -88,41 +106,12 @@ birb_cycle: subroutine
         lsr
         clc 
         adc #$2c
-        sta $0201,y
-        lda #$08
-        sta collision_0_w
-        lda #$05
-        sta collision_0_h
-; get damage amount
-        jsr enemy_get_damage_this_frame
-        lda enemy_dmg_accumulator
-        cmp #$00
-        beq .birb_not_hit
-        lda enemy_ram_hp,x
-        sec
-        sbc enemy_dmg_accumulator
-        bmi .birb_is_dead
-        sta enemy_ram_hp,x
-        jmp .birb_not_dead
-.birb_is_dead
-	inc phase_kill_count
-	; give points
-        lda #05
-        jsr player_add_points_00
-        ; change it into crossbones!
-        jsr apu_trigger_enemy_death
+        sta oam_ram_spr,y
+.frame_done
         lda #$01
-        sta enemy_ram_type,x
-.birb_not_dead
-	jsr apu_trigger_enemy_damage
-        ; palette
-        lda #$00
-        sta $0202,y
-        jmp .birb_done
-.birb_not_hit
-        ; palette
-        lda #$01
-        sta $0202,y
-.birb_done
+        jsr enemy_set_palette
+        jmp .done
+.done
 	jmp update_enemies_handler_next
+        
         

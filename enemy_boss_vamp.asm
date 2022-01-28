@@ -53,8 +53,8 @@ boss_vamp_bat_spawn: subroutine
         
         
 boss_vamp_bat_cycle: subroutine
-	ldx enemy_handler_pos
-        ldy enemy_temp_oam_x
+	ldx enemy_ram_offset
+        ldy enemy_oam_offset
         lda oam_ram_x,y
         sta collision_0_x
         lda oam_ram_y,y
@@ -74,7 +74,7 @@ boss_vamp_bat_cycle: subroutine
         ; change it into crossbones!
         jsr apu_trigger_enemy_death
         lda #$01
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
         sta enemy_ram_type,x
         jmp .done
 .not_dead
@@ -87,7 +87,7 @@ boss_vamp_bat_cycle: subroutine
         adc boss_x
         sec
         sbc boss_v5
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
         sta enemy_ram_x,x
         sta oam_ram_x,y
         ; update y pos
@@ -101,7 +101,7 @@ boss_vamp_bat_cycle: subroutine
         adc boss_y
         sec
         sbc boss_v5
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
         sta enemy_ram_x,x
         sta oam_ram_y,y
         ; update animation
@@ -188,8 +188,8 @@ boss_vamp_spawn: subroutine
 
 
 boss_vamp_cycle: subroutine
-	ldx enemy_handler_pos
-        ldy enemy_temp_oam_x
+	ldx enemy_ram_offset
+        ldy enemy_oam_offset
         inc enemy_ram_ac,x
         
 	ldx enemy_handler_pos
@@ -214,8 +214,7 @@ boss_vamp_cycle: subroutine
         lda #$01
         sta enemy_ram_type,x
         jmp sprite_4_cleanup_for_next
-        
-        
+               
 .not_dead    
         lda #$40
         lda boss_v0
@@ -239,12 +238,12 @@ boss_vamp_cycle: subroutine
         lda boss_v2
         lsr
         tay
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
         lda enemy_ram_x,x
         clc
         adc sine_15_max_128_length,y
         sta boss_x
-        ldy enemy_temp_oam_x
+        ldy enemy_oam_offset
         jsr sprite_4_set_x
         lda boss_x
         clc
@@ -255,7 +254,7 @@ boss_vamp_cycle: subroutine
         tax
 	lda sine_table,x
 	lsr
-	ldx enemy_handler_pos
+	ldx enemy_ram_offset
 	clc
         adc enemy_ram_y,x
         sta boss_y
