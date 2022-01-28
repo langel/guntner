@@ -122,8 +122,8 @@ skully_cycle: subroutine
 	; update spinning counter
 	lda #$07
         clc
-        adc ENEMY_RAM+4,x
-        sta ENEMY_RAM+4,x
+        adc enemy_ram_ac,x
+        sta enemy_ram_ac,x
         
         ; move skully
         jsr skully_handle_movement
@@ -169,14 +169,14 @@ skully_cycle: subroutine
 .normal_palette
         ; palette
         lda enemy_temp_palette 
-        sta $0202,y
-        sta $0206,y
-        sta $020a,y
-        sta $020e,y
+        sta oam_ram_att,y
+        sta oam_ram_att+4,y
+        sta oam_ram_att+8,y
+        sta oam_ram_att+12,y
         jmp .skully_done
 .hit_palette
 	dec enemy_ram_att,x
-	dec ENEMY_RAM+6,x
+	dec enemy_ram_att,x
         ; palette
         dec enemy_temp_palette
         dec enemy_temp_palette
@@ -197,28 +197,28 @@ skully_handle_movement: subroutine
         beq .demoshit
         lda #$69
         sta $f9
-        lda ENEMY_RAM+3,x
+        lda enemy_ram_pc,x
         cmp #$40
         bne .not_chasing
-        dec ENEMY_RAM+1,x
+        dec enemy_ram_x,x
         
         rts
 .not_chasing
         ; but we are zooming
         lda #$20
-        sta ENEMY_RAM+3,x
+        sta enemy_ram_pc,x
         lda #$04
         clc
-        adc ENEMY_RAM+1,x
-        sta ENEMY_RAM+1,x
+        adc enemy_ram_x,x
+        sta enemy_ram_x,x
         sta $f8
         cmp #240
         bcc .demoshit
         lda #$40
-        sta ENEMY_RAM+3,x
+        sta enemy_ram_pc,x
 	rts
 .demoshit
         ; move skully to the right
-        inc ENEMY_RAM+1,x
+        inc enemy_ram_x,x
 	rts
    

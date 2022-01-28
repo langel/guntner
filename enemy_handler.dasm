@@ -1,21 +1,20 @@
 ;;;; Constants
 
-ENEMY_RAM			= $0300
 ENEMY_HIT_PALETTE_FRAMES	= #$04
 
 enemy_ram_type = $0300
+enemy_ram_hp   = $0305
 enemy_ram_x    = $0301
 enemy_ram_y    = $0302
 enemy_ram_pc   = $0303
 enemy_ram_ac   = $0304
-enemy_ram_hp   = $0305
 enemy_ram_att  = $0306
 enemy_ram_oam  = $0307
 
+oam_ram_x      = $0203
 oam_ram_y      = $0200
 oam_ram_spr    = $0201
 oam_ram_att    = $0202
-oam_ram_x      = $0203
 
 
 
@@ -93,7 +92,7 @@ clear_all_enemies: subroutine
 	ldx #$00
         txa
 .enemy_loop
-	sta ENEMY_RAM,x
+	sta enemy_ram_type,x
         inx
         bne .enemy_loop
 	ldx #$20
@@ -110,21 +109,21 @@ enemy_death: subroutine
         sta enemy_debug
         tax
         lda #$ff
-        sta $0200+0,x
-        sta $0200+1,x
-        sta $0200+2,x
-        sta $0200+3,x
+        sta oam_ram_x,x
+        sta oam_ram_y,x
+        sta oam_ram_spr,x
+        sta oam_ram_att,x
         ; clear enemy data
         lda #$00
 	ldx enemy_ram_offset
-        sta ENEMY_RAM,x
-        sta ENEMY_RAM+1,x
-        sta ENEMY_RAM+2,x
-        sta ENEMY_RAM+3,x
-        sta ENEMY_RAM+4,x
-        sta ENEMY_RAM+5,x
-        sta ENEMY_RAM+6,x
-        sta ENEMY_RAM+7,x
+        sta enemy_ram_type,x
+        sta enemy_ram_x,x
+        sta enemy_ram_y,x
+        sta enemy_ram_hp,x
+        sta enemy_ram_pc,x
+        sta enemy_ram_ac,x
+        sta enemy_ram_att,x
+        sta enemy_ram_oam,x
         rts
         
         
@@ -142,14 +141,10 @@ update_enemies: subroutine
 .handler_loop
         ldx enemy_ram_offset
 	; get enemy type
-        lda ENEMY_RAM,x
+        lda enemy_ram_type,x
         ; not defined go next slot
         cmp #$00
         beq .handler_next
-	; set OAM position in zero page
-        lda enemy_ram_oam,x
-	; get enemy type
-        lda enemy_ram_type,x
         asl
         tax
         lda ENEMY_METHODS_LOOKUP_TABLE,x
@@ -241,23 +236,23 @@ player_dead_enemies_despawn: subroutine
         
 crossbones_cycle: subroutine
 	ldx enemy_ram_offset
-        inc ENEMY_RAM+5,x
-        lda ENEMY_RAM+5,x
+        inc enemy_ram_hp,x
+        lda enemy_ram_hp,x
         lsr
         lsr
         lsr
-        sta ENEMY_RAM+3,x
+        sta enemy_ram_y,x
         tay
         ldy enemy_oam_offset
-        lda $0200,y
+        lda oam_ram_y,y
         sec
-        sbc ENEMY_RAM+3,x
+        sbc enemy_ram_y,x
         bcc .crossbones_death
-        sta $0200,y
+        sta oam_ram_y,y
         lda #$0b
-        sta $0201,y
+        sta oam_ram_spr,y
         lda #$03
-        sta $0202,y
+        sta oam_ram_att,y
         jmp .crossbones_done
 .crossbones_death
         jsr enemy_death

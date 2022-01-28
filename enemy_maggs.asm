@@ -39,7 +39,8 @@ maggs_cycle: subroutine
         cmp #$00
         bne .not_dead
 .is_dead
-	lda #$ff
+	lda #$f0
+        ldy enemy_oam_offset
         sta oam_ram_y+4,y
 	inc phase_kill_count
         lda enemy_ram_type,x
