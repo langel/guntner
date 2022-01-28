@@ -11,6 +11,20 @@ ENEMY_HITPOINTS_TABLE:
         byte #$10 ; vampire
         byte #$0a ; vamp bat
         
+        
+ENEMY_PLAYER_POINTS_TABLE:
+; offset would be x << 1 + x (i think)
+	byte #$00,#$00,#$00
+	byte #$00,#$00,#$00
+        byte #$00,#$00,#$05 ; birb
+        byte #$00,#$00, #56 ; maggs
+        byte #$00, #25, #00 ; starglass
+        byte #$00, #99, #99 ; skully
+        byte #$00,#$00,#$00 ; powerups
+        byte #$00,#$01,#$05 ; bat
+        byte #$06,#$06,#$06 ; vampire head
+        byte #$01,#$22,#$55 ; vamp bat
+        
 
 ENEMY_PLAYER_COLLISION_TABLE:
 	byte #$00
@@ -22,7 +36,7 @@ ENEMY_PLAYER_COLLISION_TABLE:
         byte #$00 ; powerups
         byte #$03 ; bat
         byte #$40 ; vampire head
-        byte #$09 ; vamp bat
+        byte #$04 ; vamp bat
         
 
 ENEMY_METHODS_LOOKUP_TABLE:

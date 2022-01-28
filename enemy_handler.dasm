@@ -1,7 +1,7 @@
 ;;;; Constants
 
 ENEMY_RAM			= $0300
-ENEMY_HIT_PALETTE_FRAMES	= #$05
+ENEMY_HIT_PALETTE_FRAMES	= #$04
 
 enemy_ram_type = $0300
 enemy_ram_x    = $0301
@@ -11,6 +11,11 @@ enemy_ram_ac   = $0304
 enemy_ram_hp   = $0305
 enemy_ram_att  = $0306
 enemy_ram_oam  = $0307
+
+oam_ram_y      = $0200
+oam_ram_spr    = $0201
+oam_ram_att    = $0202
+oam_ram_x      = $0203
 
 
 
@@ -70,12 +75,13 @@ enemy_death: subroutine
 	ldx enemy_handler_pos
         lda ENEMY_RAM+7,x
         tax
-        lda #$00
+        lda #$ff
         sta $0200+0,x
         sta $0200+1,x
         sta $0200+2,x
         sta $0200+3,x
         ; clear enemy data
+        lda #$00
 	ldx enemy_handler_pos
         sta ENEMY_RAM,x
         sta ENEMY_RAM+1,x
@@ -131,16 +137,7 @@ update_enemies_handler_next:
 .handler_core_end
 	rts
         
-        
-        
-enemy_get_damage_this_frame: subroutine
-	lda #$00
-        sta enemy_dmg_accumulator
-        jsr player_bullet_collision_handler
-	jsr player_collision_detect
-	rts
-        
-        
+             
         
 player_dead_enemies_despawn: subroutine
 	lda player_death_flag
@@ -212,10 +209,101 @@ crossbones_cycle: subroutine
 	jmp update_enemies_handler_next
         
         
+        
+        
+enemy_get_damage_this_frame: subroutine
+	lda #$00
+        sta enemy_dmg_accumulator
+        jsr player_bullet_collision_handler
+	jsr player_collision_detect
+	rts
+        
+                
+enemy_get_damage_this_frame_2: subroutine
+	; x = enemy ram offset
+        ; y = oam ram offset
+	lda #$00
+        sta enemy_dmg_accumulator
+        jsr player_bullet_collision_handler
+	jsr player_collision_detect     
+        lda enemy_dmg_accumulator
+        cmp #$00
+        bne .hit
+	lda enemy_ram_hp,x
+        rts
+.hit
+        lda #ENEMY_HIT_PALETTE_FRAMES
+	sta enemy_ram_att,x
+	jsr apu_trigger_enemy_damage
+	lda enemy_ram_hp,x
+        sec
+        sbc enemy_dmg_accumulator
+        bcc .dead
+        sta enemy_ram_hp,x
+        rts
+.dead
+     	lda #$00
+        rts
+        
+        
+enemy_set_palette: subroutine
+	; checks/handles hit palette counter
+        ; a = enemy normal palette
+	; x = enemy ram offset
+        ; y = oam ram offset
+        ; leaves correct palette id in a
+        ; can be applied to extra sprites of larger enemy
+        sta enemy_temp_temp
+        lda enemy_ram_att,x
+        cmp #$00
+        beq .use_enemy_palette
+.use_hit_palette
+	dec enemy_ram_att,x
+	lda #$00
+        sta $0202,y
+        rts
+.use_enemy_palette
+	lda enemy_temp_temp
+        sta $0202,y
+        rts
+        
+        
+enemy_give_points: subroutine
+        ; a = enemy type
+        sta $a0
+        sta enemy_temp_temp
+        inc enemy_temp_temp
+        lda enemy_temp_temp
+        sta $a1
+        asl
+        clc
+        adc enemy_temp_temp
+        sta enemy_temp_temp
+        sta $a2
+        dec enemy_temp_temp
+        lda enemy_temp_temp
+        sta $a3
+        tax
+        lda ENEMY_PLAYER_POINTS_TABLE,x
+        sta $a4
+        jsr player_add_points_00
+        dec enemy_temp_temp
+        lda enemy_temp_temp
+        sta $a5
+        tax
+        lda ENEMY_PLAYER_POINTS_TABLE,x
+        sta $a6
+        jsr player_add_points_00__
+        dec enemy_temp_temp
+        lda enemy_temp_temp
+        sta $a7
+        tax
+        lda ENEMY_PLAYER_POINTS_TABLE,x
+        sta $a8
+        jsr player_add_points_00____
+        rts
 
         
-      
-     
         
         
 get_enemy_slot_1_sprite: subroutine

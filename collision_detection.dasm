@@ -20,22 +20,22 @@ detect_collision: subroutine
         adc collision_0_w
         bcs .no_collision ; make sure x+w is not less than x
         cmp collision_1_x
-        bmi .no_collision
+        bcc .no_collision
         clc
         lda collision_1_x
         adc collision_1_w
         cmp collision_0_x
-        bmi .no_collision
+        bcc .no_collision
         clc
         lda collision_0_y
         adc collision_0_h
         cmp collision_1_y
-        bmi .no_collision
+        bcc .no_collision
         clc 
         lda collision_1_y
         adc collision_1_h
         cmp collision_0_y
-        bmi .no_collision
+        bcc .no_collision
         lda #$ff
         rts
 .no_collision
@@ -50,22 +50,22 @@ player_collision_detect: subroutine
         adc collision_0_w
         bcs .done ; make sure x+w is not less than x
         cmp player_x_hi
-        bmi .done ; no collision
+        bcc .done ; no collision
         clc
         lda player_x_hi
         adc #$10 ; player width
         cmp collision_0_x
-        bmi .done ; no collision
+        bcc .done ; no collision
         clc
         lda collision_0_y
         adc collision_0_h
         cmp player_coll_y
-        bmi .done ; no collision
+        bcc .done ; no collision
         clc 
         lda player_coll_y
         adc #$06 ; player height
         cmp collision_0_y
-        bmi .done ; no collision
+        bcc .done ; no collision
 ; handle player collision
 	lda enemy_dmg_accumulator
         clc

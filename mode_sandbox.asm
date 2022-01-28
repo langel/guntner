@@ -11,7 +11,7 @@ sandbox_init: subroutine
         
 	jsr get_enemy_slot_1_sprite
         tax
-        jsr bat_spawn
+        ;jsr bat_spawn
         
 	jsr get_enemy_slot_4_sprite
         tax
@@ -29,7 +29,8 @@ sandbox_init: subroutine
         ;tax
         ;jsr maggs_spawn
         
-        lda #$40
+        ;lda #$40
+        lda #$ff
         sta player_health
         
 	;jsr get_enemy_slot_1_sprite

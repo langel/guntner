@@ -109,9 +109,9 @@ player_take_damage: subroutine
 	lda #$00
         sta player_health
         ; change sprite
-	ldx #$0a
-        stx $0205
-        stx $0209
+	lda #$0a
+        sta $0205
+        sta $0209
         rts
  
         

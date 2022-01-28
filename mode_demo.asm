@@ -242,6 +242,7 @@ run_player_demo: subroutine
 .player_y_equal
 	iny
 .player_y_done
+	; XXX player_movement does this add 2 too
 	; add 2 to y position for collision detection
 	lda player_y_hi
         clc

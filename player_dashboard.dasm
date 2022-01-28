@@ -262,6 +262,7 @@ dashboard_draw: subroutine
 dashboard_update: subroutine
 
 ; SCORE
+; XXX this is not translating correctly to the screen
 	lda score_00______
         asl
         tax
