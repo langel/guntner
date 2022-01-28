@@ -176,15 +176,13 @@ enemy x,y coordinates are held at OAM ref
 but those are only visual coordinates
 
 0) type
-1) x base
-2) y base
-3) pattern counter
-4) animation counter
-5) health
-6) bitwise attributes
-	7   : left/right quadrant?
-	1-0 : 3 frames of hit pallete?
-7) OAM_REF base address
+1) Health Points
+2) X base
+3) Y base
+4) Pattern Counter
+5) Animation Counter
+6) Hit palette frame Counter
+7) EXtra
 
 
 sprite configurations
@@ -240,3 +238,4 @@ const values label overwrites var name in memory browser
 main dropdown doesn't close after clicking dropdown item
 tab makes indent -- shift-tab does not deindent
 search all code for string (undefined labels are easy to find)
+git status / diff
