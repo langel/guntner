@@ -203,7 +203,8 @@ boss_vamp_cycle: subroutine
 	inc phase_kill_count
 	; give points
         lda #$ff
-        jsr player_add_points_00
+        lda enemy_ram_type,x
+        jsr enemy_give_points
         ; change it into crossbones!
         jsr apu_trigger_enemy_death
         lda #$01
@@ -237,7 +238,7 @@ boss_vamp_cycle: subroutine
 	ldx enemy_ram_offset
         lda enemy_ram_x,x
         clc
-        adc sine_15_max_128_length,y
+        adc sine_4bit,y
         sta boss_x
         ldy enemy_oam_offset
         jsr sprite_4_set_x

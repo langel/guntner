@@ -363,22 +363,27 @@ enemy_give_points: subroutine
         tax
         lda ENEMY_PLAYER_POINTS_TABLE,x
         sta $a4
-        jsr player_add_points_00
-        dec enemy_temp_temp
-        lda enemy_temp_temp
-        sta $a5
-        tax
+        clc
+        adc score_0000xx
+        sta score_0000xx
+        bcc .8bit_no_carry
+        inc score_00xx00
+.8bit_no_carry
+	dex
         lda ENEMY_PLAYER_POINTS_TABLE,x
-        sta $a6
-        jsr player_add_points_00__
-        dec enemy_temp_temp
-        lda enemy_temp_temp
-        sta $a7
-        tax
+        clc
+        adc score_00xx00
+        sta score_00xx00
+        bcc .16bit_no_carry
+        inc score_xx0000
+.16bit_no_carry
+	dex
         lda ENEMY_PLAYER_POINTS_TABLE,x
-        sta $a8
-        jsr player_add_points_00____
-        rts
+        clc
+        adc score_xx0000
+        sta score_xx0000
+	rts
+        
 
         
         

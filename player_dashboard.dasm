@@ -263,7 +263,7 @@ dashboard_update: subroutine
 
 ; SCORE
 ; XXX this is not translating correctly to the screen
-	lda score_00______
+	lda score_xx0000
         asl
         tax
         lda decimal_table,x
@@ -272,7 +272,7 @@ dashboard_update: subroutine
         lda decimal_table,x
         sta score_1000000
         
-	lda score_00____
+	lda score_xx0000
         asl
         tax
         lda decimal_table,x
@@ -281,7 +281,7 @@ dashboard_update: subroutine
         lda decimal_table,x
         sta score_10000
         
-	lda score_00__
+	lda score_00xx00
         asl
         tax
         lda decimal_table,x
@@ -290,7 +290,7 @@ dashboard_update: subroutine
         lda decimal_table,x
         sta score_100
         
-	lda score_00
+	lda score_0000xx
         asl
         tax
         lda decimal_table,x

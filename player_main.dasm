@@ -29,10 +29,9 @@ player_init: subroutine
         sta phase_end_game
         sta player_death_flag
         sta you_dead_counter
-        sta score_00
-        sta score_00__
-        sta score_00____
-        sta score_00______
+        sta score_0000xx
+        sta score_00xx00
+        sta score_xx0000
 	sta timer_frames_1s	
 	sta timer_frames_10s	
 	sta timer_seconds_1s	

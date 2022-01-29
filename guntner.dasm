@@ -82,10 +82,10 @@ score_10000	byte
 score_100000	byte
 score_1000000	byte
 score_10000000	byte
-score_00	byte
-score_00__	byte
-score_00____	byte
-score_00______	byte
+score_0000xx	byte
+score_00xx00	byte
+score_xx0000	byte
+
 
 lifebar0	byte
 lifebar1	byte
@@ -436,8 +436,6 @@ NMIHandler: subroutine
         nop	; how much prg space we using?
 	include "player_movement.dasm"
         nop	; how much prg space we using?
-	include "player_points.dasm"
-        nop	; how much prg space we using?
         
 	include "starfield.dasm"
         nop	; how much prg space we using?
@@ -449,7 +447,7 @@ NMIHandler: subroutine
 ;e666 bookmark
         
 ; LOOKUP TABLES AT TOP OF RAM
-        org $fb00
+        org $fc80
 	include "sine.dasm"
         nop	; how much prg space we using?
 	include "decimal_table.dasm"

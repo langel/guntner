@@ -5,9 +5,6 @@ sandbox_init: subroutine
         jsr player_init
         
         
-	jsr get_enemy_slot_1_sprite
-        tax
-        ;jsr powerup_spawn
         
 	jsr get_enemy_slot_1_sprite
         tax

@@ -1,30 +1,4 @@
-
-powerup_spawn:
-        ; spawn powerup
-	; x is set by enemy spawner
-	lda #$06
-        sta enemy_ram_type,x
-        lda #$01
-        sta enemy_ram_hp,x
-        ; set OAM offset
-        clc
-        txa
-        lsr
-        adc #$20
-        sta enemy_ram_ex,x ; OAM ref 
-        ; x pos
-        lda #$0
-        sta enemy_ram_x,x
-        ; y pos
-        lda rng0
-        jsr NextRandom
-        sta rng0
-        tay
-        lda game_height_scale,y
-        sta enemy_ram_y,x
-        lda #$20
-        ldy enemy_ram_ex,x
-        sta $0200,y
+; powerups always spawn from starglasses
         
 powerup_init_velocity_and_hp:
 	lda #$7f

@@ -1,4 +1,14 @@
 
+sine_8bit equ $0400
+sine_7bit equ $0480
+sine_6bit equ $0500
+sine_5bit equ $0580
+sine_4bit equ $0600
+sine_3bit equ $0680
+sine_2bit equ $0700
+sine_1bit equ $0780
+
+
 sine_init: subroutine
 	ldx #$00
         ldy #$00
@@ -24,6 +34,7 @@ sine_init: subroutine
         iny
         bne .loop
         rts
+
 
 sine_of_scale: subroutine
 	; returns scaled value of sin table
@@ -104,13 +115,3 @@ sine_table:
 	hex 393b3e414346494c
 	hex 4f5255585a5d6164
 	hex 676a6d707376797c
-        
-sine_15_max_128_length:
-	hex 0808080909090a0a0a0b0b0b0c0c0c0d
-	hex 0d0d0d0e0e0e0e0e0e0f0f0f0f0f0f0f
-	hex 0f0f0f0f0f0f0f0f0e0e0e0e0e0e0d0d
-	hex 0d0d0c0c0c0b0b0b0a0a0a0909090808
-	hex 07070706060605050504040403030302
-	hex 02020201010101010100000000000000
-	hex 00000000000000000101010101010202
-	hex 02020303030404040505050606060707

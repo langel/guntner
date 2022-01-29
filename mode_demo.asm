@@ -35,10 +35,9 @@ player_demo_init: subroutine
         sta player_death_flag
         sta you_dead_counter
         sta phase_current
-        sta score_00
-        sta score_00__
-        sta score_00____
-        sta score_00______
+        sta score_0000xx
+        sta score_00xx00
+        sta score_xx0000
 	sta timer_frames_1s	
 	sta timer_frames_10s	
 	sta timer_seconds_1s	
@@ -172,7 +171,7 @@ demo_enemy_spawn: subroutine
         lda rng0
         jsr NextRandom
         sta rng0
-        and #$01
+        and #$07
         cmp #$00
         beq .spawn_starglasses
         jsr skully_spawn
