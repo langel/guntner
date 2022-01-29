@@ -45,7 +45,5 @@ sandbox_time: subroutine
         jsr set_player_sprite
 
         jsr update_enemies
-	jsr player_bullets_update
-        jsr apu_game_frame
         
 	rts

@@ -37,7 +37,7 @@ mode_handler_post_vblank: subroutine
         lda game_mode
         cmp #$10
         bne .not_demo_time
-        jsr demo_mode
+        jsr demo_time
         jmp .done
 .not_demo_time
 	lda game_mode
@@ -57,6 +57,8 @@ mode_handler_post_vblank: subroutine
         
 ; runs after screen split
 ; not needed for title screen / options / etc.....
+; XXX seriously need to figure out if its worth
+;     turning off and back on again
 mode_handler_post_split: subroutine
 	lda game_mode
         and #$10
@@ -69,6 +71,16 @@ mode_handler_post_split: subroutine
         bne .skip_dashboard_update
 	jsr dashboard_update
 .skip_dashboard_update
-
+        jsr apu_game_frame
+	lda game_mode
+        cmp #$10
+        bne .playable_mode
+.demo_mode
+        jsr demo_enemy_spawn
+	jsr run_player_demo
+	jsr player_bullets_demo_update
+	rts
+.playable_mode
+	jsr player_bullets_update
 .no_dashboard
 	rts

@@ -35,7 +35,7 @@ starglasses_cycle: subroutine
         sta collision_0_x
         lda oam_ram_y,y
         sta collision_0_y
-        lda #$08
+        lda #$10
         sta collision_0_w
         sta collision_0_h
         jsr enemy_get_damage_this_frame

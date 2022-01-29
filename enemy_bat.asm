@@ -43,40 +43,13 @@ bat_cycle: subroutine
         sta enemy_ram_type,x
         jmp .done
 .not_dead
+	; adjust all counters
 	inc enemy_ram_x,x
-        ldy enemy_ram_pc,x
-        lda enemy_ram_ac,x
-        tax
-        tya
-        lsr
-        lsr
-        jsr sine_of_scale
-        clc
-	ldx enemy_ram_offset
-        adc enemy_ram_x,x
-        ldy enemy_oam_offset
-        sta $0203,y
-        sta collision_0_x
-        ; update y pos
-        ldy enemy_ram_pc,x
-        lda enemy_ram_ac,x
-        clc
-        adc #$40
-        tax
-        tya
-        lsr
-        lsr
-        jsr sine_of_scale
-        clc
-	ldx enemy_ram_offset
-        adc enemy_ram_y,x
-        ldy enemy_oam_offset
-        sta $0200,y
-        sta collision_0_y
         ; update animation
         lda enemy_ram_ac,x
         cmp #$80
         bcs .pattern_inc
+.pattern_dec
         dec enemy_ram_pc,x
         jmp .pattern_done
 .pattern_inc
@@ -100,6 +73,45 @@ bat_cycle: subroutine
 	lda #$3a        	
 .frame_done
 	sta oam_ram_spr,y
+        ; only calc sine every other frame
+        lda wtf
+        and #$00000001
+        sta enemy_temp_temp
+        lda enemy_slot_id
+        and #%00000001
+        cmp enemy_temp_temp
+        beq .process_sine_pos
+        jmp .done
+.process_sine_pos
+        ; update x pos
+        ldy enemy_ram_pc,x
+        lda enemy_ram_ac,x
+        tax
+        tya
+        lsr
+        lsr
+        jsr sine_of_scale
+        clc
+	ldx enemy_ram_offset
+        adc enemy_ram_x,x
+        ldy enemy_oam_offset
+        sta oam_ram_x,y
+        ; update y pos
+        ldy enemy_ram_pc,x
+        lda enemy_ram_ac,x
+        clc
+        adc #$40
+        tax
+        tya
+        lsr
+        lsr
+        jsr sine_of_scale
+        clc
+	ldx enemy_ram_offset
+        adc enemy_ram_y,x
+        ldy enemy_oam_offset
+        sta oam_ram_y,y
+        ; set palette
         lda #$01
         jsr enemy_set_palette
 .done

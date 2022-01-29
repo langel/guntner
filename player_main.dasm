@@ -1,27 +1,4 @@
-
-        
-player_init: subroutine
-; redraw playfield/hud
-	; disable rendering
-        lda #$00
-        sta PPU_MASK	
-        
-        jsr nametables_clear
-        jsr scroll_pos_reset
-	jsr starfield_init
-        jsr dashboard_init
-        jsr clear_all_enemies
-        
-	; enable rendering
-        lda #MASK_BG|MASK_SPR
-        sta PPU_MASK	
-        jsr timer_reset
-; set player lives
-	lda #$03
-        sta player_lives
-        lda #$03
-        sta player_gun_str
-; set player position
+player_game_reset: subroutine
 	lda #$00
         sta phase_current
         sta phase_state
@@ -58,6 +35,31 @@ player_init: subroutine
         stx $205
         dex 
         stx $209
+        rts
+        
+player_init: subroutine
+; redraw playfield/hud
+	; disable rendering
+        lda #$00
+        sta PPU_MASK	
+        
+        jsr nametables_clear
+        jsr scroll_pos_reset
+	jsr starfield_init
+        jsr dashboard_init
+        jsr clear_all_enemies
+        
+	; enable rendering
+        lda #MASK_BG|MASK_SPR
+        sta PPU_MASK	
+        jsr timer_reset
+; set player lives
+	lda #$03
+        sta player_lives
+        lda #$03
+        sta player_gun_str
+; set player position
+	jsr player_game_reset
         jsr apu_game_music_init
         rts
         

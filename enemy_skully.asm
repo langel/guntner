@@ -36,7 +36,6 @@ skully_cycle: subroutine
         sta collision_0_y
         lda #$10
         sta collision_0_w
-        lda #$05
         sta collision_0_h
         jsr enemy_get_damage_this_frame
         cmp #$00
@@ -130,7 +129,6 @@ skully_handle_movement: subroutine
         cmp #$00
         beq .demoshit
         lda #$69
-        sta $f9
         lda enemy_ram_pc,x
         cmp #$40
         bne .not_chasing
@@ -145,7 +143,6 @@ skully_handle_movement: subroutine
         clc
         adc enemy_ram_x,x
         sta enemy_ram_x,x
-        sta $f8
         cmp #240
         bcc .demoshit
         lda #$40

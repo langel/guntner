@@ -147,6 +147,7 @@ update_enemies: subroutine
         beq player_dead_enemies_despawn
 	; cycle through all the slots
 	lda #$00
+        sta enemy_slot_id
         sta enemy_ram_offset
         lda #$20
         sta enemy_oam_offset
@@ -169,6 +170,7 @@ update_enemies: subroutine
 update_enemies_handler_next:
 .handler_next
         ; go to next enemy slot
+        inc enemy_slot_id
 	lda #$08
         clc
         adc enemy_ram_offset
@@ -347,22 +349,17 @@ enemy_set_palette_mirror: subroutine
         
 enemy_give_points: subroutine
         ; a = enemy type
-        sta $a0
         sta enemy_temp_temp
         inc enemy_temp_temp
         lda enemy_temp_temp
-        sta $a1
         asl
         clc
         adc enemy_temp_temp
         sta enemy_temp_temp
-        sta $a2
         dec enemy_temp_temp
         lda enemy_temp_temp
-        sta $a3
         tax
         lda ENEMY_PLAYER_POINTS_TABLE,x
-        sta $a4
         clc
         adc score_0000xx
         sta score_0000xx

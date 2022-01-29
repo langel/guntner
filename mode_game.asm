@@ -51,7 +51,6 @@ game_time: subroutine
         jmp .done
         
 .player_dead_anim
-	;jsr player_bullets_despawn
         jsr death_scroll_speed
         lda player_death_flag
         cmp #$00
@@ -109,7 +108,5 @@ game_time: subroutine
 .still_dead
 .done
         jsr update_enemies
-	jsr player_bullets_update
-        jsr apu_game_frame
 .done_and_paused
 	rts

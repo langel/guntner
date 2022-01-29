@@ -30,44 +30,13 @@ player_demo_init: subroutine
 ; set player gun strength
 	lda #$03
         sta player_gun_str
-; set player position
-	lda #$00
-        sta player_death_flag
-        sta you_dead_counter
-        sta phase_current
-        sta score_0000xx
-        sta score_00xx00
-        sta score_xx0000
-	sta timer_frames_1s	
-	sta timer_frames_10s	
-	sta timer_seconds_1s	
-	sta timer_seconds_10s	
-	sta timer_minutes_1s	
-	sta timer_minutes_10s	
-	lda #$d0
-        sta player_x_hi
-        sta player_demo_x
-	lda #$70
-        sta player_y_hi
-        sta player_demo_y
-        lda #$ff
-        sta player_health
-  ; SCROLL SPEED
-  	lda #$07
-        sta scroll_speed
-        asl
-        asl
-        asl
-        sta scroll_speed_m
         
-        ldx #$8f ; set tiles
-        stx $205
-        dex 
-        stx $209
+; set player position
+	jsr player_game_reset
         rts
 
 
-demo_mode: subroutine
+demo_time: subroutine
 	; read user controls even in demo mode!
 	jsr player_change_speed
         
@@ -96,12 +65,8 @@ demo_mode: subroutine
         bne .dont_shoot
 	lda #$ff
         sta player_b_d
-        ; spawn enemies
-        jsr demo_enemy_spawn
 .dont_shoot
         jsr set_player_sprite
-; demo flight
-	jsr run_player_demo
         
 ;; XXX FORCE QUICK DEATH
         lda #$04
@@ -111,7 +76,6 @@ demo_mode: subroutine
         jmp .done
         
 .player_dead_anim
-	;jsr player_bullets_despawn
         jsr death_scroll_speed
         lda player_death_flag
         cmp #$00
@@ -134,9 +98,8 @@ demo_mode: subroutine
         jsr title_screen_init
 .still_dead
 .done
-	jsr player_bullets_demo_update
         jsr update_enemies
-        jsr apu_game_frame
+        ; spawn enemies
 .done_and_paused
 	rts
         
@@ -148,7 +111,7 @@ demo_enemy_spawn: subroutine
         cmp #$ff
         beq .no_1_sprite_spawn
         tax
-        lda wtf
+        lda rng0
         and #$01
         cmp #$00
         bne .spawn_bat

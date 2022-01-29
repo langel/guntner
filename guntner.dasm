@@ -72,8 +72,6 @@ collision_1_y	byte
 collision_1_w	byte
 collision_1_h	byte
 
-score_lo_byte	byte
-score_hi_byte	byte
 score_1		byte
 score_10	byte
 score_100	byte
@@ -82,6 +80,7 @@ score_10000	byte
 score_100000	byte
 score_1000000	byte
 score_10000000	byte
+; 24 bit max value : 16777215
 score_0000xx	byte
 score_00xx00	byte
 score_xx0000	byte
@@ -120,9 +119,9 @@ enemy_temp_addr_lo	byte
 enemy_temp_addr_hi	byte
 enemy_ram_offset	byte
 enemy_oam_offset	byte
+enemy_slot_id		byte
 ; XXX might be able to clean some of these out
 enemy_debug		byte
-enemy_temp_palette	byte
 enemy_temp_temp		byte
 enemy_dmg_accumulator	byte
 boss_x		byte

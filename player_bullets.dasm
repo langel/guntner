@@ -181,14 +181,6 @@ bullet4_despawn: subroutine
         rts
 
 
-; temp solution unti
-player_bullets_despawn:
-	jsr bullet0_despawn
-	jsr bullet1_despawn
-	jsr bullet2_despawn
-	jsr bullet3_despawn
-	jsr bullet4_despawn
-        rts
         
 player_gun_normal_fire: subroutine
 	ldx #$00

@@ -30,7 +30,6 @@ phase_handler: subroutine
         rts
 .not_init        
 	ldy phase_state
-        sty $f1
         cpy #$01
         bne .not_cycle
         lda phase_current
@@ -76,7 +75,6 @@ phase01_init: subroutine
         
 phase01_cycle: subroutine
 	lda phase_kill_count
-        sta $fa
         cmp #$01
         bCC .not_done
         jmp phase_next
@@ -97,7 +95,6 @@ phase02_init: subroutine
         
 phase02_cycle: subroutine
 	lda phase_kill_count
-        sta $fa
         cmp #$02
         bne .not_done
         jmp phase_next
@@ -119,7 +116,6 @@ phase03_init: subroutine
         
 phase03_cycle: subroutine
 	lda phase_kill_count
-        sta $fa
         cmp #$02
         bne .not_done
         jmp phase_next
@@ -141,7 +137,6 @@ phase04_init: subroutine
         
 phase04_cycle: subroutine
 	lda phase_kill_count
-        sta $fa
         cmp #$01
         bne .not_done
         jmp phase_next
@@ -181,7 +176,6 @@ phase05_init: subroutine
         
 phase05_cycle: subroutine
 	lda phase_kill_count
-        sta $fa
         cmp #$08
         bne .not_done
         jmp phase_next
@@ -212,7 +206,6 @@ phase06_init: subroutine
         
 phase06_cycle: subroutine
 	lda phase_kill_count
-        sta $fa
         cmp #$0b
         bne .not_done
         jmp phase_next
@@ -242,7 +235,6 @@ phase07_init: subroutine
         
 phase07_cycle: subroutine
 	lda phase_kill_count
-        sta $fa
         cmp #$0f
         bne .not_done
         jmp phase_next
@@ -281,7 +273,6 @@ phase08_init: subroutine
         
 phase08_cycle: subroutine
 	lda phase_kill_count
-        sta $fa
         cmp #$0f
         bne .not_done
         jmp phase_next
@@ -329,7 +320,6 @@ phase09_init: subroutine
         
 phase09_cycle: subroutine
 	lda phase_kill_count
-        sta $fa
         cmp #$1b
         bne .not_done
         jmp phase_next
