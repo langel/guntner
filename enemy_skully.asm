@@ -3,46 +3,62 @@
 skully_spawn: subroutine
 	; x is set by enemy spawner
 	lda #$05
-        sta $0300,x ; enemy type
+        sta enemy_ram_type,x ; enemy type
         tay
         lda ENEMY_HITPOINTS_TABLE,y
         sta enemy_ram_hp,x 
         lda rng0
-        sta $0304,x ; animation counter
+        sta enemy_ram_ac,x ; animation counter
         lda #$00
-        sta $0301,x ; x pos
-        sta $0303,x ; pattern counter
+        sta enemy_ram_x,x ; x pos
+        sta enemy_ram_pc,x ; pattern counter
         lda rng0
         jsr NextRandom
         sta rng0
         tay
         lda game_height_scale,y
-        sta $0302,x ; y pos
+        sta enemy_ram_y,x ; y pos
         lsr
         clc
         adc #$10
-        sta $0302,x ; y pos
-        txa
-        sec
-        sbc #$a0
-        asl
-        clc
-        adc #$80
-        sta $0307,x ; OAM ref   
+        sta enemy_ram_y,x ; y pos
    	rts
 
 
 
 ;;;; HANDLING SKULLY
 skully_cycle: subroutine
-	; store palette in temp palette register
-        ; so we can apply flip horizontal if needed
-        lda #$03
-        sta enemy_temp_palette
-        ; stash OAM ADDR in y register
+	ldx enemy_ram_offset
         ldy enemy_oam_offset
-        ; stash enemy addr in x register
+        lda oam_ram_x,y
+        sta collision_0_x
+        lda oam_ram_y,y
+        sta collision_0_y
+        lda #$10
+        sta collision_0_w
+        lda #$05
+        sta collision_0_h
+        jsr enemy_get_damage_this_frame
+        cmp #$00
+        bne .not_dead
+.is_dead
+	lda #$f0
+        ldy enemy_oam_offset
+        sta oam_ram_y+4,y
+	inc phase_kill_count
+        lda enemy_ram_type,x
+        jsr enemy_give_points    
+        ; change it into crossbones!
+        jsr apu_trigger_enemy_death
+        lda #$01
+	ldx enemy_ram_offset
+        sta enemy_ram_type,x
+        jmp sprite_4_cleanup_for_next
+.not_dead
         ldx enemy_ram_offset
+        ldy enemy_oam_offset
+        lda #$01 ; set mirror flag
+        sta enemy_ram_ex,x
         ; let's find what frame we're on
         lda enemy_ram_ac,x
         lsr
@@ -60,63 +76,26 @@ skully_cycle: subroutine
         beq .skully_sprite_7
 .skully_normal_frames
 	jsr sprite_4_set_sprite
+	lda #$00 ; unset mirror flag
+        sta enemy_ram_ex,x
         jmp .skully_sprites_done
 .skully_sprite_5
 	lda #$06
-        clc
-        ; stash them sprites
-        sta $0205,y
-        adc #$01
-        sta $0201,y
-        adc #$0f
-        sta $020d,y
-        adc #$01
-        sta $0209,y
-        ; palette
-        lda enemy_temp_palette
-        ora #$40
-	sta enemy_temp_palette
+        jsr sprite_4_set_sprite_mirror
 	jmp .skully_sprites_done
 .skully_sprite_6
 	lda #$04
-        clc
-        ; stash them sprites
-        sta $0205,y
-        adc #$01
-        sta $0201,y
-        adc #$0f
-        sta $020d,y
-        adc #$01
-        sta $0209,y
-        ; palette
-        lda enemy_temp_palette
-        ora #$40
-	sta enemy_temp_palette
+        jsr sprite_4_set_sprite_mirror
 	jmp .skully_sprites_done
 .skully_sprite_7
 	lda #$02
-        clc
-        ; stash them sprites
-        sta $0205,y
-        adc #$01
-        sta $0201,y
-        adc #$0f
-        sta $020d,y
-        adc #$01
-        sta $0209,y
-        ; palette
-        lda enemy_temp_palette
-        ora #$40
-	sta enemy_temp_palette
-	jmp .skully_sprites_done
+        jsr sprite_4_set_sprite_mirror
 .skully_sprites_done
         ; x pos
         lda enemy_ram_x,x
-        sta collision_0_x
         jsr sprite_4_set_x
         ; y pos
         lda enemy_ram_y,x
-        sta collision_0_y
         jsr sprite_4_set_y
 .skully_frame
 	; update spinning counter
@@ -128,65 +107,20 @@ skully_cycle: subroutine
         ; move skully
         jsr skully_handle_movement
         
-        ; stash it in collision detector
-        lda #$10
-        sta collision_0_w
-        sta collision_0_h
-; get damage amount
-        jsr enemy_get_damage_this_frame
-        lda enemy_dmg_accumulator
-        cmp #$00
-        beq .normal_palette
-        lda enemy_ram_hp,x
-        sec
-        sbc enemy_dmg_accumulator
-        bcc .skully_dead
-        sta enemy_ram_hp,x
-        jmp .skully_not_dead
-        
-.skully_dead
-	inc phase_kill_count
-        jsr apu_trigger_enemy_death
-	; give points
-        lda #99
-        jsr player_add_points_00
-        lda #99
-        jsr player_add_points_00__
-        ; spawn crossbones
-	lda #$01
-        sta enemy_ram_type,x
-	ldy enemy_oam_offset
-        jmp sprite_4_cleanup_for_next
-.skully_not_dead
-        ; setup hit palette counter
-	lda #ENEMY_HIT_PALETTE_FRAMES
-        sta enemy_ram_hc,x
-	jsr apu_trigger_enemy_damage
-.decide_palette
-	lda enemy_ram_hc,x
-        cmp #$00
-        bne .hit_palette
-.normal_palette
-        ; palette
-        lda enemy_temp_palette 
-        sta oam_ram_att,y
+        lda enemy_ram_ex,x
+        cmp #$01
+        beq .mirrored
+.not_mirrored
+        lda #$03
+        jsr enemy_set_palette
+        jmp .palette_done
+.mirrored
+        lda #$03
+        jsr enemy_set_palette_mirror
+.palette_done
         sta oam_ram_att+4,y
         sta oam_ram_att+8,y
         sta oam_ram_att+12,y
-        jmp .skully_done
-.hit_palette
-	dec enemy_ram_hc,x
-	dec enemy_ram_hc,x
-        ; palette
-        dec enemy_temp_palette
-        dec enemy_temp_palette
-        dec enemy_temp_palette
-        lda enemy_temp_palette
-        sta $0202,y
-        sta $0206,y
-        sta $020a,y
-        sta $020e,y
-        jmp .skully_done
 .skully_done
 	jmp update_enemies_handler_next
         

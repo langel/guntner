@@ -3,13 +3,13 @@
 ENEMY_HIT_PALETTE_FRAMES	= #$04
 
 enemy_ram_type = $0300
-enemy_ram_hp   = $0305
-enemy_ram_x    = $0301
-enemy_ram_y    = $0302
-enemy_ram_pc   = $0303
-enemy_ram_ac   = $0304
-enemy_ram_hc  = $0306
-enemy_ram_ex  = $0307
+enemy_ram_hp   = $0301
+enemy_ram_x    = $0302
+enemy_ram_y    = $0303
+enemy_ram_pc   = $0304
+enemy_ram_ac   = $0305
+enemy_ram_hc   = $0306
+enemy_ram_ex   = $0307
 
 oam_ram_x      = $0203
 oam_ram_y      = $0200
@@ -30,8 +30,6 @@ oam_ram_att    = $0202
 	;include "enemy_birb.dasm"
 
         
-sprite_1_hit_palette: subroutine
-	lda #$03
 
 sprite_4_set_sprite: subroutine
 	; a = top left tile id
@@ -45,6 +43,20 @@ sprite_4_set_sprite: subroutine
 	adc #$01
 	sta oam_ram_spr+12,y
         rts
+        
+sprite_4_set_sprite_mirror: subroutine
+	; a = top left tile id
+        ; y = oam ram offset
+	sta oam_ram_spr+4,y
+        clc
+        adc #$01
+	sta oam_ram_spr+0,y
+        adc #$0f
+	sta oam_ram_spr+12,y
+	adc #$01
+	sta oam_ram_spr+8,y
+        rts
+	
         
 sprite_4_set_x: subroutine
 	; a = x pos
@@ -260,17 +272,9 @@ crossbones_cycle: subroutine
 	jmp update_enemies_handler_next
         
         
-        
-        
-enemy_get_damage_this_frame: subroutine
-	lda #$00
-        sta enemy_dmg_accumulator
-        jsr player_bullet_collision_handler
-	jsr player_collision_detect
-	rts
-        
+  
                 
-enemy_get_damage_this_frame_2: subroutine
+enemy_get_damage_this_frame: subroutine
 	; x = enemy ram offset
         ; y = oam ram offset
 	lda #$00
@@ -311,11 +315,33 @@ enemy_set_palette: subroutine
 .use_hit_palette
 	dec enemy_ram_hc,x
 	lda #$00
-        sta $0202,y
+        sta oam_ram_att,y
         rts
 .use_enemy_palette
 	lda enemy_temp_temp
-        sta $0202,y
+        sta oam_ram_att,y
+        rts
+        
+enemy_set_palette_mirror: subroutine
+	; checks/handles hit palette counter
+        ; a = enemy normal palette
+	; x = enemy ram offset
+        ; y = oam ram offset
+        ; leaves correct palette id in a
+        ; can be applied to extra sprites of larger enemy
+        sta enemy_temp_temp
+        lda enemy_ram_hc,x
+        cmp #$00
+        beq .use_enemy_palette
+.use_hit_palette
+	dec enemy_ram_hc,x
+	lda #$40
+        sta oam_ram_att,y
+        rts
+.use_enemy_palette
+	lda enemy_temp_temp
+        ora #$40
+        sta oam_ram_att,y
         rts
         
         

@@ -172,7 +172,7 @@ demo_enemy_spawn: subroutine
         lda rng0
         jsr NextRandom
         sta rng0
-        and #$0f
+        and #$01
         cmp #$00
         beq .spawn_starglasses
         jsr skully_spawn

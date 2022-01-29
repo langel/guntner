@@ -40,7 +40,7 @@ birb_cycle: subroutine
         sta collision_0_w
         lda #$05
         sta collision_0_h
-        jsr enemy_get_damage_this_frame_2
+        jsr enemy_get_damage_this_frame
         cmp #$00
         bne .not_dead
 .is_dead
@@ -61,7 +61,6 @@ birb_cycle: subroutine
         ; set x position
         ; get x pattern position
         ; add it to base x position
-        ; save that to OAM x position
         lda enemy_ram_pc,x
         tax
         lda sine_table,x
@@ -105,7 +104,6 @@ birb_cycle: subroutine
 .frame_done
         lda #$01
         jsr enemy_set_palette
-        jmp .done
 .done
 	jmp update_enemies_handler_next
         

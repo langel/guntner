@@ -29,7 +29,7 @@ bat_cycle: subroutine
         sta collision_0_w
         lda #$05
         sta collision_0_h
-        jsr enemy_get_damage_this_frame_2
+        jsr enemy_get_damage_this_frame
         cmp #$00
         bne .not_dead
 .is_dead
@@ -102,6 +102,5 @@ bat_cycle: subroutine
 	sta oam_ram_spr,y
         lda #$01
         jsr enemy_set_palette
-        jmp .done
 .done
 	jmp update_enemies_handler_next

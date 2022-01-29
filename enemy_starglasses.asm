@@ -3,17 +3,17 @@
 starglasses_spawn: subroutine
 	; x is set by enemy spawner
 	lda #$04
-        sta $0300,x ; enemy type
+        sta enemy_ram_type,x ; enemy type
         tay
         lda ENEMY_HITPOINTS_TABLE,y
         sta enemy_ram_hp,x 
         lda rng0
         jsr NextRandom
         sta rng0
-        sta $0303,x ; pattern counter
-        sta $0304,x ; animation counter
+        sta enemy_ram_pc,x ; pattern counter
+        sta enemy_ram_ac,x ; animation counter
         lda #$00
-        sta $0301,x ; x pos
+        sta enemy_ram_x,x ; x pos
         lda rng0
         jsr NextRandom
         jsr NextRandom
@@ -22,7 +22,7 @@ starglasses_spawn: subroutine
         lsr
         clc
         adc #$18
-        sta $0302,x ; y pos
+        sta enemy_ram_y,x ; y pos
    	rts
         
            
@@ -38,7 +38,7 @@ starglasses_cycle: subroutine
         lda #$08
         sta collision_0_w
         sta collision_0_h
-        jsr enemy_get_damage_this_frame_2
+        jsr enemy_get_damage_this_frame
         cmp #$00
         bne .not_dead
 .is_dead
@@ -50,7 +50,6 @@ starglasses_cycle: subroutine
         ; spawn powerup
         jsr powerup_from_starglasses
         jmp sprite_4_cleanup_for_next
-        jmp .done
 .not_dead
 	; using pattern_counter for x sin
 	inc enemy_ram_pc,x
@@ -98,6 +97,5 @@ starglasses_cycle: subroutine
         sta oam_ram_att+4,y
         sta oam_ram_att+8,y
         sta oam_ram_att+12,y
-        jmp .done
 .done
 	jmp update_enemies_handler_next
