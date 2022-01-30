@@ -190,12 +190,15 @@ boss_vamp_spawn: subroutine
 boss_vamp_cycle: subroutine
 	ldx enemy_ram_offset
         ldy enemy_oam_offset
+        clc
         lda oam_ram_x,y
+        adc #$01
         sta collision_0_x
         lda oam_ram_y,y
         sta collision_0_y
-        lda #$08
+        lda #$0d
         sta collision_0_w
+        lda #$10
         sta collision_0_h
         jsr enemy_get_damage_this_frame
         cmp #$00
@@ -242,7 +245,12 @@ boss_vamp_cycle: subroutine
         adc sine_4bit,y
         sta boss_x
         ldy enemy_oam_offset
-        jsr sprite_4_set_x
+	sta oam_ram_x,y
+	sta oam_ram_x+8,y
+	clc
+	adc #$07
+	sta oam_ram_x+4,y
+	sta oam_ram_x+12,y
         lda boss_x
         clc
         adc #$05 ; add half of vampire size and subtract half of bat size?
@@ -276,23 +284,31 @@ boss_vamp_cycle: subroutine
         sta oam_ram_spr,x
         lda #$01
         sta oam_ram_att,x
+        ; find x
         lda oam_ram_x,y
         clc
         adc #$04
         sta oam_ram_x,x
+        ; check if rudy is left of vampire
+        lda oam_ram_x,y
+        cmp player_x_hi
+        bcc .looking_right
+.looking_left
+	dec oam_ram_x,x
+.looking_right
+	; find y
         lda oam_ram_y,y
         sta oam_ram_y,x
-        adc #$28
-        cmp player_y_hi
+        clc
+        adc #$1c
+        sec
+        sbc player_y_hi
         bcc .looking_down
-.not_looking_down
-	sec
-        sbc #$40
-        cmp player_y_hi
+        clc
+        adc #$cc
         bcs .looking_up
 .looking_across
-	inc oam_ram_x,x
-	jmp .done
+        jmp .done
 .looking_up
 	dec oam_ram_y,x
         jmp .done
