@@ -93,7 +93,8 @@ boss_vamp_bat_cycle: subroutine
         ; update y pos
         lda enemy_ram_ac,x
         clc
-        adc #$40
+        adc enemy_ram_ac,x
+        adc #$c0
         tax
         lda boss_v4
         jsr sine_of_scale
@@ -157,7 +158,7 @@ boss_vamp_spawn: subroutine
         sta PPU_DATA
         ; XXX not sure if we need this here
         lda #$0d
-        sta boss_v0 ; target count of bat underlings
+        sta boss_v0 ; target count of bat underlings; d = 13
         lda #$00
         sta boss_v1
         txa
@@ -269,6 +270,34 @@ boss_vamp_cycle: subroutine
         sta oam_ram_att+4,y
         sta oam_ram_att+8,y
         sta oam_ram_att+12,y
+.now_lets_add_eyes
+	ldx #$fc
+        lda #$26
+        sta oam_ram_spr,x
+        lda #$01
+        sta oam_ram_att,x
+        lda oam_ram_x,y
+        clc
+        adc #$04
+        sta oam_ram_x,x
+        lda oam_ram_y,y
+        sta oam_ram_y,x
+        adc #$28
+        cmp player_y_hi
+        bcc .looking_down
+.not_looking_down
+	sec
+        sbc #$40
+        cmp player_y_hi
+        bcs .looking_up
+.looking_across
+	inc oam_ram_x,x
+	jmp .done
+.looking_up
+	dec oam_ram_y,x
+        jmp .done
+.looking_down
+	inc oam_ram_y,x
 .done
 	jmp update_enemies_handler_next
         

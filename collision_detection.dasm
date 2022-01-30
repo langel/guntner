@@ -54,7 +54,7 @@ player_collision_detect: subroutine
         bcc .no_collision
         clc
         lda player_x_hi
-        adc #$10 ; player width
+        adc #$0d ; player width
         cmp collision_0_x
         bcc .no_collision
         clc
