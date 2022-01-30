@@ -8,6 +8,9 @@ sine_3bit equ $0680
 sine_2bit equ $0700
 sine_1bit equ $0780
 
+end_of_ram equ $0800
+
+
 
 sine_init: subroutine
 	ldx #$00

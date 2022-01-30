@@ -190,7 +190,7 @@ copyright:
         .byte #$00
         
 version:
-	.byte " v2.02 "
+	.byte " v2.07 "
         .byte #$00
         
         

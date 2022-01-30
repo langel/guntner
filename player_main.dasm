@@ -1,3 +1,6 @@
+
+oam_ram_rudy      = $0204
+
 player_game_reset: subroutine
 	lda #$00
         sta phase_current

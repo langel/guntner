@@ -118,7 +118,6 @@ clear_all_enemies: subroutine
 enemy_death: subroutine
         ; clear OAM data
         lda enemy_oam_offset
-        sta enemy_debug
         tax
         lda #$ff
         sta oam_ram_x,x
@@ -282,7 +281,23 @@ enemy_get_damage_this_frame: subroutine
 	lda #$00
         sta enemy_dmg_accumulator
         jsr player_bullet_collision_handler
-	jsr player_collision_detect     
+	jsr player_collision_detect
+        cmp #$00
+        beq .no_collision
+; handle player collision
+	lda enemy_dmg_accumulator
+        clc
+        adc #$02
+        sta enemy_dmg_accumulator
+        ; XXX this number is sus
+        ; player sprites don't always change at death
+        ldy enemy_ram_type,x
+        lda ENEMY_PLAYER_COLLISION_TABLE,y
+        ldy enemy_ram_ex,x
+        sta player_damage
+        jsr player_take_damage
+        jsr apu_trigger_player_damage
+.no_collision
         lda enemy_dmg_accumulator
         cmp #$00
         bne .hit

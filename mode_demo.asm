@@ -107,6 +107,7 @@ demo_time: subroutine
         
         
 demo_enemy_spawn: subroutine
+	;jmp .no_1_sprite_spawn
 	jsr get_enemy_slot_1_sprite
         cmp #$ff
         beq .no_1_sprite_spawn
@@ -134,7 +135,7 @@ demo_enemy_spawn: subroutine
         lda rng0
         jsr NextRandom
         sta rng0
-        and #$07
+        and #$03
         cmp #$00
         beq .spawn_starglasses
         jsr skully_spawn

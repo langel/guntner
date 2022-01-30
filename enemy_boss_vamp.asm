@@ -136,7 +136,7 @@ boss_vamp_spawn: subroutine
         tay
         lda ENEMY_HITPOINTS_TABLE,y
         sta enemy_ram_hp,x 
-        lda #$40
+        lda #$60
         sta enemy_ram_x,x
         lda #$15
         sta enemy_ram_y,x 

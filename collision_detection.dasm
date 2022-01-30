@@ -45,39 +45,31 @@ detect_collision: subroutine
     
         
 player_collision_detect: subroutine
+	; returns true/false in a
 	clc
         lda collision_0_x
         adc collision_0_w
-        bcs .done ; make sure x+w is not less than x
+        bcs .no_collision ; make sure x+w is not less than x
         cmp player_x_hi
-        bcc .done ; no collision
+        bcc .no_collision
         clc
         lda player_x_hi
         adc #$10 ; player width
         cmp collision_0_x
-        bcc .done ; no collision
+        bcc .no_collision
         clc
         lda collision_0_y
         adc collision_0_h
         cmp player_coll_y
-        bcc .done ; no collision
+        bcc .no_collision
         clc 
         lda player_coll_y
         adc #$06 ; player height
         cmp collision_0_y
-        bcc .done ; no collision
-; handle player collision
-	lda enemy_dmg_accumulator
-        clc
-        adc #$02
-        sta enemy_dmg_accumulator
-        ; XXX this number is sus
-        ; player sprites don't always change at death
-        ldy enemy_ram_type,x
-        lda ENEMY_PLAYER_COLLISION_TABLE,y
-        ldy enemy_ram_ex,x
-        sta player_damage
-        jsr player_take_damage
-        jsr apu_trigger_player_damage
-.done
+        bcc .no_collision
+.collision
+	lda #$ff
+        rts
+.no_collision
+	lda #$00
         rts
