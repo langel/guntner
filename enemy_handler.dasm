@@ -332,7 +332,7 @@ enemy_set_palette: subroutine
 .use_hit_palette
 	dec enemy_ram_hc,x
         lda enemy_temp_temp
-        ora #%00000011
+        and #%11111100
         sta oam_ram_att,y
         rts
 .use_enemy_palette

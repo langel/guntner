@@ -22,6 +22,7 @@ ENEMY_HITPOINTS_TABLE:
         byte #$10 ; vampire
         byte #$0a ; vamp bat
         byte #$04 ; skeet
+        byte #$10 ; zigzag
         
         
 ENEMY_PLAYER_POINTS_TABLE:
@@ -36,7 +37,8 @@ ENEMY_PLAYER_POINTS_TABLE:
         byte #$00,#$01,#$05 ; bat
         byte #$06,#$06,#$06 ; vampire head
         byte #$01,#$22,#$55 ; vamp bat
-        byte #$00,#$00,#$27 ; skeey
+        byte #$00,#$00,#$27 ; skeet
+        byte #$00,#$02,#$79 ; zigzag
         
 
 ENEMY_PLAYER_COLLISION_TABLE:
@@ -51,6 +53,7 @@ ENEMY_PLAYER_COLLISION_TABLE:
         byte #$40 ; vampire head
         byte #$04 ; vamp bat
         byte #$07 ; skeet
+        byte #$03 ; zigzag
         
 
 ENEMY_METHODS_LOOKUP_TABLE:
@@ -65,5 +68,6 @@ ENEMY_METHODS_LOOKUP_TABLE:
         word boss_vamp_cycle
         word boss_vamp_bat_cycle
         word skeet_cycle
+        word zigzag_cycle
         
         

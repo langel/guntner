@@ -1,13 +1,6 @@
-
-; skeet is a buggar that moves in curves
-;
-; ac used for both tiles and cycle counter
-; pc 2bits x velocity / 2bits y velocity
-; ex holds 4-way direction
-
-skeet_spawn: subroutine
+zigzag_spawn: subroutine
 	; x is set by enemy spawner
-	lda #$0a
+	lda #$0b
         sta enemy_ram_type,x 
         tay
         lda ENEMY_HITPOINTS_TABLE,y
@@ -58,9 +51,8 @@ skeet_spawn: subroutine
         sta enemy_ram_ex,x
 .dir_picked
 	rts
-        
-        
-skeet_cycle: subroutine
+
+zigzag_cycle: subroutine
 	ldx enemy_ram_offset
         ldy enemy_oam_offset
         lda oam_ram_x,y
@@ -85,19 +77,27 @@ skeet_cycle: subroutine
         jmp .done
 .not_dead
 	; animation
+        inc enemy_ram_ac,x
         lda enemy_ram_ac,x
-        clc
-        adc #$02
-        sta enemy_ram_ac,x
-        cmp #$40
+        cmp #$20
         bne .dont_reset_ac
         ; reset ac and pick new direction
         lda #$00
         sta enemy_ram_ac,x
+        ; get range 0..2 from 8bit value
         jsr get_next_random
-        and #%00000001
-        cmp #$00
-        bne .dir_sub
+        lsr
+        clc
+        adc rng0
+        and #$80
+        rol
+        rol ; should have a value between 0 and 2 here
+        cmp #$02
+        beq .dir_sub
+        cmp #$01
+        beq .dir_add
+.dir_same
+	jmp .ac_reset_done
 .dir_add
         inc enemy_ram_ex,x
         lda enemy_ram_ex,x
@@ -117,17 +117,13 @@ skeet_cycle: subroutine
 .dont_reset_ac
         lda enemy_ram_ac,x
         lsr
-        tax
-        lda sine_table,x
-        and #%0000001
+        lsr
+        lsr
         clc
-        adc #$4e ; base sprite tile
+        adc #$5c ; base sprite tile
 	ldx enemy_ram_offset
         ldy enemy_oam_offset
         sta oam_ram_spr,y
-        ; load up the sine off
-        lda enemy_ram_ac,x
-        tay
         ; work out the direction
         lda enemy_ram_ex,x
         cmp #$00
@@ -137,30 +133,15 @@ skeet_cycle: subroutine
         cmp #$02
         beq .go_left_down
 .go_left_up
-	lda enemy_ram_x,x
-        sec
-        sbc $0700,y
-	sta enemy_ram_x,x
-	lda enemy_ram_y,x
-        sec
-        sbc $0740,y
-	sta enemy_ram_y,x
-        lda #$d2
-        ldy enemy_oam_offset
+	dec enemy_ram_x,x
+        dec enemy_ram_y,x
+        lda #$d1
         jsr enemy_set_palette
         jmp .check_cross_top
 .go_right_up
-	lda enemy_ram_x,x
-        clc
-        adc $0700,y
-	sta enemy_ram_x,x
-	lda enemy_ram_y,x
-        sec
-        sbc $0740,y
-	sta enemy_ram_y,x
-        lda #$d2
-        lda #$a2
-        ldy enemy_oam_offset
+	inc enemy_ram_x,x
+        dec enemy_ram_y,x
+        lda #$a1
         jsr enemy_set_palette
 .check_cross_top
 	lda enemy_ram_y,x
@@ -170,23 +151,15 @@ skeet_cycle: subroutine
         sta enemy_ram_y,x
         jmp .go_done
 .go_right_down
-	lda enemy_ram_x,x
-        clc
-        adc $0700,y
-	sta enemy_ram_x,x
+	inc enemy_ram_x,x
         inc enemy_ram_y,x
-        ldy enemy_oam_offset
-        lda #$22
+        lda #$21
         jsr enemy_set_palette
         jmp .check_cross_bottom
 .go_left_down
-	lda enemy_ram_x,x
-        sec
-        sbc $0700,y
-	sta enemy_ram_x,x
+        dec enemy_ram_x,x
         inc enemy_ram_y,x
-        ldy enemy_oam_offset
-        lda #$62
+        lda #$61
         jsr enemy_set_palette
 .check_cross_bottom
 	lda enemy_ram_y,x
@@ -201,6 +174,3 @@ skeet_cycle: subroutine
         sta oam_ram_y,y       
 .done
 	jmp update_enemies_handler_next
-        
-        
-        
