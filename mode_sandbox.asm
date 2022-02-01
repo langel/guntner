@@ -4,19 +4,31 @@ sandbox_init: subroutine
         sta game_mode
         jsr player_init
         
+	; XXX temp palette
+        PPU_SETADDR $3F19
+        lda #$15
+        sta PPU_DATA
+        lda #$00
+        sta PPU_DATA
+        lda #$37
+        sta PPU_DATA
         
         
 	jsr get_enemy_slot_1_sprite
         tax
         jsr bat_spawn
         
-	jsr get_enemy_slot_4_sprite
+	jsr get_enemy_slot_1_sprite
         tax
-	jsr boss_vamp_spawn
+        jsr skeet_spawn
         
 	jsr get_enemy_slot_4_sprite
         tax
-	jsr starglasses_spawn
+	;jsr boss_vamp_spawn
+        
+	jsr get_enemy_slot_4_sprite
+        tax
+	;jsr starglasses_spawn
         
 	;jsr get_enemy_slot_1_sprite
         ;tax
@@ -37,6 +49,14 @@ sandbox_init: subroutine
         rts
         
 sandbox_time: subroutine
+
+	jsr get_enemy_slot_1_sprite
+        cmp #$ff
+        ;mp #$40
+        beq .no_enemy_spawn
+        tax
+        jsr skeet_spawn
+.no_enemy_spawn
 	; read user controls even in demo mode!
 	jsr apu_game_music_frame
 	jsr player_change_speed

@@ -28,6 +28,12 @@ WaitSync:
 
 ;;;;; RANDOM NUMBERS
 
+get_next_random: subroutine
+	lda rng0
+        jsr NextRandom
+        sta rng0
+        rts
+
 NextRandom subroutine
 	lsr
         bcc .NoEor

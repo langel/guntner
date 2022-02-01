@@ -409,6 +409,8 @@ NMIHandler: subroutine
         nop	; how much prg space we using?
 	include "enemy_maggs.asm"
         nop	; how much prg space we using?
+	include "enemy_skeet.asm"
+        nop	; how much prg space we using
 	include "enemy_skully.asm"
         nop	; how much prg space we using?
 	include "enemy_starglasses.asm"

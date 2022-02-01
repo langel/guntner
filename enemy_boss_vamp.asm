@@ -94,7 +94,7 @@ boss_vamp_bat_cycle: subroutine
         lda enemy_ram_ac,x
         clc
         adc enemy_ram_ac,x
-        adc #$c0
+        adc wtf
         tax
         lda boss_v4
         jsr sine_of_scale
@@ -280,21 +280,23 @@ boss_vamp_cycle: subroutine
         sta oam_ram_att+12,y
 .now_lets_add_eyes
 	ldx #$fc
-        lda #$26
+        lda #$36
         sta oam_ram_spr,x
         lda #$01
         sta oam_ram_att,x
         ; find x
         lda oam_ram_x,y
         clc
-        adc #$04
+        adc #$03
         sta oam_ram_x,x
         ; check if rudy is left of vampire
         lda oam_ram_x,y
         cmp player_x_hi
         bcc .looking_right
 .looking_left
-	dec oam_ram_x,x
+        lda #$26
+        sta oam_ram_spr,x
+	inc oam_ram_x,x
 .looking_right
 	; find y
         lda oam_ram_y,y
@@ -308,6 +310,13 @@ boss_vamp_cycle: subroutine
         adc #$cc
         bcs .looking_up
 .looking_across
+	lda oam_ram_spr,x
+        cmp #$26
+        beq .adjust_for_left_looking
+	inc oam_ram_x,x
+        jmp .done
+.adjust_for_left_looking
+	dec oam_ram_x,x
         jmp .done
 .looking_up
 	dec oam_ram_y,x

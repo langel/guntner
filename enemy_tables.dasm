@@ -1,3 +1,14 @@
+; 00 (not populated)
+; 01 crossbones (enemy death)
+; 02 birb
+; 03 maggs
+; 04 starglasses
+; 05 skully
+; 06 powerups
+; 07 bat
+; 08 space vampire
+; 09 vampire's bat
+; 0a skeet
 
 ENEMY_HITPOINTS_TABLE:
 	byte #$00
@@ -10,6 +21,7 @@ ENEMY_HITPOINTS_TABLE:
         byte #$06 ; bat
         byte #$10 ; vampire
         byte #$0a ; vamp bat
+        byte #$04 ; skeet
         
         
 ENEMY_PLAYER_POINTS_TABLE:
@@ -24,6 +36,7 @@ ENEMY_PLAYER_POINTS_TABLE:
         byte #$00,#$01,#$05 ; bat
         byte #$06,#$06,#$06 ; vampire head
         byte #$01,#$22,#$55 ; vamp bat
+        byte #$00,#$00,#$27 ; skeey
         
 
 ENEMY_PLAYER_COLLISION_TABLE:
@@ -37,6 +50,7 @@ ENEMY_PLAYER_COLLISION_TABLE:
         byte #$03 ; bat
         byte #$40 ; vampire head
         byte #$04 ; vamp bat
+        byte #$07 ; skeet
         
 
 ENEMY_METHODS_LOOKUP_TABLE:
@@ -50,5 +64,6 @@ ENEMY_METHODS_LOOKUP_TABLE:
         word bat_cycle
         word boss_vamp_cycle
         word boss_vamp_bat_cycle
+        word skeet_cycle
         
         
