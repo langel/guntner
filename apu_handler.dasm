@@ -145,6 +145,18 @@ apu_trigger_enemy_damage: subroutine
         sta $4007
 	rts
         
+apu_trigger_battery_hit: subroutine
+	; turn on counter / set volume
+        lda #$0f
+        sta $400c
+	; mode and pitch
+        lda #$82
+        sta $400e
+        ; set envelope
+        lda #$08
+        sta $400f
+	rts
+        
 ;$400C	--LC VVVV	Envelope loop / length counter halt (L), constant volume (C), volume/envelope (V)
 ;$400D	---- ----	Unused
 ;$400E	L--- PPPP	Loop noise (L), noise period (P)

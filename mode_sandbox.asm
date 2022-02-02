@@ -28,7 +28,10 @@ sandbox_init: subroutine
         
 	jsr get_enemy_slot_4_sprite
         tax
-	;jsr starglasses_spawn
+	jsr starglasses_spawn
+	jsr get_enemy_slot_4_sprite
+        tax
+	jsr starglasses_spawn
         
 	;jsr get_enemy_slot_1_sprite
         ;tax
@@ -59,10 +62,10 @@ sandbox_time: subroutine
         and #%00000001
         cmp #$00
         bne .zigzag
-        jsr skeet_spawn
+        ;jsr skeet_spawn
         jmp .no_enemy_spawn
 .zigzag
-        jsr zigzag_spawn
+        ;jsr zigzag_spawn
 .no_enemy_spawn
 	; read user controls even in demo mode!
 	jsr apu_game_music_frame

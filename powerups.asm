@@ -58,6 +58,7 @@ powerups_cycle: subroutine
         beq .frame
 .despawn_powerup
  	;; XXX needs its own sfx
+        ; might want different ones by type
         jsr apu_trigger_enemy_death
         jsr enemy_death
         lda player_health
@@ -75,6 +76,8 @@ powerups_cycle: subroutine
         sta enemy_ram_x,x
         ; will wrap to the left so add hp
         inc enemy_ram_hp,x
+        ; give it sfx
+        jsr apu_trigger_battery_hit
 .frame
         lda enemy_ram_pc,x
 	cmp #$ff
@@ -109,7 +112,8 @@ powerups_cycle: subroutine
         cmp #$00
         bne .done
  	;; XXX needs its own sfx
-        jsr apu_trigger_enemy_death
+        ;; despawns to the right
+        ;jsr apu_trigger_enemy_death
         jsr enemy_death
 .done   
 	jmp update_enemies_handler_next
