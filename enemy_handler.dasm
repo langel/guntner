@@ -296,7 +296,7 @@ enemy_get_damage_this_frame: subroutine
         ldy enemy_ram_ex,x
         sta player_damage
         jsr player_take_damage
-        jsr apu_trigger_player_damage
+        jsr sfx_player_damage
 .no_collision
         lda enemy_dmg_accumulator
         cmp #$00
@@ -306,7 +306,7 @@ enemy_get_damage_this_frame: subroutine
 .hit
         lda #ENEMY_HIT_PALETTE_FRAMES
 	sta enemy_ram_hc,x
-	jsr apu_trigger_enemy_damage
+	jsr sfx_enemy_damage
 	lda enemy_ram_hp,x
         sec
         sbc enemy_dmg_accumulator

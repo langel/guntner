@@ -190,7 +190,7 @@ player_gun_normal_fire: subroutine
         cmp #$00
         bne .next
         ; trigger pewpew
-	jsr apu_trigger_pewpew
+	jsr sfx_pewpew
         lda player_x_hi
         sta bullet_data+0,x
         lda player_y_hi
@@ -235,7 +235,7 @@ player_gun_turbo_fire: subroutine
         cmp #$00
         bne .next
         ; trigger pewpew
-	jsr apu_trigger_pewpew
+	jsr sfx_pewpew
         ; set x,y position
         lda player_x_hi
         sta bullet_data+0,x
@@ -392,7 +392,7 @@ player_bullets_demo_update: subroutine
         cmp #$ff
         bne .bullet0_done
 .bullet0_spawn
-	jsr apu_trigger_pewpew
+	jsr sfx_pewpew
         lda player_x_hi
         sta bullet0 + 3
         lda player_y_hi
@@ -434,7 +434,7 @@ player_bullets_demo_update: subroutine
         cmp #$ff
         bne .bullet1_done
 .bullet1_spawn
-	jsr apu_trigger_pewpew
+	jsr sfx_pewpew
         lda player_x_hi
         sta bullet1 + 3
         lda player_y_hi
@@ -489,7 +489,7 @@ player_bullets_demo_update: subroutine
         cmp #$ff
         bne .bullet2_done
 .bullet2_spawn
-	jsr apu_trigger_pewpew
+	jsr sfx_pewpew
         lda player_x_hi
         sta bullet2 + 3
         lda player_y_hi
@@ -545,7 +545,7 @@ player_bullets_demo_update: subroutine
         cmp #$ff
         bne .bullet3_done
 .bullet3_spawn
-	jsr apu_trigger_pewpew
+	jsr sfx_pewpew
         lda player_x_hi
         sta bullet3 + 3
         lda player_y_hi
@@ -600,7 +600,7 @@ player_bullets_demo_update: subroutine
         cmp #$ff
         bne .bullet4_done
 .bullet4_spawn
-	jsr apu_trigger_pewpew
+	jsr sfx_pewpew
         lda player_x_hi
         sta bullet4 + 3
         lda player_y_hi

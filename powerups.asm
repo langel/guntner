@@ -59,7 +59,8 @@ powerups_cycle: subroutine
 .despawn_powerup
  	;; XXX needs its own sfx
         ; might want different ones by type
-        jsr apu_trigger_enemy_death
+        jsr sfx_powerup_pickup
+        
         jsr enemy_death
         lda player_health
         clc
@@ -77,7 +78,7 @@ powerups_cycle: subroutine
         ; will wrap to the left so add hp
         inc enemy_ram_hp,x
         ; give it sfx
-        jsr apu_trigger_battery_hit
+        jsr sfx_battery_hit
 .frame
         lda enemy_ram_pc,x
 	cmp #$ff

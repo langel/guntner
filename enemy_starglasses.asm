@@ -46,7 +46,7 @@ starglasses_cycle: subroutine
         lda enemy_ram_type,x
         jsr enemy_give_points
         ; XXX maybe a different sound effect
-        jsr apu_trigger_enemy_death
+        jsr sfx_enemy_death
         ; spawn powerup
         jsr powerup_from_starglasses
         jmp sprite_4_cleanup_for_next

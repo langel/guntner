@@ -80,7 +80,7 @@ demo_time: subroutine
         lda player_death_flag
         cmp #$00
         bne .death_already_set
-        jsr apu_trigger_player_death
+        jsr sfx_player_death
         lda #$01
         sta player_death_flag
         ; "YOU DEAD"

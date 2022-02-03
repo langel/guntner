@@ -52,6 +52,11 @@ sandbox_init: subroutine
         rts
         
 sandbox_time: subroutine
+	lda wtf
+        cmp #$00
+        bne .no_sfx
+        ;jsr sfx_powerup_pickup
+.no_sfx
 
 	jsr get_enemy_slot_1_sprite
         cmp #$ff
@@ -68,7 +73,7 @@ sandbox_time: subroutine
         ;jsr zigzag_spawn
 .no_enemy_spawn
 	; read user controls even in demo mode!
-	jsr apu_game_music_frame
+	;jsr apu_game_music_frame
 	jsr player_change_speed
 	jsr player_move_position
         jsr player_bullets_check_controls

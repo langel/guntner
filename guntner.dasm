@@ -151,9 +151,13 @@ phase_end_game		byte
 sine_scale		byte
 sine_out		byte
 
+sfx_frame_id		byte
+sfx_counter		byte
 audio_noise_mode	byte
 audio_noise_pitch	byte
 audio_noise_volume	byte
+; XXX these are for music
+; XXX could user better names?
 audio_frame_counter     byte
 audio_root_tone         byte
 audio_pattern_pos	byte
@@ -195,7 +199,7 @@ Start:	subroutine
         jsr player_bullets_init
 ;============================== M O D E   I N I T   H E R E
         jsr title_screen_init
-        jsr sandbox_init
+        ;jsr sandbox_init
         
  	; set default speed
         lda #$02
@@ -445,6 +449,11 @@ NMIHandler: subroutine
         
 	include "timer_global.dasm"
         nop	; how much prg space we using?
+        
+        
+	include "sfx.asm"
+        nop	; how much prg space we using?
+
         
 
 ;e666 bookmark

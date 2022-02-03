@@ -72,7 +72,7 @@ boss_vamp_bat_cycle: subroutine
         jsr enemy_give_points
         
         ; change it into crossbones!
-        jsr apu_trigger_enemy_death
+        jsr sfx_enemy_death
         lda #$01
 	ldx enemy_ram_offset
         sta enemy_ram_type,x
@@ -210,7 +210,7 @@ boss_vamp_cycle: subroutine
         lda enemy_ram_type,x
         jsr enemy_give_points
         ; change it into crossbones!
-        jsr apu_trigger_enemy_death
+        jsr sfx_enemy_death
         lda #$01
         sta enemy_ram_type,x
         jmp sprite_4_cleanup_for_next

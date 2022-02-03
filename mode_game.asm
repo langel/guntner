@@ -57,17 +57,16 @@ game_time: subroutine
         bne .death_already_set
         lda #$01
         sta player_death_flag
+        jsr sfx_player_death
         dec player_lives
         lda player_lives
         cmp #$00
         bne .youdead
-        jsr apu_trigger_player_death
         ; "GAME OVER"
         ldy #$10
         jsr dashboard_message_set
         jmp .done
 .youdead
-        jsr apu_trigger_player_death
         ; "YOU DEAD"
         ldy #$00
         jsr dashboard_message_set

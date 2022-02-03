@@ -71,6 +71,8 @@ mode_handler_post_split: subroutine
         bne .skip_dashboard_update
 	jsr dashboard_update
 .skip_dashboard_update
+	; XXX if we remove sprite 0 from title/options
+        ; XXX sfx by frame will not work here
         jsr apu_game_frame
 	lda game_mode
         cmp #$10
