@@ -29,6 +29,9 @@ mode_handler_vblank: subroutine
         bne .not_title_screen
         jsr title_screen_handler
 .not_title_screen
+	cmp #$01
+        bne .done
+        jsr options_screen_handler
 .done
 	rts
         

@@ -52,6 +52,7 @@ title_screen_handler: subroutine
 	rts
         
         
+        
 title_screen_init: subroutine
 	lda #$00
         sta game_mode
@@ -76,6 +77,8 @@ title_screen_init: subroutine
 	PPU_SETADDR $2000
         ldy #$a0
         lda #$b1
+; XXX this chunk just gets us down the screen in vram
+; i dont think we need to do this if we fix the address above
 clear_top_rows:
 	sta PPU_DATA
         iny

@@ -199,6 +199,7 @@ Start:	subroutine
         jsr player_bullets_init
 ;============================== M O D E   I N I T   H E R E
         jsr title_screen_init
+        jsr options_screen_init
         ;jsr sandbox_init
         
  	; set default speed
@@ -392,6 +393,8 @@ NMIHandler: subroutine
 	include "mode_handler.asm"
         nop	; how much prg space we using?
 	include "mode_title_screen.asm"
+        nop	; how much prg space we using?
+	include "mode_options.asm"
         nop	; how much prg space we using?
 	include "mode_demo.asm"
         nop	; how much prg space we using?
