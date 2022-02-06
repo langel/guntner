@@ -163,6 +163,11 @@ audio_root_tone         byte
 audio_pattern_pos	byte
 audio_pattern_num       byte
 
+options_song_id		byte
+options_sound_id	byte
+options_rudy_color1	byte	
+options_rudy_color2	byte
+
 ;;;;; RAM NOTES
 ; $100 6502 stack
 ; $200 PPU OAM sprite data
@@ -198,7 +203,7 @@ Start:	subroutine
         jsr SetPalette 
         jsr player_bullets_init
 ;============================== M O D E   I N I T   H E R E
-        jsr title_screen_init
+        ;jsr title_screen_init
         jsr options_screen_init
         ;jsr sandbox_init
         

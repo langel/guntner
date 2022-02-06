@@ -76,21 +76,7 @@ apu_game_frame: subroutine
 .not_powerup_pickup
 	rts
 
-	lda audio_noise_mode
-        ; enemy death sound
-        cmp #$01
-        bne .not_enemy_death_sound
-        ; enemy death sound
-        jmp sfx_enemy_death_frame
-.not_enemy_death_sound
-	lda audio_noise_mode
-        cmp #$02
-        bne .not_player_death_sound
-        ; player death sound
-        jmp sfx_player_death_frame
-.dont_kill_player_death_sound
-.not_player_death_sound
-	rts
+
         
  
      

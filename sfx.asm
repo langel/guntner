@@ -1,6 +1,7 @@
 ; these should only use Pulse 2 and Noise channels
 ; unless its a non-music moment (like player death)
 
+; sound test 00
 sfx_pewpew: subroutine
 	; pulse 2
 	;rts
@@ -14,6 +15,7 @@ sfx_pewpew: subroutine
         sta $4007
 	rts
 
+; sound test 01
 sfx_player_damage: subroutine
 	; noise
 	;rts
@@ -25,6 +27,7 @@ sfx_player_damage: subroutine
         sta $400f
         rts
         
+; sound test 02
 sfx_player_death: subroutine
 	; noise and?
         ;rts
@@ -82,6 +85,7 @@ sfx_player_death_frame: subroutine
 .dont_kill_player_death_sound
 	rts
         
+; sound test 04
 sfx_enemy_damage: subroutine
 	; pulse 2
 	;rts
@@ -95,6 +99,7 @@ sfx_enemy_damage: subroutine
         sta $4007
 	rts
         
+; sound test 05
 sfx_battery_hit: subroutine
 	; turn on counter / set volume
         lda #$0f
@@ -107,6 +112,7 @@ sfx_battery_hit: subroutine
         sta $400f
 	rts
         
+; sound test 06
 sfx_powerup_pickup: subroutine
 	lda #$03
         sta sfx_frame_id
@@ -148,6 +154,7 @@ sfx_powerup_pickup_frame: subroutine
         rts
 
         
+; sound test 03
 sfx_enemy_death: subroutine
 	; enemy death is noise mode 1
         lda #$01
