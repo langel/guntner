@@ -134,5 +134,12 @@ set_player_sprite: subroutine
 ; attributes
         sta $206
         sta $20a
+        ; XXX sprites
+        ; not sure where this was set for the game
+        ; setting it here for options screen
+        lda #$8e
+        sta oam_ram_rudy+5
+        lda #$8f
+        sta oam_ram_rudy+1
         rts
         

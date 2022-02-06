@@ -1,4 +1,7 @@
 
+text_options:
+	.byte "Options Screeen"
+        .byte #$00
 
 text_song:
 	.byte "song"
@@ -15,8 +18,11 @@ options_screen_init: subroutine
 	lda #$00
         sta options_song_id	
         sta options_sound_id
+        sta options_rudy_pos
         sta scroll_y
         sta scroll_page
+        lda #$38
+        sta player_x_hi
         jsr WaitSync	
 	; disable rendering
         lda #$00
@@ -24,9 +30,21 @@ options_screen_init: subroutine
         
         jsr nametables_clear
         jsr scroll_pos_reset
+        jsr set_player_sprite
         
         
-	PPU_SETADDR $2108
+	PPU_SETADDR $2048
+        ldy #$00
+.options_text
+	lda text_options,y
+        beq .options_end
+        sta PPU_DATA
+        iny
+        bne .options_text
+.options_end
+        
+        
+	PPU_SETADDR $210a
         ldy #$00
 .song_text
 	lda text_song,y
@@ -36,7 +54,7 @@ options_screen_init: subroutine
         bne .song_text
 .song_end
 
-	PPU_SETADDR $2148
+	PPU_SETADDR $214a
         ldy #$00
 .sound_text
 	lda text_sound,y
@@ -69,9 +87,29 @@ options_screen_init: subroutine
         
         
 options_screen_handler: subroutine
+	lda options_rudy_pos
+        asl
+        asl
+        asl
+        asl
+        clc
+        adc #$48
+        sta oam_ram_rudy
+        sta oam_ram_rudy+4
 	jsr apu_game_frame
+        lda #$02
+        sta PPU_OAM_DMA
+; check if option changes
+	lda player_down_d
+        cmp #$00
+        beq .dont_change_option
+        inc options_rudy_pos
+        lda options_rudy_pos
+        and #%00000001
+        sta options_rudy_pos
+.dont_change_option
 ; show song id
-	PPU_SETADDR $210f
+	PPU_SETADDR $2112
         ;inc options_song_id	
 	lda options_song_id
         cmp #100
@@ -87,7 +125,7 @@ options_screen_handler: subroutine
         lda decimal_table,x
         sta PPU_DATA
 ; show sound id
-	PPU_SETADDR $214f
+	PPU_SETADDR $2152
         lda player_right_d
         cmp #$00
         beq .dont_up_sound
