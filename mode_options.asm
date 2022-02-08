@@ -11,6 +11,13 @@ text_sound:
 	.byte "sound"
         .byte #$00
         
+text_col1:
+	.byte "color1"
+        .byte #$00
+text_col2:
+	.byte "color2"
+        .byte #$00
+        
      
 options_screen_init: subroutine
 	lda #$01
@@ -63,7 +70,42 @@ options_screen_init: subroutine
         iny
         bne .sound_text
 .sound_end
-
+; color 1
+	PPU_SETADDR $218a
+        ldy #$00
+.col1_text
+	lda text_col1,y
+        beq .col1_end
+        sta PPU_DATA
+        iny
+        bne .col1_text
+.col1_end
+	lda #$20
+        sta PPU_DATA
+        sta PPU_DATA
+        lda #$1d
+        sta PPU_DATA
+        sta PPU_DATA
+; color 2
+	PPU_SETADDR $21ca
+        ldy #$00
+.col2_text
+	lda text_col2,y
+        beq .col2_end
+        sta PPU_DATA
+        iny
+        bne .col2_text
+.col2_end
+	lda #$20
+        sta PPU_DATA
+        sta PPU_DATA
+        lda #$1e
+        sta PPU_DATA
+        sta PPU_DATA
+; set rudy color blocks' tile attributes
+	PPU_SETADDR $23dc
+        lda #%11111111
+        sta PPU_DATA
 ; hud bar on title screen
 	PPU_SETADDR $22c0
         lda #$1d
@@ -73,6 +115,10 @@ options_screen_init: subroutine
         dey
         bne .set_hud_bar
         
+; reset music?
+	lda #$00
+        sta options_music_on
+        jsr apu_game_music_init
         
 ; turn ppu back on
         jsr WaitSync	; wait for VSYNC
@@ -87,6 +133,16 @@ options_screen_init: subroutine
         
         
 options_screen_handler: subroutine
+	jsr player_update_colors
+	lda player_start_d
+        beq .dont_start_game
+        lda #$00
+        sta player_start_d
+        lda #$11
+        sta game_mode
+        jsr player_init
+        rts
+.dont_start_game
 	lda options_rudy_pos
         asl
         asl
@@ -102,12 +158,25 @@ options_screen_handler: subroutine
 ; check if option changes
 	lda player_down_d
         cmp #$00
-        beq .dont_change_option
+        beq .dont_change_option_down
         inc options_rudy_pos
-        lda options_rudy_pos
-        and #%00000001
-        sta options_rudy_pos
-.dont_change_option
+.dont_change_option_down
+	lda player_up_d
+        cmp #$00
+        beq .dont_change_option_up
+        dec options_rudy_pos
+.dont_change_option_up
+; check option pos is in range
+	lda options_rudy_pos
+        cmp #$ff ; min value - 1
+        bne .dont_wrap_up
+        lda #$03
+.dont_wrap_up
+	cmp #$04 ; max value + 1
+        bne .dont_wrap_down
+        lda #$00
+.dont_wrap_down
+	sta options_rudy_pos
 ; show song id
 	PPU_SETADDR $2112
         ;inc options_song_id	
@@ -126,6 +195,52 @@ options_screen_handler: subroutine
         sta PPU_DATA
 ; show sound id
 	PPU_SETADDR $2152
+        lda options_sound_id
+        asl
+        tax
+        lda decimal_table,x
+        sta PPU_DATA
+        inx
+        lda decimal_table,x
+        sta PPU_DATA
+; play music if on
+	lda options_music_on
+        beq .no_music
+        jsr apu_game_music_frame
+.no_music
+; which option handler?
+.options_case
+        lda options_rudy_pos
+        cmp #$00
+        beq options_screen_song_handler
+        cmp #$01
+	beq options_screen_sfx_handler
+        cmp #$02
+        bne .not_color1
+        jmp options_screen_color1_handler
+.not_color1
+        cmp #$03
+        bne .not_color2
+        jmp options_screen_color2_handler
+.not_color2
+        rts
+        
+        
+options_screen_song_handler: subroutine
+	lda player_b_d
+        beq .no_b
+        lda #$00
+        sta options_music_on
+.no_b
+	lda player_a_d
+        beq .no_a
+        lda #$01
+        sta options_music_on
+.no_a
+	rts
+        
+        
+options_screen_sfx_handler: subroutine
         lda player_right_d
         cmp #$00
         beq .dont_up_sound
@@ -147,13 +262,6 @@ options_screen_handler: subroutine
         lda #$00
         sta options_sound_id
 .sound_id_not_maxed
-        asl
-        tax
-        lda decimal_table,x
-        sta PPU_DATA
-        inx
-        lda decimal_table,x
-        sta PPU_DATA
 ; trigger sound with button
 	lda player_a_d
         ora player_b_d
@@ -194,4 +302,49 @@ options_screen_handler: subroutine
         bne .not07
         jmp sfx_player_death
 .not07
+	rts
+        
+
+options_screen_color1_handler: subroutine
+	; starts at 14
+	lda player_right_d
+        beq .dont_increase
+        inc player_color0
+        lda #$1d
+        cmp player_color0
+        bne .dont_increase
+        lda #$11
+        sta player_color0
+.dont_increase
+	lda player_left_d
+        beq .dont_decrease
+        dec player_color0
+        lda #$10
+        cmp player_color0
+        bne .dont_decrease
+        lda #$1c
+        sta player_color0
+.dont_decrease
+	rts
+
+options_screen_color2_handler: subroutine
+	; starts at 21
+	lda player_right_d
+        beq .dont_increase
+        inc player_color1
+        lda #$2d
+        cmp player_color1
+        bne .dont_increase
+        lda #$20
+        sta player_color1
+.dont_increase
+	lda player_left_d
+        beq .dont_decrease
+        dec player_color1
+        lda #$1f
+        cmp player_color1
+        bne .dont_decrease
+        lda #$2c
+        sta player_color1
+.dont_decrease
 	rts

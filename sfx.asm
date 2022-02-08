@@ -133,7 +133,9 @@ sfx_powerup_pickup_frame: subroutine
         lda sfx_counter
         and #%00000011
         bne .dont_trigger
-        lda sfx_powerup_pickup_arp,x
+        lda audio_root_tone
+        clc
+        adc sfx_powerup_pickup_arp,x
         tax
 	lda #%10000111
         sta $4004

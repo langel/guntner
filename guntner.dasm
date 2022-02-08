@@ -164,6 +164,7 @@ audio_pattern_pos	byte
 audio_pattern_num       byte
 
 options_rudy_pos	byte
+options_music_on	byte
 options_song_id		byte
 options_sound_id	byte
 options_rudy_color1	byte	
