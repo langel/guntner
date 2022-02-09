@@ -3,7 +3,25 @@ optimization marks:
 	e6aa - nop after title_screen.dasm
 
 
-get range 0..2 from 8bit value:
+
+
+nametable plan:
+$2000 : Title Screen / Starfield / (Cut Scene Text maybe?)
+$2400 : Option Screen / Starfield / HUD/dashboard
+
+on cart load:
+	draw title screen w/ verison bar
+	draw option screen w/ hud
+on game start:
+	fill in version text with bar
+	clear starfield space
+on title return:
+	draw title screen
+	
+
+
+
+; get range 0..2 from 8bit value:
 lda value  ; A = 0-255
 lsr a      ;     0-127
 clc
@@ -37,6 +55,7 @@ ship only self-heals when not in motion?
 More Enemies
 	uzi that shoots bullets
 	middle finger (boss?)
+        spark - flickers/indestrucible - comes on screen and leaves
   - sense of bosses
   - enemies that spawn smaller enemies
 More Levels
@@ -200,7 +219,7 @@ HUD info to include:
 	current world/level/phase/wave `X-X` eg. 7-1, 1-3 etc.....
 
 
-LIFE BAR
+SHIELD CAPACITOR METER
 	256 range
 	16 tiles
 	64 lines
@@ -239,3 +258,4 @@ main dropdown doesn't close after clicking dropdown item
 tab makes indent -- shift-tab does not deindent
 search all code for string (undefined labels are easy to find)
 git status / diff
+git pull changes maybe overwritten by current open file?
