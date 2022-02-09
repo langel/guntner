@@ -1,35 +1,16 @@
 ;;; constants
 
-speed_addr		= $2306
-life_bar_addr		= $2308
-lives_addr		= $231d
-phase_addr		= $2348
-score_addr		= $234c
-timer_addr		= $2356
+speed_addr		= $2706
+life_bar_addr		= $2708
+lives_addr		= $271d
+phase_addr		= $2748
+score_addr		= $274c
+timer_addr		= $2756
 tile_empty		= $05
 
 
 dashboard_init: subroutine
-
-	; set colors of dash
-        ; nametable 1
-	PPU_SETADDR $23e8
-	lda #%11110001
-        ldx #$f8
-.23e8_loop
-        sta PPU_DATA
-        inx
-        bne .23e8_loop
-        
-	PPU_SETADDR $23f0
-	lda #%11111111
-        ldx #$f0
-.23f0_loop
-        sta PPU_DATA
-        inx
-        bne .23f0_loop
-        
-        ; nametable 2
+        ; set split color attr for top row
 	PPU_SETADDR $27e8
 	lda #%11110001
         ldx #$f8
@@ -37,7 +18,7 @@ dashboard_init: subroutine
         sta PPU_DATA
         inx
         bne .27e8_loop
-        
+        ; set full color attr for the rest
 	PPU_SETADDR $27f0
 	lda #%11111111
         ldx #$f0
@@ -45,37 +26,32 @@ dashboard_init: subroutine
         sta PPU_DATA
         inx
         bne .27f0_loop
-        
-        ; set tiles of dash
-; fill nametable 1 dash top tile
+        ; fill page 1 bar for sprite 0 collisions
 	PPU_SETADDR $22c0
+        lda #$04
+        ldy #$20
+.tile_dash_set_page1
+        sta PPU_DATA
+        iny
+        bne .tile_dash_set_page1
+        ; fill page 2 dashboard top row
+	PPU_SETADDR $26c0
         lda #$04
         ldy #$20
 .set_top_bar
 	sta PPU_DATA
         dey
         bne .set_top_bar
-
-; fill nametable 1 rest of dash tiles
+	; fill page 2 dashboard tiles
         lda #$1d
         ldx #$00
-.tile_dash_set_page1
+.tile_dash_set_page2
 	lda dashboard_bg_tiles,x
         sta PPU_DATA
         inx
-        bne .tile_dash_set_page1
-        
-        
-        
-; fill nametable 2 dash area with dash top bar tile
-	PPU_SETADDR $26c0
-        lda #$04
-        ldy #$20
-.tile_dash_set_page2
-        sta PPU_DATA
-        iny
         bne .tile_dash_set_page2
 	rts
+        
         
 dashboard_bg_tiles:
 	; top row 0
@@ -258,9 +234,9 @@ dashboard_draw: subroutine
 	rts
         
         
+        
 ; GET DASH UPDATES READY TO RENDER
 dashboard_update: subroutine
-
 
 
 ; LIFEBARF

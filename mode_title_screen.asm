@@ -1,3 +1,32 @@
+guntner_msg:
+	.byte "G u n T n e R"
+        .byte #$00
+        
+PleaseStart_msg:
+	.byte " Please  START "
+        .byte #$00
+        
+copyright:
+	.byte "(c)MMXXII puke7, LoBlast"
+        .byte #$00
+        
+version:
+	.byte " v2.07 "
+        .byte #$00
+        
+guntner_title_name_table:
+  hex b1b1e0a0a1c5b1d2e4c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1f1d0b1b1b1b1b1b1
+  hex b1b1b2b0b1b1b1b1f4f5a1a1a1a1a1a2a0a1a1a1a1a1a1f2f3b1d2c1c1e2b1b1
+  hex b1b1b2b0b1b1d2d0b1d5d2a0a1c5b1b2b0b1d2a0a1c5d2a0a1c5b2a0a1a3b1b1
+  hex b1b1b2b0b1b1b2b0b1b3b2b0b1b3b1b2b0b1b2b0b1b3b1b0b1b1b2b0b1b3b1b1
+  hex b1b1b2b0b1b1b2b0b1b3b2b0b1b3b1b2b0b1b2b0b1b3b1b0b1b1b2b0b1b3b1b1
+  hex b1b1b2b0b1d5b2b0b1b3b2b0b1b3b1b2b0b1b2b0b1b3b1d0c5b1b2d0c1e3b1b1
+  hex b1b1b2b0b1b3b2b0b1b3b2b0b1b3b1b2b0b1b2b0b1b3b1b0b1b1b2b0b1b2b1b1
+  hex b1b1b2b0b1b3d2d0d1d4d2d0b5d5b5b2b0b1d2d0b5d5d2d0d1d5b2b0b1b2b1b1
+  hex b1b1b2b0b1b3b1b1b1b1b1b1b1b1d2a0a2d0b1b1b1b1b1b1b1b1d2d0b5b2b1b1
+  hex b1b1b2c0c1c2b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b2b1b1
+  hex b1b1e1a1a1c5b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d4b1b1
+
 
 
 title_screen_handler: subroutine
@@ -13,19 +42,22 @@ title_screen_handler: subroutine
         cmp #$03
         ;cmp #$a3
         bne .sit_and_wait
+.start_demo
         lda #$10
         sta game_mode
-        jsr player_demo_init
+        jsr game_init
 .sit_and_wait
 	lda player_start_d
         cmp #$ff
         bne .do_nothing
         ;; disable start_d so game doesn't instantly pause
+.start_game
         lda #$00
         sta player_start_d
         lda #$11
         sta game_mode
-        jsr player_init
+        jsr game_init
+        jsr clear_all_enemies
 .do_nothing
 ; except animate that color tho
         ; increase color
@@ -53,6 +85,7 @@ title_screen_handler: subroutine
         
         
         
+        
 title_screen_init: subroutine
 	lda #$00
         sta game_mode
@@ -60,8 +93,6 @@ title_screen_init: subroutine
         sta scroll_page
         sta title_screen_chord_played
         jsr WaitSync	; wait for VSYNC
-        ;jsr WaitSync	; wait for VSYNC (and PPU warmup)
-	;jsr PPU_init
         
 	; disable rendering
         lda #$00
@@ -69,7 +100,6 @@ title_screen_init: subroutine
         
         jsr nametables_clear
         jsr scroll_pos_reset
-        
         
 ; G u n T n e R
 
@@ -156,23 +186,11 @@ version_loop:
 .version_end
         
 ; clear sprites
-        lda #0
-        ldx #$00
-.clear_sprite_ram
-	sta $200,x	; PPU OAM sprite data
-        inx
-        bne .clear_sprite_ram
-        sta PPU_ADDR
-        sta PPU_ADDR	; PPU addr = $0000
-        sta PPU_SCROLL
-        sta PPU_SCROLL  ; PPU scroll = $0000
-	lda #$02
-        sta PPU_OAM_DMA
+	jsr sprite_clear
         
 	; enable rendering
         lda #MASK_BG|MASK_SPR
         sta PPU_MASK	
-        
         
         jsr WaitSync	; wait for VSYNC
         
@@ -180,32 +198,3 @@ version_loop:
 	rts
         
         
-guntner_msg:
-	.byte "G u n T n e R"
-        .byte #$00
-        
-PleaseStart_msg:
-	.byte " Please  START "
-        .byte #$00
-        
-copyright:
-	.byte "(c)MMXXII puke7, LoBlast"
-        .byte #$00
-        
-version:
-	.byte " v2.07 "
-        .byte #$00
-        
-        
-guntner_title_name_table:
-  hex b1b1e0a0a1c5b1d2e4c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1f1d0b1b1b1b1b1b1
-  hex b1b1b2b0b1b1b1b1f4f5a1a1a1a1a1a2a0a1a1a1a1a1a1f2f3b1d2c1c1e2b1b1
-  hex b1b1b2b0b1b1d2d0b1d5d2a0a1c5b1b2b0b1d2a0a1c5d2a0a1c5b2a0a1a3b1b1
-  hex b1b1b2b0b1b1b2b0b1b3b2b0b1b3b1b2b0b1b2b0b1b3b1b0b1b1b2b0b1b3b1b1
-  hex b1b1b2b0b1b1b2b0b1b3b2b0b1b3b1b2b0b1b2b0b1b3b1b0b1b1b2b0b1b3b1b1
-  hex b1b1b2b0b1d5b2b0b1b3b2b0b1b3b1b2b0b1b2b0b1b3b1d0c5b1b2d0c1e3b1b1
-  hex b1b1b2b0b1b3b2b0b1b3b2b0b1b3b1b2b0b1b2b0b1b3b1b0b1b1b2b0b1b2b1b1
-  hex b1b1b2b0b1b3d2d0d1d4d2d0b5d5b5b2b0b1d2d0b5d5d2d0d1d5b2b0b1b2b1b1
-  hex b1b1b2b0b1b3b1b1b1b1b1b1b1b1d2a0a2d0b1b1b1b1b1b1b1b1d2d0b5b2b1b1
-  hex b1b1b2c0c1c2b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b2b1b1
-  hex b1b1e1a1a1c5b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d4b1b1

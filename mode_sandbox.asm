@@ -2,7 +2,7 @@
 sandbox_init: subroutine
 	lda #$1f
         sta game_mode
-        jsr player_init
+        jsr game_init
         
 	; XXX temp palette
         PPU_SETADDR $3F19

@@ -218,8 +218,8 @@ cart_start:	subroutine
         
         jsr player_bullets_init
 ;============================== M O D E   I N I T   H E R E
-        ;jsr title_screen_init
-        jsr options_screen_init
+        jsr title_screen_init
+        ;jsr options_screen_init
         ;jsr sandbox_init
         
         ; XXX player attributes should be set in game init
@@ -350,7 +350,7 @@ nmi_handler: subroutine
         lda #$00
         sta PPU_SCROLL
 ; disable page 2 for HUD
-	lda #$00
+	lda #$01
         ora #CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
         
@@ -454,6 +454,9 @@ nmi_handler: subroutine
         nop	; how much prg space we using?
 	include "player_movement.dasm"
         nop	; how much prg space we using?
+	include "player_demo.asm"
+        nop	; how much prg space we using?
+
         
 	include "starfield.dasm"
         nop	; how much prg space we using?
@@ -466,8 +469,8 @@ nmi_handler: subroutine
         nop	; how much prg space we using?
 
         
-
-;e666 bookmark
+;ea9f bookmark new
+;e666 bookmark old
         
 ; LOOKUP TABLES AT TOP OF RAM
         org $fc80

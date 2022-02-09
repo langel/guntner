@@ -64,6 +64,15 @@ nametables_clear:
         bne .page_loop
         rts
         
+sprite_clear:
+        lda #$00
+        tax
+.clear_sprite_ram
+	sta $200,x	; PPU OAM sprite data
+        inx
+        bne .clear_sprite_ram
+	rts
+        
         
 scroll_pos_reset:
         lda #0

@@ -1,5 +1,22 @@
 
 
+game_init: subroutine
+; redraw playfield/hud
+	; disable rendering
+        lda #$00
+        sta PPU_MASK	
+        jsr nametables_clear
+	jsr starfield_init
+        jsr dashboard_init
+        
+	; enable rendering
+        lda #MASK_BG|MASK_SPR
+        sta PPU_MASK	
+        jsr timer_reset
+; set player position
+	jsr player_game_reset
+        rts
+
 
 game_time: subroutine
 	; read user controls even in demo mode!

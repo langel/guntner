@@ -40,7 +40,7 @@ options_screen_init: subroutine
         jsr set_player_sprite
         
         
-	PPU_SETADDR $2048
+	PPU_SETADDR $2448
         ldy #$00
 .options_text
 	lda text_options,y
@@ -51,7 +51,7 @@ options_screen_init: subroutine
 .options_end
         
         
-	PPU_SETADDR $210a
+	PPU_SETADDR $250a
         ldy #$00
 .song_text
 	lda text_song,y
@@ -61,7 +61,7 @@ options_screen_init: subroutine
         bne .song_text
 .song_end
 
-	PPU_SETADDR $214a
+	PPU_SETADDR $254a
         ldy #$00
 .sound_text
 	lda text_sound,y
@@ -71,7 +71,7 @@ options_screen_init: subroutine
         bne .sound_text
 .sound_end
 ; color 1
-	PPU_SETADDR $218a
+	PPU_SETADDR $258a
         ldy #$00
 .col1_text
 	lda text_col1,y
@@ -87,7 +87,7 @@ options_screen_init: subroutine
         sta PPU_DATA
         sta PPU_DATA
 ; color 2
-	PPU_SETADDR $21ca
+	PPU_SETADDR $25ca
         ldy #$00
 .col2_text
 	lda text_col2,y
@@ -103,11 +103,11 @@ options_screen_init: subroutine
         sta PPU_DATA
         sta PPU_DATA
 ; set rudy color blocks' tile attributes
-	PPU_SETADDR $23dc
+	PPU_SETADDR $27dc
         lda #%11111111
         sta PPU_DATA
 ; hud bar on title screen
-	PPU_SETADDR $22c0
+	PPU_SETADDR $26c0
         lda #$1d
         ldy #$20
 .set_hud_bar
@@ -132,7 +132,16 @@ options_screen_init: subroutine
         
         
         
+        
+        
+        
 options_screen_handler: subroutine
+
+        lda #$00
+        sta PPU_SCROLL
+        lda wtf
+        sta PPU_SCROLL
+        
 	jsr player_update_colors
 	lda player_start_d
         beq .dont_start_game
@@ -140,7 +149,7 @@ options_screen_handler: subroutine
         sta player_start_d
         lda #$11
         sta game_mode
-        jsr player_init
+        jsr game_init
         rts
 .dont_start_game
 	lda options_rudy_pos
@@ -178,7 +187,7 @@ options_screen_handler: subroutine
 .dont_wrap_down
 	sta options_rudy_pos
 ; show song id
-	PPU_SETADDR $2112
+	PPU_SETADDR $2512
         ;inc options_song_id	
 	lda options_song_id
         cmp #100
@@ -194,7 +203,7 @@ options_screen_handler: subroutine
         lda decimal_table,x
         sta PPU_DATA
 ; show sound id
-	PPU_SETADDR $2152
+	PPU_SETADDR $2552
         lda options_sound_id
         asl
         tax

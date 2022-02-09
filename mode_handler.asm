@@ -82,7 +82,7 @@ mode_handler_post_split: subroutine
         bne .playable_mode
 .demo_mode
         jsr demo_enemy_spawn
-	jsr run_player_demo
+	jsr player_demo_controls
 	jsr player_bullets_demo_update
 	rts
 .playable_mode
