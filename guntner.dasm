@@ -181,13 +181,14 @@ options_rudy_color2	byte
 
 ;;;;; START OF CODE
 
-Start:	subroutine
+cart_start:	subroutine
 	NES_INIT	; set up stack pointer, turn off PPU
         jsr WaitSync	; wait for VSYNC
-; CLEAR CPU RAM
+        ; XXX is this where this belongs?
         ldx #$00
         txa
         sta title_screen_color
+; CLEAR CPU RAM
         jsr ClearRAM	; clear RAM
         jsr WaitSync	; wait for VSYNC (and PPU warmup)
         jsr scroll_pos_reset
@@ -202,18 +203,29 @@ Start:	subroutine
         sta rng2
         
         jsr sine_init
-        jsr SetPalette 
+        
+        ; XXX need to compartmentalize palette handling
+; set palette colors
+; set PPU address to palette start
+	PPU_SETADDR $3f00
+        ldy #0
+.loop:
+	lda Palette00,y	; lookup byte in ROM
+	sta PPU_DATA	; store byte to PPU data
+        iny		; Y = Y + 1
+        cpy #32		; is Y equal to 32?
+	bne .loop	; not yet, loop
+        
         jsr player_bullets_init
 ;============================== M O D E   I N I T   H E R E
         ;jsr title_screen_init
         jsr options_screen_init
         ;jsr sandbox_init
         
+        ; XXX player attributes should be set in game init
  	; set default speed
         lda #$02
         sta player_speed
-        
-        
         ; reinitializing lives left
         ; so timer will run on title screen
         ; XXX need a cleanup of this
@@ -221,6 +233,7 @@ Start:	subroutine
         lda #$05
         sta player_lives
         
+        ; XXX this is dumb
         ; make sure we can write player palette
         jsr WaitSync	; wait for VSYNC (and PPU warmup)
 ; set default player colors
@@ -232,7 +245,7 @@ Start:	subroutine
         sta player_color2
 	jsr player_update_colors
         
-        
+        ; XXX move this and SetSprite0 below to player_dash?
         ; set hud y pos
         lda #182
         sta sprite_0_y
@@ -252,18 +265,6 @@ Start:	subroutine
 
 
 
-; set palette colors
-SetPalette: subroutine
-; set PPU address to palette start
-	PPU_SETADDR $3f00
-        ldy #0
-.loop:
-	lda Palette00,y	; lookup byte in ROM
-	sta PPU_DATA	; store byte to PPU data
-        iny		; Y = Y + 1
-        cpy #32		; is Y equal to 32?
-	bne .loop	; not yet, loop
-        rts		; return to caller
        
        
  
@@ -287,7 +288,7 @@ SetSprite0: subroutine
 
 ;;;;; INTERRUPT HANDLERS
 
-NMIHandler: subroutine
+nmi_handler: subroutine
 
 	SAVE_REGS
         
@@ -295,7 +296,7 @@ NMIHandler: subroutine
 	lda nmi_lockout
         cmp #$00
         beq .no_lock
-        jmp .NMI_end
+        jmp .nmi_end
 .no_lock
         inc nmi_lockout
         
@@ -326,6 +327,7 @@ NMIHandler: subroutine
         sta PPU_SCROLL
         
         
+      	; XXX could all of this be in the game loop?
         
 ; main game logic
         jsr mode_handler_post_vblank
@@ -336,8 +338,7 @@ NMIHandler: subroutine
         lda #$c0
 .wait1	bit PPU_STATUS
         beq .wait1
-        ; reset palette
-        ;jsr SetPalette
+        
 
 ; HUD POSITIONING
 ; set PPU_ADDR.1
@@ -380,7 +381,7 @@ NMIHandler: subroutine
         sta nmi_lockout
         
                 
-.NMI_end
+.nmi_end
 	RESTORE_REGS
 	rti
         
@@ -479,7 +480,7 @@ NMIHandler: subroutine
 
 
 
-        
+        ; XXX need a palette handler and palette table
 Palette00:
 	hex 1f		;screen color
 	hex 02283000	;background 0
@@ -497,8 +498,11 @@ Palette00:
 
 
 ;;;;; CPU VECTORS
-	org $fffe
-	NES_VECTORS
+	seg Vectors		; segment "Vectors"
+	org $fffa		; start at address $fffa
+       	.word nmi_handler	; $fffa vblank nmi
+	.word cart_start	; $fffc reset
+	.word nmi_handler	; $fffe irq / brk
 
 ;;;;; GRAPHX
 	org $10000

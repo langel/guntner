@@ -1,4 +1,6 @@
 
+; XXX set game mode then call game init
+; XXX game init can determine things by game mode
         
 player_demo_init: subroutine
 ; redraw playfield/hud
@@ -16,6 +18,7 @@ player_demo_init: subroutine
         bne .clear_top_rows
 	jsr starfield_init
         jsr dashboard_init
+        ; XXX redundant with scroll_pos_reset ?
         sta PPU_ADDR
         sta PPU_ADDR	; PPU addr = $0000
         sta PPU_SCROLL
