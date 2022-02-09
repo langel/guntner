@@ -175,9 +175,11 @@ options_rudy_color2	byte
 ; $200 PPU OAM sprite data
 ; $300 entity data
 
+
 ;;;;; NES CARTRIDGE HEADER
 
 	NES_HEADER 0,1,1,NES_MIRR_VERT ; mapper 0, 1 PRGs, 1 CHR
+
 
 ;;;;; START OF CODE
 
@@ -217,21 +219,16 @@ cart_start:	subroutine
 	bne .loop	; not yet, loop
         
         jsr player_bullets_init
+        
+        jsr nametables_clear
+	jsr player_game_reset
+        jsr dashboard_init
+        jsr dashboard_update
+        jsr dashboard_draw
 ;============================== M O D E   I N I T   H E R E
         jsr title_screen_init
         ;jsr options_screen_init
         ;jsr sandbox_init
-        
-        ; XXX player attributes should be set in game init
- 	; set default speed
-        lda #$02
-        sta player_speed
-        ; reinitializing lives left
-        ; so timer will run on title screen
-        ; XXX need a cleanup of this
-        ; very spaghetti
-        lda #$05
-        sta player_lives
         
         ; XXX this is dumb
         ; make sure we can write player palette
@@ -246,9 +243,6 @@ cart_start:	subroutine
 	jsr player_update_colors
         
         ; XXX move this and SetSprite0 below to player_dash?
-        ; set hud y pos
-        lda #182
-        sta sprite_0_y
         
         
 ; activate PPU graphics       
@@ -264,24 +258,6 @@ cart_start:	subroutine
 	jmp .endless	; endless loop
 
 
-
-       
-       
- 
-; SPRITE HANDLINGS
-        
-        ; set sprite 0
-SetSprite0: subroutine
-        lda sprite_0_y	;y
-	sta $200
-        lda #$f0	;tile
-        sta $201
-        lda #$20	;flags
-        sta $202
-        lda #$01	;xpos
-        sta $203
-	rts
-        
 
         
 
@@ -300,21 +276,16 @@ nmi_handler: subroutine
 .no_lock
         inc nmi_lockout
         
+        ; disable PPU
         
 ; load sprites
 	lda #$02
         sta PPU_OAM_DMA
         
-        
 ; main game logic
         jsr mode_handler_vblank
- 
-; SPRITES TIME!!
-	; XXX maybe we should only do this in game mode
-        ; it was below mode_handler_post_vblank
-        ; put it here to fix bad oam offset write glitches
-        jsr SetSprite0       
-        
+      
+; set horizontal scroll position       
 	lda scroll_page
         and #$01
         ora #CTRL_NMI|CTRL_BG_1000
@@ -326,34 +297,11 @@ nmi_handler: subroutine
         lda #$f8
         sta PPU_SCROLL
         
-        
-      	; XXX could all of this be in the game loop?
+        ; reenable PPU
         
 ; main game logic
         jsr mode_handler_post_vblank
                
-; SPRITE 0 WAIT TIME!!!
-.wait0	bit PPU_STATUS
-        bvs .wait0
-        lda #$c0
-.wait1	bit PPU_STATUS
-        beq .wait1
-        
-
-; HUD POSITIONING
-; set PPU_ADDR.1
-        bit PPU_STATUS
-; set PPU_SCROLL.1
-        lda #$00
-        sta PPU_SCROLL
-; set PPU_SCROLL.2
-        lda #$00
-        sta PPU_SCROLL
-; disable page 2 for HUD
-	lda #$01
-        ora #CTRL_NMI|CTRL_BG_1000
-        sta PPU_CTRL
-        
 ; update dashboard tiles 
 	jsr mode_handler_post_split
         
@@ -364,7 +312,6 @@ nmi_handler: subroutine
 	inc wtf
 ; update global time
 	jsr timer_update 
-
 ; rng updates
 	lda rng0
         jsr NextRandom
@@ -380,7 +327,6 @@ nmi_handler: subroutine
         lda #$00
         sta nmi_lockout
         
-                
 .nmi_end
 	RESTORE_REGS
 	rti
@@ -409,6 +355,9 @@ nmi_handler: subroutine
 	include "mode_game.asm"
         nop	; how much prg space we using?
 	include "mode_sandbox.asm"
+        nop	; how much prg space we using?
+        
+	include "dashboard.asm"
         nop	; how much prg space we using?
         
 	include "powerups.asm"
@@ -442,15 +391,12 @@ nmi_handler: subroutine
         nop	; how much prg space we using?
 	include "phase_table.dasm"
         nop	; how much prg space we using?
-
         
 	include "player_main.dasm"
         nop	; how much prg space we using?
 	include "player_bullets.dasm"
         nop	; how much prg space we using?
 	include "player_controls.dasm"
-        nop	; how much prg space we using?
-	include "player_dashboard.dasm"
         nop	; how much prg space we using?
 	include "player_movement.dasm"
         nop	; how much prg space we using?

@@ -14,8 +14,6 @@
 
 ; runs at top of NMI
 mode_handler_vblank: subroutine
-	;lda #$10
-        ;sta game_mode
 	lda game_mode
         and #$10
         cmp #$10
@@ -37,11 +35,16 @@ mode_handler_vblank: subroutine
         
         
 mode_handler_post_vblank: subroutine
+	; if game_mode < #$10 get outtta here
+        lda game_mode
+        cmp #$10
+        bcs .game_logic
+        rts
+.game_logic
         lda game_mode
         cmp #$10
         bne .not_demo_time
         jsr demo_time
-        jmp .done
 .not_demo_time
 	lda game_mode
         cmp #$11
@@ -53,7 +56,21 @@ mode_handler_post_vblank: subroutine
         bne .not_sandbox_time
         jsr sandbox_time
 .not_sandbox_time
-.not_title_screen
+	; wait for Sprite 0; SPRITE 0 WAIT TIME!!!
+.wait0	bit PPU_STATUS
+        bvs .wait0
+        lda #$c0
+.wait1	bit PPU_STATUS
+        beq .wait1
+	; HUD POSITIONING
+        bit PPU_STATUS
+        lda #$00
+        sta PPU_SCROLL
+        sta PPU_SCROLL
+	; set bg pos to page 2
+	lda #$01
+        ora #CTRL_NMI|CTRL_BG_1000
+        sta PPU_CTRL
 .done
 	rts
         

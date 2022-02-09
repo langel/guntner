@@ -10,27 +10,22 @@ starfield_init: subroutine
 ; $23c0 and $27c0
 	lda #$0f
         sta starfield_tile
-        
+        ; page 1 attributes
 	PPU_SETADDR $23c0
 	lda #%00010100
-        ldx #$c0
-        ;sta $1c
+        ldx #$e0
 .23c0_loop
         sta PPU_DATA
         inx
-        ;stx $1a
         bne .23c0_loop
-        ldx #$c0
-        
+        ; page 2 attributes
 	PPU_SETADDR $27c0
 	lda #%00010100
-        ldx #$c0
+        ldx #$e0
 .27c0_loop
         sta PPU_DATA
         inx
-        ;stx $1b
         bne .27c0_loop
-        ;sta $19
 ; reset star palette twinkles
 	lda #STARFIELD_COL0_START
         sta starfield_col0
@@ -128,6 +123,7 @@ starfield_update: subroutine
         sta starfield_rng
         
 ;update_starfield_column
+	; XXX need to implement CTRL_INC_32 in PPU_CTRL
 	ldy #$00
 .col_loop
 .page_loop

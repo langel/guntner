@@ -98,7 +98,6 @@ title_screen_init: subroutine
         lda #$00
         sta PPU_MASK	
         
-        jsr nametables_clear
         jsr scroll_pos_reset
         
 ; G u n T n e R

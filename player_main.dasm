@@ -27,6 +27,8 @@ player_game_reset: subroutine
         lda #$ff
         sta player_health
 ; set player stats
+        lda #$02
+        sta player_speed
 	lda #$03
         sta player_lives
         sta player_gun_str

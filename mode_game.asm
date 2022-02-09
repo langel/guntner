@@ -5,9 +5,17 @@ game_init: subroutine
 	; disable rendering
         lda #$00
         sta PPU_MASK	
-        jsr nametables_clear
 	jsr starfield_init
-        jsr dashboard_init
+        
+        ; draw dashbar on title screen page
+	PPU_SETADDR $22c0
+        lda #$04
+        ldy #$20
+.set_top_bar
+	sta PPU_DATA
+        dey
+        bne .set_top_bar
+        
         
 	; enable rendering
         lda #MASK_BG|MASK_SPR
@@ -15,6 +23,17 @@ game_init: subroutine
         jsr timer_reset
 ; set player position
 	jsr player_game_reset
+; SPRITE HANDLINGS
+        
+        ; set sprite 0
+        lda sprite_0_y	;y
+	sta $200
+        lda #$f0	;tile
+        sta $201
+        lda #$20	;flags
+        sta $202
+        lda #$01	;xpos
+        sta $203
         rts
 
 

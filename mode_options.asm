@@ -18,6 +18,10 @@ text_col2:
 	.byte "color2"
         .byte #$00
         
+text_menureturn:
+	.byte "Menu Return"
+        .byte #$00
+        
      
 options_screen_init: subroutine
 	lda #$01
@@ -35,7 +39,6 @@ options_screen_init: subroutine
         lda #$00
         sta PPU_MASK	
         
-        jsr nametables_clear
         jsr scroll_pos_reset
         jsr set_player_sprite
         
@@ -106,14 +109,17 @@ options_screen_init: subroutine
 	PPU_SETADDR $27dc
         lda #%11111111
         sta PPU_DATA
-; hud bar on title screen
-	PPU_SETADDR $26c0
-        lda #$1d
-        ldy #$20
-.set_hud_bar
-	sta PPU_DATA
-        dey
-        bne .set_hud_bar
+        
+; Menu Return
+	PPU_SETADDR $260a
+        ldy #$00
+.menur_text
+	lda text_menureturn,y
+        beq .manur_end
+        sta PPU_DATA
+        iny
+        bne .menur_text
+.manur_end
         
 ; reset music?
 	lda #$00
@@ -122,6 +128,9 @@ options_screen_init: subroutine
         
 ; turn ppu back on
         jsr WaitSync	; wait for VSYNC
+        ; set to page 2
+        lda #$01
+        sta scroll_page
 	; enable rendering
         lda #MASK_BG|MASK_SPR
         sta PPU_MASK	
@@ -136,14 +145,12 @@ options_screen_init: subroutine
         
         
 options_screen_handler: subroutine
-
-        lda #$00
-        sta PPU_SCROLL
-        lda wtf
-        sta PPU_SCROLL
         
 	jsr player_update_colors
 	lda player_start_d
+        beq .dont_start_game
+        lda #$04 ; menu return pos
+        cmp options_rudy_pos
         beq .dont_start_game
         lda #$00
         sta player_start_d
@@ -179,9 +186,9 @@ options_screen_handler: subroutine
 	lda options_rudy_pos
         cmp #$ff ; min value - 1
         bne .dont_wrap_up
-        lda #$03
+        lda #$04
 .dont_wrap_up
-	cmp #$04 ; max value + 1
+	cmp #$05 ; max value + 1
         bne .dont_wrap_down
         lda #$00
 .dont_wrap_down
@@ -232,6 +239,10 @@ options_screen_handler: subroutine
         bne .not_color2
         jmp options_screen_color2_handler
 .not_color2
+	cmp #$04
+       	bne .not_menu_return
+        jmp options_menu_return
+.not_menu_return
         rts
         
         
@@ -356,4 +367,18 @@ options_screen_color2_handler: subroutine
         lda #$2c
         sta player_color1
 .dont_decrease
+	rts
+        
+        
+options_menu_return: subroutine
+	lda player_a_d
+        ora player_b_d
+        ora player_start_d
+        cmp #$00
+        beq .do_nothing
+	lda #$00
+        sta game_mode
+        sta scroll_page
+        jsr timer_reset
+.do_nothing
 	rts
