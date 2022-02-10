@@ -4,6 +4,8 @@
 ; #$00 = title screen
 ; #$01 = options
 ; #$02 = about
+; #$0a = scroll to options
+; #$0b = scroll to titles
 ; #$10 = demo
 ; #$11 = game : normal playing
 ; #$12 = game : "phase world" display
@@ -28,8 +30,16 @@ mode_handler_vblank: subroutine
         jmp title_screen_handler
 .not_title_screen
 	cmp #$01
-        bne .done
+        bne .not_options_screen
         jmp options_screen_handler
+.not_options_screen
+	cmp #$0a
+        bne .not_scrollto_options
+        jmp scrollto_options_handler
+.not_scrollto_options
+	cmp #$0b
+        bne .done
+        jmp scrollto_titles_handler
 .done
 	rts
         

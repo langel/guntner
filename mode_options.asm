@@ -374,9 +374,9 @@ options_menu_return: subroutine
         ora player_start_d
         cmp #$00
         beq .do_nothing
-	lda #$00
+	lda #$0b
         sta game_mode
+        lda #$00
         sta scroll_page
-        jsr timer_reset
 .do_nothing
 	rts

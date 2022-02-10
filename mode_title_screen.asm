@@ -83,9 +83,8 @@ title_screen_handler: subroutine
         jsr clear_all_enemies
         jmp .do_nothing
 .goto_options
-	lda #$01
+	lda #$0a
         sta game_mode
-        jsr options_screen_init
 .do_nothing
 	lda title_rudy_pos
         asl
