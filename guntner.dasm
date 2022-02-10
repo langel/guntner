@@ -354,11 +354,11 @@ nmi_handler: subroutine
         
 	include "mode_handler.asm"
         nop	; how much prg space we using?
+	include "mode_menu_screens.asm"
+        nop	; how much prg space we using?
 	include "mode_title_screen.asm"
         nop	; how much prg space we using?
 	include "mode_options.asm"
-        nop	; how much prg space we using?
-	include "mode_scroller.asm"
         nop	; how much prg space we using?
 
 	include "mode_demo.asm"

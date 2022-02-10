@@ -1,27 +1,7 @@
 
-text_options:
-	.byte "Options Screeen"
-        .byte #$00
 
-text_song:
-	.byte "song"
-        .byte #$00
         
-text_sound:
-	.byte "sound"
-        .byte #$00
-        
-text_col1:
-	.byte "color1"
-        .byte #$00
-text_col2:
-	.byte "color2"
-        .byte #$00
-        
-text_menureturn:
-	.byte "Menu Return"
-        .byte #$00
-        
+
      
 options_screen_init: subroutine
 	lda #$01
@@ -33,109 +13,19 @@ options_screen_init: subroutine
         sta scroll_y
         sta scroll_page
         jsr WaitSync	
-	; disable rendering
-        lda #$00
-        sta PPU_MASK	
         
         jsr scroll_pos_reset
         lda #$38
         sta player_x_hi
         jsr set_player_sprite
         
-        
-	PPU_SETADDR $2448
-        ldy #$00
-.options_text
-	lda text_options,y
-        beq .options_end
-        sta PPU_DATA
-        iny
-        bne .options_text
-.options_end
-        
-        
-	PPU_SETADDR $250a
-        ldy #$00
-.song_text
-	lda text_song,y
-        beq .song_end
-        sta PPU_DATA
-        iny
-        bne .song_text
-.song_end
-
-	PPU_SETADDR $254a
-        ldy #$00
-.sound_text
-	lda text_sound,y
-        beq .sound_end
-        sta PPU_DATA
-        iny
-        bne .sound_text
-.sound_end
-; color 1
-	PPU_SETADDR $258a
-        ldy #$00
-.col1_text
-	lda text_col1,y
-        beq .col1_end
-        sta PPU_DATA
-        iny
-        bne .col1_text
-.col1_end
-	lda #$20
-        sta PPU_DATA
-        sta PPU_DATA
-        lda #$1d
-        sta PPU_DATA
-        sta PPU_DATA
-; color 2
-	PPU_SETADDR $25ca
-        ldy #$00
-.col2_text
-	lda text_col2,y
-        beq .col2_end
-        sta PPU_DATA
-        iny
-        bne .col2_text
-.col2_end
-	lda #$20
-        sta PPU_DATA
-        sta PPU_DATA
-        lda #$1e
-        sta PPU_DATA
-        sta PPU_DATA
-; set rudy color blocks' tile attributes
-	PPU_SETADDR $27dc
-        lda #%11111111
-        sta PPU_DATA
-        
-; Menu Return
-	PPU_SETADDR $260a
-        ldy #$00
-.menur_text
-	lda text_menureturn,y
-        beq .manur_end
-        sta PPU_DATA
-        iny
-        bne .menur_text
-.manur_end
-        
 ; reset music?
 	lda #$00
         sta options_music_on
         jsr apu_game_music_init
         
-; turn ppu back on
-        jsr WaitSync	; wait for VSYNC
-        ; set to page 2
         lda #$01
         sta scroll_page
-	; enable rendering
-        lda #MASK_BG|MASK_SPR
-        sta PPU_MASK	
-        jsr WaitSync	; wait for VSYNC
-        jsr timer_reset
 	rts
 
         
@@ -159,15 +49,7 @@ options_screen_handler: subroutine
         jsr game_init
         rts
 .dont_start_game
-	lda options_rudy_pos
-        asl
-        asl
-        asl
-        asl
-        clc
-        adc #$48
-        sta oam_ram_rudy
-        sta oam_ram_rudy+4
+	jsr options_screen_set_rudy_y
 	jsr apu_game_frame
 ; check if option changes
 	lda player_down_d
@@ -243,6 +125,17 @@ options_screen_handler: subroutine
 .not_menu_return
         rts
         
+options_screen_set_rudy_y: subroutine
+	lda options_rudy_pos
+        asl
+        asl
+        asl
+        asl
+        clc
+        adc #$48
+        sta oam_ram_rudy
+        sta oam_ram_rudy+4
+        rts
         
 options_screen_song_handler: subroutine
 	lda player_b_d
@@ -376,7 +269,5 @@ options_menu_return: subroutine
         beq .do_nothing
 	lda #$0b
         sta game_mode
-        lda #$00
-        sta scroll_page
 .do_nothing
 	rts
