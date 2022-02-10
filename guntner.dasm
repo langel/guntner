@@ -111,10 +111,6 @@ timer_seconds_10s	byte
 timer_minutes_1s	byte
 timer_minutes_10s	byte
 
-title_screen_chord_played	byte
-title_screen_color	byte
-title_temp	byte
-
 enemy_temp_addr_lo	byte
 enemy_temp_addr_hi	byte
 enemy_ram_offset	byte
@@ -163,6 +159,11 @@ audio_root_tone         byte
 audio_pattern_pos	byte
 audio_pattern_num       byte
 
+
+title_screen_chord_played	byte
+title_screen_color	byte
+title_rudy_pos		byte
+
 options_rudy_pos	byte
 options_music_on	byte
 options_song_id		byte
@@ -190,6 +191,7 @@ cart_start:	subroutine
         ldx #$00
         txa
         sta title_screen_color
+        sta title_rudy_pos
 ; CLEAR CPU RAM
         jsr ClearRAM	; clear RAM
         jsr WaitSync	; wait for VSYNC (and PPU warmup)
@@ -296,8 +298,6 @@ nmi_handler: subroutine
         sta PPU_SCROLL
         lda #$f8
         sta PPU_SCROLL
-        
-        ; reenable PPU
         
 ; main game logic
         jsr mode_handler_post_vblank

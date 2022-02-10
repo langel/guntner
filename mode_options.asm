@@ -32,14 +32,14 @@ options_screen_init: subroutine
         sta options_rudy_pos
         sta scroll_y
         sta scroll_page
-        lda #$38
-        sta player_x_hi
         jsr WaitSync	
 	; disable rendering
         lda #$00
         sta PPU_MASK	
         
         jsr scroll_pos_reset
+        lda #$38
+        sta player_x_hi
         jsr set_player_sprite
         
         
@@ -169,8 +169,6 @@ options_screen_handler: subroutine
         sta oam_ram_rudy
         sta oam_ram_rudy+4
 	jsr apu_game_frame
-        lda #$02
-        sta PPU_OAM_DMA
 ; check if option changes
 	lda player_down_d
         cmp #$00

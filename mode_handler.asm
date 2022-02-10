@@ -25,11 +25,11 @@ mode_handler_vblank: subroutine
 	lda game_mode
         cmp #$00
         bne .not_title_screen
-        jsr title_screen_handler
+        jmp title_screen_handler
 .not_title_screen
 	cmp #$01
         bne .done
-        jsr options_screen_handler
+        jmp options_screen_handler
 .done
 	rts
         

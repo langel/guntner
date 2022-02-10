@@ -3,7 +3,11 @@ guntner_msg:
         .byte #$00
         
 PleaseStart_msg:
-	.byte " Please  START "
+	.byte "  Please  START "
+        .byte #$00
+        
+MuchOptions_msg:
+	.byte "  Much  Options "
         .byte #$00
         
 copyright:
@@ -11,7 +15,7 @@ copyright:
         .byte #$00
         
 version:
-	.byte " v2.07 "
+	.byte " v2.09 "
         .byte #$00
         
 guntner_title_name_table:
@@ -47,18 +51,51 @@ title_screen_handler: subroutine
         sta game_mode
         jsr game_init
 .sit_and_wait
-	lda player_start_d
-        cmp #$ff
+	lda player_up_d
+        ora player_down_d
+        ora player_left_d
+        ora player_right_d
+        ora player_select_d
+        cmp #$00
+        beq .dont_change_pos
+        inc title_rudy_pos
+        lda #%00000001
+        and title_rudy_pos
+        sta title_rudy_pos
+        jsr timer_reset
         bne .do_nothing
-        ;; disable start_d so game doesn't instantly pause
+.dont_change_pos
+	lda player_start_d
+        ora player_b_d
+        ora player_a_d
+        cmp #$00
+        beq .do_nothing
+        lda title_rudy_pos
+        cmp #$01
+        beq .goto_options
 .start_game
+        ;; disable start_d so game doesn't instantly pause
         lda #$00
         sta player_start_d
         lda #$11
         sta game_mode
         jsr game_init
         jsr clear_all_enemies
+        jmp .do_nothing
+.goto_options
+	lda #$01
+        sta game_mode
+        jsr options_screen_init
 .do_nothing
+	lda title_rudy_pos
+        asl
+        asl
+        asl
+        asl
+        clc
+        adc #$87
+        sta player_y_hi
+	jsr set_player_sprite
 ; except animate that color tho
         ; increase color
 	inc title_screen_color
@@ -74,12 +111,12 @@ title_screen_handler: subroutine
         sta title_screen_color
 .dont_reset_screen_color
         adc #$01
-        sta title_temp
+        tay
 	PPU_SETADDR $3f01
-        lda title_temp
+        tya
         sta PPU_DATA
 	PPU_SETADDR $3f09
-        lda title_temp
+        tya
         sta PPU_DATA
 	rts
         
@@ -97,23 +134,19 @@ title_screen_init: subroutine
 	; disable rendering
         lda #$00
         sta PPU_MASK	
+; clear sprites
+	jsr sprite_clear
         
         jsr scroll_pos_reset
+        lda #$38
+        sta player_x_hi
+        jsr set_player_sprite
         
 ; G u n T n e R
 
-; clear top rows
-	PPU_SETADDR $2000
-        ldy #$a0
-        lda #$b1
-; XXX this chunk just gets us down the screen in vram
-; i dont think we need to do this if we fix the address above
-clear_top_rows:
-	sta PPU_DATA
-        iny
-        bne clear_top_rows
-
 ; BIG TITLE
+	PPU_SETADDR $2040
+        ldy #$00
 big_title_loop:
 	lda guntner_title_name_table,y
 	sta PPU_DATA
@@ -128,7 +161,7 @@ big_title_loop2:
 
 
 ; little title
-	PPU_SETADDR $21a9
+	PPU_SETADDR $2189
 	ldy #$00		; set Y counter to 0
 .title_loop4:
 	lda guntner_msg,y	; get next character
@@ -154,7 +187,7 @@ copyright_loop:
 
 
 ; please start
-	PPU_SETADDR $2248
+	PPU_SETADDR $2208
 	ldy #$0		; set Y counter to 0
 .please_start_loop:
 	lda PleaseStart_msg,y	; get next character
@@ -163,6 +196,17 @@ copyright_loop:
         iny		; next character
 	bne .please_start_loop	; loop
 .end
+
+; much options
+	PPU_SETADDR $2248
+	ldy #$0		; set Y counter to 0
+.much_options_loop:
+	lda MuchOptions_msg,y	; get next character
+        beq .options_end	; is 0? exit loop
+	sta PPU_DATA	; store+advance PPU
+        iny		; next character
+	bne .much_options_loop	; loop
+.options_end
 
 
 ; hud bar on title screen
@@ -184,8 +228,6 @@ version_loop:
 	bne version_loop	; loop
 .version_end
         
-; clear sprites
-	jsr sprite_clear
         
 	; enable rendering
         lda #MASK_BG|MASK_SPR
