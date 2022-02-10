@@ -382,15 +382,18 @@ nmi_handler: subroutine
         nop	; how much prg space we using?
 	include "enemy_birb.asm"
         nop	; how much prg space we using?
+	include "enemy_chomps.asm"
+        nop	; how much prg space we using?
 	include "enemy_maggs.asm"
         nop	; how much prg space we using?
 	include "enemy_skeet.asm"
         nop	; how much prg space we using
 	include "enemy_skully.asm"
         nop	; how much prg space we using?
+	include "enemy_spark.asm"
+        nop	; how much prg space we using?
 	include "enemy_starglasses.asm"
         nop	; how much prg space we using?
-        
 	include "enemy_zigzag.asm"
         nop	; how much prg space we using?
 

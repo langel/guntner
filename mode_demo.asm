@@ -79,13 +79,17 @@ demo_enemy_spawn: subroutine
         tax
         lda rng0
         lsr
-        and #$03
+        and #$07
         cmp #$00
         beq .spawn_bat
         cmp #$01
         beq .spawn_zigzag
         cmp #$02
         beq .spawn_skeet
+        cmp #$03
+        beq .spawn_chomps
+        cmp #$04
+        beq .spawn_spark
         jsr birb_spawn
         rts
 .spawn_bat
@@ -96,6 +100,12 @@ demo_enemy_spawn: subroutine
         rts
 .spawn_skeet
 	jsr skeet_spawn
+        rts
+.spawn_chomps
+	jsr chomps_spawn
+        rts
+.spawn_spark
+	jsr spark_spawn
         rts
 .no_1_sprite_spawn
 	jsr get_enemy_slot_2_sprite

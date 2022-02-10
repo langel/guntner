@@ -31,7 +31,6 @@ skeet_spawn: subroutine
         lda #$b0
         sta enemy_ram_y,x
         lda #$00
-        sta enemy_ram_ex,x
         jmp .dir_picked
 .spawn_left
         lda #$00
@@ -39,7 +38,6 @@ skeet_spawn: subroutine
 	lda rng0
         sta enemy_ram_y,x
         lda #$01
-        sta enemy_ram_ex,x
         jmp .dir_picked
 .spawn_top
 	lda rng0
@@ -47,7 +45,6 @@ skeet_spawn: subroutine
         lda #$00
         sta enemy_ram_y,x
         lda #$02
-        sta enemy_ram_ex,x
         jmp .dir_picked
 .spawn_right
         lda #$f0
@@ -55,8 +52,8 @@ skeet_spawn: subroutine
 	lda rng0
         sta enemy_ram_y,x
         lda #$03
-        sta enemy_ram_ex,x
 .dir_picked
+        sta enemy_ram_ex,x
 	rts
         
         

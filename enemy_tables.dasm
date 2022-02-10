@@ -9,6 +9,9 @@
 ; 08 space vampire
 ; 09 vampire's bat
 ; 0a skeet
+; 0b zigzag
+; 0c chomps
+; 0d spark
 
 ENEMY_HITPOINTS_TABLE:
 	byte #$00
@@ -23,6 +26,8 @@ ENEMY_HITPOINTS_TABLE:
         byte #$0a ; vamp bat
         byte #$04 ; skeet
         byte #$10 ; zigzag
+        byte #$07 ; chomps
+        byte #$0f ; spark
         
         
 ENEMY_PLAYER_POINTS_TABLE:
@@ -39,6 +44,8 @@ ENEMY_PLAYER_POINTS_TABLE:
         byte #$01,#$22,#$55 ; vamp bat
         byte #$00,#$00,#$27 ; skeet
         byte #$00,#$02,#$79 ; zigzag
+        byte #$00,#$02,#$79 ; chomps
+        byte #$ff,#$ff,#$ff ; spark
         
 
 ENEMY_PLAYER_COLLISION_TABLE:
@@ -54,6 +61,8 @@ ENEMY_PLAYER_COLLISION_TABLE:
         byte #$04 ; vamp bat
         byte #$07 ; skeet
         byte #$03 ; zigzag
+        byte #$03 ; chomps
+        byte #$00 ; spark
         
 
 ENEMY_METHODS_LOOKUP_TABLE:
@@ -69,5 +78,7 @@ ENEMY_METHODS_LOOKUP_TABLE:
         word boss_vamp_bat_cycle
         word skeet_cycle
         word zigzag_cycle
+        word chomps_cycle
+        word spark_cycle
         
         

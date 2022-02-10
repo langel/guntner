@@ -298,6 +298,8 @@ enemy_get_damage_this_frame: subroutine
         jsr player_take_damage
         jsr sfx_player_damage
 .no_collision
+	; fix y register
+	ldy enemy_oam_offset
         lda enemy_dmg_accumulator
         cmp #$00
         bne .hit

@@ -1,7 +1,4 @@
 
-
-        
-
      
 options_screen_init: subroutine
 	lda #$01
@@ -11,13 +8,6 @@ options_screen_init: subroutine
         sta options_sound_id
         sta options_rudy_pos
         sta scroll_y
-        sta scroll_page
-        jsr WaitSync	
-        
-        jsr scroll_pos_reset
-        lda #$38
-        sta player_x_hi
-        jsr set_player_sprite
         
 ; reset music?
 	lda #$00
@@ -28,8 +18,6 @@ options_screen_init: subroutine
         sta scroll_page
 	rts
 
-        
-        
         
         
         

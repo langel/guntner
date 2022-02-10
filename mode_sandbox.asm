@@ -14,13 +14,41 @@ sandbox_init: subroutine
         sta PPU_DATA
         
         
-	jsr get_enemy_slot_1_sprite
+        jsr get_enemy_slot_1_sprite
         tax
-        jsr bat_spawn
+        jsr chomps_spawn
+        jsr get_enemy_slot_1_sprite
+        tax
+        jsr chomps_spawn
+        jsr get_enemy_slot_1_sprite
+        tax
+        jsr chomps_spawn
+        jsr get_enemy_slot_1_sprite
+        tax
+        jsr chomps_spawn
+        jsr get_enemy_slot_1_sprite
+        tax
+        jsr spark_spawn
+        jsr get_enemy_slot_1_sprite
+        tax
+        jsr spark_spawn
+        jsr get_enemy_slot_1_sprite
+        tax
+        jsr spark_spawn
+        jsr get_enemy_slot_1_sprite
+        tax
+        jsr spark_spawn
+        jsr get_enemy_slot_1_sprite
+        tax
+        jsr spark_spawn
         
 	jsr get_enemy_slot_1_sprite
         tax
-        jsr skeet_spawn
+        ;jsr bat_spawn
+        
+	jsr get_enemy_slot_1_sprite
+        tax
+        ;jsr skeet_spawn
         
 	jsr get_enemy_slot_4_sprite
         tax
@@ -28,10 +56,10 @@ sandbox_init: subroutine
         
 	jsr get_enemy_slot_4_sprite
         tax
-	jsr starglasses_spawn
+	;jsr starglasses_spawn
 	jsr get_enemy_slot_4_sprite
         tax
-	jsr starglasses_spawn
+	;jsr starglasses_spawn
         
 	;jsr get_enemy_slot_1_sprite
         ;tax
@@ -67,7 +95,8 @@ sandbox_time: subroutine
         and #%00000001
         cmp #$00
         bne .zigzag
-        jsr skeet_spawn
+        ;jsr skeet_spawn
+        jsr spark_spawn
         jmp .no_enemy_spawn
 .zigzag
         ;jsr zigzag_spawn

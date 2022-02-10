@@ -8,12 +8,6 @@ title_screen_init: subroutine
         sta scroll_y
         sta scroll_page
         sta title_screen_chord_played
-        jsr WaitSync	; wait for VSYNC
-        
-        jsr scroll_pos_reset
-        lda #$38
-        sta player_x_hi
-        jsr set_player_sprite
         
 	jsr menu_screens_draw
         
