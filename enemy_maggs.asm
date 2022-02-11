@@ -25,12 +25,6 @@ maggs_spawn: subroutine
         
 ;;;; HANDLING maggs
 maggs_cycle: subroutine
-	ldx enemy_ram_offset
-        ldy enemy_oam_offset
-        lda oam_ram_x,y
-        sta collision_0_x
-        lda oam_ram_y,y
-        sta collision_0_y
         lda #$10
         sta collision_0_w
         lda #$05

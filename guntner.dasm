@@ -309,9 +309,6 @@ nmi_handler: subroutine
         
 ; main game logic
         jsr mode_handler_post_vblank
-               
-; update dashboard tiles 
-	jsr mode_handler_post_split
         
 ; read Player Controls
         jsr player_controls_read

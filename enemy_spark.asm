@@ -22,15 +22,8 @@ spark_spawn: subroutine
 	rts
 
 spark_cycle: subroutine
-	ldx enemy_ram_offset
-        ldy enemy_oam_offset
-        lda oam_ram_x,y
-        sta collision_0_x
-        lda oam_ram_y,y
-        sta collision_0_y
-        lda #$10
+        lda #$08
         sta collision_0_w
-        lda #$05
         sta collision_0_h
         jsr enemy_get_damage_this_frame
         cmp #$00
@@ -74,7 +67,7 @@ spark_cycle: subroutine
 .go_up
 	dec enemy_ram_y,x
         bne .dir_done
-        lda #$b6
+        lda sprite_0_y
         sta enemy_ram_y,x
         jmp .dir_done
 .go_right
@@ -83,7 +76,7 @@ spark_cycle: subroutine
 .go_down
 	inc enemy_ram_y,x
 	lda enemy_ram_y,x
-        cmp #$b6
+        cmp sprite_0_y
         bcc .dir_done
         lda #$00
         sta enemy_ram_y,x

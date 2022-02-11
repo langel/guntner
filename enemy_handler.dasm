@@ -164,8 +164,14 @@ update_enemies: subroutine
         inx
         lda ENEMY_METHODS_LOOKUP_TABLE,x
         sta enemy_temp_addr_hi
+        ; setup collision detection enemy origin pos
+	ldx enemy_ram_offset
+        ldy enemy_oam_offset
+        lda oam_ram_x,y
+        sta collision_0_x
+        lda oam_ram_y,y
+        sta collision_0_y
         jmp (enemy_temp_addr_lo)
-        ;ENEMY_TYPE_SWITCH $01,birb_cycle
 update_enemies_handler_next:
 .handler_next
         ; go to next enemy slot

@@ -52,13 +52,8 @@ zigzag_spawn: subroutine
 .dir_picked
 	rts
 
+
 zigzag_cycle: subroutine
-	ldx enemy_ram_offset
-        ldy enemy_oam_offset
-        lda oam_ram_x,y
-        sta collision_0_x
-        lda oam_ram_y,y
-        sta collision_0_y
         lda #$08
         sta collision_0_w
         sta collision_0_h
@@ -147,7 +142,7 @@ zigzag_cycle: subroutine
 	lda enemy_ram_y,x
         cmp #$ba
         bcc .go_done
-        lda #$b6
+        lda sprite_0_y
         sta enemy_ram_y,x
         jmp .go_done
 .go_right_down
@@ -163,7 +158,7 @@ zigzag_cycle: subroutine
         jsr enemy_set_palette
 .check_cross_bottom
 	lda enemy_ram_y,x
-        cmp #$b6
+        cmp sprite_0_y
         bcc .go_done
         lda #$00
         sta enemy_ram_y,x

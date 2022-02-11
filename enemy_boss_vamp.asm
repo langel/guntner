@@ -53,12 +53,6 @@ boss_vamp_bat_spawn: subroutine
         
         
 boss_vamp_bat_cycle: subroutine
-	ldx enemy_ram_offset
-        ldy enemy_oam_offset
-        lda oam_ram_x,y
-        sta collision_0_x
-        lda oam_ram_y,y
-        sta collision_0_y
         lda #$08
         sta collision_0_w
         sta collision_0_h
@@ -188,14 +182,10 @@ boss_vamp_spawn: subroutine
 
 
 boss_vamp_cycle: subroutine
-	ldx enemy_ram_offset
-        ldy enemy_oam_offset
         clc
         lda oam_ram_x,y
         adc #$01
         sta collision_0_x
-        lda oam_ram_y,y
-        sta collision_0_y
         lda #$0d
         sta collision_0_w
         lda #$10

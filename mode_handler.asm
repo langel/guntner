@@ -44,6 +44,7 @@ mode_handler_vblank: subroutine
 	rts
         
         
+        
 mode_handler_post_vblank: subroutine
 	; if game_mode < #$10 get outtta here
         lda game_mode
@@ -81,38 +82,23 @@ mode_handler_post_vblank: subroutine
 	lda #$01
         ora #CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
-.done
-	rts
         
-        
-; runs after screen split
-; not needed for title screen / options / etc.....
-; XXX seriously need to figure out if its worth
-;     turning off and back on again
-mode_handler_post_split: subroutine
-	lda game_mode
-        and #$10
-        cmp #$10
-        bne .no_dashboard
+        jsr apu_game_frame
+	jsr player_bullets_update
         ; HUD prepare for next draw
         ; stop updating HUD if game over
         lda player_death_flag
         cmp #$00
-        bne .skip_dashboard_update
+        bne .skip_stuff
 	jsr dashboard_update
 .skip_dashboard_update
 	; XXX if we remove sprite 0 from title/options
         ; XXX sfx by frame will not work here
-        jsr apu_game_frame
 	lda game_mode
         cmp #$10
-        bne .playable_mode
+        bne .skip_stuff
 .demo_mode
         jsr demo_enemy_spawn
 	jsr player_demo_controls
-	jsr player_bullets_demo_update
-	rts
-.playable_mode
-	jsr player_bullets_update
-.no_dashboard
+.skip_stuff
 	rts

@@ -7,7 +7,7 @@ game_init: subroutine
         sta PPU_MASK	
 	jsr starfield_init
         
-        ; draw dashbar on title screen page
+        ; draw dashbar top bar on title screen page
 	PPU_SETADDR $22c0
         lda #$04
         ldy #$20
