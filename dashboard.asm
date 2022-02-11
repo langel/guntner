@@ -239,7 +239,7 @@ dashboard_draw: subroutine
         sta PPU_DATA
         lda score_10
         sta PPU_DATA
-        lda score_1
+        lda score_00000001
         sta PPU_DATA
         
 	rts
@@ -562,50 +562,28 @@ dashboard_update: subroutine
 
 ; SCORE
 ; XXX this is not translating correctly to the screen
-	lda #$30
-        sta score_10000000
-        sta score_1000000
-        sta score_100000
-        sta score_10000
-        sta score_1000
-        sta score_100
-        sta score_10
-        sta score_1
+        
+        ldx #$00
+        ldy #$00
+.score_display_loop
+	lda score_000000xx,y
+        and #%00001111
+        clc
+        adc #$30
+        sta score_00000001,x
+        lda score_000000xx,y
+        lsr
+        lsr
+        lsr
+        lsr
+        clc
+        adc #$30
+        inx
+        sta score_00000001,x
+        inx
+        iny
+        cpy #$04
+        bne .score_display_loop
 
-	lda score_xx0000
-        asl
-        tax
-        lda decimal_table,x
-        sta score_10000000
-        inx
-        lda decimal_table,x
-        sta score_1000000
-        
-	lda score_xx0000
-        asl
-        tax
-        lda decimal_table,x
-        sta score_100000
-        inx
-        lda decimal_table,x
-        sta score_10000
-        
-	lda score_00xx00
-        asl
-        tax
-        lda decimal_table,x
-        sta score_1000
-        inx
-        lda decimal_table,x
-        sta score_100
-        
-	lda score_0000xx
-        asl
-        tax
-        lda decimal_table,x
-        sta score_10
-        inx
-        lda decimal_table,x
-        sta score_1
         rts
         

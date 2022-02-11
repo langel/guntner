@@ -375,38 +375,25 @@ enemy_set_palette_mirror: subroutine
         
 enemy_give_points: subroutine
         ; a = enemy type
-        sta enemy_temp_temp
-        inc enemy_temp_temp
-        lda enemy_temp_temp
+        asl
         asl
         clc
-        adc enemy_temp_temp
-        sta enemy_temp_temp
-        dec enemy_temp_temp
-        lda enemy_temp_temp
-        tax
-        lda ENEMY_PLAYER_POINTS_TABLE,x
+        adc #$03
+        tay ; enemy points counter
+        ldx #$00 ; score bytes counter
+.score_loop
+        lda ENEMY_PLAYER_POINTS_TABLE,y
+        dey
         clc
-        adc score_0000xx
-        sta score_0000xx
-        bcc .8bit_no_carry
-        inc score_00xx00
-.8bit_no_carry
-	dex
-        lda ENEMY_PLAYER_POINTS_TABLE,x
-        clc
-        adc score_00xx00
-        sta score_00xx00
-        bcc .16bit_no_carry
-        inc score_xx0000
-.16bit_no_carry
-	dex
-        lda ENEMY_PLAYER_POINTS_TABLE,x
-        clc
-        adc score_xx0000
-        sta score_xx0000
-	rts
-        
+        adc score_000000xx,x
+        sta score_000000xx,x
+        bcc .no_carry
+        inc score_000000xx+1,x
+.no_carry
+	inx
+        cpx #$04
+	bne .score_loop
+        rts
 
         
         

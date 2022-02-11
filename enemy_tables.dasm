@@ -31,21 +31,21 @@ ENEMY_HITPOINTS_TABLE:
         
         
 ENEMY_PLAYER_POINTS_TABLE:
-; offset would be x << 1 + x (i think)
-	byte #$00,#$00,#$00
-	byte #$00,#$00,#$00
-        byte #$00,#$00,#$05 ; birb
-        byte #$00,#$00, #56 ; maggs
-        byte #$00, #25, #00 ; starglass
-        byte #$00, #99, #99 ; skully
-        byte #$00,#$00,#$00 ; powerups
-        byte #$00,#$01,#$05 ; bat
-        byte #$06,#$06,#$06 ; vampire head
-        byte #$01,#$22,#$55 ; vamp bat
-        byte #$00,#$00,#$27 ; skeet
-        byte #$00,#$02,#$79 ; zigzag
-        byte #$00,#$02,#$79 ; chomps
-        byte #$ff,#$ff,#$ff ; spark
+	; msb to lsb
+	byte #$00,#$00,#$00,#$00
+	byte #$00,#$00,#$00,#$00
+        byte #$00,#$00,#$00,#$05 ; birb
+        byte #$00,#$00,#$00,#$56 ; maggs
+        byte #$00,#$00,#$25,#$00 ; starglass
+        byte #$00,#$00,#$00,#$ff ; skully
+        byte #$00,#$00,#$00,#$00 ; powerups
+        byte #$00,#$00,#$00,#$05 ; bat
+        byte #$00,#$06,#$06,#$06 ; vampire head
+        byte #$00,#$01,#$22,#$55 ; vamp bat
+        byte #$00,#$00,#$00,#$27 ; skeet
+        byte #$00,#$00,#$02,#$79 ; zigzag
+        byte #$00,#$00,#$02,#$79 ; chomps
+        byte #$00,#$40,#$ff,#$ff ; spark
         
 
 ENEMY_PLAYER_COLLISION_TABLE:

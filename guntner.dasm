@@ -72,7 +72,7 @@ collision_1_y	byte
 collision_1_w	byte
 collision_1_h	byte
 
-score_1		byte
+score_00000001	byte
 score_10	byte
 score_100	byte
 score_1000	byte
@@ -81,9 +81,10 @@ score_100000	byte
 score_1000000	byte
 score_10000000	byte
 ; 24 bit max value : 16777215
-score_0000xx	byte
-score_00xx00	byte
-score_xx0000	byte
+score_000000xx	byte
+score_0000xx00	byte
+score_00xx0000	byte
+score_xx000000	byte
 
 
 lifebar0	byte
