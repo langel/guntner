@@ -7,6 +7,8 @@ demo_time: subroutine
         
         ; start should return to menu in demo mode
         lda player_start_d
+        ora player_a_d
+        ora player_b_d
         cmp #$ff
         bne .player_check_for_dead
         jsr title_screen_init

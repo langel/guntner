@@ -13,6 +13,8 @@ dashboard_init: subroutine
         ; set hud y pos
         lda #182
         sta sprite_0_y
+        
+        ; COLOR SPLIT
         ; set split color attr for top row
 	PPU_SETADDR $27e8
 	lda #%11110001
@@ -21,6 +23,8 @@ dashboard_init: subroutine
         sta PPU_DATA
         inx
         bne .27e8_loop
+        
+        ; COLOR FULL
         ; set full color attr for the rest
 	PPU_SETADDR $27f0
 	lda #%11111111
@@ -29,6 +33,7 @@ dashboard_init: subroutine
         sta PPU_DATA
         inx
         bne .23f0_loop
+        
         ; fill page 1 bar for sprite 0 collisions
 	PPU_SETADDR $22c0
         lda #$04
@@ -37,6 +42,7 @@ dashboard_init: subroutine
         sta PPU_DATA
         dey
         bne .tile_dash_set_page1
+        
         ; fill page 2 dashboard top row
 	PPU_SETADDR $26c0
         lda #$04
@@ -45,14 +51,15 @@ dashboard_init: subroutine
 	sta PPU_DATA
         dey
         bne .set_top_bar
+        
 	; fill page 2 dashboard tiles
         lda #$1d
         ldx #$00
-.tile_dash_set_page2
+.dashboard_fill_tiles
 	lda dashboard_bg_tiles,x
         sta PPU_DATA
         inx
-        bne .tile_dash_set_page2
+        bne .dashboard_fill_tiles
 	rts
         
         
@@ -90,6 +97,7 @@ DASHBOARD_MESSAGES:
 	byte " G A M E O V Er " ; y = #$10
 	byte "gg ConGraTiON gg" ; y = #$20
 	byte " please unpause " ; y = #$30
+        
         
         
 dashboard_message_set: subroutine
