@@ -85,7 +85,7 @@ sprite_4_cleanup_for_next: subroutine
         clc
 	adc $0200+$03,y
         sta $0200+$03,y
-	lda #$03 ; move first sprite down 3 pixels
+	lda #$04 ; move first sprite down 3 pixels
         clc
         adc $0200+$00,y
         sta $0200+$00,y

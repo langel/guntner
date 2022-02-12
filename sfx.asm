@@ -166,6 +166,7 @@ sfx_enemy_death: subroutine
         sta audio_noise_pitch
         sta audio_noise_volume
 	rts
+        ; XXX wtf?
 	lda #%00001111
         sta $400c
         lda #%00000100

@@ -166,7 +166,7 @@ menu_screen_tile_data:
         .byte "  Much  Options "
         .byte #$00
         .hex 22d7
-	.byte " v2.0a "
+	.byte " v2.0f "
         .byte #$00
         .hex 2304
 	.byte "(c)MMXXII puke7, LoBlast"

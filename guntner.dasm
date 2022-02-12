@@ -8,12 +8,11 @@
 	org $0
 
 nmi_lockout	byte
+game_mode	byte
 sprite_0_y	byte
 scroll_x	byte
 scroll_page	byte
 scroll_y	byte
-wtf		byte
-game_mode	byte
 scroll_speed	byte
 scroll_speed_m	byte
 bg_tile_default	byte
@@ -54,15 +53,18 @@ player_a_d	byte
 player_dir_bits	byte ; matches controller
 player_boundless	byte
 
+wtf		byte
 rng0		byte
 rng1		byte
 rng2		byte
+
 starfield_col	byte
 starfield_rng	byte
 starfield_page	byte
 starfield_tile	byte
 starfield_col0	byte
 starfield_col1	byte
+
 collision_0_x	byte
 collision_0_y	byte
 collision_0_w	byte
@@ -147,6 +149,9 @@ phase_end_game		byte
 
 sine_scale		byte
 sine_out		byte
+
+temp00	byte
+temp01	byte
 
 sfx_frame_id		byte
 sfx_counter		byte
@@ -426,15 +431,13 @@ nmi_handler: subroutine
 	include "sfx.asm"
         nop	; how much prg space we using?
 
-        
+;e8b6 newnewnew
 ;ea9f bookmark new
 ;e666 bookmark old
         
 ; LOOKUP TABLES AT TOP OF RAM
-        org $fc80
+        org $fd00
 	include "sine.dasm"
-        nop	; how much prg space we using?
-	include "decimal_table.dasm"
         nop	; how much prg space we using?
 	include "scale_table.dasm"
         nop	; how much prg space we using?

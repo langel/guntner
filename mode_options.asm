@@ -70,22 +70,20 @@ options_screen_handler: subroutine
         lda #$00
         sta options_song_id
 .song_id_no_reset
-        asl
-        tax
-        lda decimal_table,x
+	lda #$30
         sta PPU_DATA
-        inx
-        lda decimal_table,x
+	lda options_song_id
+	clc
+        adc #$30
         sta PPU_DATA
 ; show sound id
 	PPU_SETADDR $2552
         lda options_sound_id
-        asl
-        tax
-        lda decimal_table,x
+	lda #$30
         sta PPU_DATA
-        inx
-        lda decimal_table,x
+	lda options_sound_id
+	clc
+        adc #$30
         sta PPU_DATA
 ; play music if on
 	lda options_music_on

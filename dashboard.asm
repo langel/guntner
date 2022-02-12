@@ -80,7 +80,7 @@ dashboard_bg_tiles:
         hex d1d1d1d1a4d3d1d1
         hex c3d1d1d1d1d1d21d
         ; score row 3
-	hex 1db05048415345b1
+	hex 1db057415645b1b1
 	hex b1b1b2b0b1b1b1b1
 	hex b1b1b1b2b2b0b1b1
 	hex b1b1b1b1b1b1b21d
@@ -136,13 +136,9 @@ dashboard_draw: subroutine
 	PPU_SETADDR phase_addr
         lda phase_current
         clc
-        adc #$01
-        asl
-        tax
-        lda decimal_table,x
+        adc #$31
         sta PPU_DATA
-        inx
-        lda decimal_table,x
+        lda #$20
         sta PPU_DATA
 
 .lifebarf
@@ -199,7 +195,7 @@ dashboard_draw: subroutine
         clc 
         adc #$30
         sta PPU_DATA
-        lda #$3a
+        lda #$aa
         sta PPU_DATA
         lda timer_seconds_10s
         clc 
@@ -251,6 +247,8 @@ dashboard_update: subroutine
 
 
 ; LIFEBARF
+	; XXX gut / refactor how lifebar messaging works
+        
 	; check if end game
 	lda phase_end_game
         cmp #$00
@@ -258,7 +256,7 @@ dashboard_update: subroutine
         ; "gg congration gg"
         ldy #$20
         jsr dashboard_message_set
-        jmp .super_done
+        jmp .no_lifebar
 .lifebarf_not_end_game
 	; if paused then just say P A U S E D
         ; wait maybe it says PLEASE UNPAUSE
@@ -270,7 +268,7 @@ dashboard_update: subroutine
         ; "please unpause"
         ldy #$30
         jsr dashboard_message_set
-        jmp .super_done
+        jmp .no_lifebar
         
 .lifebarf_is_live
         ; 64 health lines on screen
@@ -280,289 +278,41 @@ dashboard_update: subroutine
         
         ldy #$00
         
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sec
-        sbc #60
-        bcc .tile_0_no
-        sta lifebar0
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_0_no
-	lda #tile_empty
-        sta lifebar0
-.tile_0_done
-	iny
+        lda #$3c   ; #60 (4 less than max)
+        sta temp00 ; life value floor for tile
         
         lda player_health
         lsr
         lsr
-        ;sta $81
-        ; player_health at 64 range
+        sta temp01 ; life / 4 aka 0..63
+.find_top_tile
+        lda temp01
+        cmp temp00
+        bcs .top_tile_found ; life > tile floor value
+        lda temp00
         sec
-        sbc #56
-        bcc .tile_1_no
-        sta lifebar1
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_1_no
-	lda #tile_empty
-        sta lifebar1
-.tile_1_done
-	iny
-
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sec
-        sbc #52
-        bcc .tile_2_no
-        sta lifebar2
-        jmp .fill_remaining_bars
-.tile_2_no
-	lda #tile_empty
-        sta lifebar2
-.tile_2_done
-	iny
-
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sec
-        sbc #48
-        bcc .tile_3_no
-        sta lifebar3
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_3_no
-	lda #tile_empty
-        sta lifebar3
-.tile_3_done
-	iny
-
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sec
-        sbc #44
-        bcc .tile_4_no
-        sta lifebar4
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_4_no
-	lda #tile_empty
-        sta lifebar4
-.tile_4_done
-	iny
-
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sec
-        sbc #40
-        bcc .tile_5_no
-        sta lifebar5
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_5_no
-	lda #tile_empty
-        sta lifebar5
-.tile_5_done
-	iny
-
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sec
-        sbc #36
-        bcc .tile_6_no
-        sta lifebar6
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_6_no
-	lda #tile_empty
-        sta lifebar6
-.tile_6_done
-	iny
-
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sec
-        sbc #32
-        bcc .tile_7_no
-        sta lifebar7
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_7_no
-	lda #tile_empty
-        sta lifebar7
-.tile_7_done
-	iny
-
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sec
-        sbc #28
-        bcc .tile_8_no
-        sta lifebar8
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_8_no
-	lda #tile_empty
-        sta lifebar8
-.tile_8_done
-	iny
-
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sec
-        sbc #24
-        bcc .tile_9_no
-        sta lifebar9
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_9_no
-	lda #tile_empty
-        sta lifebar9
-.tile_9_done
-	iny
-
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sec
-        sbc #20
-        bcc .tile_a_no
-        sta lifebara
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_a_no
-	lda #tile_empty
-        sta lifebara
-.tile_a_done
-	iny
-
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sec
-        sbc #16
-        bcc .tile_b_no
-        sta lifebarb
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_b_no
-	lda #tile_empty
-        sta lifebarb
-.tile_b_done
-	iny
-
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sec
-        sbc #12
-        bcc .tile_c_no
-        sta lifebarc
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_c_no
-	lda #tile_empty
-        sta lifebarc
-.tile_c_done
-	iny
-
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sec
-        sbc #8
-        bcc .tile_d_no
-        sta lifebard
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_d_no
-	lda #tile_empty
-        sta lifebard
-.tile_d_done
-	iny
-
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sec
-        sbc #4
-        bcc .tile_e_no
-        sta lifebare
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_e_no
-	lda #tile_empty
-        sta lifebare
-.tile_e_done
-	iny
-
-        lda player_health
-        lsr
-        lsr
-        ;sta $81
-        ; player_health at 64 range
-        sta lifebarf
-        ;sta $80
-        jmp .fill_remaining_bars
-.tile_f_no
-	lda #tile_empty
-        sta lifebarf
-.tile_f_done
-	iny
-
-.fill_remaining_bars
-        lda #$03
-.draw_health_bar
-        iny
-        cpy #16
-        beq .super_done
-	;sta PPU_DATA
+        sbc #$04
+        sta temp00
+        lda #$20 ; empty tile
         sta lifebar0,y
-        jmp .draw_health_bar
-.super_done
-
-
+        iny
+        bne .find_top_tile
+.top_tile_found
+	lda temp01
+        sec
+        sbc temp00
+        sta lifebar0,y
+        iny
+.fill_remaining_tiles
+	lda #$03 ; full tile
+        sta lifebar0,y
+        iny
+        cpy #$11
+        bne .fill_remaining_tiles 
+.no_lifebar
+       
+       
 ; SCORE
-; XXX this is not translating correctly to the screen
-        
         ldx #$00
         ldy #$00
 .score_display_loop
