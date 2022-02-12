@@ -61,6 +61,8 @@ title_screen_handler: subroutine
         ;; disable start_d so game doesn't instantly pause
         lda #$00
         sta player_start_d
+        sta player_a_d
+        sta player_b_d
         lda #$11
         sta game_mode
         jsr game_init

@@ -153,33 +153,4 @@ NES_MIRR_QUAD	= 8
         pla
         ENDM
 
-;-------------------------------------------------------------------------------
-; SLEEP clockcycles
-; Original author: Thomas Jentzsch
-; Inserts code which takes the specified number of cycles to execute.  This is
-; useful for code where precise timing is required.
-; LEGAL OPCODE VERSION MAY AFFECT FLAGS (uses 'bit' opcode)
 
-NO_ILLEGAL_OPCODES = 1
-
-            MAC SLEEP            ;usage: SLEEP n (n>1)
-.CYCLES     SET {1}
-
-                IF .CYCLES < 2
-                    ECHO "MACRO ERROR: 'SLEEP': Duration must be > 1"
-                    ERR
-                ENDIF
-
-                IF .CYCLES & 1
-                    IFNCONST NO_ILLEGAL_OPCODES
-                        nop 0
-                    ELSE
-                        bit $00
-                    ENDIF
-.CYCLES             SET .CYCLES - 3
-                ENDIF
-            
-                REPEAT .CYCLES / 2
-                    nop
-                REPEND
-            ENDM

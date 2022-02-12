@@ -16,6 +16,8 @@ oam_ram_y      = $0200
 oam_ram_spr    = $0201
 oam_ram_att    = $0202
 
+oam_enemy_sprites = $0220
+
 
 
 ;;;; enemy types

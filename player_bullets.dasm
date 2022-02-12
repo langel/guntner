@@ -16,6 +16,7 @@ controller_input	.byte #$ff
 player_power		.byte #$ff
 
 bullet_data	= $03e0
+12_free_bytes	= $03f4
 
 
         
@@ -246,7 +247,7 @@ player_gun_turbo_fire: subroutine
         ; direction
         jsr player_gun_turbo_init_dir
         ; sprite
-        lda #$79
+        lda player_bullet_sprite
         sta bullet0+1,x
         ; palette
         lda #$01
