@@ -470,4 +470,4 @@ Palette00:
 
 ;;;;; GRAPHX
 	org $10000
-	incbin "char_rom.chr"
+	incbin "guntner.chr"
