@@ -35,16 +35,12 @@ skully_cycle: subroutine
         cmp #$00
         bne .not_dead
 .is_dead
-	lda #$f0
-        ;ldy enemy_oam_offset
-        sta oam_ram_y+4,y
 	inc phase_kill_count
         lda enemy_ram_type,x
         jsr enemy_give_points    
         ; change it into crossbones!
         jsr sfx_enemy_death
         lda #$01
-	ldx enemy_ram_offset
         sta enemy_ram_type,x
         jmp sprite_4_cleanup_for_next
 .not_dead

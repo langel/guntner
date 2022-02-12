@@ -375,6 +375,8 @@ enemy_set_palette_mirror: subroutine
         
 enemy_give_points: subroutine
         ; a = enemy type
+        stx temp00
+        sty temp01
         asl
         asl
         clc
@@ -393,6 +395,8 @@ enemy_give_points: subroutine
 	inx
         cpx #$04
 	bne .score_loop
+        ldx temp00
+        ldy temp01
         rts
 
         

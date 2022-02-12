@@ -44,7 +44,6 @@ birb_cycle: subroutine
         ; change it into crossbones!
         jsr sfx_enemy_death
         lda #$01
-	ldx enemy_ram_offset
         sta enemy_ram_type,x
         jmp .done
 .not_dead

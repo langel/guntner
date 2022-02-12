@@ -302,12 +302,11 @@ dashboard_update: subroutine
         sec
         sbc temp00
         sta lifebar0,y
-        iny
 .fill_remaining_tiles
 	lda #$03 ; full tile
         sta lifebar0,y
         iny
-        cpy #$11
+        cpy #$10
         bne .fill_remaining_tiles 
 .no_lifebar
        
