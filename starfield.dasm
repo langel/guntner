@@ -4,6 +4,7 @@ STARFIELD_MASK		.byte #$1f ; star probability against %00011111
 STARFIELD_COL0_START	.byte #$00
 STARFIELD_COL1_START	.byte #$08
 
+star_cache	EQU 	$0140
 
 starfield_init: subroutine
 ; set bg tile palette attributes / colors
@@ -47,6 +48,10 @@ death_scroll_speed:
         sta scroll_speed
         ; slow down stars
 .scroll_slow_done
+	rts
+        
+        
+starfield_render: subroutine
 	rts
 
 

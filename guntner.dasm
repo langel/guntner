@@ -89,24 +89,6 @@ score_00xx0000	byte
 score_xx000000	byte
 
 
-lifebar0	byte
-lifebar1	byte
-lifebar2	byte
-lifebar3	byte
-lifebar4	byte
-lifebar5	byte
-lifebar6	byte
-lifebar7	byte
-lifebar8	byte
-lifebar9	byte
-lifebara	byte
-lifebarb	byte
-lifebarc	byte
-lifebard	byte
-lifebare	byte
-lifebarf	byte
-
-
 timer_frames_1s		byte
 timer_frames_10s	byte
 timer_seconds_1s	byte
