@@ -29,6 +29,7 @@ title_screen_handler: subroutine
         ; number of seconds before demo
         cmp #$03
         ;cmp #$a3
+        ;cmp #$00
         bne .sit_and_wait
 .start_demo
         lda #$10

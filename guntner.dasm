@@ -276,13 +276,22 @@ cart_start:	subroutine
 
 
         
+        
 
 
 ;;;;; INTERRUPT HANDLERS
 
 nmi_handler: subroutine
 
-	SAVE_REGS
+	; 2250 cycles for PPU access (PAL is 7450 cycles)
+        ; "On NTSC, count on being able to copy 160 bytes 
+        ; to nametables or the palette using a moderately 
+        ; unrolled loop"
+        ; write 64 tiles?
+        ; write all palettes
+        ; oam dma
+
+	SAVE_REGS ; 13 cycles
         
 ; enable NMI lockout
 	lda nmi_lockout
@@ -295,6 +304,7 @@ nmi_handler: subroutine
         ; disable PPU
         
 ; load sprites
+	; 513 cycles
 	lda #$02
         sta PPU_OAM_DMA
         
@@ -312,6 +322,10 @@ nmi_handler: subroutine
         sta PPU_SCROLL
         lda #$f8
         sta PPU_SCROLL
+        
+        ; hope everything above was under
+        ; 2250 cycles!
+        
         
 ; main game logic
         jsr mode_handler_post_vblank
@@ -339,7 +353,7 @@ nmi_handler: subroutine
         sta nmi_lockout
         
 .nmi_end
-	RESTORE_REGS
+	RESTORE_REGS ; 16 cycles
 	rti
         
         

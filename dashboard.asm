@@ -8,6 +8,8 @@ score_addr		= $274c
 timer_addr		= $2756
 tile_empty		= $05
 
+dash_cache EQU $0100
+
 
 dashboard_init: subroutine
         ; set hud y pos
@@ -60,32 +62,43 @@ dashboard_init: subroutine
         sta PPU_DATA
         inx
         bne .dashboard_fill_tiles
+	ldx #$00
+.dash_cache_fill
+	lda dashboard_bg_tiles+$20,x
+        sta dash_cache,x
+	lda dashboard_bg_tiles+$80,x
+        sta dash_cache+$20,x
+        inx
+        cpx #$20
+        bne .dash_cache_fill
 	rts
         
         
 dashboard_bg_tiles:
-	; top row 0
+	; row 0 is top bar
+	; row 1 : top hud frames
 	hex 1da0a1a1a1a1a1a3
         hex a1a1a1a1a1a1a1a1
         hex a1a1a1a1a1a1a1a1
         hex a3a1a1a1a1a1a21d
-        ; health row 1
+        ; row 2 : health, meter, lives
 	hex 1db0a5a6a7a8b1b3
 	hex b1b1b1b1b1b1b1b1
         hex b1b1b1b1b1b1b1b1
         hex b310117830b1b21d
-        ; middle row 2
+        ; row 3 : middle hud frames
 	hex 1dd0d1d1d1d1d1c3
         hex d1d1a4d3d1d1d1d1
         hex d1d1d1d1a4d3d1d1
         hex c3d1d1d1d1d1d21d
-        ; score row 3
+        ; row 4 : wave, score, time
 	hex 1db057415645b1b1
 	hex b1b1b2b0b1b1b1b1
 	hex b1b1b1b2b2b0b1b1
 	hex b1b1b1b1b1b1b21d
-	; bottom 4
-	hex 1d1d1d1d1d1d1d1d
+	; row 5 : bottom hud frames
+        ; XXX should be better defined than solid tiles
+	hex 1d1d1d1d1d1d1d1d 
 	hex 1d1d1d1d1d1d1d1d
 	hex 1d1d1d1d1d1d1d1d
 	hex 1d1d1d1d1d1d1d1d
@@ -105,7 +118,7 @@ dashboard_message_set: subroutine
 	ldx #$00
 .loop
         lda DASHBOARD_MESSAGES,y
-        sta lifebar0,x
+        sta dash_cache+$08,x
         iny
         inx
         cpx #$10
@@ -117,7 +130,27 @@ dashboard_message_set: subroutine
 
 ; RENDER DASH STATS TO SCREEN
 dashboard_draw: subroutine
+	; top hud info row
+	PPU_SETADDR $2706 	; PPU_SETADDR is 12 cycles
+        ldx #$06
+.top_row_loop
+        lda dash_cache,x
+        sta PPU_DATA
+        inx
+        cpx #$1e
+        bne .top_row_loop
+        ; bottom hud info row
+        PPU_SETADDR $2748
+        ldx #$08
+.bottom_row_loop
+        lda dash_cache+$20,x
+        sta PPU_DATA
+        inx
+        cpx #$14
+        bne .bottom_row_loop
+        rts
 
+	; XXX these might need to stay like this
 .speed
 	PPU_SETADDR speed_addr
         lda player_speed
@@ -141,102 +174,7 @@ dashboard_draw: subroutine
         lda #$20
         sta PPU_DATA
 
-.lifebarf
-	PPU_SETADDR life_bar_addr
-        lda lifebar0
-        sta PPU_DATA
-        lda lifebar1
-        sta PPU_DATA
-        lda lifebar2
-        sta PPU_DATA
-        lda lifebar3
-        sta PPU_DATA
-        lda lifebar4
-        sta PPU_DATA
-        lda lifebar5
-        sta PPU_DATA
-        lda lifebar6
-        sta PPU_DATA
-        lda lifebar7
-        sta PPU_DATA
-        lda lifebar8
-        sta PPU_DATA
-        lda lifebar9
-        sta PPU_DATA
-        lda lifebara
-        sta PPU_DATA
-        lda lifebarb
-        sta PPU_DATA
-        lda lifebarc
-        sta PPU_DATA
-        lda lifebard
-        sta PPU_DATA
-        lda lifebare
-        sta PPU_DATA
-        lda lifebarf
-        sta PPU_DATA
 
-.timer 
-	; make sure player has lives / not game over
-	lda player_lives
-        cmp #$00
-        beq .timer_done
-        ; make sure player hasn't finished the game
-	lda phase_end_game
-        cmp #$01
-        beq .timer_done
-; we good to update the visual timer
-        PPU_SETADDR timer_addr
-        lda timer_minutes_10s
-        clc 
-        adc #$30
-        sta PPU_DATA
-        lda timer_minutes_1s
-        clc 
-        adc #$30
-        sta PPU_DATA
-        lda #$aa
-        sta PPU_DATA
-        lda timer_seconds_10s
-        clc 
-        adc #$30
-        sta PPU_DATA
-        lda timer_seconds_1s
-        clc 
-        adc #$30
-        sta PPU_DATA
-        lda #$2e
-        sta PPU_DATA
-        lda timer_frames_10s
-        clc 
-        adc #$30
-        sta PPU_DATA
-        lda timer_frames_1s
-        clc 
-        adc #$30
-        sta PPU_DATA
-.timer_done
-
-.score
-	PPU_SETADDR score_addr
-        lda #$30
-        ;sta PPU_DATA
-        lda score_10000000
-        sta PPU_DATA
-        lda score_1000000
-        sta PPU_DATA
-        lda score_100000
-        sta PPU_DATA
-        lda score_10000
-        sta PPU_DATA
-        lda score_1000
-        sta PPU_DATA
-        lda score_100
-        sta PPU_DATA
-        lda score_10
-        sta PPU_DATA
-        lda score_00000001
-        sta PPU_DATA
         
 	rts
         
@@ -245,6 +183,11 @@ dashboard_draw: subroutine
 ; GET DASH UPDATES READY TO RENDER
 dashboard_update: subroutine
 
+; player speed
+        lda player_speed
+        clc
+        adc #$31
+        sta $0100+6
 
 ; LIFEBARF
 	; XXX gut / refactor how lifebar messaging works
@@ -294,28 +237,26 @@ dashboard_update: subroutine
         sbc #$04
         sta temp00
         lda #$20 ; empty tile
-        sta lifebar0,y
+        sta dash_cache+$08,y
         iny
         bne .find_top_tile
 .top_tile_found
 	lda temp01
         sec
         sbc temp00
-        sta lifebar0,y
+        sta dash_cache+$08,y
+.fill_remaining_tiles
         iny
         cpy #$10
         beq .no_lifebar
-.fill_remaining_tiles
 	lda #$03 ; full tile
-        sta lifebar0,y
-        iny
-        cpy #$10
+        sta dash_cache+$08,y
         bne .fill_remaining_tiles 
 .no_lifebar
        
        
 ; SCORE
-        ldx #$00
+        ldx #$07
         ldy #$00
 .score_display_loop
 	lda score_000000xx,y
@@ -323,6 +264,7 @@ dashboard_update: subroutine
         clc
         adc #$30
         sta score_00000001,x
+        sta dash_cache+$2c,x
         lda score_000000xx,y
         lsr
         lsr
@@ -330,12 +272,65 @@ dashboard_update: subroutine
         lsr
         clc
         adc #$30
-        inx
+        dex
         sta score_00000001,x
-        inx
+        sta dash_cache+$2c,x
+        dex
         iny
         cpy #$04
         bne .score_display_loop
+        
+; TIMER	
+
+
+.timer 
+	; make sure player has lives / not game over
+	lda player_lives
+        cmp #$00
+        beq .timer_done
+        ; make sure player hasn't finished the game
+	lda phase_end_game
+        cmp #$01
+        beq .timer_done
+; we good to update the visual timer
+        ;PPU_SETADDR timer_addr
+        lda timer_minutes_10s
+        clc 
+        adc #$30
+        sta dash_cache+$36
+        ;sta PPU_DATA
+        lda timer_minutes_1s
+        clc 
+        adc #$30
+        ;sta PPU_DATA
+        sta dash_cache+$37
+        lda #$aa
+        ;sta PPU_DATA
+        sta dash_cache+$38
+        lda timer_seconds_10s
+        clc 
+        adc #$30
+        ;sta PPU_DATA
+        sta dash_cache+$39
+        lda timer_seconds_1s
+        clc 
+        adc #$30
+        ;sta PPU_DATA
+        sta dash_cache+$3a
+        lda #$2e
+        ;sta PPU_DATA
+        sta dash_cache+$3b
+        lda timer_frames_10s
+        clc 
+        adc #$30
+        ;sta PPU_DATA
+        sta dash_cache+$3c
+        lda timer_frames_1s
+        clc 
+        adc #$30
+        sta dash_cache+$3d
+        ;sta PPU_DATA
+.timer_done
 
         rts
         

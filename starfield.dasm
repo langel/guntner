@@ -51,9 +51,9 @@ death_scroll_speed:
 
 
 
-
 starfield_update: subroutine
-
+	
+        ; XXX this should be calculated before NMI head
 	; update scroll pos
 	lda scroll_y
         sec
@@ -63,6 +63,10 @@ starfield_update: subroutine
 .samepage
 	sta scroll_y
 	
+        
+
+; XXX holding star twinkles out for now
+; XXX need a palette manager
         ; twinkle them stars
         PPU_SETADDR $3f01
         lda starfield_col0
@@ -92,7 +96,6 @@ starfield_update: subroutine
         lda STARFIELD_COL0_START
         sta starfield_col1
 .col1_no_reset:
-        
 
 	; XXX hook this up with tile changing later
         ; probably hearts after killing a boss
