@@ -53,7 +53,7 @@ nametables_clear:
 	ldx #$00
         ldy #$00
         PPU_SETADDR $2000
-        lda #$20 ; 'space' is a clear tile
+        lda #$00 ; 'space' is a clear tile
 .page_loop
 .byte_loop
         sta PPU_DATA

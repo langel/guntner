@@ -28,7 +28,7 @@ game_init: subroutine
         ; set sprite 0
         lda sprite_0_y	;y
 	sta $200
-        lda #$f0	;tile
+        lda #$ff	;tile
         sta $201
         lda #$20	;flags
         sta $202

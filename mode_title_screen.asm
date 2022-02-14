@@ -27,9 +27,10 @@ title_screen_handler: subroutine
 .chord_played
 	lda timer_seconds_1s
         ; number of seconds before demo
-        cmp #$03
+        ; add #$30 because timer based on numerical tiles
+        cmp #$33
         ;cmp #$a3
-        ;cmp #$00
+        ;cmp #$30
         bne .sit_and_wait
 .start_demo
         lda #$10

@@ -6,6 +6,12 @@
 ; must capture max fall velocity (4px/frame)
 ; rise and fall needs full 8bit range
         
+; POWER UP TYPES
+; battery (partial and full) fill meter
+; mushroom makes everything trippy
+; machine gun does an autofire
+; slow down makes movement unbearable
+        
 powerup_from_starglasses:
 	ldx enemy_ram_offset
         ldy enemy_oam_offset

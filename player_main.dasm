@@ -13,12 +13,7 @@ player_game_reset: subroutine
         sta score_00xx0000
         sta score_0000xx00
         sta score_000000xx
-	sta timer_frames_1s	
-	sta timer_frames_10s	
-	sta timer_seconds_1s	
-	sta timer_seconds_10s	
-	sta timer_minutes_1s	
-	sta timer_minutes_10s	
+        jsr timer_reset
 	lda #$d0
         sta player_x_hi
         sta player_demo_x
