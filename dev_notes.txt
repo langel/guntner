@@ -35,6 +35,11 @@ rol a      ; 0:0000 00RR
 
 Kickstarter 100 / January 2022
 
+top tier puke's little helpers
+cave dingle - MicroD + BGT
+discord DM - Doug
+emails - Justin + Caylen
+
 source:
   - cartridge shells
   - rom chips
