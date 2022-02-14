@@ -1,8 +1,8 @@
 ;;;; Constants
 
-STARFIELD_MASK		.byte #$1f ; star probability against %00011111
+STARFIELD_MASK		.byte #%00011111 ; star probability
 STARFIELD_COL0_START	.byte #$00
-STARFIELD_COL1_START	.byte #$08
+STARFIELD_COL1_START	.byte #$07
 
 star_cache	EQU 	$0140
 
@@ -51,7 +51,8 @@ death_scroll_speed:
 	rts
         
         
-starfield_render: subroutine
+starfield_draw: subroutine
+	; copy tiles to PPU VRAM during vblank
 	rts
 
 
@@ -126,41 +127,35 @@ starfield_update: subroutine
         sta starfield_page
 .scroll_page_done
         
+        ; setup rng for star probability
         lda rng0
+        lsr
         and STARFIELD_MASK
         sta starfield_rng
         
 ;update_starfield_column
-	; XXX need to implement CTRL_INC_32 in PPU_CTRL
-	ldy #$00
-.col_loop
-.page_loop
+        lda #CTRL_INC_32
+        sta PPU_CTRL
+        ldy #$16
+        ; set base PPU address
 	lda starfield_page
         sta PPU_ADDR
         lda starfield_col
         sta PPU_ADDR
+.check_next_star
         cpy starfield_rng
-        bne .plot_empty
-.plot_star
+        bne .no_star
+.yes_star
 	lda starfield_tile
-        jmp .plot_done
-.plot_empty
+        jmp .stash_tile
+.no_star
 	lda #$20
-.plot_done
+.stash_tile
 	sta PPU_DATA
-        iny
-        cpy #$16
-        beq .col_done
-        lda #$20
-        clc
-        adc starfield_col
-        sta starfield_col
-        bcs .page_done
-        jmp .page_loop
-.page_done
-        inc starfield_page
-        jmp .col_loop
 .col_done
+        dey
+        bne .check_next_star
 	rts
+        
         
         

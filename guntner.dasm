@@ -292,12 +292,6 @@ nmi_handler: subroutine
         
 ; main game logic
         jsr mode_handler_vblank
-      
-; set horizontal scroll position       
-	lda scroll_page
-        and #$01
-        ora #CTRL_NMI|CTRL_BG_1000
-        sta PPU_CTRL
 ; TOP SCROLL
 	bit PPU_STATUS
         lda scroll_y
@@ -308,6 +302,12 @@ nmi_handler: subroutine
         ; hope everything above was under
         ; 2250 cycles!
         
+      
+; set horizontal scroll position       
+	lda scroll_page
+        and #$01
+        ora #CTRL_NMI|CTRL_BG_1000
+        sta PPU_CTRL
         
 ; main game logic
         jsr mode_handler_post_vblank

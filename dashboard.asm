@@ -1,5 +1,8 @@
 ;;; constants
 
+dash_page1_top_bar	= $22c0
+dash_page2_top_bar	= $26c0
+
 speed_addr		= $2706
 life_bar_addr		= $2708
 lives_addr		= $271d
@@ -37,7 +40,7 @@ dashboard_init: subroutine
         bne .23f0_loop
         
         ; fill page 1 bar for sprite 0 collisions
-	PPU_SETADDR $22c0
+	PPU_SETADDR dash_page1_top_bar
         lda #$04
         ldy #$20
 .tile_dash_set_page1
@@ -46,7 +49,7 @@ dashboard_init: subroutine
         bne .tile_dash_set_page1
         
         ; fill page 2 dashboard top row
-	PPU_SETADDR $26c0
+	PPU_SETADDR dash_page2_top_bar
         lda #$04
         ldy #$20
 .set_top_bar
@@ -61,6 +64,7 @@ dashboard_init: subroutine
 	lda dashboard_bg_tiles,x
         sta PPU_DATA
         inx
+        cpx #$a0
         bne .dashboard_fill_tiles
 	ldx #$00
 .dash_cache_fill

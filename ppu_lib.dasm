@@ -60,7 +60,7 @@ nametables_clear:
 	iny
         bne .byte_loop
         inx
-        cpx #$08
+        cpx #$09
         bne .page_loop
         rts
         

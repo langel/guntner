@@ -20,8 +20,8 @@ mode_handler_vblank: subroutine
         and #$10
         cmp #$10
         bne .not_game_time
-	jsr starfield_update
         jsr dashboard_draw
+	jsr starfield_update
         jmp .done
 .not_game_time
 	lda game_mode
