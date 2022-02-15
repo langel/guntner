@@ -17,9 +17,10 @@ chomps_spawn: subroutine
         jsr NextRandom
         sta rng2
         sta enemy_ram_ac,x ; animation counter
-        lsr
-        clc
-        adc #$0c
+        ;lsr
+        ;clc
+        ;adc #$0c
+        jsr enemy_spawn_random_y_pos
         sta enemy_ram_y,x ; y pos
    	rts
         

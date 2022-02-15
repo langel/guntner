@@ -16,8 +16,7 @@ maggs_spawn: subroutine
         jsr NextRandom
         sta rng0
         sta enemy_ram_pc,x ; pattern counter
-        tay
-        lda game_height_scale,y
+        jsr enemy_spawn_random_y_pos
         sta enemy_ram_y,x ; y pos      
    	rts
         

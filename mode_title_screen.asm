@@ -12,6 +12,24 @@ title_screen_init: subroutine
 	jsr menu_screens_draw
         
         jsr timer_reset
+; set bg tile palette attributes / colors
+; $23c0 and $27c0
+        ; page 1 attributes
+	PPU_SETADDR $23c0
+	lda #$00
+        ldx #$e0
+.23c0_loop
+        sta PPU_DATA
+        inx
+        bne .23c0_loop
+        ; page 2 attributes
+	PPU_SETADDR $27c0
+	lda #$00
+        ldx #$e0
+.27c0_loop
+        sta PPU_DATA
+        inx
+        bne .27c0_loop
 	rts
         
         

@@ -61,7 +61,6 @@ rng2		byte
 starfield_col	byte
 starfield_rng	byte
 starfield_page	byte
-starfield_tile	byte
 starfield_col0	byte
 starfield_col1	byte
 
@@ -119,9 +118,6 @@ phase_state		byte
 phase_temp_addr_lo	byte
 phase_temp_addr_hi	byte
 phase_end_game		byte
-
-sine_scale		byte
-sine_out		byte
 
 temp00	byte
 temp01	byte
@@ -431,19 +427,17 @@ nmi_handler: subroutine
         nop	; how much prg space we using?
 
         
-        
 	include "sfx.asm"
         nop	; how much prg space we using?
 
+;e7be
 ;e8b6 newnewnew
 ;ea9f bookmark new
 ;e666 bookmark old
         
 ; LOOKUP TABLES AT TOP OF RAM
-        org $fd00
+        org $fe00
 	include "sine.dasm"
-        nop	; how much prg space we using?
-	include "scale_table.dasm"
         nop	; how much prg space we using?
 
 

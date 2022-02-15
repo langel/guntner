@@ -4,13 +4,15 @@ STARFIELD_MASK		.byte #%00111111 ; star probability
 STARFIELD_COL0_START	.byte #$00
 STARFIELD_COL1_START	.byte #$07
 
+starfield_tile	.byte #$0f
+starempty_tile	.byte #$20
+
 star_cache	EQU 	$0140
+
 
 starfield_init: subroutine
 ; set bg tile palette attributes / colors
 ; $23c0 and $27c0
-	lda #$0f
-        sta starfield_tile
         ; page 1 attributes
 	PPU_SETADDR $23c0
 	lda #%00010100
@@ -53,13 +55,28 @@ death_scroll_speed:
         
 starfield_draw: subroutine
 	; copy tiles to PPU VRAM during vblank
-	rts
+;update_starfield_column
+        lda #CTRL_INC_32
+        sta PPU_CTRL
+        ; set base PPU address
+	lda starfield_page
+        sta PPU_ADDR
+        lda starfield_col
+        sta PPU_ADDR
+; rip from cache to PPU
+        ldy #$16
+.col_loop
+	lda star_cache,y
+        sta PPU_DATA
+        dey
+        bne .col_loop
+        rts
 
 
 
 starfield_update: subroutine
+	; precalculate all starfield things post sprite 0
 	
-        ; XXX this should be calculated before NMI head
 	; update scroll pos
 	lda scroll_y
         sec
@@ -69,39 +86,26 @@ starfield_update: subroutine
 .samepage
 	sta scroll_y
 	
-        
-
-; XXX holding star twinkles out for now
-; XXX need a palette manager
-        ; twinkle them stars
-        PPU_SETADDR $3f01
+        ; twinkle them stars with palette stuff
         lda starfield_col0
-        sta PPU_DATA
-        adc #$21
-        sta PPU_DATA
-        adc #$0d
-        sta PPU_DATA
-        inc starfield_col0
-        lda starfield_col0
-        cmp #$0d
-        bne .col0_no_reset
-        lda STARFIELD_COL0_START
+        jsr palette_next_rainbow_color
         sta starfield_col0
-.col0_no_reset:
-        PPU_SETADDR $3f05
+        sta pal_bg_0_1
+        clc
+        adc #$21
+        sta pal_bg_0_2
+        adc #$0d
+        sta pal_bg_0_3
         lda starfield_col1
-        sta PPU_DATA
-        adc #$20
-        sta PPU_DATA
-        adc #$0f
-        sta PPU_DATA
-        inc starfield_col1
-        lda starfield_col1
-        cmp #$0d
-        bne .col1_no_reset
-        lda STARFIELD_COL0_START
+        jsr palette_next_rainbow_color
         sta starfield_col1
-.col1_no_reset:
+        sta pal_bg_1_1
+        clc
+        adc #$21
+        sta pal_bg_1_2
+        adc #$0d
+        sta pal_bg_1_3
+        
 
 	; XXX hook this up with tile changing later
         ; probably hearts after killing a boss
@@ -133,30 +137,22 @@ starfield_update: subroutine
         lsr
         and STARFIELD_MASK
         sta starfield_rng
-        
-;update_starfield_column
-        lda #CTRL_INC_32
-        sta PPU_CTRL
-        ldy #$16
-        ; set base PPU address
-	lda starfield_page
-        sta PPU_ADDR
-        lda starfield_col
-        sta PPU_ADDR
-.check_next_star
-        cpy starfield_rng
-        bne .no_star
-.yes_star
+      	ldy #$00
+.col_assign_tile_loop
+	cpy starfield_rng
+        bne .empty_tile
+.star_tile
 	lda starfield_tile
-        jmp .stash_tile
-.no_star
-	lda #$20
-.stash_tile
-	sta PPU_DATA
-.col_done
-        dey
-        bne .check_next_star
-	rts
+        jmp .cache_tile
+.empty_tile
+	lda starempty_tile 
+.cache_tile
+	sta star_cache,y
+        iny
+        cpy #$16
+        bne .col_assign_tile_loop
+        rts
+        
         
         
         

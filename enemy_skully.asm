@@ -12,15 +12,7 @@ skully_spawn: subroutine
         lda #$00
         sta enemy_ram_x,x ; x pos
         sta enemy_ram_pc,x ; pattern counter
-        lda rng0
-        jsr NextRandom
-        sta rng0
-        tay
-        lda game_height_scale,y
-        sta enemy_ram_y,x ; y pos
-        lsr
-        clc
-        adc #$10
+        jsr enemy_spawn_random_y_pos
         sta enemy_ram_y,x ; y pos
    	rts
 

@@ -24,7 +24,7 @@ mode_handler_vblank: subroutine
         cmp #$10
         bne .not_game_time
         jsr dashboard_draw
-	jsr starfield_update
+	jsr starfield_draw
         jmp .done
 .not_game_time
 	lda game_mode
@@ -89,6 +89,7 @@ mode_handler_post_vblank: subroutine
         
         jsr apu_game_frame
 	jsr player_bullets_update
+        jsr starfield_update
         ; HUD prepare for next draw
         ; stop updating HUD if game over
         lda player_death_flag

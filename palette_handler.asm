@@ -51,6 +51,23 @@ palette_cache_colors: subroutine
         bne .loop
 	rts
         
+        
+palette_next_rainbow_color: subroutine
+	; a = current and return color
+        sta temp00
+        inc temp00
+        lda temp00
+        and #$0f
+        cmp #$0d
+        beq .wrap
+        lda temp00
+        rts
+.wrap
+        lda temp00
+        sec
+        sbc #$0c
+        rts
+        
 
 	; 12 + 32 x 7 = 236 cycles
 palette_frame_update: subroutine

@@ -252,6 +252,17 @@ player_dead_enemies_despawn: subroutine
         
         
 
+enemy_spawn_random_y_pos: subroutine
+	jsr get_next_random
+        lsr
+        sta temp00
+        lsr
+        lsr
+        clc
+        adc temp00
+        clc
+        adc #$08
+	rts
         
         
         
@@ -401,201 +412,78 @@ enemy_give_points: subroutine
         ldy temp01
         rts
 
-        
+
+; 16 1 sprite enemies
+; 4  2 sprite enemies
+; 8  4 sprite enemies
+; 28 total on screen enemies / entities
+; 1 sprite can occupy all slots
+; 2 sprite can occupy 12 slots
+; 4 sprite restricted to their 8 slots
         
         
 get_enemy_slot_1_sprite: subroutine
-	; returns enemy_ram_p
-.slot0
-	lda $0300
-        cmp #$00
-        bne .slot1
+	; returns enemy_ram offset
         lda #$00
-        jmp .found_slot
-.slot1
-	lda $0308
+.slot_loop
+	tax
+        stx temp00
+        lda $0300,x
         cmp #$00
-        bne .slot2
+        beq .slot_found
         lda #$08
-        jmp .found_slot
-.slot2
-	lda $0310
-        cmp #$00
-        bne .slot3
-        lda #$10
-        jmp .found_slot
-.slot3
-	lda $0318
-        cmp #$00
-        bne .slot4
-        lda #$18
-        jmp .found_slot
-.slot4
-	lda $0320
-        cmp #$00
-        bne .slot5
-        lda #$20
-        jmp .found_slot
-.slot5
-	lda $0328
-        cmp #$00
-        bne .slot6
-        lda #$28
-        jmp .found_slot
-.slot6
-	lda $0330
-        cmp #$00
-        bne .slot7
-        lda #$30
-        jmp .found_slot
-.slot7
-	lda $0338
-        cmp #$00
-        bne .slot8
-        lda #$38
-        jmp .found_slot
-.slot8
-	lda $0340
-        cmp #$00
-        bne .slot9
-        lda #$40
-        jmp .found_slot
-.slot9
-	lda $0348
-        cmp #$00
-        bne .slota
-        lda #$48
-        jmp .found_slot
-.slota
-	lda $0350
-        cmp #$00
-        bne .slotb
-        lda #$50
-        jmp .found_slot
-.slotb
-	lda $0358
-        cmp #$00
-        bne .slotc
-        lda #$58
-        jmp .found_slot
-.slotc
-	lda $0360
-        cmp #$00
-        bne .slotd
-        lda #$60
-        jmp .found_slot
-.slotd
-	lda $0368
-        cmp #$00
-        bne .slote
-        lda #$68
-        jmp .found_slot
-.slote
-	lda $0370
-        cmp #$00
-        bne .slotf
-        lda #$70
-        jmp .found_slot
-.slotf
-	lda $0378
-        cmp #$00
-        bne .slot_wtf_no
-        lda #$78
-        jmp .found_slot
-.slot_wtf_no
-;return #$ff for FALSE
-	lda #$ff
-.found_slot
+        clc
+        adc temp00
+        cmp #$80
+        bne .slot_loop
+.no_available_slot
+        ldx #$ff 
+.slot_found
+	txa
 	rts
         
         
+        
 get_enemy_slot_2_sprite: subroutine
-.slot0
-	lda $0380
-        cmp #$00
-        bne .slot1
+	; returns enemy_ram offset
         lda #$80
-        jmp .found_slot
-.slot1
-	lda $0388
+.slot_loop
+	tax
+        stx temp00
+        lda $0300,x
         cmp #$00
-        bne .slot2
-        lda #$88
-        jmp .found_slot
-.slot2
-	lda $0390
-        cmp #$00
-        bne .slot3
-        lda #$90
-        jmp .found_slot
-.slot3
-	lda $0398
-        cmp #$00
-        bne .slot_wtf_no
-        lda #$98
-        jmp .found_slot
-.slot_wtf_no
-;return #$ff for FALSE
-	lda #$ff
-.found_slot
+        beq .slot_found
+        lda #$08
+        clc
+        adc temp00
+        cmp #$a0
+        bne .slot_loop
+.no_available_slot
+        ldx #$ff 
+.slot_found
+	txa
 	rts
         
         
 get_enemy_slot_4_sprite: subroutine
-.slot0
-	lda $03a0
-        cmp #$00
-        bne .slot1
+	; returns enemy_ram offset
         lda #$a0
-        jmp .found_slot
-.slot1
-	lda $03a8
+.slot_loop
+	tax
+        stx temp00
+        lda $0300,x
         cmp #$00
-        bne .slot2
-        lda #$a8
-        jmp .found_slot
-.slot2
-	lda $03b0
-        cmp #$00
-        bne .slot3
-        lda #$b0
-        jmp .found_slot
-.slot3
-	lda $03b8
-        cmp #$00
-        bne .slot4
-        lda #$b8
-        jmp .found_slot
-.slot4
-	lda $03c0
-        cmp #$00
-        bne .slot5
-        lda #$c0
-        jmp .found_slot
-.slot5
-	lda $03c8
-        cmp #$00
-        bne .slot6
-        lda #$c8
-        jmp .found_slot
-.slot6
-	lda $03d0
-        cmp #$00
-        bne .slot7
-        lda #$d0
-        jmp .found_slot
-.slot7
-	lda $03d8
-        cmp #$00
-        bne .slot_wtf_no
-        lda #$d8
-        jmp .found_slot
-.slot_wtf_no
-;return #$ff for FALSE
-	lda #$ff
-.found_slot
+        beq .slot_found
+        lda #$08
+        clc
+        adc temp00
+        cmp #$e0
+        bne .slot_loop
+.no_available_slot
+        ldx #$ff 
+.slot_found
+	txa
 	rts
-        
         
 
 
