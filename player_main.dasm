@@ -46,34 +46,25 @@ player_game_reset: subroutine
         
         
 player_update_colors: subroutine
-	PPU_SETADDR $3f0d
+	; dashboard is bg_3
 	lda player_color0
-        sta PPU_DATA
+        ; XXX lets feel this out for a bit
+        sec
+        sbc #$10
+        sta pal_bg_3_1
 	lda player_color1
-        sta PPU_DATA
+        sta pal_bg_3_2
 	lda player_color2
-        sta PPU_DATA
-	PPU_SETADDR $3f11
+        sta pal_bg_3_3
+        ; player is spr_0
 	lda player_color2
-        sta PPU_DATA
+        sta pal_spr_0_1
 	lda player_color1
-        sta PPU_DATA
+        sta pal_spr_0_2
 	lda player_color0
-        sta PPU_DATA
+        sta pal_spr_0_3
 	rts
         
-        
-; set palette colors
-; set PPU address to palette start
-	PPU_SETADDR $3f00
-        ldy #0
-.loop:
-	lda Palette00,y	; lookup byte in ROM
-	sta PPU_DATA	; store byte to PPU data
-        iny		; Y = Y + 1
-        cpy #32		; is Y equal to 32?
-	bne .loop	; not yet, loop
-        rts		; return to caller
         
         
         

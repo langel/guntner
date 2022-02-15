@@ -1,6 +1,6 @@
 ;;;; Constants
 
-STARFIELD_MASK		.byte #%00011111 ; star probability
+STARFIELD_MASK		.byte #%00111111 ; star probability
 STARFIELD_COL0_START	.byte #$00
 STARFIELD_COL1_START	.byte #$07
 
@@ -105,8 +105,9 @@ starfield_update: subroutine
 
 	; XXX hook this up with tile changing later
         ; probably hearts after killing a boss
-	;lda #$7f
-        ;sta starfield_tile
+        ; XXX starfield_tile
+        ; #$0f star
+        ; #$90 heart
 
         
 	lda scroll_y

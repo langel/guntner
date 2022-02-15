@@ -3,13 +3,16 @@
 
 ; #$00 = title screen
 ; #$01 = options
-; #$02 = about
+; #$02 = about ( XXX not implemented )
 ; #$0a = scroll to options
 ; #$0b = scroll to titles
 ; #$10 = demo
 ; #$11 = game : normal playing
 ; #$12 = game : "phase world" display
 ; #$1f = game : sandbox mode
+
+; #$20 = palette fade out
+; #$21 = palette fade in
 
 
 
@@ -67,6 +70,7 @@ mode_handler_post_vblank: subroutine
         bne .not_sandbox_time
         jsr sandbox_time
 .not_sandbox_time
+
 	; wait for Sprite 0; SPRITE 0 WAIT TIME!!!
 .wait0	bit PPU_STATUS
         bvs .wait0
@@ -92,8 +96,6 @@ mode_handler_post_vblank: subroutine
         bne .skip_stuff
 	jsr dashboard_update
 .skip_dashboard_update
-	; XXX if we remove sprite 0 from title/options
-        ; XXX sfx by frame will not work here
 	lda game_mode
         cmp #$10
         bne .skip_stuff

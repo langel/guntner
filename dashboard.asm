@@ -258,7 +258,6 @@ dashboard_update: subroutine
         and #%00001111
         clc
         adc #$30
-        sta score_00000001,x
         sta dash_cache+$2c,x
         lda score_000000xx,y
         lsr
@@ -268,7 +267,6 @@ dashboard_update: subroutine
         clc
         adc #$30
         dex
-        sta score_00000001,x
         sta dash_cache+$2c,x
         dex
         iny
