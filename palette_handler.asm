@@ -1,5 +1,5 @@
 
-palette_cache	EQU $0140
+palette_cache	EQU $0158
 
 
 Palette00:
@@ -39,7 +39,7 @@ palette_init: subroutine
         cpy #25
         bne .loop
         rts
-        
+       
         
 palette_cache_colors: subroutine
 	ldy #$00
@@ -49,6 +49,86 @@ palette_cache_colors: subroutine
         iny
         cpy #25
         bne .loop
+	rts
+        
+palette_cache_restore: subroutine
+	ldy #$00
+.loop
+        lda palette_cache,y
+	sta pal_uni_bg,y
+        iny
+        cpy #25
+        bne .loop
+	rts
+
+
+palette_fade_in_init: subroutine
+        lda #$20
+        sta game_mode
+        jsr palette_cache_colors
+        lda #$40
+        sta pal_fade_c ; frame counter
+palette_fade_in_frame: subroutine
+	lda pal_fade_c
+        and #%11110000
+        sta pal_fade_offset
+	ldx #$00
+.loop
+	lda palette_cache,x
+        sec
+        sbc pal_fade_offset
+        bcs .no_reset
+        lda #$0f
+.no_reset
+	sta pal_uni_bg,x
+        inx
+        cpx #25
+        bne .loop
+        lda pal_fade_c
+        sec
+        sbc #$03
+        cmp #$10
+        bne .fade_mode_not_done
+        lda pal_fade_target
+        sta game_mode
+        jmp palette_cache_restore
+.fade_mode_not_done
+	sta pal_fade_c
+	rts
+        
+palette_fade_out_init: subroutine
+        lda #$21
+        sta game_mode
+        jsr palette_cache_colors
+        lda #$10
+        sta pal_fade_c ; frame counter
+palette_fade_out_frame: subroutine
+	lda pal_fade_c
+        and #%11110000
+        sta pal_fade_offset
+	ldx #$00
+.loop
+	lda palette_cache,x
+        sec
+        sbc pal_fade_offset
+        bcs .no_reset
+        lda #$0f
+.no_reset
+	sta pal_uni_bg,x
+        inx
+        cpx #25
+        bne .loop
+        lda pal_fade_c
+        clc
+        adc #$03
+        cmp #$40
+        bne .fade_mode_not_done
+        jsr palette_cache_restore
+        lda pal_fade_target
+        sta game_mode
+        jmp game_init
+.fade_mode_not_done
+	sta pal_fade_c
 	rts
         
         

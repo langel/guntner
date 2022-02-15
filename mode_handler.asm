@@ -11,8 +11,8 @@
 ; #$12 = game : "phase world" display
 ; #$1f = game : sandbox mode
 
-; #$20 = palette fade out
-; #$21 = palette fade in
+; #$20 = palette fade in
+; #$21 = palette fade out
 
 
 
@@ -49,6 +49,17 @@ mode_handler_vblank: subroutine
         
         
 mode_handler_post_vblank: subroutine
+	; check for fades
+        lda game_mode
+        cmp #$20
+        bcc .not_a_fade
+        cmp #$21
+        beq .fade_out
+.fade_in
+        jmp palette_fade_in_frame
+.fade_out
+	jmp palette_fade_out_frame
+.not_a_fade
 	; if game_mode < #$10 get outtta here
         lda game_mode
         cmp #$10

@@ -122,6 +122,9 @@ phase_end_game		byte
 temp00	byte
 temp01	byte
 
+pal_fade_c	byte
+pal_fade_offset	byte
+pal_fade_target	byte
 pal_uni_bg	byte
 pal_bg_0_1	byte
 pal_bg_0_2	byte
@@ -223,16 +226,7 @@ cart_start:	subroutine
         jsr dashboard_draw
         lda #$c0
         sta scroll_to_counter
-;============================== M O D E   I N I T   H E R E
-        jsr options_screen_init
-        jsr title_screen_init
-        ;lda #$0a
-        ;sta game_mode
         
-        ;jsr options_screen_init
-        ;jsr sandbox_init
-        
-        jsr WaitSync	; wait for VSYNC (and PPU warmup)
 ; set default player colors
 	lda #$14
         sta player_color0
@@ -242,8 +236,18 @@ cart_start:	subroutine
         sta player_color2
 	jsr player_update_colors
         
+;============================== M O D E   I N I T   H E R E
+        jsr options_screen_init
+        jsr title_screen_init
+        ;lda #$0a
+        ;sta game_mode
+        
+        ;jsr options_screen_init
+        ;jsr sandbox_init
+        
         
 ; activate PPU graphics       
+        jsr WaitSync	; wait for VSYNC (and PPU warmup)
 	; enable rendering
         lda #MASK_BG|MASK_SPR
         sta PPU_MASK	

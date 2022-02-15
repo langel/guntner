@@ -3,33 +3,16 @@
         
         
 title_screen_init: subroutine
+	jsr menu_screens_draw
 	lda #$00
+        sta pal_fade_target
         sta game_mode
         sta scroll_y
         sta scroll_page
         sta title_screen_chord_played
-        
-	jsr menu_screens_draw
-        
         jsr timer_reset
-; set bg tile palette attributes / colors
-; $23c0 and $27c0
-        ; page 1 attributes
-	PPU_SETADDR $23c0
-	lda #$00
-        ldx #$e0
-.23c0_loop
-        sta PPU_DATA
-        inx
-        bne .23c0_loop
-        ; page 2 attributes
-	PPU_SETADDR $27c0
-	lda #$00
-        ldx #$e0
-.27c0_loop
-        sta PPU_DATA
-        inx
-        bne .27c0_loop
+        jsr title_screen_handler
+        jmp palette_fade_in_init
 	rts
         
         
@@ -52,8 +35,8 @@ title_screen_handler: subroutine
         bne .sit_and_wait
 .start_demo
         lda #$10
-        sta game_mode
-        jsr game_init
+        sta pal_fade_target
+        jmp palette_fade_out_init
 .sit_and_wait
 	lda player_up_d
         ora player_down_d
