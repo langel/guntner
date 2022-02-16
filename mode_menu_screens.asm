@@ -19,6 +19,7 @@ scrollto_options_handler: subroutine
 	jmp menus_position_rudy
 	rts
         
+        
 scrollto_titles_handler: subroutine
 	lda #$00
         sta scroll_page
@@ -39,6 +40,7 @@ scrollto_titles_handler: subroutine
 .done
 	jmp menus_position_rudy
 	rts
+
 
 menus_position_rudy: subroutine
 	lda scroll_y
@@ -109,7 +111,7 @@ menu_screens_draw: subroutine
 ; $23c0 and $27c0
         ; page 1 attributes
 	PPU_SETADDR $23c0
-	lda #$00
+	lda #%10101010
         ldx #$e0
 .23c0_loop
         sta PPU_DATA
@@ -117,7 +119,7 @@ menu_screens_draw: subroutine
         bne .23c0_loop
         ; page 2 attributes
 	PPU_SETADDR $27c0
-	lda #$00
+	lda #%10101010
         ldx #$e0
 .27c0_loop
         sta PPU_DATA

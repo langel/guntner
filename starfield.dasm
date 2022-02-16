@@ -34,6 +34,8 @@ starfield_init: subroutine
         sta starfield_col0
         lda STARFIELD_COL1_START
         sta starfield_col1
+        ; XXX should go ahead and fill in all star tiles
+        ; before render
 	rts
         
         

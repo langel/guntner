@@ -20,6 +20,12 @@ ClearRAM: subroutine
         bne .clearRAM	; loop 256 times
         rts
 
+render_enable:
+	rts
+        
+redner_disable:
+	rts
+
 ; wait for VSYNC to start
 WaitSync:
 	bit PPU_STATUS

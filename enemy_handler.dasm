@@ -255,13 +255,8 @@ player_dead_enemies_despawn: subroutine
 enemy_spawn_random_y_pos: subroutine
 	jsr get_next_random
         lsr
-        sta temp00
-        lsr
-        lsr
         clc
-        adc temp00
-        clc
-        adc #$08
+        adc #$10
 	rts
         
         

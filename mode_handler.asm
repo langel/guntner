@@ -8,13 +8,53 @@
 ; #$0b = scroll to titles
 ; #$10 = demo
 ; #$11 = game : normal playing
-; #$12 = game : "phase world" display
-; #$1f = game : sandbox mode
+; #$12 = game : sandbox mode
+; #$13 = game : "phase world" display
 
 ; #$20 = palette fade in
 ; #$21 = palette fade out
 
-
+MODE_INIT_TABLE:
+	word title_screen_init
+        word options_screen_init
+        word #$00
+        word #$00
+        word #$00
+        word #$00
+        word #$00
+        word #$00
+        word #$00
+        word #$00
+        word #$00	; #$0a
+        word #$00
+        word #$00
+        word #$00
+        word #$00
+        word #$00
+        word game_init	; #$10
+        word game_init
+        word sandbox_init
+        
+MODE_HANDLER_TABLE:
+	word title_screen_handler
+        word options_screen_handler
+        word #$00
+        word #$00
+        word #$00
+        word #$00
+        word #$00
+        word #$00
+        word #$00
+        word #$00
+        word scrollto_options_handler	; #$0a
+        word scrollto_titles_handler
+        word #$00
+        word #$00
+        word #$00
+        word #$00
+        word demo_time	; #$10
+        word game_time
+        word sandbox_time
 
 
 ; runs at top of NMI
@@ -77,7 +117,7 @@ mode_handler_post_vblank: subroutine
         jsr game_time
 .not_game_time
 	lda game_mode
-        cmp #$1f
+        cmp #$12
         bne .not_sandbox_time
         jsr sandbox_time
 .not_sandbox_time

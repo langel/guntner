@@ -74,207 +74,36 @@ player_controls_read: subroutine
         bne .joy_read_loop	; repeat if X is 0
         
         sta player_controls
-               
-               
-.up
-	and #%00001000
-        cmp #%00001000
-        beq .up_pressed
-        bne .up_not_pressed
-.up_pressed
-	lda player_up
-        cmp #$00
-        bne .up_not_fresh
-        lda #$ff
-        sta player_up
-        sta player_up_d
-        jmp .up_done
-.up_not_fresh
-	lda #$00
-        sta player_up_d
-	jmp .up_done
-.up_not_pressed
-	lda #$00
-        sta player_up
-        sta player_up_d
-.up_done
-
-
-.right
-	lda player_controls
-	and #%00000001
-        cmp #%00000001
-        beq .right_pressed
-        bne .right_not_pressed
-.right_pressed
-	lda player_right
-        cmp #$00
-        bne .right_not_fresh
-        lda #$ff
-        sta player_right
-        sta player_right_d
-        jmp .right_done
-.right_not_fresh
-	lda #$00
-        sta player_right_d
-	jmp .right_done
-.right_not_pressed
-	lda #$00
-        sta player_right
-        sta player_right_d
-.right_done
-
-
-.down
-	lda player_controls
-	and #%00000100
-        cmp #%00000100
-        beq .down_pressed
-        bne .down_not_pressed
-.down_pressed
-	lda player_down
-        cmp #$00
-        bne .down_not_fresh
-        lda #$ff
-        sta player_down
-        sta player_down_d
-        jmp .down_done
-.down_not_fresh
-	lda #$00
-        sta player_down_d
-	jmp .down_done
-.down_not_pressed
-	lda #$00
-        sta player_down
-        sta player_down_d
-.down_done
-
-
-.left
-	lda player_controls
-	and #%00000010
-        cmp #%00000010
-        beq .left_pressed
-        bne .left_not_pressed
-.left_pressed
-	lda player_left
-        cmp #$00
-        bne .left_not_fresh
-        lda #$ff
-        sta player_left
-        sta player_left_d
-        jmp .left_done
-.left_not_fresh
-	lda #$00
-        sta player_left_d
-	jmp .left_done
-.left_not_pressed
-	lda #$00
-        sta player_left
-        sta player_left_d
-.left_done
-
-        
-.select
-	lda player_controls
-	and #%00100000
-        cmp #%00100000
-        beq .select_pressed
-        bne .select_not_pressed
-.select_pressed
-	lda player_select
-        cmp #$00
-        bne .select_not_fresh
-        lda #$ff
-        sta player_select
-        sta player_select_d
-        jmp .select_done
-.select_not_fresh
-	lda #$00
-        sta player_select_d
-	jmp .select_done
-.select_not_pressed
-	lda #$00
-        sta player_select
-        sta player_select_d
-.select_done
-
-
-.start
-	lda player_controls
-	and #%00010000
-        cmp #%00010000
-        beq .start_pressed
-        bne .start_not_pressed
-.start_pressed
-	lda player_start
-        cmp #$00
-        bne .start_not_fresh
-        lda #$ff
-        sta player_start
-        sta player_start_d
-        jmp .start_done
-.start_not_fresh
-	lda #$00
-        sta player_start_d
-	jmp .start_done
-.start_not_pressed
-	lda #$00
-        sta player_start
-        sta player_start_d
-.start_done
-        
-        
-.a
-	lda player_controls
-	and #%10000000
-        cmp #%10000000
-        beq .a_pressed
-        bne .a_not_pressed
-.a_pressed
-	lda player_a
-        cmp #$00
-        bne .a_not_fresh
-        lda #$ff
-        sta player_a
-        sta player_a_d
-        jmp .a_done
-.a_not_fresh
-	lda #$00
-        sta player_a_d
-	jmp .a_done
-.a_not_pressed
-	lda #$00
-        sta player_a
-        sta player_a_d
-.a_done
-
-
-.b
-	lda player_controls
-	and #%01000000
-        cmp #%01000000
-        beq .b_pressed
-        bne .b_not_pressed
-.b_pressed
-	lda player_b
-        cmp #$00
-        bne .b_not_fresh
-        lda #$ff
-        sta player_b
-        sta player_b_d
-        jmp .b_done
-.b_not_fresh
-	lda #$00
-        sta player_b_d
-	jmp .b_done
-.b_not_pressed
-	lda #$00
-        sta player_b
-        sta player_b_d
-.b_done
-
-	lda player_controls
+        ; XXX wtf is this?
         sta player_dir_bits 
+               
+        lda #$01
+        sta temp00
+        ldx #$00
+.joy_interpret_loop:
+	lda player_controls
+        and temp00
+        cmp temp00
+        bne .not_pressed
+.pressed
+	lda player_right,x
+        cmp #$00
+        bne .not_fresh
+        lda #$ff
+        sta player_right,x
+        sta player_right_d,x
+        jmp .button_done
+.not_fresh
+	lda #$00
+        sta player_right_d,x
+        jmp .button_done
+.not_pressed
+	lda #$00
+        sta player_right,x
+        sta player_right_d,x
+.button_done
+	inx
+        inx
+        asl temp00
+        bcc .joy_interpret_loop
         rts
-        
