@@ -20,10 +20,11 @@ ClearRAM: subroutine
         bne .clearRAM	; loop 256 times
         rts
 
+; disable PPU drawing and NMI
 render_enable:
 	rts
         
-redner_disable:
+render_disable:
 	rts
 
 ; wait for VSYNC to start

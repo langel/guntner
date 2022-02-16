@@ -170,6 +170,9 @@ nmi_handler: subroutine
 	include "ppu_lib.dasm"
         nop	; how much prg space we using?  
         
+	include "state_machine.asm"
+        nop	; how much prg space we using?
+        
 	include "collision_detection.dasm"
         nop	; how much prg space we using?
 

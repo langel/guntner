@@ -128,6 +128,8 @@ mode_handler_post_vblank: subroutine
         lda #$c0
 .wait1	bit PPU_STATUS
         beq .wait1
+        ; XXX change bg color here?
+        ; for stars-as-sprites situations
 	; HUD POSITIONING
         bit PPU_STATUS
         lda #$00
