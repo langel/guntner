@@ -19,6 +19,35 @@ on title return:
 	draw title screen
 	
 
+STATE MACHINE
+	each state has 4 subroutines
+		init, render, update, shutdown
+		*pointers can be to do-nothing generics
+	flags
+		rendering, sprite0, fade in, fade out, trip-mode, i-frames
+		
+	
+FADE IN/OUT orders of operation
+	used for transitions between soft_state(s)
+	fade in after soft_state inits
+	fade out before next soft_state inits
+	scrolling menus do not need fades
+	init of a soft_state means ppu rendering is off
+	
+FADE IN/OUT script
+	fade in title screen
+	fade out title/options screen
+	fade in? demo game
+	fade out demo game
+	repeat
+player hits start game
+	fade out title/options screen
+	fade in cut scene
+	fade out cut scene
+	fade in game start
+player game overs
+	
+
 
 
 ; get range 0..2 from 8bit value:
