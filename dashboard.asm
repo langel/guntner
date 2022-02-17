@@ -133,7 +133,7 @@ dashboard_message_set: subroutine
 
 
 ; RENDER DASH STATS TO SCREEN
-dashboard_draw: subroutine
+dashboard_render: subroutine
 	; top hud info row
 	PPU_SETADDR $2706 	; PPU_SETADDR is 12 cycles
         ldx #$06

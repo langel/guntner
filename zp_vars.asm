@@ -84,6 +84,17 @@ timer_seconds_10s	byte
 timer_minutes_1s	byte
 timer_minutes_10s	byte
 
+state_sprite0	byte
+state_fade_in	byte
+state_fade_out	byte
+state_tripmode	byte
+state_iframes	byte
+
+state_render_addr_lo	byte
+state_render_addr_hi	byte
+state_update_addr_lo	byte
+state_update_addr_hi	byte
+
 enemy_temp_addr_lo	byte
 enemy_temp_addr_hi	byte
 enemy_ram_offset	byte

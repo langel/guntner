@@ -63,8 +63,8 @@ mode_handler_vblank: subroutine
         and #$10
         cmp #$10
         bne .not_game_time
-        jsr dashboard_draw
-	jsr starfield_draw
+        jsr dashboard_render
+	jsr starfield_render
         jmp .done
 .not_game_time
 	lda game_mode
@@ -96,9 +96,9 @@ mode_handler_post_vblank: subroutine
         cmp #$21
         beq .fade_out
 .fade_in
-        jmp palette_fade_in_frame
+        jmp palette_fade_in_update
 .fade_out
-	jmp palette_fade_out_frame
+	jmp palette_fade_out_update
 .not_a_fade
 	; if game_mode < #$10 get outtta here
         lda game_mode

@@ -55,7 +55,7 @@ death_scroll_speed:
 	rts
         
         
-starfield_draw: subroutine
+starfield_render: subroutine
 	; copy tiles to PPU VRAM during vblank
 ;update_starfield_column
         lda #CTRL_INC_32
@@ -104,7 +104,7 @@ starfield_update: subroutine
         sta pal_bg_1_1
         clc
         adc #$21
-        sta pal_bg_1_2
+        ;sta pal_bg_1_2
         adc #$0d
         sta pal_bg_1_3
         

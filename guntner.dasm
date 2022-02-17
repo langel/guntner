@@ -43,7 +43,8 @@ cart_start:	subroutine
 	jsr player_game_reset
         jsr dashboard_init
         jsr dashboard_update
-        jsr dashboard_draw
+        ; XXX is this where this goes? :u
+        jsr dashboard_render
         lda #$c0
         sta scroll_to_counter
         
@@ -108,25 +109,21 @@ nmi_handler: subroutine
         inc nmi_lockout
         
 ; PPU vBLANK STUFF
-
-        ; 236 cycles
-        jsr palette_frame_update
-        
-; load sprites
-	; 513 cycles
+        ; jmp (state_render_addr_lo)
+        jsr mode_handler_vblank
+state_render_done:
+	; OAM DMA	513 cycles
 	lda #$02
         sta PPU_OAM_DMA
-        
-; main game logic
-        jsr mode_handler_vblank
-; TOP SCROLL
+        ; PALETTE	236 cycles
+        jsr palette_render
+	; SCROLL POS	17 cycles
 	bit PPU_STATUS
         lda scroll_y
         sta PPU_SCROLL
         lda #$f8
         sta PPU_SCROLL
-      
-; set horizontal scroll position       
+	; NAMETABLE++	9 cycles     
 	lda scroll_page
         and #$01
         ora #CTRL_NMI|CTRL_BG_1000
@@ -137,16 +134,15 @@ nmi_handler: subroutine
         
 ; main game logic
         jsr mode_handler_post_vblank
-        
-; read Player Controls
+        ; jmp (state_update_addr_lo)
+        ; XXX if sprite0 set wait
+state_update_done:
         jsr player_controls_read
-        
-; frame counter        
-	inc wtf
-; update global time
-	jsr timer_update 
-; rng updates
-	lda rng0
+        ;jsr apu_manage
+        jsr palette_update
+	inc wtf	; frame counter  
+	jsr timer_update ; update global time
+	lda rng0 ; rng updates
         jsr NextRandom
         sta rng0
 	lda rng1
@@ -173,6 +169,13 @@ nmi_handler: subroutine
 	include "state_machine.asm"
         nop	; how much prg space we using?
         
+	include "palette.asm"
+        nop	; how much prg space we using?
+	include "dashboard.asm"
+        nop	; how much prg space we using?
+	include "starfield.dasm"
+        nop	; how much prg space we using?
+        
 	include "collision_detection.dasm"
         nop	; how much prg space we using?
 
@@ -193,12 +196,6 @@ nmi_handler: subroutine
 	include "mode_game.asm"
         nop	; how much prg space we using?
 	include "mode_sandbox.asm"
-        nop	; how much prg space we using?
-        
-	include "dashboard.asm"
-        nop	; how much prg space we using?
-        
-	include "starfield.dasm"
         nop	; how much prg space we using?
         
 	include "powerups.asm"
@@ -250,8 +247,6 @@ nmi_handler: subroutine
 	include "apu_engine.asm"
         nop	; how much prg space we using?    
 	include "apu_sfx.asm"
-        nop	; how much prg space we using?
-	include "palette_engine.asm"
         nop	; how much prg space we using?
 
 ;e7be
