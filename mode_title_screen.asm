@@ -91,13 +91,8 @@ title_screen_handler: subroutine
         sta title_screen_color
 .dont_reset_screen_color
         adc #$01
-        tay
-	PPU_SETADDR $3f01
-        tya
-        sta PPU_DATA
-	PPU_SETADDR $3f09
-        tya
-        sta PPU_DATA
+        sta pal_bg_0_1
+        sta pal_bg_2_1
 	rts
         
 title_screen_set_rudy_y: subroutine
