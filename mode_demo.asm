@@ -1,7 +1,25 @@
 
 
 
-demo_time: subroutine
+demo_init:
+	jsr game_init_generic
+        lda #5
+        jsr state_update_set_addr
+        rts
+        
+        
+
+demo_update: subroutine
+
+        ; HUD prepare for next draw
+        ; stop updating HUD if game over
+        lda player_death_flag
+        cmp #$00
+        bne .skip_stuff
+        jsr demo_enemy_spawn
+	jsr player_demo_controls
+.skip_stuff
+
 	; read user controls even in demo mode!
 	jsr player_change_speed
         
@@ -57,18 +75,24 @@ demo_time: subroutine
 .death_already_set
 	inc you_dead_counter
         lda you_dead_counter
+        cmp #80
+        beq .trigger_fadeout
         cmp #120
         bne .still_dead
         
+	jmp state_update_done
+        
+.trigger_fadeout
         ; GO BACK TO TITLE SCREEN 
         ; AFTER DEATH SEQUENCE
-        jsr menu_screens_init
+	lda #0
+	jsr palette_fade_out_init
 .still_dead
 .done
         jsr update_enemies
         ; spawn enemies
 .done_and_paused
-	rts
+	jmp state_update_done
         
         
         

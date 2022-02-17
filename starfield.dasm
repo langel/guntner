@@ -75,7 +75,8 @@ starfield_render: subroutine
         ; put that shit back to sequential order
         lda #0
         sta PPU_CTRL
-        rts
+        jsr dashboard_render
+        jmp state_render_done
 
 
 

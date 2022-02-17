@@ -6,7 +6,7 @@
 	org $0
 
 nmi_lockout	byte
-game_mode	byte
+
 sprite_0_y	byte
 scroll_x	byte
 scroll_page	byte

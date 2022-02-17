@@ -90,12 +90,20 @@ palette_state_reset:
 
 
 palette_fade_in_init: subroutine
-        lda #$20
-        sta game_mode
+	; a = init callback index
+        sta pal_fade_target
+        ; make sure we're not already fading out
+	lda state_fade_out
+        cmp #$00
+        bne .init_skip
+.init_fade
         lda #$40
         sta pal_fade_c ; frame counter
         lda #$ff
         sta state_fade_in
+.init_skip
+        rts
+        
 palette_fade_in_update: subroutine
 	lda pal_fade_c
         and #%11110000
@@ -118,19 +126,25 @@ palette_fade_in_update: subroutine
         cmp #$10
         bne .fade_mode_not_done
         jsr palette_state_reset
-        lda pal_fade_target
-        sta game_mode
 .fade_mode_not_done
 	sta pal_fade_c
 	rts
         
 palette_fade_out_init: subroutine
-        lda #$21
-        sta game_mode
+	; a = init callback index
+        sta pal_fade_target
+        ; make sure we're not already fading out
+	lda state_fade_out
+        cmp #$00
+        bne .init_skip
+.init_fade
         lda #$10
         sta pal_fade_c ; frame counter
         lda #$ff
         sta state_fade_out
+.init_skip
+        rts
+        
 palette_fade_out_update: subroutine
 	lda pal_fade_c
         and #%11110000
@@ -153,12 +167,12 @@ palette_fade_out_update: subroutine
         cmp #$5e
         bne .fade_mode_not_done
         jsr palette_state_reset
-        lda pal_fade_target
-        sta game_mode
-        jmp game_init
+	lda pal_fade_target
+        jmp state_init_call
 .fade_mode_not_done
 	sta pal_fade_c
 	rts
+        
 
 	; 12 + 32 x 7 = 236 cycles
 palette_render: subroutine

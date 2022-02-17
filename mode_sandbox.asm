@@ -1,8 +1,12 @@
 
 sandbox_init: subroutine
-	lda #$1f
-        sta game_mode
+
         jsr game_init
+        
+        lda #2
+        jsr state_render_set_addr
+        lda #7
+        jsr state_update_set_addr
         
 	; XXX temp palette
         PPU_SETADDR $3F19
@@ -80,7 +84,7 @@ sandbox_init: subroutine
         rts
         
         
-sandbox_time: subroutine
+sandbox_update: subroutine
 	lda wtf
         cmp #$00
         bne .no_sfx

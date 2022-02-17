@@ -86,6 +86,14 @@ powerups_cycle: subroutine
         ; give it sfx
         jsr sfx_battery_hit
 .frame
+	lda enemy_ram_y,x
+        sta oam_ram_y,y
+        ; XXX sprite shouldn't be hardcoded
+        lda #$2b
+        sta oam_ram_spr,y
+        ; XXX attr shouldn't be hardcoded
+	lda #$03
+        sta oam_ram_att,y
         lda enemy_ram_pc,x
 	cmp #$ff
         beq .max_velocity

@@ -69,17 +69,17 @@ mode_handler_post_vblank: subroutine
         lda game_mode
         cmp #$10
         bne .not_demo_time
-        jsr demo_time
+;        jsr demo_time
 .not_demo_time
 	lda game_mode
         cmp #$11
         bne .not_game_time
-        jsr game_time
+;        jsr game_time
 .not_game_time
 	lda game_mode
         cmp #$12
         bne .not_sandbox_time
-        jsr sandbox_time
+;        jsr sandbox_time
 .not_sandbox_time
 
         

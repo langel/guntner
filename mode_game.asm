@@ -1,13 +1,10 @@
 
 
-game_init: subroutine
-; redraw playfield/hud
-	; disable rendering
-        lda #$00
-        sta PPU_MASK	
-	jsr starfield_init
+game_init_generic: subroutine
+
+	jsr render_disable
         
-        lda #$01
+        lda #2
         jsr state_render_set_addr
         
         ; draw dashbar top bar on title screen page
@@ -19,28 +16,24 @@ game_init: subroutine
         dey
         bne .set_top_bar
         
-        
-	; enable rendering
-        lda #MASK_BG|MASK_SPR
-        sta PPU_MASK	
         jsr timer_reset
-; set player position
 	jsr player_game_reset
-; SPRITE HANDLINGS
         
-        ; set sprite 0
-        lda sprite_0_y	;y
-	sta $200
-        lda #$ff	;tile
-        sta $201
-        lda #$20	;flags
-        sta $202
-        lda #$01	;xpos
-        sta $203
+        jsr state_sprite0_enable
+        jsr render_enable
+        jsr palette_fade_in_init
+        rts
+        
+
+game_init:
+	jsr game_init_generic
+        lda #6
+        jsr state_update_set_addr
         rts
 
 
-game_time: subroutine
+
+game_update: subroutine
 	; read user controls even in demo mode!
 	jsr player_change_speed
         
@@ -147,4 +140,4 @@ game_time: subroutine
 .done
         jsr update_enemies
 .done_and_paused
-	rts
+	jmp state_update_done

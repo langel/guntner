@@ -42,6 +42,23 @@
 
 ; star update is based on starfield state
 
+STATE_INIT_FUNCTION_TABLE:
+	.word	menu_screens_init		; 0
+        .word	demo_init			; 1
+        .word	game_init			; 2
+        
+state_init_call:
+	; a = function table slot
+        asl
+        tax
+	lda STATE_INIT_FUNCTION_TABLE,x
+        sta boss_v0
+        inx
+	lda STATE_INIT_FUNCTION_TABLE,x
+        sta boss_v1
+        jmp (boss_v0)
+        rts
+	
 
 STATE_RENDER_FUNCTION_TABLE:
 	.word	state_render_do_nothing		; 0
@@ -54,6 +71,9 @@ STATE_UPDATE_FUNCTION_TABLE:
         .word	scrollto_options_update		; 2
         .word	options_screen_update		; 3
         .word	scrollto_titles_update		; 4
+        .word	demo_update			; 5
+        .word	game_update			; 6
+        .word	sandbox_update			; 7
 
 
 
@@ -85,4 +105,24 @@ state_update_set_addr:
         inx
 	lda STATE_UPDATE_FUNCTION_TABLE,x
         sta state_update_addr_hi
+        rts
+
+state_sprite0_enable:
+        lda #$01
+        sta oam_ram_x
+        lda sprite_0_y
+	sta oam_ram_y
+        lda #$ff
+        sta oam_ram_spr
+        lda #$20
+        sta oam_ram_att
+        lda #$ff
+        sta state_sprite0
+        rts
+        
+state_sprite0_disable:
+	lda #$ff
+        sta oam_ram_y
+        lda #$00
+        sta state_sprite0
         rts

@@ -59,6 +59,10 @@ cart_start:	subroutine
         sta player_color2
 	jsr player_update_colors
         
+        jsr WaitSync
+        jsr WaitSync
+        jsr WaitSync
+        
 ;============================== M O D E   I N I T   H E R E
 	jsr menu_screens_init
         ;lda #$0a
@@ -149,6 +153,16 @@ sprite0_wait:
 	lda #$01
         ora #CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
+        ; must be game mode
+        jsr apu_game_frame
+	jsr player_bullets_update
+        jsr starfield_update
+        ; HUD prepare for next draw
+        ; stop updating HUD if game over
+        lda player_death_flag
+        cmp #$00
+        bne sprite0_done
+	jsr dashboard_update
 sprite0_done:
 
         jsr player_controls_read
@@ -196,9 +210,6 @@ sprite0_done:
         nop	; how much prg space we using?
 
 	include "timer_global.dasm"
-        nop	; how much prg space we using?
-        
-	include "mode_handler.asm"
         nop	; how much prg space we using?
 
 	include "mode_demo.asm"

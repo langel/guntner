@@ -4,6 +4,7 @@ menu_screens_init: subroutine
         jsr WaitSync	; wait for VSYNC
         jsr render_disable
 	jsr sprite_clear
+        jsr state_sprite0_disable
         
 	lda #$01
         jsr state_render_set_addr
@@ -245,7 +246,7 @@ menu_screen_tile_data:
         .byte "  Much  Options "
         .byte #$00
         .hex 22d7
-	.byte " v2.13 "
+	.byte " v2.17 "
         .byte #$00
         .hex 2304
 	.byte "(c)MMXXII puke7, LoBlast"
@@ -305,9 +306,8 @@ title_screen_update: subroutine
         ;cmp #$30
         bne .sit_and_wait
 .start_demo
-        lda #$10
-        sta pal_fade_target
-        jmp palette_fade_out_init
+        lda #1
+        jsr palette_fade_out_init
 .sit_and_wait
 	lda player_up_d
         ora player_down_d
@@ -337,9 +337,8 @@ title_screen_update: subroutine
         sta player_start_d
         sta player_a_d
         sta player_b_d
-        lda #$11
-        sta game_mode
-        jsr game_init
+        lda #2
+        jsr palette_fade_out_init
         jsr clear_all_enemies
         jmp .do_nothing
 .goto_options
@@ -383,9 +382,9 @@ options_screen_update: subroutine
         beq .dont_start_game
         lda #$00
         sta player_start_d
-        lda #$11
-        sta game_mode
         jsr game_init
+        lda #6
+        jsr state_update_set_addr
         rts
         
 .dont_start_game
