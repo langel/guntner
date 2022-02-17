@@ -7,7 +7,7 @@ title_screen_init: subroutine
 	lda #$00
         sta pal_fade_target
         sta game_mode
-        sta scroll_y
+        sta scroll_x
         sta scroll_page
         sta title_screen_chord_played
         jsr timer_reset

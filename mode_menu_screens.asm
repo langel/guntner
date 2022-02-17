@@ -5,7 +5,7 @@ scrollto_options_handler: subroutine
         sta scroll_to_counter
         tax
         lda sine_table,x
-        sta scroll_y
+        sta scroll_x
         cpx #$40
         bne .done
         ; setup options
@@ -13,7 +13,7 @@ scrollto_options_handler: subroutine
         sta game_mode
         sta scroll_page
         lda #$00
-        sta scroll_y
+        sta scroll_x
         ;jmp options_screen_init
 .done
 	jmp menus_position_rudy
@@ -29,7 +29,7 @@ scrollto_titles_handler: subroutine
         sta scroll_to_counter
         tax
         lda sine_table,x
-        sta scroll_y
+        sta scroll_x
         cpx #$c0
         bne .done
         ; setup options
@@ -43,7 +43,7 @@ scrollto_titles_handler: subroutine
 
 
 menus_position_rudy: subroutine
-	lda scroll_y
+	lda scroll_x
         cmp #$00
         bne .do_eeet
         rts
@@ -54,13 +54,13 @@ menus_position_rudy: subroutine
 	jsr title_screen_set_rudy_y
 	lda #$3a
 	sec
-        sbc scroll_y
+        sbc scroll_x
 	jmp .plot_tiles
 .coming_from_right
 	jsr options_screen_set_rudy_y
 	lda #$38
         sec
-        sbc scroll_y
+        sbc scroll_x
 .plot_tiles
         sta oam_ram_rudy+3
         clc

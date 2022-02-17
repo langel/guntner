@@ -7,7 +7,7 @@ options_screen_init: subroutine
         sta options_song_id	
         sta options_sound_id
         sta options_rudy_pos
-        sta scroll_y
+        sta scroll_x
         
 ; reset music?
 	lda #$00

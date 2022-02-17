@@ -33,6 +33,9 @@ cart_start:	subroutine
         lda #$ff
         sta rng2
         
+        lda #$f8
+        sta scroll_y ; just seems right
+        
         jsr sine_init
         
         jsr palette_init
@@ -119,9 +122,9 @@ state_render_done:
         jsr palette_render
 	; SCROLL POS	17 cycles
 	bit PPU_STATUS
-        lda scroll_y
+        lda scroll_x
         sta PPU_SCROLL
-        lda #$f8
+        lda scroll_y
         sta PPU_SCROLL
 	; NAMETABLE++	9 cycles     
 	lda scroll_page

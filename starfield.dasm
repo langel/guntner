@@ -72,6 +72,9 @@ starfield_render: subroutine
         sta PPU_DATA
         dey
         bne .col_loop
+        ; put that shit back to sequential order
+        lda #0
+        sta PPU_CTRL
         rts
 
 
@@ -80,13 +83,13 @@ starfield_update: subroutine
 	; precalculate all starfield things post sprite 0
 	
 	; update scroll pos
-	lda scroll_y
+	lda scroll_x
         sec
         sbc scroll_speed
         bcs .samepage
         inc scroll_page
 .samepage
-	sta scroll_y
+	sta scroll_x
 	
         ; twinkle them stars with palette stuff
         lda starfield_col0
@@ -104,7 +107,7 @@ starfield_update: subroutine
         sta pal_bg_1_1
         clc
         adc #$21
-        ;sta pal_bg_1_2
+        sta pal_bg_1_2
         adc #$0d
         sta pal_bg_1_3
         
@@ -116,7 +119,7 @@ starfield_update: subroutine
         ; #$90 heart
 
         
-	lda scroll_y
+	lda scroll_x
         lsr
         lsr
         lsr

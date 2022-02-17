@@ -78,6 +78,13 @@ palette_update: subroutine
         cpy #25
         bne .loop
 	rts
+        
+        
+palette_state_reset:
+	lda #$00
+        sta state_fade_in
+        sta state_fade_out
+        rts
 
 
 palette_fade_in_init: subroutine
@@ -85,6 +92,8 @@ palette_fade_in_init: subroutine
         sta game_mode
         lda #$40
         sta pal_fade_c ; frame counter
+        lda #$ff
+        sta state_fade_in
 palette_fade_in_update: subroutine
 	lda pal_fade_c
         and #%11110000
@@ -106,6 +115,7 @@ palette_fade_in_update: subroutine
         sbc #$03
         cmp #$10
         bne .fade_mode_not_done
+        jsr palette_state_reset
         lda pal_fade_target
         sta game_mode
 .fade_mode_not_done
@@ -117,6 +127,8 @@ palette_fade_out_init: subroutine
         sta game_mode
         lda #$10
         sta pal_fade_c ; frame counter
+        lda #$ff
+        sta state_fade_out
 palette_fade_out_update: subroutine
 	lda pal_fade_c
         and #%11110000
@@ -138,6 +150,7 @@ palette_fade_out_update: subroutine
         adc #$03
         cmp #$5e
         bne .fade_mode_not_done
+        jsr palette_state_reset
         lda pal_fade_target
         sta game_mode
         jmp game_init
