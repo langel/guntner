@@ -172,8 +172,6 @@ audio_root_tone         byte
 audio_pattern_pos	byte
 audio_pattern_num       byte
 
-
-title_screen_chord_played	byte
 title_screen_color	byte
 title_rudy_pos		byte
 

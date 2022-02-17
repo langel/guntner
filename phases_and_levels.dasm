@@ -337,10 +337,12 @@ phase_end_cycle: subroutine
 	; wow sound   
         jsr apu_make_it_hum
 	; hit start to return to title screen
+        ; XXX should the player have to hit START
+        ; after they beat the game, really?
         lda player_start_d
         cmp #$00
         beq .keep_flying
-        jsr title_screen_init
+        jsr menu_screens_init
 .keep_flying
 	rts
 	

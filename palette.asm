@@ -35,6 +35,8 @@ palette_init: subroutine
 .loop
 	lda Palette00,y
         sta pal_uni_bg,y
+        lda #$00
+        sta palette_cache,y
         iny
         cpy #25
         bne .loop

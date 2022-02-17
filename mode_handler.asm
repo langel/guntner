@@ -14,47 +14,7 @@
 ; #$20 = palette fade in
 ; #$21 = palette fade out
 
-MODE_INIT_TABLE:
-	word title_screen_init
-        word options_screen_init
-        word #$00
-        word #$00
-        word #$00
-        word #$00
-        word #$00
-        word #$00
-        word #$00
-        word #$00
-        word #$00	; #$0a
-        word #$00
-        word #$00
-        word #$00
-        word #$00
-        word #$00
-        word game_init	; #$10
-        word game_init
-        word sandbox_init
-        
-MODE_HANDLER_TABLE:
-	word title_screen_handler
-        word options_screen_handler
-        word #$00
-        word #$00
-        word #$00
-        word #$00
-        word #$00
-        word #$00
-        word #$00
-        word #$00
-        word scrollto_options_handler	; #$0a
-        word scrollto_titles_handler
-        word #$00
-        word #$00
-        word #$00
-        word #$00
-        word demo_time	; #$10
-        word game_time
-        word sandbox_time
+
 
 
 ; runs at top of NMI
@@ -70,19 +30,19 @@ mode_handler_vblank: subroutine
 	lda game_mode
         cmp #$00
         bne .not_title_screen
-        jmp title_screen_handler
+        jmp title_screen_update
 .not_title_screen
 	cmp #$01
         bne .not_options_screen
-        jmp options_screen_handler
+;        jmp options_screen_handler
 .not_options_screen
 	cmp #$0a
         bne .not_scrollto_options
-        jmp scrollto_options_handler
+;        jmp scrollto_options_handler
 .not_scrollto_options
 	cmp #$0b
         bne .done
-        jmp scrollto_titles_handler
+;        jmp scrollto_titles_handler
 .done
 	rts
         
@@ -122,23 +82,6 @@ mode_handler_post_vblank: subroutine
         jsr sandbox_time
 .not_sandbox_time
 
-	; wait for Sprite 0; SPRITE 0 WAIT TIME!!!
-.wait0	bit PPU_STATUS
-        bvs .wait0
-        lda #$c0
-.wait1	bit PPU_STATUS
-        beq .wait1
-        ; XXX change bg color here?
-        ; for stars-as-sprites situations
-	; HUD POSITIONING
-        bit PPU_STATUS
-        lda #$00
-        sta PPU_SCROLL
-        sta PPU_SCROLL
-	; set bg pos to page 2
-	lda #$01
-        ora #CTRL_NMI|CTRL_BG_1000
-        sta PPU_CTRL
         
         jsr apu_game_frame
 	jsr player_bullets_update

@@ -20,11 +20,19 @@ ClearRAM: subroutine
         bne .clearRAM	; loop 256 times
         rts
 
+
 ; disable PPU drawing and NMI
 render_enable:
+        lda #MASK_BG|MASK_SPR
+        sta PPU_MASK	
+        lda #CTRL_NMI|CTRL_BG_1000
+        sta PPU_CTRL	
 	rts
         
 render_disable:
+	lda #$00
+        sta PPU_MASK	
+        sta PPU_CTRL	
 	rts
 
 ; wait for VSYNC to start
@@ -32,6 +40,7 @@ WaitSync:
 	bit PPU_STATUS
 	bpl WaitSync
         rts
+        
 
 ;;;;; RANDOM NUMBERS
 
@@ -71,6 +80,7 @@ nametables_clear:
         bne .page_loop
         rts
         
+        
 sprite_clear:
         lda #$00
         tax
@@ -81,10 +91,3 @@ sprite_clear:
 	rts
         
         
-scroll_pos_reset:
-        lda #0
-        sta PPU_SCROLL
-        sta PPU_SCROLL  ; PPU scroll = $0000     
-        rts
-        
-

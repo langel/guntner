@@ -22,7 +22,6 @@ cart_start:	subroutine
         
 ; CLEAR CPU RAM
         jsr ClearRAM	; clear RAM
-        jsr scroll_pos_reset
         jsr apu_init
 
 ; MY SETUP
@@ -61,8 +60,7 @@ cart_start:	subroutine
 	jsr player_update_colors
         
 ;============================== M O D E   I N I T   H E R E
-        jsr options_screen_init
-        jsr title_screen_init
+	jsr menu_screens_init
         ;lda #$0a
         ;sta game_mode
         
@@ -70,16 +68,6 @@ cart_start:	subroutine
         ;jsr sandbox_init
         
         
-; activate PPU graphics       
-        jsr WaitSync	; wait for VSYNC (and PPU warmup)
-	; enable rendering
-        lda #MASK_BG|MASK_SPR
-        sta PPU_MASK	
-        ; enable NMI
-        lda #$00
-        sta nmi_lockout
-        lda #CTRL_NMI|CTRL_BG_1000
-        sta PPU_CTRL	
 .endless
 	jmp .endless	; endless loop
 
@@ -112,8 +100,8 @@ nmi_handler: subroutine
         inc nmi_lockout
         
 ; PPU vBLANK STUFF
-        ; jmp (state_render_addr_lo)
-        jsr mode_handler_vblank
+        jmp (state_render_addr_lo)
+        ;jsr mode_handler_vblank
 state_render_done:
 	; OAM DMA	513 cycles
 	lda #$02
@@ -136,10 +124,33 @@ state_render_done:
         ; ~2250 cycles!
         
 ; main game logic
-        jsr mode_handler_post_vblank
-        ; jmp (state_update_addr_lo)
-        ; XXX if sprite0 set wait
+        ;jsr mode_handler_post_vblank
+        jmp (state_update_addr_lo)
 state_update_done:
+
+sprite0_wait:
+	lda state_sprite0
+        cmp #$00
+        beq sprite0_done
+	; wait for Sprite 0; SPRITE 0 WAIT TIME!!!
+.wait0	bit PPU_STATUS
+        bvs .wait0
+        lda #$c0
+.wait1	bit PPU_STATUS
+        beq .wait1
+        ; XXX change bg color here?
+        ; for stars-as-sprites situations
+	; HUD POSITIONING
+        bit PPU_STATUS
+        lda #$00
+        sta PPU_SCROLL
+        sta PPU_SCROLL
+	; set bg pos to page 2 for dashboard
+	lda #$01
+        ora #CTRL_NMI|CTRL_BG_1000
+        sta PPU_CTRL
+sprite0_done:
+
         jsr player_controls_read
         ;jsr apu_manage
         jsr palette_update
@@ -171,6 +182,8 @@ state_update_done:
         
 	include "state_machine.asm"
         nop	; how much prg space we using?
+	include "state_menu_screens.asm"
+        nop	; how much prg space we using?
         
 	include "palette.asm"
         nop	; how much prg space we using?
@@ -186,12 +199,6 @@ state_update_done:
         nop	; how much prg space we using?
         
 	include "mode_handler.asm"
-        nop	; how much prg space we using?
-	include "mode_menu_screens.asm"
-        nop	; how much prg space we using?
-	include "mode_title_screen.asm"
-        nop	; how much prg space we using?
-	include "mode_options.asm"
         nop	; how much prg space we using?
 
 	include "mode_demo.asm"

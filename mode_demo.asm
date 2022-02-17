@@ -11,7 +11,7 @@ demo_time: subroutine
         ora player_b_d
         cmp #$ff
         bne .player_check_for_dead
-        jsr title_screen_init
+        jsr menu_screens_init
         jmp .done_and_paused
         
 .player_check_for_dead
@@ -62,7 +62,7 @@ demo_time: subroutine
         
         ; GO BACK TO TITLE SCREEN 
         ; AFTER DEATH SEQUENCE
-        jsr title_screen_init
+        jsr menu_screens_init
 .still_dead
 .done
         jsr update_enemies

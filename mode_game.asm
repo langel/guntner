@@ -7,6 +7,9 @@ game_init: subroutine
         sta PPU_MASK	
 	jsr starfield_init
         
+        lda #$01
+        jsr state_render_set_addr
+        
         ; draw dashbar top bar on title screen page
 	PPU_SETADDR $22c0
         lda #$04
@@ -118,7 +121,7 @@ game_time: subroutine
         bne .next_life
         ; no lives left game over
         ; GO BACK TO TITLE SCREEN AFTER DEATH SEQUENCE
-        jmp title_screen_init
+        jmp menu_screens_init
         
 .next_life
 	; set star speed
