@@ -85,7 +85,7 @@ chomps_cycle: subroutine
         adc #$4a
         sta oam_ram_spr,y
 .frame_done
-        lda #$02
+        lda #$01
         jsr enemy_set_palette
 .done
 	jmp update_enemies_handler_next

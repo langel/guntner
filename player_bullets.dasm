@@ -15,8 +15,7 @@ player_bullet_sprite	.byte #$79
 controller_input	.byte #$ff
 player_power		.byte #$ff
 
-bullet_data	= $03e0
-12_free_bytes	= $03f4
+bullet_data	= 188
 
 
         
@@ -206,7 +205,7 @@ player_gun_normal_fire: subroutine
         lda #$79
         sta bullet0+1,x
         ; palette
-        lda #$01
+        lda #$00
         sta bullet0+2,x
         jmp .done
 .next
@@ -250,7 +249,7 @@ player_gun_turbo_fire: subroutine
         lda player_bullet_sprite
         sta bullet0+1,x
         ; palette
-        lda #$01
+        lda #$00
         sta bullet0+2,x
         jmp .done
 .next

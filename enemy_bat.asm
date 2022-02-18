@@ -105,7 +105,7 @@ bat_cycle: subroutine
         ldy enemy_oam_offset
         sta oam_ram_y,y
         ; set palette
-        lda #$01
+        lda #$03
         jsr enemy_set_palette
 .done
 	jmp update_enemies_handler_next

@@ -9,6 +9,8 @@
 ; $300 entity data
 ; $400-7ff sine scale tables
 
+unused_ram	EQU	$3e0
+
 
 ;;;;; NES CARTRIDGE HEADER
 

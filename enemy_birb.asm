@@ -95,7 +95,7 @@ birb_cycle: subroutine
         adc #$2c
         sta oam_ram_spr,y
 .frame_done
-        lda #$01
+        lda #$03
         jsr enemy_set_palette
 .done
 	jmp update_enemies_handler_next

@@ -1,5 +1,5 @@
 
-palette_cache	EQU $da
+palette_cache	EQU 231
 
 
 Palette00:		; 25 bytes
@@ -10,9 +10,10 @@ Palette00:		; 25 bytes
         hex 02113c	;background 2
         hex 0b1a3b	;background 3
         hex 192939	;sprite 0
-        hex 132130	;sprite 1
+        ;hex 132130	;sprite 1; old birb palete
+        hex 051637
         hex 071727	;sprite 2
-        hex 013530	;sprite 3
+        hex 013530	;sprite 3 
         
         
 ; bg 0 - stars 1

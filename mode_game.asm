@@ -107,6 +107,7 @@ game_update_generic: subroutine
         sta player_death_flag
         sta you_dead_counter
         ; reset player sprites
+        ; XXX player sprites should be set in one place
         ldx #$8f ; set tiles
         stx $205
         dex 

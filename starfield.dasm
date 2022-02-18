@@ -7,7 +7,7 @@ STARFIELD_COL1_START	.byte #$07
 starfield_tile	.byte #$0f
 starempty_tile	.byte #$20
 
-star_cache	EQU 	$c0
+star_cache	EQU 	208
 
 
 starfield_init: subroutine
