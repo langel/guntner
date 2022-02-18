@@ -35,6 +35,7 @@ menu_screens_init: subroutine
         inx
         bne .27c0_loop
         
+	jsr player_game_reset
         jsr dashboard_init
         jsr dashboard_update
         jsr dashboard_render
@@ -211,9 +212,8 @@ options_screen_set_rudy_y: subroutine
         asl
         clc
         adc #$48
-        sta oam_ram_rudy
-        sta oam_ram_rudy+4
-        rts
+        sta player_y_hi
+        jmp set_player_sprite
 
         
         
@@ -231,7 +231,7 @@ menu_screen_tile_data:
         .byte "  Much  Options "
         .byte #$00
         .hex 22d7
-	.byte " v2.17 "
+	.byte " v2.1a "
         .byte #$00
         .hex 2304
 	.byte "(c)MMXXII puke7, LoBlast"

@@ -9,6 +9,13 @@ demo_init:
         jsr state_update_set_addr
         lda #$ff
         sta demo_true
+  ; SCROLL SPEED
+  	lda #$07
+        sta scroll_speed
+        asl
+        asl
+        asl
+        sta scroll_speed_m
         rts
         
         

@@ -13,6 +13,10 @@ phase_handler: subroutine
         clc
         adc #$03
         sta scroll_speed
+        asl
+        asl
+        asl
+        sta scroll_speed_m
 .speed_skip
 	; get current phase lookup table position
         lda phase_current

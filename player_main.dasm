@@ -1,6 +1,8 @@
 
 oam_ram_rudy      = $0204
 
+player_dead_tile .byte #$0a
+
 player_game_reset: subroutine
 	lda #$00
         sta phase_current
@@ -28,18 +30,6 @@ player_game_reset: subroutine
 	lda #$03
         sta player_lives
         sta player_gun_str
-  ; SCROLL SPEED
-  	lda #$07
-        sta scroll_speed
-        asl
-        asl
-        asl
-        sta scroll_speed_m
-        
-        ldx #$8f ; set tiles
-        stx $205
-        dex 
-        stx $209
         rts
         
   
@@ -69,6 +59,12 @@ player_update_colors: subroutine
         
         
 player_take_damage: subroutine
+	; make sure iframes are not enable
+        lda state_iframes
+        cmp #$00
+        beq .apply_damage
+        rts
+.apply_damage
 ; damage amount in player_damage
 	lda player_health
         sec
@@ -80,11 +76,6 @@ player_take_damage: subroutine
 	; player_health 00 means DEATH
 	lda #$00
         sta player_health
-        ; change sprite
-        ; XXX this gets overwritten sometimes?
-	lda #$0a
-        sta $0205
-        sta $0209
         rts
  
         
@@ -103,9 +94,29 @@ set_player_sprite: subroutine
 ; attributes
         sta $206
         sta $20a
-        ; XXX sprites
-        ; not sure where this was set for the game
-        ; setting it here for options screen
+        
+        lda player_health
+        cmp #$00
+        bne .not_dead
+.is_dead
+	lda player_dead_tile
+        sta oam_ram_rudy+5
+        sta oam_ram_rudy+1
+        rts
+.not_dead
+	lda state_iframes
+        cmp #$00
+        beq .not_iframes
+        dec state_iframes
+        lsr
+        lsr
+        and #1
+        beq .not_iframes
+        lda #$8d
+        sta oam_ram_rudy+5
+        sta oam_ram_rudy+1
+        rts
+.not_iframes
         lda #$8e
         sta oam_ram_rudy+5
         lda #$8f

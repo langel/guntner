@@ -95,30 +95,16 @@ game_update_generic: subroutine
 	jsr palette_fade_out_init
         jmp .done
 .next_life
-	; set star speed
-        ; XXX lets check all scroll_speed references someday!
-        ;lda #$07
-        ;sta scroll_speed
-        ;asl
-        ;asl
-        ;asl
-        ;sta scroll_speed_m
         ; reset health
 	lda #$ff
         sta player_health
         ; turn on iframes
-        lda #100
+        lda #120
         sta state_iframes
         ; reset death sequence timers
         lda #$00
         sta player_death_flag
         sta you_dead_counter
-        ; reset player sprites
-        ; XXX player sprites should be set in one place
-        ldx #$8f ; set tiles
-        stx $205
-        dex 
-        stx $209
 
 .player_not_dead
 
@@ -144,9 +130,10 @@ game_update_generic: subroutine
         lda #$04
         sta player_damage
 ;; XXX FORCE QUICK DEATH
-        jsr player_take_damage
+        ;jsr player_take_damage
 .done
         jsr update_enemies
+        jsr set_player_sprite
 	rts
         
         
@@ -159,6 +146,10 @@ game_update:
         beq .done_and_paused
         jsr phase_handler
         jsr game_update_generic
+        
+	lda player_health
+        cmp #$00
+        beq .done_and_paused
 		
 	jsr player_move_position
         jsr player_bullets_check_controls
