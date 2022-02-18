@@ -10,8 +10,7 @@ menu_screens_init: subroutine
         jsr state_render_set_addr
 	lda #$01
         jsr state_update_set_addr
-	lda #$00
-        sta pal_fade_target
+        lda #$00
         sta scroll_x
         sta scroll_page
         jsr timer_reset
@@ -22,7 +21,7 @@ menu_screens_init: subroutine
         ; page 1 attributes
 	PPU_SETADDR $23c0
 	lda #%10101010
-        ldx #$e0
+        ldx #$c0
 .23c0_loop
         sta PPU_DATA
         inx
@@ -30,11 +29,15 @@ menu_screens_init: subroutine
         ; page 2 attributes
 	PPU_SETADDR $27c0
 	lda #%10101010
-        ldx #$e0
+        ldx #$c0
 .27c0_loop
         sta PPU_DATA
         inx
         bne .27c0_loop
+        
+        jsr dashboard_init
+        jsr dashboard_update
+        jsr dashboard_render
         
 ; G u n T n e R
 

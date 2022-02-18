@@ -7,7 +7,7 @@ STARFIELD_COL1_START	.byte #$07
 starfield_tile	.byte #$0f
 starempty_tile	.byte #$20
 
-star_cache	EQU 	$0140
+star_cache	EQU 	$c0
 
 
 starfield_init: subroutine
@@ -16,15 +16,24 @@ starfield_init: subroutine
         ; page 1 attributes
 	PPU_SETADDR $23c0
 	lda #%00010100
-        ldx #$e0
+        ldx #$d8
 .23c0_loop
         sta PPU_DATA
         inx
         bne .23c0_loop
+        ; COLOR SPLIT
+        ; set split color attr for top row
+	PPU_SETADDR $23e8
+	lda #%11110001
+        ldx #$f8
+.27e8_loop
+        sta PPU_DATA
+        inx
+        bne .27e8_loop
         ; page 2 attributes
 	PPU_SETADDR $27c0
 	lda #%00010100
-        ldx #$e0
+        ldx #$d8
 .27c0_loop
         sta PPU_DATA
         inx
@@ -34,8 +43,30 @@ starfield_init: subroutine
         sta starfield_col0
         lda STARFIELD_COL1_START
         sta starfield_col1
-        ; XXX should go ahead and fill in all star tiles
-        ; before render
+; draw stars on nametable 1
+        lda #CTRL_INC_32
+        sta PPU_CTRL
+        ;stx starfield_page
+	ldx #$00
+.draw_stars_loop
+        stx starfield_col
+        jsr get_next_random
+        jsr starfield_cache_next_col
+	lda #$20
+        sta PPU_ADDR
+        lda starfield_col
+        sta PPU_ADDR
+        ldy #$16
+.transfer_loop
+	lda star_cache,y
+        sta PPU_DATA
+        dey
+        bne .transfer_loop
+        inx
+        cpx #$20
+        bne .draw_stars_loop
+        lda #0
+        sta PPU_CTRL
 	rts
         
         
@@ -138,6 +169,7 @@ starfield_update: subroutine
         sta starfield_page
 .scroll_page_done
         
+starfield_cache_next_col:
         ; setup rng for star probability
         lda rng0
         lsr

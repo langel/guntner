@@ -43,10 +43,7 @@ cart_start:	subroutine
         
         jsr nametables_clear
 	jsr player_game_reset
-        jsr dashboard_init
-        jsr dashboard_update
-        ; XXX is this where this goes? :u
-        jsr dashboard_render
+        
         lda #$c0
         sta scroll_to_counter
         

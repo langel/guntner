@@ -97,7 +97,7 @@ palette_fade_in_init: subroutine
         cmp #$00
         bne .init_skip
 .init_fade
-        lda #$40
+        lda #$00
         sta pal_fade_c ; frame counter
         lda #$ff
         sta state_fade_in
@@ -106,25 +106,21 @@ palette_fade_in_init: subroutine
         
 palette_fade_in_update: subroutine
 	lda pal_fade_c
-        and #%11110000
+        ora #%00001111
         sta pal_fade_offset
 	ldx #$00
 .loop
 	lda pal_uni_bg,x
-        sec
-        sbc pal_fade_offset
-        bcs .no_reset
-        lda #$0f
-.no_reset
+        and pal_fade_offset
 	sta palette_cache,x
         inx
         cpx #25
         bne .loop
         lda pal_fade_c
-        sec
-        sbc #$03
-        cmp #$10
-        bne .fade_mode_not_done
+        clc
+        adc #$03
+        cmp #$40
+        bcc .fade_mode_not_done
         jsr palette_state_reset
 .fade_mode_not_done
 	sta pal_fade_c
@@ -164,8 +160,8 @@ palette_fade_out_update: subroutine
         lda pal_fade_c
         clc
         adc #$03
-        cmp #$5e
-        bne .fade_mode_not_done
+        cmp #$60
+        bcc .fade_mode_not_done
         jsr palette_state_reset
 	lda pal_fade_target
         jmp state_init_call

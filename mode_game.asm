@@ -7,6 +7,8 @@ game_init_generic: subroutine
         lda #2
         jsr state_render_set_addr
         
+        jsr starfield_init
+        
         ; draw dashbar top bar on title screen page
 	PPU_SETADDR $22c0
         lda #$04
