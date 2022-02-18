@@ -24,7 +24,9 @@ demo_update: subroutine
         ora player_b_d
         cmp #$ff
         bne .menu_return_buttons_not_pressed
-        jsr menu_screens_init
+        lda #0
+	jsr palette_fade_out_init
+	jmp state_update_done
 .menu_return_buttons_not_pressed
 
 	jsr demo_enemy_spawn
