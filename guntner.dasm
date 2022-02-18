@@ -166,6 +166,7 @@ sprite0_wait:
         cmp #$00
         bne sprite0_done
 	jsr dashboard_update
+        jsr get_enemy_slots_next
 sprite0_done:
 
         jsr player_controls_read

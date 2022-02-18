@@ -416,7 +416,69 @@ enemy_give_points: subroutine
 ; 2 sprite can occupy 12 slots
 ; 4 sprite restricted to their 8 slots
         
+get_enemy_slots_next:
         
+;get_enemy_slot_1_sprite: subroutine
+	; returns enemy_ram offset
+        lda #$00
+.slot_1_loop
+	tax
+        stx temp00
+        lda $0300,x
+        cmp #$00
+        beq .slot_1_found
+        lda #$08
+        clc
+        adc temp00
+        cmp #$80
+        bne .slot_1_loop
+.no_available_slot_1
+        ldx #$ff 
+.slot_1_found
+	stx enemy_slot_1_next
+        
+;get_enemy_slot_2_sprite: subroutine
+	; returns enemy_ram offset
+        lda #$80
+.slot_2_loop
+	tax
+        stx temp00
+        lda $0300,x
+        cmp #$00
+        beq .slot_2_found
+        lda #$08
+        clc
+        adc temp00
+        cmp #$a0
+        bne .slot_2_loop
+.no_available_slot_2
+        ldx #$ff 
+.slot_2_found
+	stx enemy_slot_2_next
+        
+;get_enemy_slot_4_sprite: subroutine
+	; returns enemy_ram offset
+        lda #$a0
+.slot_4_loop
+	tax
+        stx temp00
+        lda $0300,x
+        cmp #$00
+        beq .slot_4_found
+        lda #$08
+        clc
+        adc temp00
+        cmp #$e0
+        bne .slot_4_loop
+.no_available_slot_4
+        ldx #$ff 
+.slot_4_found
+	stx enemy_slot_4_next
+	rts
+        
+
+
+
 get_enemy_slot_1_sprite: subroutine
 	; returns enemy_ram offset
         lda #$00
@@ -436,8 +498,6 @@ get_enemy_slot_1_sprite: subroutine
 .slot_found
 	txa
 	rts
-        
-        
         
 get_enemy_slot_2_sprite: subroutine
 	; returns enemy_ram offset
@@ -459,7 +519,6 @@ get_enemy_slot_2_sprite: subroutine
 	txa
 	rts
         
-        
 get_enemy_slot_4_sprite: subroutine
 	; returns enemy_ram offset
         lda #$a0
@@ -479,6 +538,3 @@ get_enemy_slot_4_sprite: subroutine
 .slot_found
 	txa
 	rts
-        
-
-

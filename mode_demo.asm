@@ -48,7 +48,7 @@ demo_update: subroutine
         
 demo_enemy_spawn: subroutine
 	;jmp .no_1_sprite_spawn
-	jsr get_enemy_slot_1_sprite
+        lda enemy_slot_1_next
         cmp #$ff
         beq .no_1_sprite_spawn
         tax
@@ -83,13 +83,13 @@ demo_enemy_spawn: subroutine
 	jsr spark_spawn
         rts
 .no_1_sprite_spawn
-	jsr get_enemy_slot_2_sprite
+        lda enemy_slot_2_next
         cmp #$ff
         beq .no_maggs_spawn
         tax
         jsr maggs_spawn
 .no_maggs_spawn
-	jsr get_enemy_slot_4_sprite
+        lda enemy_slot_4_next
         cmp #$ff
         beq .no_bigs_spawn
         tax

@@ -101,6 +101,9 @@ enemy_temp_addr_hi	byte
 enemy_ram_offset	byte
 enemy_oam_offset	byte
 enemy_slot_id		byte
+enemy_slot_1_next	byte
+enemy_slot_2_next	byte
+enemy_slot_4_next	byte
 enemy_temp_temp		byte
 enemy_dmg_accumulator	byte
 boss_x		byte
