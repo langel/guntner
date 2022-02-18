@@ -18,6 +18,7 @@ on game start:
 on title return:
 	draw title screen
 	
+	
 
 STATE MACHINE
 	each state has 4 subroutines
@@ -26,6 +27,15 @@ STATE MACHINE
 	flags
 		rendering, sprite0, fade in, fade out, trip-mode, i-frames
 		
+		
+
+
+; more problems...
+
+; star update is based on starfield state
+
+
+
 	
 FADE IN/OUT orders of operation
 	used for transitions between soft_state(s)
