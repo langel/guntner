@@ -3,46 +3,32 @@
 
 demo_init:
 	jsr game_init_generic
+        lda #1
+        sta player_lives
         lda #5
         jsr state_update_set_addr
+        lda #$ff
+        sta demo_true
         rts
         
         
 
 demo_update: subroutine
-
-        ; HUD prepare for next draw
-        ; stop updating HUD if game over
-        lda player_death_flag
+	lda player_lives
         cmp #$00
-        bne .skip_stuff
-        jsr demo_enemy_spawn
-	jsr player_demo_controls
-.skip_stuff
+        beq .done
 
-	; read user controls even in demo mode!
-	jsr player_change_speed
-        
-        ; start should return to menu in demo mode
+        ; some buttons return to menu
         lda player_start_d
         ora player_a_d
         ora player_b_d
         cmp #$ff
-        bne .player_check_for_dead
+        bne .menu_return_buttons_not_pressed
         jsr menu_screens_init
-        jmp .done_and_paused
-        
-.player_check_for_dead
-	; MOCKUP DEATH SEQUENCE
-        lda player_health
-        cmp #$00
-        bne .player_not_dead
-.player_dead
-	lda #$00
-        sta player_lives
-	jmp .player_dead_anim
-        
-.player_not_dead
+.menu_return_buttons_not_pressed
+
+	jsr demo_enemy_spawn
+        jsr player_demo_controls
 	; push the shoot button
         lda timer_frames_10s
         and #$02
@@ -50,48 +36,9 @@ demo_update: subroutine
         bne .dont_shoot
 	lda #$ff
         sta player_b_d
-.dont_shoot
-        jsr set_player_sprite
-        
-;; XXX FORCE QUICK DEATH
-        lda #$04
-        sta player_damage
-        ;jsr player_take_damage
-        
-        jmp .done
-        
-.player_dead_anim
-        jsr death_scroll_speed
-        lda player_death_flag
-        cmp #$00
-        bne .death_already_set
-        jsr sfx_player_death
-        lda #$01
-        sta player_death_flag
-        ; "YOU DEAD"
-        ldy #$00
-        jsr dashboard_message_set
-        jmp .done
-.death_already_set
-	inc you_dead_counter
-        lda you_dead_counter
-        cmp #80
-        beq .trigger_fadeout
-        cmp #120
-        bne .still_dead
-        
-	jmp state_update_done
-        
-.trigger_fadeout
-        ; GO BACK TO TITLE SCREEN 
-        ; AFTER DEATH SEQUENCE
-	lda #0
-	jsr palette_fade_out_init
-.still_dead
+.dont_shoot   
 .done
-        jsr update_enemies
-        ; spawn enemies
-.done_and_paused
+	jsr game_update_generic
 	jmp state_update_done
         
         

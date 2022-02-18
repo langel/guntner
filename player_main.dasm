@@ -81,6 +81,7 @@ player_take_damage: subroutine
 	lda #$00
         sta player_health
         ; change sprite
+        ; XXX this gets overwritten sometimes?
 	lda #$0a
         sta $0205
         sta $0209

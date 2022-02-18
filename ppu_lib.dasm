@@ -85,7 +85,7 @@ sprite_clear:
         lda #$00
         tax
 .clear_sprite_ram
-	sta $200,x	; PPU OAM sprite data
+	sta oam_ram_y,x	; PPU OAM sprite data
         inx
         bne .clear_sprite_ram
 	rts

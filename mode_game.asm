@@ -24,63 +24,22 @@ game_init_generic: subroutine
         jsr palette_fade_in_init
         rts
         
+        
 
 game_init:
 	jsr game_init_generic
         lda #6
         jsr state_update_set_addr
+        lda #$00
+        sta demo_true
         rts
 
 
 
-game_update: subroutine
-	; read user controls even in demo mode!
-	jsr player_change_speed
-        
-        jsr player_pause
-        ; test for paused
-        lda player_paused
-        cmp #$ff
-        bne .player_check_for_dead
-        jmp .done_and_paused
-        
-.player_check_for_dead
-	; MOCKUP DEATH SEQUENCE
-        lda player_health
+game_update_generic: subroutine
+	lda player_health
         cmp #$00
         bne .player_not_dead
-.player_dead
-	jmp .player_dead_anim
-        
-.player_not_dead
-	jsr apu_game_music_frame
-	lda player_health
-        cmp #$ff
-        beq .no_heal
-        inc player_heal_c
-        inc player_heal_c
-        inc player_heal_c
-        lda player_heal_c
-        cmp #$40
-        bne .no_heal
-        lda #$00
-        sta player_heal_c
-        inc player_health
-.no_heal
-	jsr player_move_position
-        jsr player_bullets_check_controls
-        ; spawn enemies
-; PHASE HANDLER
-        jsr phase_handler
-.dont_shoot
-        jsr set_player_sprite
-        lda #$04
-        sta player_damage
-        
-;; XXX FORCE QUICK DEATH
-        ;jsr player_take_damage
-        
-        jmp .done
         
 .player_dead_anim
         jsr death_scroll_speed
@@ -94,6 +53,10 @@ game_update: subroutine
         lda player_lives
         cmp #$00
         bne .youdead
+        ; demo mode has different behaviour
+        lda demo_true
+        cmp #$ff
+        beq .youdead
         ; "GAME OVER"
         ldy #$10
         jsr dashboard_message_set
@@ -106,18 +69,26 @@ game_update: subroutine
 .death_already_set
 	inc you_dead_counter
         lda you_dead_counter
+        cmp #80
+        beq .trigger_fadeout
 	cmp #120
-        bne .still_dead
+        bne .done
 ; next life      
         lda player_lives
         cmp #$00
         bne .next_life
         ; no lives left game over
         ; GO BACK TO TITLE SCREEN AFTER DEATH SEQUENCE
-        jmp menu_screens_init
-        
+        jmp .done
+.trigger_fadeout
+        ; GO BACK TO TITLE SCREEN 
+        ; AFTER DEATH SEQUENCE
+	lda #0
+	jsr palette_fade_out_init
+        jmp .done
 .next_life
 	; set star speed
+        ; XXX lets check all scroll_speed references someday!
         lda #$07
         sta scroll_speed
         asl
@@ -127,6 +98,8 @@ game_update: subroutine
         ; reset health
 	lda #$ff
         sta player_health
+        ; turn on iframes
+        sta state_iframes
         ; reset death sequence timers
         lda #$00
         sta player_death_flag
@@ -136,8 +109,49 @@ game_update: subroutine
         stx $205
         dex 
         stx $209
-.still_dead
+
+.player_not_dead
+
+.healing_with_time
+	lda player_health
+        cmp #$ff
+        beq .no_heal
+        lda player_heal_c
+        clc
+        adc #$23 ; speed of heal counter increment
+        sta player_heal_c
+        bcc .no_heal
+.reset_heal_counter
+        inc player_health
+.no_heal
+
+	; XXX maybe move this functions contents to here
+        ; seems like speed gets reset when it shouldn't
+	jsr player_change_speed
+        jsr set_player_sprite
+        ; XXX is this default damage from enemies?
+        ; XXX actually seems like a testing mechanic
+        lda #$04
+        sta player_damage
+;; XXX FORCE QUICK DEATH
+        ;jsr player_take_damage
 .done
         jsr update_enemies
+	rts
+        
+        
+game_update:
+	jsr player_pause
+        ; test for paused
+        lda player_paused
+        cmp #$ff
+        ;bne .player_check_for_dead
+        beq .done_and_paused
+        jsr phase_handler
+        jsr game_update_generic
+		
+	jsr player_move_position
+        jsr player_bullets_check_controls
 .done_and_paused
-	jmp state_update_done
+        jmp state_update_done
+        

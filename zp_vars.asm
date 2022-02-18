@@ -17,6 +17,7 @@ bg_tile_default	byte
 player_health	byte
 player_lives	byte
 player_heal_c	byte
+demo_true	byte ; if set game in demo mode
 player_demo_x	byte ; dest x for demo cornputer controlls
 player_demo_y	byte ; dest y for same
 player_demo_lr	byte
