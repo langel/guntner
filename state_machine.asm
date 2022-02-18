@@ -46,12 +46,14 @@ STATE_INIT_FUNCTION_TABLE:
 	.word	menu_screens_init		; 0
         .word	demo_init			; 1
         .word	game_init			; 2
+        .word	cut_scene_00_init		; 3
         
 state_init_call:
 	; a = function table slot
         asl
         tax
 	lda STATE_INIT_FUNCTION_TABLE,x
+        ; XXX maybe don't use boss variable space?
         sta boss_v0
         inx
 	lda STATE_INIT_FUNCTION_TABLE,x
@@ -74,6 +76,7 @@ STATE_UPDATE_FUNCTION_TABLE:
         .word	demo_update			; 5
         .word	game_update			; 6
         .word	sandbox_update			; 7
+        .word	cut_scene_update_generic	; 8
 
 
 

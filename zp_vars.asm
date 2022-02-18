@@ -96,6 +96,9 @@ state_render_addr_hi	byte
 state_update_addr_lo	byte
 state_update_addr_hi	byte
 
+nametable_tile_planter_addr_lo	byte
+nametable_tile_planter_addr_hi	byte
+
 enemy_temp_addr_lo	byte
 enemy_temp_addr_hi	byte
 enemy_ram_offset	byte

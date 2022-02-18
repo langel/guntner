@@ -70,11 +70,10 @@ starfield_init: subroutine
 	rts
         
         
-death_scroll_speed:
+death_scroll_speed: subroutine
         lda scroll_speed
         cmp #$00
         beq .scroll_slow_done
-        dec scroll_speed
 	dec scroll_speed_m
         lda scroll_speed_m
         lsr

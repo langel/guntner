@@ -65,27 +65,9 @@ big_title_loop2:
         dey
         bne .set_top_bar
         
-      
-menu_screen_tile_planter:
-	ldx #$00
-        lda menu_screen_tile_data,x	; upper byte
-.tileset_loop
-        sta PPU_ADDR
-        inx
-        lda menu_screen_tile_data,x	; lower byte
-        sta PPU_ADDR
-        inx
-.string_loop
-        lda menu_screen_tile_data,x	; read string
-        inx
-        cmp #$00
-        beq .terminate_string
-        sta PPU_DATA
-        bne .string_loop
-.terminate_string
-	lda menu_screen_tile_data,x	; look for ff
-        cmp #$ff
-        bne .tileset_loop
+; various stuff on screen        
+        NMTP_SETADDR menu_screen_tile_data
+        jsr nametable_tile_planter
 
 ; set rudy color blocks' tile attributes
 	PPU_SETADDR $27dc
@@ -340,7 +322,8 @@ title_screen_update: subroutine
         sta player_start_d
         sta player_a_d
         sta player_b_d
-        lda #2
+        ; init cut scene 00
+        lda #3
         jsr palette_fade_out_init
         jsr clear_all_enemies
         jmp .do_nothing

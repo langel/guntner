@@ -91,3 +91,35 @@ sprite_clear:
 	rts
         
         
+        
+;;;;; namtetable_tile_planter
+;;;;; data set address <address> - set 16-bit PPU address
+
+	MAC NMTP_SETADDR
+        lda #>{1}	; upper byte
+        sta nametable_tile_planter_addr_hi
+        lda #<{1}	; lower byte
+        sta nametable_tile_planter_addr_lo
+        ENDM
+        
+nametable_tile_planter:
+	ldy #$00
+        lda (nametable_tile_planter_addr_lo),y	; upper byte
+.tileset_loop
+        sta PPU_ADDR
+        iny
+        lda (nametable_tile_planter_addr_lo),y	; lower byte
+        sta PPU_ADDR
+        iny
+.string_loop
+        lda (nametable_tile_planter_addr_lo),y	; read string
+        iny
+        cmp #$00
+        beq .terminate_string
+        sta PPU_DATA
+        bne .string_loop
+.terminate_string
+	lda (nametable_tile_planter_addr_lo),y	; look for ff
+        cmp #$ff
+        bne .tileset_loop
+        rts

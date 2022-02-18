@@ -5,11 +5,15 @@ PHASE_MAX	.byte #$01
 
         
 phase_handler: subroutine
+	lda player_health
+        cmp #$00
+        beq .speed_skip
 	; update starfield speed
         lda phase_current
         clc
         adc #$03
         sta scroll_speed
+.speed_skip
 	; get current phase lookup table position
         lda phase_current
         asl

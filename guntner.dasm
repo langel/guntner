@@ -66,8 +66,12 @@ cart_start:	subroutine
         jsr WaitSync
         jsr WaitSync
         
+        ; XXX probably don't need this
+        jsr state_sprite0_disable
 ;============================== M O D E   I N I T   H E R E
-	jsr menu_screens_init
+	jsr game_init
+	;jsr menu_screens_init
+        ;jsr cut_scene_00_init
         ;lda #$0a
         ;sta game_mode
         
@@ -202,6 +206,8 @@ sprite0_done:
         nop	; how much prg space we using?
 	include "state_menu_screens.asm"
         nop	; how much prg space we using?
+	include "state_cutscenes.asm"
+        nop	; how much prg space we using?
         
 	include "palette.asm"
         nop	; how much prg space we using?
@@ -209,6 +215,7 @@ sprite0_done:
         nop	; how much prg space we using?
 	include "starfield.dasm"
         nop	; how much prg space we using?
+        
         
 	include "collision_detection.dasm"
         nop	; how much prg space we using?

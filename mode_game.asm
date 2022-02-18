@@ -20,6 +20,9 @@ game_init_generic: subroutine
         
         jsr timer_reset
 	jsr player_game_reset
+        jsr dashboard_init
+        jsr dashboard_update
+        jsr dashboard_render
         
         jsr state_sprite0_enable
         jsr render_enable
@@ -83,6 +86,9 @@ game_update_generic: subroutine
         ; GO BACK TO TITLE SCREEN AFTER DEATH SEQUENCE
         jmp .done
 .trigger_fadeout
+        lda player_lives
+        cmp #$00
+        bne .done
         ; GO BACK TO TITLE SCREEN 
         ; AFTER DEATH SEQUENCE
 	lda #0
@@ -91,16 +97,17 @@ game_update_generic: subroutine
 .next_life
 	; set star speed
         ; XXX lets check all scroll_speed references someday!
-        lda #$07
-        sta scroll_speed
-        asl
-        asl
-        asl
-        sta scroll_speed_m
+        ;lda #$07
+        ;sta scroll_speed
+        ;asl
+        ;asl
+        ;asl
+        ;sta scroll_speed_m
         ; reset health
 	lda #$ff
         sta player_health
         ; turn on iframes
+        lda #100
         sta state_iframes
         ; reset death sequence timers
         lda #$00
@@ -137,7 +144,7 @@ game_update_generic: subroutine
         lda #$04
         sta player_damage
 ;; XXX FORCE QUICK DEATH
-        ;jsr player_take_damage
+        jsr player_take_damage
 .done
         jsr update_enemies
 	rts
