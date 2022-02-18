@@ -34,6 +34,9 @@ cart_start:	subroutine
         
         lda #$f8
         sta scroll_y ; just seems right
+        ; set hud y pos
+        lda #182
+        sta sprite_0_y
         
         jsr sine_init
         

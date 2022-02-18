@@ -15,9 +15,6 @@ dash_cache EQU $0100
 
 
 dashboard_init: subroutine
-        ; set hud y pos
-        lda #182
-        sta sprite_0_y
         
         ; COLOR SPLIT
         ; set split color attr for top row
