@@ -243,6 +243,8 @@ sprite0_done:
         nop	; how much prg space we using?
 	include "enemy_chomps.asm"
         nop	; how much prg space we using?
+	include "enemy_dumbface.asm"
+        nop
 	include "enemy_maggs.asm"
         nop	; how much prg space we using?
 	include "enemy_skeet.asm"

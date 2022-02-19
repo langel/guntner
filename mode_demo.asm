@@ -106,6 +106,11 @@ demo_enemy_spawn: subroutine
         and #$03
         cmp #$00
         beq .spawn_starglasses
+        cmp #$01
+        beq .spawn_skully
+        jsr dumbface_spawn
+        jmp .no_bigs_spawn
+.spawn_skully
         jsr skully_spawn
         jmp .no_bigs_spawn
 .spawn_starglasses
