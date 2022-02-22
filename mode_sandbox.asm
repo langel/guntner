@@ -115,4 +115,4 @@ sandbox_update: subroutine
 
         jsr update_enemies
         
-	rts
+        jmp state_update_done
