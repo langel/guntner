@@ -1,7 +1,11 @@
 
 sandbox_init: subroutine
 
-        jsr game_init
+        ;jsr game_init
+        jsr game_init_generic
+  ; SCROLL SPEED
+  	;lda #$27
+        sta scroll_speed
         
         lda #2
         jsr state_render_set_addr
@@ -20,31 +24,31 @@ sandbox_init: subroutine
         
         jsr get_enemy_slot_1_sprite
         tax
-        jsr chomps_spawn
+        ;jsr chomps_spawn
+        jsr get_enemy_slot_1_sprite
+        tax
+        ;jsr chomps_spawn
+        jsr get_enemy_slot_1_sprite
+        tax
+        ;jsr chomps_spawn
         jsr get_enemy_slot_1_sprite
         tax
         jsr chomps_spawn
         jsr get_enemy_slot_1_sprite
         tax
-        jsr chomps_spawn
+        ;jsr spark_spawn
         jsr get_enemy_slot_1_sprite
         tax
-        jsr chomps_spawn
+        ;jsr spark_spawn
         jsr get_enemy_slot_1_sprite
         tax
-        jsr spark_spawn
-        jsr get_enemy_slot_1_sprite
-        tax
-        jsr spark_spawn
+        ;jsr spark_spawn
         jsr get_enemy_slot_1_sprite
         tax
         jsr spark_spawn
         jsr get_enemy_slot_1_sprite
         tax
-        jsr spark_spawn
-        jsr get_enemy_slot_1_sprite
-        tax
-        jsr spark_spawn
+        jsr zigzag_spawn
         
 	jsr get_enemy_slot_1_sprite
         tax
@@ -56,7 +60,7 @@ sandbox_init: subroutine
         
 	jsr get_enemy_slot_4_sprite
         tax
-	jsr boss_vamp_spawn
+	;jsr boss_vamp_spawn
         
 	jsr get_enemy_slot_4_sprite
         tax
@@ -97,22 +101,22 @@ sandbox_update: subroutine
         beq .no_enemy_spawn
         tax
         lda rng0
-        and #%00000001
+        lsr
+        and #%00000010
         cmp #$00
         bne .zigzag
         ;jsr skeet_spawn
         jsr spark_spawn
         jmp .no_enemy_spawn
 .zigzag
-        ;jsr zigzag_spawn
+        jsr zigzag_spawn
 .no_enemy_spawn
 	; read user controls even in demo mode!
 	;jsr apu_game_music_frame
-	jsr player_change_speed
+
+        ;jsr update_enemies
+	jsr game_update_generic
 	jsr player_move_position
         jsr player_bullets_check_controls
-        jsr set_player_sprite
-
-        jsr update_enemies
         
         jmp state_update_done

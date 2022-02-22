@@ -54,12 +54,11 @@ state_init_call:
         tax
 	lda STATE_INIT_FUNCTION_TABLE,x
         ; XXX maybe don't use boss variable space?
-        sta boss_v0
+        sta temp00
         inx
 	lda STATE_INIT_FUNCTION_TABLE,x
-        sta boss_v1
-        jmp (boss_v0)
-        rts
+        sta temp01
+        jmp (temp00)
 	
 
 STATE_RENDER_FUNCTION_TABLE:
