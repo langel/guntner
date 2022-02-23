@@ -162,8 +162,9 @@ sandbox_scroll_y3: subroutine
         sta scroll_y
         dex
         dex
+        dex
         cpx #$88
-        beq .inc_state
+        bcc .inc_state
         stx boss_v0
         rts
 .not_scroll_off

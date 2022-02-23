@@ -125,7 +125,6 @@ game_update_generic: subroutine
 	; XXX maybe move this functions contents to here
         ; seems like speed gets reset when it shouldn't
 	jsr player_change_speed
-        jsr set_player_sprite
         ; XXX is this default damage from enemies?
         ; XXX actually seems like a testing mechanic
         lda #$04

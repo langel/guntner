@@ -104,10 +104,12 @@ set_player_sprite: subroutine
         sta oam_ram_rudy+1
         rts
 .not_dead
+	; check and decrement iframe counter
 	lda state_iframes
         cmp #$00
         beq .not_iframes
         dec state_iframes
+        ; flash rudy based on iframe counter
         lsr
         lsr
         and #1

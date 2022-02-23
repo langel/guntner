@@ -76,7 +76,8 @@ cart_start:	subroutine
         ;sta game_mode
         
         ;jsr options_screen_init
-        jsr sandbox_init
+        ;jsr sandbox_init
+        jsr sandbox2_init
         
         
 .endless
@@ -225,6 +226,16 @@ sprite0_done:
         nop	; how much prg space we using?
 	include "state_cutscenes.asm"
         nop	; how much prg space we using?
+	include "mode_demo.asm"
+        nop	; how much prg space we using?
+	include "mode_game.asm"
+        nop	; how much prg space we using?
+	include "mode_sandbox.asm"
+        nop	; how much prg space we using?
+        
+	include "state_sandbox2.asm"
+        nop	; how much prg space we using?
+
         
 	include "palette.asm"
         nop	; how much prg space we using?
@@ -238,13 +249,6 @@ sprite0_done:
         nop	; how much prg space we using?
 
 	include "timer_global.dasm"
-        nop	; how much prg space we using?
-
-	include "mode_demo.asm"
-        nop	; how much prg space we using?
-	include "mode_game.asm"
-        nop	; how much prg space we using?
-	include "mode_sandbox.asm"
         nop	; how much prg space we using?
         
 	include "powerups.asm"

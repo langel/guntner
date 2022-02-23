@@ -78,6 +78,7 @@ STATE_UPDATE_FUNCTION_TABLE:
         .word	game_update			; 6
         .word	sandbox_update			; 7
         .word	cut_scene_update_generic	; 8
+        .word	sandbox2_update			; 9
 
 
 
