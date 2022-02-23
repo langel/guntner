@@ -1,7 +1,17 @@
 
 phase_msg_tile_data:
+	; XXX this definitely should not be done during render
         .hex 2107
-        .byte "PHASE x1 COMPLETED"
+        .byte "PHASE 1x COMPLETED"
+        .byte #$00
+        .hex 2147
+        .byte "moar text for test"
+        .byte #$00
+        ; XXX might need another method for writing
+        ;     one line at a time to nametable
+        .byte #$ff
+        .hex 2187
+        .byte "no i won't shutup"
         .byte #$00
         .byte #$ff
 
@@ -12,7 +22,7 @@ sandbox_init: subroutine
         jsr game_init_generic
   ; SCROLL SPEED
   	;lda #$27
-        lda #$03
+        lda #$07
         sta scroll_speed
         
         jsr starfield_spr_init
@@ -24,7 +34,10 @@ sandbox_init: subroutine
         lda #7
         jsr state_update_set_addr
         
-        
+        ; XXX maybe boss vars should be state vars
+        lda #$00
+        sta boss_v0
+        sta boss_v1
         
         PPU_SETADDR $2001
         ; update column
@@ -99,20 +112,68 @@ sandbox_init: subroutine
         
         rts
         
+
         
-sandbox_scroll_y: subroutine
-	inc scroll_y
-        lda scroll_y
-        cmp #240
-        bcc .dont_reset_y
-        lda #$00
+sandbox_scroll_y3: subroutine
+	lda boss_v1
+        cmp #$00
+        bne .not_init
+        ; init
+        lda #$88
+        sta boss_v0
+        bne .inc_state
+.not_init
+	cmp #$01
+        bne .not_scroll_up
+	; animate sine pos $90 to $40
+        ldx boss_v0
+        lda sine_table,x
+        sec
+        sbc #$10
         sta scroll_y
-.dont_reset_y
-	rts
+        ldx boss_v0
+        dex
+        dex
+        cpx #$40
+        beq .inc_state
+        stx boss_v0
+        rts
+.not_scroll_up
+	cmp #$02
+        bne .not_pause
+        ; hold 2 seconds?
+        inc boss_v0
+        lda #160
+        cmp boss_v0
+        beq .inc_state
+        rts
+.not_pause
+	cmp #$03
+        bne .not_init_scroll_off
+        lda #$c0
+        sta boss_v0
+        bne .inc_state
+.not_init_scroll_off
+	cmp #$04
+        bne .not_scroll_off
+        ; animate sine pos $c0 to $90
+        ldx boss_v0
+        lda sine_table,x
+        sta scroll_y
+        dex
+        dex
+        cpx #$88
+        beq .inc_state
+        stx boss_v0
+        rts
+.not_scroll_off
+.inc_state
+	inc boss_v1
+        rts
         
         
 sandbox_update: subroutine
-	;jsr sandbox_scroll_y
+	jsr sandbox_scroll_y3
 	jsr get_enemy_slot_1_sprite
         cmp #$ff
         ;mp #$40
