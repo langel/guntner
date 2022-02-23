@@ -38,14 +38,6 @@ dashboard_init: subroutine
         inx
         bne .23f0_loop
         
-        ; fill page 1 bar for sprite 0 collisions
-	PPU_SETADDR dash_page1_top_bar
-        lda dash_top_bar_tile
-        ldy #$20
-.tile_dash_set_page1
-        sta PPU_DATA
-        dey
-        bne .tile_dash_set_page1
         
         ; fill page 2 dashboard top row
 	PPU_SETADDR dash_page2_top_bar
@@ -76,6 +68,7 @@ dashboard_init: subroutine
         bne .dash_cache_fill
 	rts
         
+
         
 dashboard_bg_tiles:
 	; row 0 is top bar

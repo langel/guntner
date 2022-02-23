@@ -64,7 +64,9 @@ state_init_call:
 STATE_RENDER_FUNCTION_TABLE:
 	.word	state_render_do_nothing		; 0
         .word	menu_screens_render		; 1
-        .word	starfield_render		; 2
+        .word	starfield_bg_render		; 2
+        .word 	starfield_spr_render		; 3
+        .word	dashboard_render		; 4
 
 STATE_UPDATE_FUNCTION_TABLE:
 	.word	state_update_do_nothing		; 0

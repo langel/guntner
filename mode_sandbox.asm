@@ -1,36 +1,46 @@
 
+phase_msg_tile_data:
+        .hex 2107
+        .byte "PHASE x1 COMPLETED"
+        .byte #$00
+        .byte #$ff
+
+
 sandbox_init: subroutine
 
         ;jsr game_init
         jsr game_init_generic
   ; SCROLL SPEED
   	;lda #$27
+        lda #$03
         sta scroll_speed
         
-        lda #2
+        jsr starfield_spr_init
+        jsr nametables_clear
+        jsr dashboard_init
+        
+        lda #3
         jsr state_render_set_addr
         lda #7
         jsr state_update_set_addr
         
-	; XXX temp palette
-        PPU_SETADDR $3F19
-        lda #$15
-        sta PPU_DATA
-        lda #$00
-        sta PPU_DATA
-        lda #$37
-        sta PPU_DATA
         
         
-        jsr get_enemy_slot_1_sprite
-        tax
-        ;jsr chomps_spawn
-        jsr get_enemy_slot_1_sprite
-        tax
-        ;jsr chomps_spawn
-        jsr get_enemy_slot_1_sprite
-        tax
-        ;jsr chomps_spawn
+        PPU_SETADDR $2001
+        ; update column
+        lda #CTRL_INC_32
+        sta PPU_CTRL
+        lda #$0d
+        ldx #$20
+.col_loop
+        sta PPU_DATA
+        dex
+        bne .col_loop
+        
+       	; put that shit back to sequential order
+        lda #0
+        sta PPU_CTRL
+        
         jsr get_enemy_slot_1_sprite
         tax
         jsr chomps_spawn
@@ -84,17 +94,25 @@ sandbox_init: subroutine
 	;jsr get_enemy_slot_1_sprite
         ;tax
         ;jsr powerup_spawn
+        jsr render_enable
+        jsr palette_fade_in_init
         
         rts
         
         
+sandbox_scroll_y: subroutine
+	inc scroll_y
+        lda scroll_y
+        cmp #240
+        bcc .dont_reset_y
+        lda #$00
+        sta scroll_y
+.dont_reset_y
+	rts
+        
+        
 sandbox_update: subroutine
-	lda wtf
-        cmp #$00
-        bne .no_sfx
-        ;jsr sfx_powerup_pickup
-.no_sfx
-
+	;jsr sandbox_scroll_y
 	jsr get_enemy_slot_1_sprite
         cmp #$ff
         ;mp #$40
@@ -106,10 +124,10 @@ sandbox_update: subroutine
         cmp #$00
         bne .zigzag
         ;jsr skeet_spawn
-        jsr spark_spawn
+        ;jsr spark_spawn
         jmp .no_enemy_spawn
 .zigzag
-        jsr zigzag_spawn
+        ;jsr zigzag_spawn
 .no_enemy_spawn
 	; read user controls even in demo mode!
 	;jsr apu_game_music_frame

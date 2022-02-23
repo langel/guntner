@@ -149,17 +149,34 @@ sprite0_wait:
         lda #$c0
 .wait1	bit PPU_STATUS
         beq .wait1
-        ; XXX change bg color here?
-        ; for stars-as-sprites situations
-	; HUD POSITIONING
-        bit PPU_STATUS
+        
+        lda #$26
+        sta PPU_ADDR
+        lda #$c0
+        sta PPU_ADDR
         lda #$00
         sta PPU_SCROLL
         sta PPU_SCROLL
+        
 	; set bg pos to page 2 for dashboard
-	lda #$01
-        ora #CTRL_NMI|CTRL_BG_1000
-        sta PPU_CTRL
+	;lda #$01
+        ;ora #CTRL_NMI|CTRL_BG_1000
+        ;sta PPU_CTRL
+        
+	; set bg pos to page 2 for dashboard
+	;bit PPU_STATUS
+	;lda #$04
+        ;sta PPU_CTRL
+        ; XXX change bg color here?
+        ; for stars-as-sprites situations
+	; HUD POSITIONING
+        ;bit PPU_STATUS
+        ;lda #$00
+        ;sta PPU_SCROLL
+        ;sta PPU_SCROLL
+        
+        
+        
         ; must be game mode
         jsr apu_game_frame
 	jsr player_bullets_update

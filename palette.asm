@@ -16,14 +16,14 @@ Palette00:		; 25 bytes
         hex 013530	;sprite 3 
         
         
-; bg 0 - stars 1
-; bg 1 - stars 2
+; bg 0 - stars bg_tiles 1
+; bg 1 - stars bg_tiles 2
 ; bg 2 - menu screens / bg enemies
 ; bg 3 - dashboard
 ; spr 0 - player
 ; spr 1 - enemy
-; spr 2 - enemy
-; spr 3 - enemy
+; spr 2 - enemy / stars sprites 1
+; spr 3 - enemy / stars sprite 2
 
 
 	; XXX need a way to load certain palettes

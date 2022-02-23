@@ -57,6 +57,7 @@ rng0		byte
 rng1		byte
 rng2		byte
 
+starfield_state	byte
 starfield_col	byte
 starfield_rng	byte
 starfield_page	byte

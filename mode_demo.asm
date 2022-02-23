@@ -16,6 +16,9 @@ demo_init:
         asl
         asl
         sta scroll_speed_m
+        jsr starfield_bg_init
+        jsr render_enable
+        jsr palette_fade_in_init
         rts
         
         

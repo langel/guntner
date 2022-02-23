@@ -7,12 +7,12 @@ game_init_generic: subroutine
         lda #2
         jsr state_render_set_addr
         
-        jsr starfield_init
+        ;jsr starfield_bg_init
         
         ; draw dashbar top bar on title screen page
 	PPU_SETADDR $22c0
         lda #$04
-        ldy #$20
+        ldy #$24
 .set_top_bar
 	sta PPU_DATA
         dey
@@ -25,8 +25,6 @@ game_init_generic: subroutine
         jsr dashboard_render
         
         jsr state_sprite0_enable
-        jsr render_enable
-        jsr palette_fade_in_init
         rts
         
         
@@ -37,6 +35,9 @@ game_init:
         jsr state_update_set_addr
         lda #$00
         sta demo_true
+        jsr starfield_bg_init
+        jsr render_enable
+        jsr palette_fade_in_init
         rts
 
 
