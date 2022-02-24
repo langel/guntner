@@ -5,7 +5,7 @@ sandbox2_init: subroutine
         jsr game_init_generic
   ; SCROLL SPEED
   	;lda #$27
-        lda #$07
+        lda #$03
         sta scroll_speed
         
         jsr starfield_bg_init
@@ -18,6 +18,9 @@ sandbox2_init: subroutine
         jsr state_update_set_addr
         
         jsr render_enable
+        
+        jsr get_enemy_slot_1_sprite
+        jsr galger_spawn
         
 	rts
         

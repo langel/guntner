@@ -117,6 +117,7 @@ sine_of_scale: subroutine
         bcs .not_128
         adc sine_8bit,x
 .not_128
+	lsr
 	rts
         
         

@@ -13,6 +13,7 @@
 ; 0c chomps
 ; 0d spark
 ; 0e dumbface
+; 0f galger
 
 ENEMY_HITPOINTS_TABLE:
 	byte #$00
@@ -30,6 +31,7 @@ ENEMY_HITPOINTS_TABLE:
         byte #$07 ; chomps
         byte #$0f ; spark
         byte #$10 ; dumface
+        byte #$02 ; galger
         
         
 ENEMY_PLAYER_POINTS_TABLE:
@@ -49,6 +51,7 @@ ENEMY_PLAYER_POINTS_TABLE:
         byte #$00,#$00,#$02,#$79 ; chomps
         byte #$00,#$40,#$ff,#$ff ; spark
         byte #$00,#$00,#$00,#$72 ; dumbface
+        byte #$00,#$00,#$00,#$11 ; galger
         
 
 ENEMY_PLAYER_COLLISION_TABLE:
@@ -67,6 +70,7 @@ ENEMY_PLAYER_COLLISION_TABLE:
         byte #$03 ; chomps
         byte #$00 ; spark
         byte #$05 ; dumbface
+        byte #$00 ; galger
         
 
 ENEMY_METHODS_LOOKUP_TABLE:
@@ -85,5 +89,6 @@ ENEMY_METHODS_LOOKUP_TABLE:
         word chomps_cycle
         word spark_cycle
         word dumbface_cycle
+        word galger_cycle
         
         
