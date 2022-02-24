@@ -232,7 +232,7 @@ boss_vamp_cycle: subroutine
 	ldx enemy_ram_offset
         lda enemy_ram_x,x
         clc
-        adc sine_4bit,y
+        adc sine_4bits,y
         sta boss_x
         ldy enemy_oam_offset
 	sta oam_ram_x,y

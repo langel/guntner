@@ -1,12 +1,12 @@
 
-sine_8bit equ $0400
-sine_7bit equ $0480
-sine_6bit equ $0500
-sine_5bit equ $0580
-sine_4bit equ $0600
-sine_3bit equ $0680
-sine_2bit equ $0700
-sine_1bit equ $0780
+
+sine_7bits equ $0480
+sine_6bits equ $0500
+sine_5bits equ $0580
+sine_4bits equ $0600
+sine_3bits equ $0680
+sine_2bits equ $0700
+sine_1bits equ $0780
 
 end_of_ram equ $0800
 
@@ -52,21 +52,20 @@ sine_init: subroutine
         ldy #$00
 .loop
 	lda sine_table,y
-        sta sine_8bit,x
         lsr
-        sta sine_7bit,x
+        sta sine_7bits,x
         lsr
-        sta sine_6bit,x
+        sta sine_6bits,x
         lsr
-        sta sine_5bit,x
+        sta sine_5bits,x
         lsr
-        sta sine_4bit,x
+        sta sine_4bits,x
         lsr
-        sta sine_3bit,x
+        sta sine_3bits,x
         lsr
-        sta sine_2bit,x
+        sta sine_2bits,x
         lsr
-        sta sine_1bit,x
+        sta sine_1bits,x
         inx
         iny
         iny
@@ -86,38 +85,34 @@ sine_of_scale: subroutine
         tax
         lda #$00
         lsr temp00
-        bcs .not_1
-        adc sine_1bit,x
-.not_1
         lsr temp00
-        bcs .not_2
-        adc sine_2bit,x
-.not_2
+        bcs .not_1bits
+        adc sine_1bits,x
+.not_1bits
         lsr temp00
-        bcs .not_4
-        adc sine_3bit,x
-.not_4
+        bcs .not_2bits
+        adc sine_2bits,x
+.not_2bits
         lsr temp00
-        bcs .not_8
-        adc sine_4bit,x
-.not_8
+        bcs .not_3bits
+        adc sine_3bits,x
+.not_3bits
         lsr temp00
-        bcs .not_16
-        adc sine_5bit,x
-.not_16
+        bcs .not_4bits
+        adc sine_4bits,x
+.not_4bits
         lsr temp00
-        bcs .not_32
-        adc sine_6bit,x
-.not_32
+        bcs .not_5bits
+        adc sine_5bits,x
+.not_5bits
         lsr temp00
-        bcs .not_64
-        adc sine_7bit,x
-.not_64
+        bcs .not_6bits
+        adc sine_6bits,x
+.not_6bits
         lsr temp00
-        bcs .not_128
-        adc sine_8bit,x
-.not_128
-	lsr
+        bcs .not_7bits
+        adc sine_7bits,x
+.not_7bits
 	rts
         
         

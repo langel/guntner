@@ -70,7 +70,7 @@ maggs_cycle: subroutine
         lda enemy_ram_pc,x
         lsr
         tay
-        lda sine_4bit,y
+        lda sine_4bits,y
         clc
         adc enemy_ram_y,x
 	ldy enemy_oam_offset

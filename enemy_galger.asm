@@ -26,7 +26,7 @@ galger_spawn: subroutine
         lda ENEMY_HITPOINTS_TABLE,y
         sta enemy_ram_hp,x 
         
-        lda #$00
+        lda #$08
         sta enemy_ram_x,x
         sta enemy_ram_y,x
         rts
@@ -50,11 +50,33 @@ galger_spawn: subroutine
 
 galger_cycle: subroutine
         inc enemy_ram_pc,x
+        inc enemy_ram_pc,x
+        inc enemy_ram_pc,x
+        inc enemy_ram_pc,x
+        inc enemy_ram_pc,x
+        inc enemy_ram_pc,x
+        inc enemy_ram_pc,x
+        inc enemy_ram_pc,x
+        bne .dont_increase
+        inc boss_v0
+.dont_increase
+
+	; set reference
+        lda #$08
+        sta oam_ram_y+36
+        lda boss_v0
+        clc
+        adc #8
+        sta oam_ram_x+36
+        lda #$69
+        sta oam_ram_spr+36
+        lda #03
+        sta oam_ram_att+36
         
         ; set x position
         lda enemy_ram_pc,x
         tax
-        lda #$5f
+        lda boss_v0
         jsr sine_of_scale
         ldx enemy_ram_offset
         clc
