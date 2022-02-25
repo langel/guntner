@@ -44,8 +44,7 @@ sine_table:
 	hex 393b3e414346494c
 	hex 4f5255585a5d6164
 	hex 676a6d707376797c
-        
-        
+
 
 sine_init: subroutine
 	ldx #$00

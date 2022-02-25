@@ -158,7 +158,7 @@ boss_vamp_spawn: subroutine
         txa
         tay
         sty boss_v3
-        lda #$10
+        lda #$40
         sta boss_v4 ; minimum bat circle size
 .bat_spawn_loop
 	; a = animation counter / v1
@@ -221,6 +221,7 @@ boss_vamp_cycle: subroutine
 	dec boss_v4
 .bat_circle_adjust_done
 	lda boss_v4
+        lsr
         sta boss_v5 ; half of bat circle size
 	; calc x
         inc boss_v2 ; x sine

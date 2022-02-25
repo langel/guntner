@@ -5,7 +5,7 @@ sandbox2_init: subroutine
         jsr game_init_generic
   ; SCROLL SPEED
   	;lda #$27
-        lda #$03
+        lda #$07
         sta scroll_speed
         
         jsr starfield_bg_init
@@ -19,14 +19,32 @@ sandbox2_init: subroutine
         
         jsr render_enable
         
-        jsr get_enemy_slot_1_sprite
-        jsr galger_spawn
+        ;jsr get_enemy_slot_1_sprite
+        ;jsr galger_spawn
+        ;jsr get_enemy_slot_1_sprite
+        ;jsr galger2_spawn
+        
+	jsr get_enemy_slot_4_sprite
+        tax
+	;jsr boss_vamp_spawn
         
 	rts
         
         
         
 sandbox2_update: subroutine
+
+
+	lda wtf
+        and #$07
+        cmp #$0
+        bne .dont_spawn
+        jsr get_enemy_slot_1_sprite
+        cmp #$ff
+        beq .dont_spawn
+        jsr galger_spawn
+.dont_spawn
+
 	jsr game_update_generic
 	jsr player_move_position
         jsr player_bullets_check_controls

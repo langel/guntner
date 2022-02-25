@@ -132,6 +132,8 @@ state_render_done:
         and #$01
         ora #CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
+        lda #MASK_BG|MASK_SPR
+        sta PPU_MASK	
         
         ; hope everything above was under
         ; ~2250 cycles!
@@ -171,6 +173,8 @@ sprite0_wait:
 	; set bg pos to page 2 for dashboard
 	lda #$01|#CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
+        lda #MASK_BG
+        sta PPU_MASK	
         
         
         
@@ -260,6 +264,10 @@ sprite0_done:
         nop	; how much prg space we using?
 	include "enemy_chomps.asm"
         nop	; how much prg space we using?
+        
+	include "enemy_dart.asm"
+        nop	; how much prg space we using?
+
 	include "enemy_dumbface.asm"
         nop
 	include "enemy_galger.asm"
