@@ -53,6 +53,7 @@ starfield_scroll: subroutine
         sbc scroll_speed
         bcs .samepage
         inc scroll_page
+        dec starfield_temp
 .samepage
 	sta scroll_x
  	; find starfield column for updating       
@@ -328,13 +329,13 @@ starfield_bg2psr_init: subroutine
         bne .loop
         ; log destination of nametable0 cleared
         lda starfield_page
-        cmp #$24
+        cmp #$20
         bne .do_the_full_monty
-        lda scroll_x
+        lda #2
         sta starfield_temp
 	rts
 .do_the_full_monty
-	lda #8
+	lda #3
         sta starfield_temp
         rts
         
@@ -362,12 +363,11 @@ starfield_bg2spr_update: subroutine
         jsr starfield_twinkle_spr
         
         ; check if nametable0 is cleared
-        lda starfield_page
-        cmp #$24
-        beq .done
+        ; XXX could be more efficient
+        ; XXX getting to spr stars faster
         lda starfield_temp
-        cmp scroll_x
-        bcc .done
+        cmp #0
+        bne .done
         lda #1
         sta starfield_state
 .done	
@@ -375,9 +375,6 @@ starfield_bg2spr_update: subroutine
         
         
 starfield_spr_get_position: subroutine
-	; scroll_x decides which sprite and x position
-        lda scroll_x
-        and #$07 ; this is the x position
         lda scroll_x
         lsr
         lsr
@@ -387,6 +384,12 @@ starfield_spr_get_position: subroutine
         clc
         adc #$80
         tax ; oam ram offset
+	; scroll_x decides which sprite and x position
+        lda scroll_x
+        and #$07 ; this is the x position
+        sec
+        sbc #8
+        sta oam_ram_x,x
 	rts
         
                 
