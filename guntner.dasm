@@ -45,6 +45,7 @@ cart_start:	subroutine
         jsr sine_init
         
         jsr palette_init
+        jsr starfield_twinkle_reset
         
         jsr player_bullets_init
         
@@ -114,7 +115,6 @@ nmi_handler: subroutine
         
 ; PPU vBLANK STUFF
         jmp (state_render_addr_lo)
-        ;jsr mode_handler_vblank
 state_render_done:
 	; OAM DMA	513 cycles
 	lda #$02
@@ -139,7 +139,6 @@ state_render_done:
         ; ~2250 cycles!
         
 ; main game logic
-        ;jsr mode_handler_post_vblank
         jmp (state_update_addr_lo)
 state_update_done:
 
@@ -182,6 +181,7 @@ sprite0_wait:
         jsr apu_game_frame
 	jsr player_bullets_update
         jsr starfield_update
+        
         ; HUD prepare for next draw
         ; stop updating HUD if game over
         lda player_death_flag
@@ -190,6 +190,9 @@ sprite0_wait:
 	jsr dashboard_update
         jsr get_enemy_slots_next
 sprite0_done:
+
+	; XXX starfield debugger
+        jsr starfield_debugger
 
         jsr player_controls_read
         ;jsr apu_manage

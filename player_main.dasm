@@ -77,7 +77,9 @@ player_take_damage: subroutine
 	lda #$00
         sta player_health
         rts
- 
+         
+        
+
         
         
 set_player_sprite: subroutine

@@ -1,19 +1,4 @@
 
-phase_msg_tile_data:
-	; XXX this definitely should not be done during render
-        .hex 2107
-        .byte "PHASE 1x COMPLETED"
-        .byte #$00
-        .hex 2147
-        .byte "moar text for test"
-        .byte #$00
-        ; XXX might need another method for writing
-        ;     one line at a time to nametable
-        .byte #$ff
-        .hex 2187
-        .byte "no i won't shutup"
-        .byte #$00
-        .byte #$ff
 
 
 sandbox_init: subroutine
@@ -39,16 +24,6 @@ sandbox_init: subroutine
         sta boss_v0
         sta boss_v1
         
-        PPU_SETADDR $2001
-        ; update column
-        lda #CTRL_INC_32
-        sta PPU_CTRL
-        lda #$0d
-        ldx #$20
-.col_loop
-        sta PPU_DATA
-        dex
-        bne .col_loop
         
        	; put that shit back to sequential order
         lda #0

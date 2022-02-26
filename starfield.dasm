@@ -19,6 +19,170 @@ star_cache	EQU 	208
 ;		- sprite to bg
 
 
+death_scroll_speed: subroutine
+        lda scroll_speed
+        cmp #$00
+        beq .scroll_slow_done
+	dec scroll_speed_m
+        lda scroll_speed_m
+        lsr
+        lsr
+        lsr
+        sta scroll_speed
+        ; slow down stars
+.scroll_slow_done
+	rts
+        
+        
+starfield_draw_dash_top_bar_nametable0: subroutine
+        ; fill page 1 bar for sprite 0 collisions
+	PPU_SETADDR dash_page1_top_bar
+        lda dash_top_bar_tile
+        ldy #$20
+.tile_dash_set_page1
+        sta PPU_DATA
+        dey
+        bne .tile_dash_set_page1
+        rts
+        
+        
+starfield_scroll: subroutine
+	; update scroll pos
+	lda scroll_x
+        sec
+        sbc scroll_speed
+        bcs .samepage
+        inc scroll_page
+.samepage
+	sta scroll_x
+ 	; find starfield column for updating       
+        lsr
+        lsr
+        lsr
+        sta starfield_col
+        ; set nametable for column updating
+        lda scroll_page
+        and #$01
+        cmp #$00
+        bne .scroll_page
+        lda #$20
+        sta starfield_page
+   	jmp .scroll_page_done
+.scroll_page
+	lda #$24
+        sta starfield_page
+.scroll_page_done
+        rts
+        
+
+
+starfield_debugger: subroutine
+	; dash cache meter is $108-$118
+        ; scroll page
+        lda scroll_page
+        and #1
+        clc
+        adc #$30
+        sta $109
+        ; scroll x position
+        lda scroll_x
+        lsr
+        lsr
+        lsr
+        lsr
+        clc 
+        adc #$30
+        sta $10b
+        lda scroll_x
+        and #$f
+        clc
+        adc #$30
+        sta $10c
+        ; scroll y position
+        lda scroll_y
+        lsr
+        lsr
+        lsr
+        lsr
+        clc 
+        adc #$30
+        sta $10e
+        lda scroll_y
+        and #$f
+        clc
+        adc #$30
+        sta $10f
+        ; starfield state
+        lda starfield_state
+        clc
+        adc #$30
+        sta $111
+	rts
+        
+        
+        
+starfield_bg_render: subroutine
+	; copy tiles to PPU VRAM during vblank
+;update_starfield_column
+        lda #CTRL_INC_32
+        sta PPU_CTRL
+        ; set base PPU address
+	lda starfield_page
+        sta PPU_ADDR
+        lda starfield_col
+        sta PPU_ADDR
+; rip from cache to PPU
+        ldy #$16
+.col_loop
+	lda star_cache,y
+        sta PPU_DATA
+        dey
+        bne .col_loop
+        ; put that shit back to sequential order
+        lda #0
+        sta PPU_CTRL
+        jsr dashboard_render
+        jmp state_render_done
+        
+        
+phase_msg_tile_data:
+	; XXX this definitely should not be done during render
+        .hex 2107
+        .byte "PHASE 1x COMPLETED"
+        .byte #$00
+        ; XXX might need another method for writing
+        ;     one line at a time to nametable
+        .byte #$ff
+        .hex 2147
+        .byte "moar text for test"
+        .byte #$00
+        .hex 2187
+        .byte "no i won't shutup"
+        .byte #$00
+        .byte #$ff
+        
+starfield_spr_render: subroutine
+	; XXX pretty sure this will never do a thing?
+        ; maybe could be used to put messages on screen?
+        ;NMTP_SETADDR phase_msg_tile_data
+        ;jsr nametable_tile_planter
+        jsr dashboard_render
+        jmp state_render_done
+        
+        
+        
+starfield_bg2spr_render: subroutine
+	; remove bg columns
+        jmp state_render_done
+        
+        
+starfield_spr2bg_render: subroutine
+	; populate bg columns
+        jmp state_render_done
+        
+        
+        
+   
 starfield_bg_init: subroutine
 ; set starfield state
 	lda #$00
@@ -52,11 +216,6 @@ starfield_bg_init: subroutine
         bne .27c0_loop
         ; make sure sprite0 has something to collide with
         jsr starfield_draw_dash_top_bar_nametable0
-; reset star palette twinkles
-	lda STARFIELD_COL0_START
-        sta starfield_col0
-        lda STARFIELD_COL1_START
-        sta starfield_col1
 ; draw stars on nametable 1
         lda #CTRL_INC_32
         sta PPU_CTRL
@@ -83,75 +242,13 @@ starfield_bg_init: subroutine
         sta PPU_CTRL
 	rts
         
-        
-starfield_draw_dash_top_bar_nametable0: subroutine
-        ; fill page 1 bar for sprite 0 collisions
-	PPU_SETADDR dash_page1_top_bar
-        lda dash_top_bar_tile
-        ldy #$20
-.tile_dash_set_page1
-        sta PPU_DATA
-        dey
-        bne .tile_dash_set_page1
-        rts
-        
-        
-death_scroll_speed: subroutine
-        lda scroll_speed
-        cmp #$00
-        beq .scroll_slow_done
-	dec scroll_speed_m
-        lda scroll_speed_m
-        lsr
-        lsr
-        lsr
-        sta scroll_speed
-        ; slow down stars
-.scroll_slow_done
-	rts
-        
-        
-starfield_bg_render: subroutine
-	; copy tiles to PPU VRAM during vblank
-;update_starfield_column
-        lda #CTRL_INC_32
-        sta PPU_CTRL
-        ; set base PPU address
-	lda starfield_page
-        sta PPU_ADDR
-        lda starfield_col
-        sta PPU_ADDR
-; rip from cache to PPU
-        ldy #$16
-.col_loop
-	lda star_cache,y
-        sta PPU_DATA
-        dey
-        bne .col_loop
-        ; put that shit back to sequential order
-        lda #0
-        sta PPU_CTRL
-        jsr dashboard_render
-        jmp state_render_done
+
         
         
         
-starfield_spr_render: subroutine
-	; XXX pretty sure this will never do a thing?
-        ; maybe could be used to put messages on screen?
-        NMTP_SETADDR phase_msg_tile_data
-        jsr nametable_tile_planter
-        jsr dashboard_render
-        jmp state_render_done
-        
-starfield_bg2spr_render: subroutine
-        jmp state_render_done
-        
-starfield_spr2bg_render: subroutine
-        jmp state_render_done
         
         
-        
+                
 STARFIELD_STATE_UPDATE_FUNCTION_TABLE:
 	.word starfield_bg_update
 	.word starfield_spr_update
@@ -168,227 +265,30 @@ starfield_update: subroutine
 	lda STARFIELD_STATE_UPDATE_FUNCTION_TABLE,x
         sta temp01
         jmp (temp00)
-        
-        
-starfield_spr_init: subroutine
-	; set that state
-	lda #$01
-        sta starfield_state
-; reset star palette twinkles
-	; XXX redundant with starfield_bg_init
-	lda STARFIELD_COL0_START
-        sta starfield_col0
-        lda STARFIELD_COL1_START
-        sta starfield_col1
-        ; work with top half of sprites
-	lda #$80
-        sta temp00
-        lda #$00
-        sta temp01
-.set_each_star
-	; temp00 holds oam ram offset
-        ; temp01 holds x pos offset
-        lda temp01
-        ldx temp00
-        sta oam_ram_x,x
-        lda temp00
-        lsr
-        lsr
-        and #%00000001
-        clc
-        adc #$22
-        sta oam_ram_att,x
-        jsr get_next_random
-        lsr
-        and STARFIELD_MASK
-        cmp #$16
-        bcc .is_star
-.no_star
-        lda #$ff
-        ldx temp00
-        sta oam_ram_y,x
-        bne .forward_loop
-.is_star
-	asl
-        asl
-        asl
-        ldx temp00
-        sta oam_ram_y,x
-        lda starfield_sprite
-        sta oam_ram_spr,x
-.forward_loop
-        ; next loop
-        lda #$08
-        clc
-        adc temp01
-        sta temp01
-        lda #$04
-        clc
-        adc temp00
-        sta temp00
-        bcc .set_each_star
-        jsr nametables_clear
-	rts
-        
-starfield_spr_update: subroutine
-        ; twinkle them stars with palette stuff
-        lda starfield_col0
-        jsr palette_next_rainbow_color
-        sta starfield_col0
-        sta pal_spr_2_1
-        clc
-        adc #$21
-        sta pal_spr_2_2
-        adc #$0d
-        sta pal_spr_2_3
-        lda starfield_col1
-        jsr palette_next_rainbow_color
-        sta starfield_col1
-        sta pal_spr_3_1
-        clc
-        adc #$21
-        sta pal_spr_3_2
-        adc #$0d
-        sta pal_spr_3_3
-        
-        
-	lda #$80
-        sta temp00
-.scroll_loop
-	ldx temp00
-        lda oam_ram_x,x
-        clc
-        adc scroll_speed
-        sta oam_ram_x,x
-        bcc .dont_update_star
-        jsr starfield_spr_set_next
-.dont_update_star
-        lda #$04
-        clc
-        adc temp00
-        sta temp00
-        bcc .scroll_loop
-        
-        ldy #$00
-.keep_star_bg_col_clear
-	lda starempty_tile 
-	sta star_cache,y
-        iny
-        cpy #$16
-        bne .keep_star_bg_col_clear
-	rts
-        
-starfield_spr_set_next: subroutine
-	; decides if a star exists and its y position
-        ; oam offset should be in temp00
-        jsr get_next_random
-        lsr
-        and STARFIELD_MASK
-        cmp #$16
-        bcc .is_star
-.no_star
-        lda #$ff
-        ldx temp00
-        sta oam_ram_y,x
-        rts
-.is_star
-	asl
-        asl
-        asl
-        clc
-        adc #$08
-        ldx temp00
-        sta oam_ram_y,x
-        lda starfield_sprite
-        sta oam_ram_spr,x
-        ; XXX maybe only set att in init?
-        ;lda #$20
-        ;sta oam_ram_att,x
-        rts
-        
-        
 
-starfield_bg2spr_update: subroutine
-	; wait until bg x pos is close to 0
-        ; then empty updating columns
-        ; and replace with sprite instance
-	rts
-        
-starfield_spr2bg_update: subroutine
-	; set bg close to 0
-        ; start populating columns
-        ; free sprites as they leave to the right
-	rts
 
 
 
 starfield_bg_update: subroutine
-	; precalculate all starfield things post sprite 0
-	
-	; update scroll pos
-	lda scroll_x
-        sec
-        sbc scroll_speed
-        bcs .samepage
-        inc scroll_page
-.samepage
-	sta scroll_x
-	
+	; precalculate all starfield things post sprite 
+	jsr starfield_scroll
         ; twinkle them stars with palette stuff
-        lda starfield_col0
-        jsr palette_next_rainbow_color
-        sta starfield_col0
-        sta pal_bg_0_1
-        clc
-        adc #$21
-        sta pal_bg_0_2
-        adc #$0d
-        sta pal_bg_0_3
-        lda starfield_col1
-        jsr palette_next_rainbow_color
-        sta starfield_col1
-        sta pal_bg_1_1
-        clc
-        adc #$21
-        sta pal_bg_1_2
-        adc #$0d
-        sta pal_bg_1_3
-        
-
+        jsr starfield_twinkle_colors
+        jsr starfield_twinkle_bg
 	; XXX hook this up with tile changing later
         ; probably hearts after killing a boss
         ; XXX starfield_tile
         ; #$0f star
         ; #$90 heart
-
-        
-	lda scroll_x
-        lsr
-        lsr
-        lsr
-        sta starfield_col
-        
-        lda scroll_page
-        and #$01
-        cmp #$00
-        bne .scroll_page
-        lda #$20
-        sta starfield_page
-   	jmp .scroll_page_done
-.scroll_page
-	lda #$24
-        sta starfield_page
-.scroll_page_done
-        
 starfield_cache_next_col:
         ; setup rng for star probability
         lda rng0
         lsr
         and STARFIELD_MASK
-        sta starfield_rng
+        sta starfield_temp
       	ldy #$00
 .col_assign_tile_loop
-	cpy starfield_rng
+	cpy starfield_temp
         bne .empty_tile
 .star_tile
 	lda starfield_tile
@@ -405,3 +305,258 @@ starfield_cache_next_col:
         
         
         
+starfield_bg2psr_init: subroutine
+        lda #2
+        sta starfield_state
+        ; distribute star sprites
+	ldx #$80
+        lda scroll_x
+        and #7
+        sta temp00
+.loop
+	sta oam_ram_x,x
+        lda #$ff
+        sta oam_ram_y,x
+        lda #$08
+        clc
+        adc temp00
+        sta temp00
+        inx
+        inx
+        inx
+        inx
+        bne .loop
+        ; log destination of nametable0 cleared
+        lda starfield_page
+        cmp #$24
+        bne .do_the_full_monty
+        lda scroll_x
+        sta starfield_temp
+	rts
+.do_the_full_monty
+	lda #8
+        sta starfield_temp
+        rts
+        
+        
+starfield_bg2spr_update: subroutine
+	; an initializer needs to set a counter for when
+        ; nametable0 is cleared
+        
+        ; clear left col of nametable starfield
+        lda #$20
+        ldx #$16
+.clear_col_loop
+	sta star_cache,x
+        dex
+        bne .clear_col_loop
+        
+        ; setup left col of starfield sprite
+        jsr starfield_spr_get_position
+        jsr starfield_spr_set_next
+       
+	jsr starfield_scroll
+        jsr starfield_spr_update
+        jsr starfield_twinkle_colors
+        jsr starfield_twinkle_bg
+        jsr starfield_twinkle_spr
+        
+        ; check if nametable0 is cleared
+        lda starfield_page
+        cmp #$24
+        beq .done
+        lda starfield_temp
+        cmp scroll_x
+        bcc .done
+        lda #1
+        sta starfield_state
+.done	
+	rts
+        
+        
+starfield_spr_get_position: subroutine
+	; scroll_x decides which sprite and x position
+        lda scroll_x
+        and #$07 ; this is the x position
+        lda scroll_x
+        lsr
+        lsr
+        lsr ; col position (range of 32)
+        asl
+        asl
+        clc
+        adc #$80
+        tax ; oam ram offset
+	rts
+        
+                
+starfield_spr_init: subroutine
+	; set that state
+	lda #$01
+        sta starfield_state
+        lda #$03
+        jsr state_render_set_addr
+        ; work with top half of sprites
+	lda #$80
+        sta temp00
+        lda #$00
+        sta temp01
+.set_each_star
+	; temp00 holds oam ram offset
+        ; temp01 holds x position
+        ldx temp00
+        lda temp01
+        sta oam_ram_x,x
+        jsr starfield_spr_set_next
+.forward_loop
+        ; next loop
+        lda #$08
+        clc
+        adc temp01
+        sta temp01
+        lda #$04
+        clc
+        adc temp00
+        sta temp00
+        bcc .set_each_star
+        jsr nametables_clear
+        ; make sure sprite0 has something to collide with
+        PPU_SETADDR $2001
+        ; update column
+        lda #CTRL_INC_32
+        sta PPU_CTRL
+        lda #$0d
+        ldx #$20
+.col_loop
+        sta PPU_DATA
+        dex
+        bne .col_loop
+        lda #CTRL_INC_1
+        sta PPU_CTRL
+	rts
+        
+        
+starfield_spr_update: subroutine
+        ; twinkle them stars with palette stuff
+        jsr starfield_twinkle_colors
+        jsr starfield_twinkle_spr
+        ; cycle through all star sprites
+	lda #$80
+        sta temp00
+.scroll_loop
+	ldx temp00
+        lda oam_ram_x,x
+        clc
+        adc scroll_speed
+        sta oam_ram_x,x
+        bcc .dont_update_star
+        jsr starfield_spr_set_next
+.dont_update_star
+        lda #$04
+        clc
+        adc temp00
+        sta temp00
+        bcc .scroll_loop
+	rts
+        
+        
+starfield_spr_set_next: subroutine
+	; decides if a star exists and its y pos, spr, att
+        ; x = oam offset
+        jsr get_next_random
+        lsr
+        and STARFIELD_MASK
+        cmp #$16
+        bcc .is_star
+.no_star
+        lda #$ff
+        sta oam_ram_y,x
+        rts
+.is_star
+	asl
+        asl
+        asl
+        clc
+        adc #$08
+        sta oam_ram_y,x
+        lda starfield_sprite
+        sta oam_ram_spr,x
+        ; set spr pal based on x position
+	txa
+        lsr
+        lsr
+        lsr
+        and #1
+        clc
+        ; $20 = behind bg tiles
+        ; $02 = use sprite palettes 2 and 3
+        adc #$22
+        sta oam_ram_att,x
+        rts
+        
+        
+        
+
+        
+starfield_spr2bg_update: subroutine
+	; set bg close to 0
+        ; start populating columns
+        ; free sprites as they leave to the right
+	rts
+        
+        
+        
+        
+        
+        
+        
+starfield_twinkle_reset: subroutine
+	lda STARFIELD_COL0_START
+        sta starfield_col0
+        lda STARFIELD_COL1_START
+        sta starfield_col1
+	rts
+        
+        
+starfield_twinkle_colors: subroutine
+        lda starfield_col0
+        jsr palette_next_rainbow_color
+        sta starfield_col0
+        lda starfield_col1
+        jsr palette_next_rainbow_color
+        sta starfield_col1
+	rts
+        
+starfield_twinkle_bg: subroutine
+	lda starfield_col0
+        sta pal_bg_0_1
+        clc
+        adc #$21
+        sta pal_bg_0_2
+        adc #$0d
+        sta pal_bg_0_3
+        lda starfield_col1
+        sta pal_bg_1_1
+        clc
+        adc #$21
+        sta pal_bg_1_2
+        adc #$0d
+        sta pal_bg_1_3
+	rts
+        
+starfield_twinkle_spr: subroutine
+        lda starfield_col0
+        sta pal_spr_2_1
+        clc
+        adc #$21
+        sta pal_spr_2_2
+        adc #$0d
+        sta pal_spr_2_3
+        lda starfield_col1
+        sta pal_spr_3_1
+        clc
+        adc #$21
+        sta pal_spr_3_2
+        adc #$0d
+        sta pal_spr_3_3
+	rts

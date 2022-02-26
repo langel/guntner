@@ -5,15 +5,20 @@ sandbox2_init: subroutine
         jsr game_init_generic
   ; SCROLL SPEED
   	;lda #$27
-        lda #$07
+        lda #$03
         sta scroll_speed
         
+        
         jsr starfield_bg_init
+        lda #200
+        sta scroll_x
+        jsr starfield_bg2psr_init
+        ;jsr starfield_spr_init
         ;jsr nametables_clear
         jsr dashboard_init
         
-        lda #2
-        jsr state_render_set_addr
+        ;lda #2
+        ;jsr state_render_set_addr
         lda #9
         jsr state_update_set_addr
         
@@ -42,7 +47,7 @@ sandbox2_update: subroutine
         jsr get_enemy_slot_1_sprite
         cmp #$ff
         beq .dont_spawn
-        jsr galger_spawn
+        ;jsr galger_spawn
 .dont_spawn
 
 	jsr game_update_generic
