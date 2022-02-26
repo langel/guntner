@@ -86,6 +86,12 @@ timer_seconds_10s	byte
 timer_minutes_1s	byte
 timer_minutes_10s	byte
 
+state_v0		byte
+state_v1		byte
+state_v2		byte
+state_v3		byte
+state_v4		byte
+state_v5		byte
 state_sprite0	byte
 state_fade_in	byte
 state_fade_out	byte
@@ -112,12 +118,6 @@ enemy_temp_temp		byte
 enemy_dmg_accumulator	byte
 boss_x		byte
 boss_y		byte
-boss_v0		byte
-boss_v1		byte
-boss_v2		byte
-boss_v3		byte
-boss_v4		byte
-boss_v5		byte
 
 player_color0	byte
 player_color1	byte

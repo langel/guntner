@@ -75,12 +75,12 @@ boss_vamp_bat_cycle: subroutine
         ; update x pos
         lda enemy_ram_ac,x
         tax
-        lda boss_v4
+        lda state_v4
         jsr sine_of_scale
         clc
         adc boss_x
         sec
-        sbc boss_v5
+        sbc state_v5
 	ldx enemy_ram_offset
         sta enemy_ram_x,x
         sta oam_ram_x,y
@@ -90,12 +90,12 @@ boss_vamp_bat_cycle: subroutine
         adc enemy_ram_ac,x
         adc wtf
         tax
-        lda boss_v4
+        lda state_v4
         jsr sine_of_scale
         clc
         adc boss_y
         sec
-        sbc boss_v5
+        sbc state_v5
 	ldx enemy_ram_offset
         sta enemy_ram_x,x
         sta oam_ram_y,y
@@ -152,14 +152,14 @@ boss_vamp_spawn: subroutine
         sta PPU_DATA
         ; XXX not sure if we need this here
         lda #$0d
-        sta boss_v0 ; target count of bat underlings; d = 13
+        sta state_v0 ; target count of bat underlings; d = 13
         lda #$00
-        sta boss_v1
+        sta state_v1
         txa
         tay
-        sty boss_v3
+        sty state_v3
         lda #$40
-        sta boss_v4 ; minimum bat circle size
+        sta state_v4 ; minimum bat circle size
 .bat_spawn_loop
 	; a = animation counter / v1
 	; x = slot in enemy ram 
@@ -167,13 +167,13 @@ boss_vamp_spawn: subroutine
         ; stash boss slot in pattern counter
 	jsr get_enemy_slot_1_sprite
         tax
-        lda boss_v1
+        lda state_v1
         clc
         adc #$14
-        sta boss_v1
-        ldy boss_v3
+        sta state_v1
+        ldy state_v3
         jsr boss_vamp_bat_spawn
-	dec boss_v0
+	dec state_v0
         beq .done
         jmp .bat_spawn_loop
 .done
@@ -208,26 +208,26 @@ boss_vamp_cycle: subroutine
 .not_dead    
         inc enemy_ram_ac,x
         lda #$40
-        lda boss_v0
+        lda state_v0
         lda enemy_ram_ac,x
         asl
         asl
         cmp #$80
         bcs .shrink_bat_circle
 .grow_bat_circle
-	inc boss_v4
+	inc state_v4
         jmp .bat_circle_adjust_done
 .shrink_bat_circle
-	dec boss_v4
+	dec state_v4
 .bat_circle_adjust_done
-	lda boss_v4
+	lda state_v4
         lsr
-        sta boss_v5 ; half of bat circle size
+        sta state_v5 ; half of bat circle size
 	; calc x
-        inc boss_v2 ; x sine
-        inc boss_v2 ; x sine
-        inc boss_v2 ; x sine
-        lda boss_v2
+        inc state_v2 ; x sine
+        inc state_v2 ; x sine
+        inc state_v2 ; x sine
+        lda state_v2
         lsr
         tay
 	ldx enemy_ram_offset
