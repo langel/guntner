@@ -66,7 +66,8 @@ STATE_RENDER_FUNCTION_TABLE:
         .word	menu_screens_render		; 1
         .word	starfield_bg_render		; 2
         .word 	starfield_spr_render		; 3
-        .word	dashboard_render		; 4
+        .word	starfield_sprmsg_render		; 4
+        .word	dashboard_render		; 5
 
 STATE_UPDATE_FUNCTION_TABLE:
 	.word	state_update_do_nothing		; 0
@@ -79,6 +80,7 @@ STATE_UPDATE_FUNCTION_TABLE:
         .word	sandbox_update			; 7
         .word	cut_scene_update_generic	; 8
         .word	sandbox2_update			; 9
+        .word	starfield_sprmsg_update		; a
 
 
 

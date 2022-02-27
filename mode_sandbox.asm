@@ -10,8 +10,8 @@ sandbox_init: subroutine
         lda #$07
         sta scroll_speed
         
-        jsr starfield_spr_init
         jsr nametables_clear
+        jsr starfield_spr_init
         jsr dashboard_init
         
         lda #3
@@ -23,11 +23,10 @@ sandbox_init: subroutine
         lda #$00
         sta state_v0
         sta state_v1
+        sta state_v6
+        sta state_v7
         
-        
-       	; put that shit back to sequential order
-        lda #0
-        sta PPU_CTRL
+ 
         
         jsr get_enemy_slot_1_sprite
         tax

@@ -59,7 +59,6 @@ rng2		byte
 
 starfield_state	byte
 starfield_col	byte
-starfield_temp	byte
 starfield_page	byte
 starfield_col0	byte
 starfield_col1	byte
@@ -92,6 +91,8 @@ state_v2		byte
 state_v3		byte
 state_v4		byte
 state_v5		byte
+state_v6		byte
+state_v7		byte
 state_sprite0	byte
 state_fade_in	byte
 state_fade_out	byte
