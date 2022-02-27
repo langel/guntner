@@ -8,9 +8,9 @@ starfield_tile	.byte #$0f
 starempty_tile	.byte #$20
 starfield_sprite	.byte	#$6b
 
-starfield_msg_cache	EQU	$03e0	; 32 bytes for string data
+starfield_msg_cache	=	$03e0	; 32 bytes for string data
 
-star_cache	EQU 	208
+star_cache		EQU 	208
 
 
 ;	POSSIBLE STARFIELD STATES
@@ -485,9 +485,9 @@ starfield_sprmsg_render: subroutine
         jsr starfield_tile_left_border
         jmp state_render_done
 .not_tile_left_border
-	lda state_v0
-        sta PPU_ADDR
 	lda state_v1
+        sta PPU_ADDR
+	lda state_v0
         sta PPU_ADDR
         ldx #31
 .sprmsg_loop
@@ -495,14 +495,13 @@ starfield_sprmsg_render: subroutine
         sta PPU_DATA
         dex
         bne .sprmsg_loop
+        jsr dashboard_render
         jmp state_render_done
 
 
-starfield_dashboard_rows_table: 
-	.word $22c0, $22e0, $2300, $2320, $2340, $2360
 starfield_sprmsg_update: subroutine
+        jsr starfield_spr_update
 	lda state_v7
-        inc state_v7
         asl
         tax
         lda starfield_msgscroll_setup_table,x
@@ -510,10 +509,8 @@ starfield_sprmsg_update: subroutine
         inx
         lda starfield_msgscroll_setup_table,x
         sta temp01
+        inc state_v7
         jmp (temp00)
-        
-        
-        
 starfield_msgscroll_setup_table:
 	.word starfield_msgscroll_setup_clear_msg_cache		; 0
         .word starfield_msgscroll_setup_clear_dash_space	; 1
@@ -529,6 +526,7 @@ starfield_msgscroll_setup_clear_msg_cache: subroutine
 	; frame 0
 	lda #0
         tax
+        lda #$20
 .loop
         sta starfield_msg_cache,x
         inx
@@ -536,22 +534,31 @@ starfield_msgscroll_setup_clear_msg_cache: subroutine
         bne .loop
         rts
 
+starfield_dashboard_rows_table: 
+	.word $22c0, $22e0, $2300, $2320, $2340, $2360
+        
 starfield_msgscroll_setup_clear_dash_space: subroutine
 	; frame 1-6
 	ldx state_v7
         dex
+        dex ; off by 1? this works!
         txa
         asl
         tax
         lda starfield_dashboard_rows_table,x
         sta state_v0
+        sta state_v2
+        stx state_v4
         inx
         ldy starfield_dashboard_rows_table,x
-        iny
+        ;iny
         sty state_v1
+        sta state_v3
 	rts
         
 starfield_msgscroll_setup_populate_message: subroutine
+	lda #$61
+        sta scroll_y
         rts
  	; scroll from $61 to $ef? maybe $f8?
         
