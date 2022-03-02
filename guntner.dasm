@@ -36,7 +36,7 @@ cart_start:	subroutine
         lda #$ff
         sta rng2
         
-        lda #$f8
+        lda #232
         sta scroll_y ; just seems right
         ; set hud y pos
         lda #182
@@ -50,6 +50,7 @@ cart_start:	subroutine
         jsr player_bullets_init
         
         jsr nametables_clear
+        jsr sprite_clear
 	jsr player_game_reset
         
         lda #$c0
@@ -63,6 +64,8 @@ cart_start:	subroutine
 	lda #$37
         sta player_color2
 	jsr player_update_colors
+        lda #MASK_BG|MASK_SPR
+        sta ppu_mask_cache
         
         jsr WaitSync
         jsr WaitSync
@@ -132,7 +135,7 @@ state_render_done:
         and #$01
         ora #CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
-        lda #MASK_BG|MASK_SPR
+        lda ppu_mask_cache
         sta PPU_MASK	
         
         ; hope everything above was under

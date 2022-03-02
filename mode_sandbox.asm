@@ -88,67 +88,8 @@ sandbox_init: subroutine
         
 
         
-sandbox_scroll_y3: subroutine
-	lda state_v1
-        cmp #$00
-        bne .not_init
-        ; init
-        lda #$88
-        sta state_v0
-        bne .inc_state
-.not_init
-	cmp #$01
-        bne .not_scroll_up
-	; animate sine pos $90 to $40
-        ldx state_v0
-        lda sine_table,x
-        sec
-        sbc #$10
-        sta scroll_y
-        ldx state_v0
-        dex
-        dex
-        cpx #$40
-        beq .inc_state
-        stx state_v0
-        rts
-.not_scroll_up
-	cmp #$02
-        bne .not_pause
-        ; hold 2 seconds?
-        inc state_v0
-        lda #160
-        cmp state_v0
-        beq .inc_state
-        rts
-.not_pause
-	cmp #$03
-        bne .not_init_scroll_off
-        lda #$c0
-        sta state_v0
-        bne .inc_state
-.not_init_scroll_off
-	cmp #$04
-        bne .not_scroll_off
-        ; animate sine pos $c0 to $90
-        ldx state_v0
-        lda sine_table,x
-        sta scroll_y
-        dex
-        dex
-        dex
-        cpx #$88
-        bcc .inc_state
-        stx state_v0
-        rts
-.not_scroll_off
-.inc_state
-	inc state_v1
-        rts
-        
         
 sandbox_update: subroutine
-	jsr sandbox_scroll_y3
 	jsr get_enemy_slot_1_sprite
         cmp #$ff
         ;mp #$40

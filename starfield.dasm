@@ -120,6 +120,11 @@ starfield_debugger: subroutine
         clc
         adc #$30
         sta $111
+        ; transition frame
+        lda state_v7
+        clc
+        adc #$30
+        sta $113
 	rts
         
         
@@ -174,11 +179,10 @@ starfield_spr_render: subroutine
         
         
         
+; XXX are these even used?
 starfield_bg2spr_render: subroutine
 	; remove bg columns
         jmp state_render_done
-        
-        
 starfield_spr2bg_render: subroutine
 	; populate bg columns
         jmp state_render_done
@@ -310,7 +314,7 @@ starfield_cache_next_col:
         
         
         
-starfield_bg2psr_init: subroutine
+starfield_bg2spr_init: subroutine
         lda #2
         sta starfield_state
         ; distribute star sprites
@@ -364,9 +368,7 @@ starfield_bg2spr_update: subroutine
        
 	jsr starfield_scroll
         jsr starfield_spr_update
-        ;jsr starfield_twinkle_colors
         jsr starfield_twinkle_bg
-        ;jsr starfield_twinkle_spr
         
         ; check if nametable0 is cleared
         lda scroll_x
@@ -381,6 +383,9 @@ starfield_bg2spr_update: subroutine
         sta scroll_x
         sta scroll_page
         sta state_v7
+        ; XXX this tile setting is necessary?
+        lda #$1d
+        sta state_v6 ; left col tile
         lda #4
         jsr state_render_set_addr
 .done	
@@ -440,6 +445,7 @@ starfield_spr_init: subroutine
         sta temp00
         bcc .set_each_star
         jsr nametables_clear
+        ; XXX this might need a state variable set to a tile
         jsr starfield_tile_left_border
 	rts
         
@@ -466,106 +472,8 @@ starfield_spr_update: subroutine
         sta temp00
         bcc .scroll_loop
 	rts
-
-
-
-starfield_sprmsg_table:
-        .byte "       PHASE 1x COMPLETED       "	; 2100
-        .byte "       moar text for test       "	; 2140
-        .byte "       no i won't shutup        "	; 2180
         
-starfield_sprmsg_render: subroutine
-	; state_v7 is a state counter
-        ; state_v0 nametable high address
-        ; state_v1 nametable low address
-        ; write from msg_cache to nametable
-	lda state_v7
-        cmp #0
-        bne .not_tile_left_border
-        jsr starfield_tile_left_border
-        jmp state_render_done
-.not_tile_left_border
-	lda state_v1
-        sta PPU_ADDR
-	lda state_v0
-        sta PPU_ADDR
-        ldx #31
-.sprmsg_loop
-        lda starfield_msg_cache,x
-        sta PPU_DATA
-        dex
-        bne .sprmsg_loop
-        jsr dashboard_render
-        jmp state_render_done
-
-
-starfield_sprmsg_update: subroutine
-        jsr starfield_spr_update
-	lda state_v7
-        asl
-        tax
-        lda starfield_msgscroll_setup_table,x
-        sta temp00
-        inx
-        lda starfield_msgscroll_setup_table,x
-        sta temp01
-        inc state_v7
-        jmp (temp00)
-starfield_msgscroll_setup_table:
-	.word starfield_msgscroll_setup_clear_msg_cache		; 0
-        .word starfield_msgscroll_setup_clear_dash_space	; 1
-        .word starfield_msgscroll_setup_clear_dash_space	; 2
-        .word starfield_msgscroll_setup_clear_dash_space	; 3
-        .word starfield_msgscroll_setup_clear_dash_space	; 4
-        .word starfield_msgscroll_setup_clear_dash_space	; 5
-        .word starfield_msgscroll_setup_clear_dash_space	; 6
-        .word starfield_msgscroll_setup_populate_message	; 7
-        .word starfield_msgscroll_setup_next_state
-        
-starfield_msgscroll_setup_clear_msg_cache: subroutine
-	; frame 0
-	lda #0
-        tax
-        lda #$20
-.loop
-        sta starfield_msg_cache,x
-        inx
-        cpx #$20
-        bne .loop
-        rts
-
-starfield_dashboard_rows_table: 
-	.word $22c0, $22e0, $2300, $2320, $2340, $2360
-        
-starfield_msgscroll_setup_clear_dash_space: subroutine
-	; frame 1-6
-	ldx state_v7
-        dex
-        dex ; off by 1? this works!
-        txa
-        asl
-        tax
-        lda starfield_dashboard_rows_table,x
-        sta state_v0
-        sta state_v2
-        stx state_v4
-        inx
-        ldy starfield_dashboard_rows_table,x
-        ;iny
-        sty state_v1
-        sta state_v3
-	rts
-        
-starfield_msgscroll_setup_populate_message: subroutine
-	lda #$61
-        sta scroll_y
-        rts
- 	; scroll from $61 to $ef? maybe $f8?
-        
-starfield_msgscroll_setup_next_state: subroutine
-	jmp starfield_spr2bg_init
-        
-        
+                
 starfield_spr_set_next: subroutine
 	; decides if a star exists and its y pos, spr, att
         ; x = oam offset
@@ -602,10 +510,240 @@ starfield_spr_set_next: subroutine
         
         
 
-starfield_spr2bg_init: subroutine
-	lda #1
-        sta starfield_state
+
+        
+starfield_sprmsg_render: subroutine
+	; state_v7 is a state counter
+        ; state_v0 nametable high address
+        ; state_v1 nametable low address
+        ; write from msg_cache to nametable
+	lda state_v7
+        cmp #0
+        bne .not_tile_left_border
+        jsr starfield_tile_left_border
+        jsr dashboard_render
+        jmp state_render_done
+.not_tile_left_border
+	lda state_v1
+        sta PPU_ADDR
+	lda state_v0
+        sta PPU_ADDR
+        ldx #31
+.sprmsg_loop
+        lda starfield_msg_cache,x
+        sta PPU_DATA
+        dex
+        bne .sprmsg_loop
+        jsr dashboard_render
+        jmp state_render_done
+
+
+starfield_sprmsg_update: subroutine
+        jsr starfield_spr_update
+	lda state_v7
+        asl
+        tax
+        lda starfield_msgscroll_setup_table,x
+        sta temp00
+        inx
+        lda starfield_msgscroll_setup_table,x
+        sta temp01
+        inc state_v7
+        jmp (temp00)
+starfield_msgscroll_setup_table:
+	.word starfield_msgscroll_setup_clear_msg_cache		; 1
+        .word starfield_msgscroll_setup_clear_dash_space	; 2
+        .word starfield_msgscroll_setup_clear_dash_space	; 3
+        .word starfield_msgscroll_setup_clear_dash_space	; 4
+        .word starfield_msgscroll_setup_clear_dash_space	; 5
+        .word starfield_msgscroll_setup_clear_dash_space	; 6
+        .word starfield_msgscroll_setup_clear_dash_space	; 7
+        .word starfield_msgscroll_setup_populate_message	; 8
+        .word starfield_msgscroll_setup_populate_message	; 9
+        .word starfield_msgscroll_setup_populate_message	; a
+        .word starfield_msgscroll_scrollup			; b
+        .word starfield_msgscroll_wait				; c
+        .word starfield_msgscroll_upandout			; d
+	.word starfield_msgscroll_setup_clear_msg_cache		; e
+        .word starfield_msgscroll_cleanup_msg			; f
+        .word starfield_msgscroll_cleanup_msg			; 10
+        .word starfield_msgscroll_cleanup_reinstate_dash	; 11
+        .word starfield_msgscroll_done				; 12
+        
+starfield_msgscroll_setup_clear_msg_cache: subroutine
+	; frame 1 / e
+        ldx #0
+        lda #$20
+.loop
+        sta starfield_msg_cache,x
+        inx
+        cpx #$20
+        bne .loop
+        lda #MASK_BG|MASK_SPR|MASK_SPR_CLIP|MASK_BG_CLIP
+        sta ppu_mask_cache
+        rts
+
+starfield_dashboard_rows_table: 
+	.word $22c1, $22e1, $2301, $2321, $2341, $2361
+        
+starfield_msgscroll_setup_clear_dash_space: subroutine
+	; frame 2-7
+	ldx state_v7
+        dex
+        dex ; off by 1? this works!
+        txa
+        asl
+        tax
+        lda starfield_dashboard_rows_table,x
+        sta state_v0
+        inx
+        lda starfield_dashboard_rows_table,x
+        sta state_v1
 	rts
+
+starfield_sprmsg_table:
+        .byte "       PHASE 1x COMPLETED       "	; 2100
+        .byte "       moar text for test       "	; 2140
+        .byte "       no i won't shutup        "	; 2180
+starfield_sprmsg_rows_table:
+	.word $2101, $2141, $2181
+starfield_msgscroll_setup_populate_message: subroutine
+	; frame 8-a
+	lda #$61
+        sta scroll_y
+        lda state_v7
+        sec
+	sbc #8
+        sta temp00
+        ; load message
+        asl
+        asl
+        asl
+        asl
+        asl
+        tax
+        ldy #32
+.msg_loop
+	lda starfield_sprmsg_table,x
+        sta starfield_msg_cache,y
+        inx
+        dey
+        bne .msg_loop
+        ; load nametable address
+        lda temp00
+        asl
+        tax
+        lda starfield_sprmsg_rows_table,x
+        sta state_v0
+        inx
+        lda starfield_sprmsg_rows_table,x
+        sta state_v1
+        ; set start scroll position for next msgscroll step
+        lda #$80
+       	sta state_v6
+        rts
+ 	; scroll from $61 to $ef? maybe $f8?
+        
+        
+starfield_msgscroll_scrollup: subroutine
+	; frame b
+	; uses state_v6 for sine offset position
+        ; animate sine pos $80 to $40
+        ldx state_v6
+        lda sine_table,x
+        sec
+        sbc #$10
+        sta scroll_y
+        ldx state_v6
+        dex
+        dex
+        cpx #$40
+        beq .next_msgscroll_step
+        stx state_v6
+        ; keep msgscroll step locked here until done
+        dec state_v7
+.next_msgscroll_step
+	rts
+        
+starfield_msgscroll_wait: subroutine
+	; frame c
+        ; hold 2 seconds?
+        inc state_v6
+        lda #160
+        cmp state_v6
+        beq .next_msgscroll_step
+        ; keep msgscroll step locked here until done
+        dec state_v7
+.next_msgscroll_step
+	rts
+        
+starfield_msgscroll_upandout: subroutine
+	; frame d
+        ; animate sine pos $c0 to $90
+        ldx state_v6
+        lda sine_table,x
+        sta scroll_y
+        dex
+        dex
+        dex
+        cpx #$88
+        bcc .next_msgscroll_step
+        stx state_v6
+        ; keep msgscroll step locked here until done
+        dec state_v7
+.next_msgscroll_step
+	rts
+        
+starfield_msgscroll_cleanup_msg: subroutine
+	; frame f-10 (frame e clears out bottom row)
+	lda state_v7
+        sec
+        sbc #$0f
+        asl
+        tax
+        lda starfield_sprmsg_rows_table,x
+        sta state_v0
+        inx
+        lda starfield_sprmsg_rows_table,x
+        sta state_v1
+	rts
+        
+starfield_msgscroll_cleanup_reinstate_dash: subroutine
+	; frame 11
+	; XXX redundant with starfield_draw_dash_top_bar_nametable0
+        lda #>dash_page1_top_bar
+        sta state_v1
+        sta state_v4
+        lda 1+#<dash_page1_top_bar
+        sta state_v0
+        sta state_v5
+        lda dash_top_bar_tile
+        ldy #$20
+.loop
+	sta starfield_msg_cache,y
+        dey
+        bne .loop
+        lda #232
+        sta scroll_y
+        lda #MASK_BG|MASK_SPR
+        sta ppu_mask_cache
+        rts
+        
+starfield_msgscroll_done: subroutine
+	; frame 12
+        ; move to the next starfield state WOW
+        lda #2
+        jsr state_render_set_addr
+	lda #4
+        sta starfield_state
+        lda #8
+        sta scroll_x
+        lda #$ff
+        sta state_v6 ; countdown to sprites done eliminating
+        rts
+        
+        
+
         
 
         
@@ -613,7 +751,31 @@ starfield_spr2bg_update: subroutine
 	; set bg close to 0
         ; start populating columns
         ; free sprites as they leave to the right
-	rts
+        jsr starfield_bg_update     
+        jsr starfield_spr_update
+        ; cycle through all star sprites
+        ; if x < 8 move off screen
+	lda #$80
+        sta temp00
+.loop
+	ldx temp00
+        lda oam_ram_x,x
+        cmp #8
+        bcs .keep_it_for_now
+        lda #$ff
+        sta oam_ram_y,x
+.keep_it_for_now
+	lda #$04
+        clc
+        adc temp00
+        sta temp00
+        bcc .loop
+        dec state_v6
+        bne .done
+.goto_next_state
+	jsr sandbox2_init
+.done
+        rts
         
         
         

@@ -30,7 +30,12 @@ oam_enemy_sprites = $0220
 
 
 	;include "enemy_birb.dasm"
+        
 
+enemy_handler_init: subroutine
+	; set all sprites below the fold
+        lda #$ff
+	rts
         
 
 sprite_4_set_sprite: subroutine
