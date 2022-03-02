@@ -11,10 +11,9 @@ sandbox_init: subroutine
         sta scroll_speed
         
         jsr nametables_clear
-        jsr starfield_spr_init
         jsr dashboard_init
         
-        lda #3
+        lda #2
         jsr state_render_set_addr
         lda #7
         jsr state_update_set_addr

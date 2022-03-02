@@ -153,29 +153,7 @@ starfield_bg_render: subroutine
         jmp state_render_done
         
         
-phase_msg_tile_data:
-	; XXX this definitely should not be done during render
-        .hex 2107
-        .byte "PHASE 1x COMPLETED"
-        .byte #$00
-        ; XXX might need another method for writing
-        ;     one line at a time to nametable
-        .hex 2147
-        .byte "moar text for test"
-        .byte #$00
-        .byte #$ff
-        .hex 2187
-        .byte "no i won't shutup"
-        .byte #$00
-        .byte #$ff
-        
-starfield_spr_render: subroutine
-	; XXX pretty sure this will never do a thing?
-        ; maybe could be used to put messages on screen?
-        NMTP_SETADDR phase_msg_tile_data
-        jsr nametable_tile_planter
-        jsr dashboard_render
-        jmp state_render_done
+
         
         
         
@@ -377,16 +355,14 @@ starfield_bg2spr_update: subroutine
         lda state_v7
         cmp #0
         bne .done
+        ; setup next starfield state
         lda #3
         sta starfield_state
         lda #0
         sta scroll_x
         sta scroll_page
         sta state_v7
-        ; XXX this tile setting is necessary?
-        lda #$1d
-        sta state_v6 ; left col tile
-        lda #4
+        lda #4 ; starfield_sprmsg_render
         jsr state_render_set_addr
 .done	
 	rts
@@ -734,9 +710,9 @@ starfield_msgscroll_done: subroutine
 	; frame 12
         ; move to the next starfield state WOW
         lda #2
-        jsr state_render_set_addr
+        jsr state_render_set_addr ; starfield_bg_render
 	lda #4
-        sta starfield_state
+        sta starfield_state ; starfield_spr2bg_update
         lda #8
         sta scroll_x
         lda #$ff
@@ -771,10 +747,16 @@ starfield_spr2bg_update: subroutine
         adc temp00
         sta temp00
         bcc .loop
-        dec state_v6
+        lda state_v6
+        sec
+        sbc scroll_speed
+        sta state_v6
         bne .done
 .goto_next_state
-	jsr sandbox2_init
+        lda #0
+        sta starfield_state ; starfield_bg_update
+        ; XXX these needs to be more generic/abstract
+        jsr sandbox2_phase_next
 .done
         rts
         

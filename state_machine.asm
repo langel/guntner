@@ -65,7 +65,7 @@ STATE_RENDER_FUNCTION_TABLE:
 	.word	state_render_do_nothing		; 0
         .word	menu_screens_render		; 1
         .word	starfield_bg_render		; 2
-        .word 	starfield_spr_render		; 3
+        .word 	state_render_do_nothing ; placeholder
         .word	starfield_sprmsg_render		; 4
         .word	dashboard_render		; 5
 

@@ -8,44 +8,37 @@ sandbox2_init: subroutine
         lda #$03
         sta scroll_speed
         
-        
         jsr starfield_bg_init
-        lda #200
-        sta scroll_x
-        ;jsr starfield_bg2spr_init
-        ;jsr starfield_spr_init
-        ;jsr nametables_clear
         jsr dashboard_init
         
-        ;lda #2
-        ;jsr state_render_set_addr
         lda #9
         jsr state_update_set_addr
         
         jsr render_enable
         
-        ;jsr get_enemy_slot_1_sprite
-        ;jsr galger_spawn
-        ;jsr get_enemy_slot_1_sprite
-        ;jsr galger2_spawn
-        
 	jsr get_enemy_slot_4_sprite
         tax
 	;jsr boss_vamp_spawn
         
+        jsr sandbox2_phase_next
+        
+	rts
+        
+        
+sandbox2_phase_next: subroutine
         ; enemy spawn decounter
         lda #16
         sta state_v5
         lda #0
         sta phase_kill_count
-        
+        sta phase_state
 	rts
         
         
-        
 sandbox2_update: subroutine
-
-
+	lda phase_state
+        cmp #0
+        bne .dont_spawn
 	lda wtf
         and #$07
         cmp #$0
@@ -67,9 +60,11 @@ sandbox2_update: subroutine
 	lda phase_kill_count
         cmp #16
         bne .dont_next_state
-        lda starfield_state
+        lda phase_state
         cmp #0
         bne .dont_next_state
+        inc phase_current
+        inc phase_state
         jsr starfield_bg2spr_init
 .dont_next_state
         

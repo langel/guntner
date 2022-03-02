@@ -127,6 +127,7 @@ palette_fade_in_update: subroutine
 	sta pal_fade_c
 	rts
         
+        
 palette_fade_out_init: subroutine
 	; a = init callback index
         sta pal_fade_target

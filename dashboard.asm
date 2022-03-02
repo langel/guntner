@@ -236,9 +236,18 @@ dashboard_update: subroutine
 
 ; PHASE
 	lda phase_current
+        and #$f0
+        lsr
+        lsr
+        lsr
+        lsr
         clc
         adc #$30
 	sta dash_cache+$28
+	lda phase_current
+        and #$0f
+        clc
+        adc #$30
 	sta dash_cache+$29
        
        
