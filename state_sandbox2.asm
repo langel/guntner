@@ -67,6 +67,9 @@ sandbox2_update: subroutine
 	lda phase_kill_count
         cmp #16
         bne .dont_next_state
+        lda starfield_state
+        cmp #0
+        bne .dont_next_state
         jsr starfield_bg2spr_init
 .dont_next_state
         

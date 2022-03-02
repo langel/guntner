@@ -405,6 +405,7 @@ starfield_spr_get_position: subroutine
         clc
         adc #$80
         tax ; oam ram offset
+      	stx state_v2
 	; scroll_x decides which sprite and x position
         lda scroll_x
         and #$07 ; this is the x position
