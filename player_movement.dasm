@@ -1,5 +1,17 @@
 
 
+; controllers
+; 8) bit 3 up
+; 4) bit 2 down
+; 2) bit 1 left
+; 1) bit 0 right
+
+; a then thats up + left
+; 5 then thats down + right
+
+
+
+
 ;      straight/ diag
 ;speed 1  0.75 / 0.53
 ;speed 2  1.00 / 0.7071
@@ -10,16 +22,7 @@
 ;speed 3  2.25 / 1.5909
 ;speed 4  3.50 / 2.4748
 
-; 1/ 256 = 0.00390625
-
-; controllers
-; 8) bit 3 up
-; 4) bit 2 down
-; 2) bit 1 left
-; 1) bit 0 right
-
-; a then thats up + left
-; 5 then thats down + right
+; 1 / 256 = 0.00390625
 
 player_direction_speed_table:
 	; lo byte then hi byte
@@ -32,6 +35,7 @@ player_direction_speed_table:
         byte #192,#1,#61,#1
         ; speed 4
         byte #128,#2,#197,#1
+        
         ; old speed 3
         byte #64,#2,#151,#1
         ; old speed 4

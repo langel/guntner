@@ -79,6 +79,7 @@ sine_of_scale: subroutine
         ; x = sine pos
 	eor #$ff
         sta temp00
+        ; half x for lookup table
         txa
         lsr
         tax
