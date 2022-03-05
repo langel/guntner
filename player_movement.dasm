@@ -150,12 +150,8 @@ player_move_up: subroutine
         sec
         sbc player_direction_speed_table,y
         sta player_y_lo
-        bcs .no_y_hi_rollover
-        dec player_y_hi
-.no_y_hi_rollover
 	lda player_y_hi
         iny
-        sec
         sbc player_direction_speed_table,y
         sta player_y_hi
 	lda #$ff
@@ -175,12 +171,8 @@ player_move_up_right: subroutine
         clc
         adc player_direction_speed_table,x
         sta player_x_lo
-        bcc .no_x_hi_rollover
-        inc player_x_hi
-.no_x_hi_rollover
 	lda player_x_hi
         inx
-        clc
         adc player_direction_speed_table,x
         sta player_x_hi
 	; do y
@@ -188,12 +180,8 @@ player_move_up_right: subroutine
         sec
         sbc player_direction_speed_table,y
         sta player_y_lo
-        bcs .no_y_hi_rollover
-        dec player_y_hi
-.no_y_hi_rollover
 	lda player_y_hi
         iny
-        sec
         sbc player_direction_speed_table,y
         sta player_y_hi
 	rts
@@ -208,12 +196,8 @@ player_move_right: subroutine
         clc
         adc player_direction_speed_table,x
         sta player_x_lo
-        bcc .no_x_hi_rollover
-        inc player_x_hi
-.no_x_hi_rollover
         inx
 	lda player_x_hi
-        clc
         adc player_direction_speed_table,x
         sta player_x_hi
 .no_x_rollover
@@ -233,12 +217,8 @@ player_move_down_right: subroutine
         clc
         adc player_direction_speed_table,x
         sta player_x_lo
-        bcc .no_x_hi_rollover
-        inc player_x_hi
-.no_x_hi_rollover
 	lda player_x_hi
         inx
-        clc
         adc player_direction_speed_table,x
         sta player_x_hi
 	; do y
@@ -246,12 +226,8 @@ player_move_down_right: subroutine
         clc
         adc player_direction_speed_table,y
         sta player_y_lo
-        bcc .no_y_hi_rollover
-        inc player_y_hi
-.no_y_hi_rollover
 	lda player_y_hi
         iny
-        clc
         adc player_direction_speed_table,y
         sta player_y_hi
 	rts
@@ -267,12 +243,8 @@ player_move_down: subroutine
         clc
         adc player_direction_speed_table,y
         sta player_y_lo
-        bcc .no_y_hi_rollover
-        inc player_y_hi
-.no_y_hi_rollover
 	lda player_y_hi
         iny
-        clc
         adc player_direction_speed_table,y
         sta player_y_hi
         bcs .no_y_rollover
@@ -293,12 +265,8 @@ player_move_down_left: subroutine
         sec
         sbc player_direction_speed_table,x
         sta player_x_lo
-        bcs .no_x_hi_rollover
-        dec player_x_hi
-.no_x_hi_rollover
 	lda player_x_hi
         inx
-        sec
         sbc player_direction_speed_table,x
         sta player_x_hi
         bcc .no_x_rollover
@@ -308,12 +276,8 @@ player_move_down_left: subroutine
         clc
         adc player_direction_speed_table,y
         sta player_y_lo
-        bcc .no_y_hi_rollover
-        inc player_y_hi
-.no_y_hi_rollover
 	lda player_y_hi
         iny
-        clc
         adc player_direction_speed_table,y
         sta player_y_hi
         bcs .no_y_rollover
@@ -330,12 +294,8 @@ player_move_left: subroutine
         sec
         sbc player_direction_speed_table,x
         sta player_x_lo
-        bcs .no_x_hi_rollover
-        dec player_x_hi
-.no_x_hi_rollover
 	lda player_x_hi
         inx
-        sec
         sbc player_direction_speed_table,x
         sta player_x_hi
         bcc .no_x_rollover
@@ -356,12 +316,8 @@ player_move_up_left: subroutine
         sec
         sbc player_direction_speed_table,x
         sta player_x_lo
-        bcs .no_x_hi_rollover
-        dec player_x_hi
-.no_x_hi_rollover
 	lda player_x_hi
         inx
-        sec
         sbc player_direction_speed_table,x
         sta player_x_hi
 	; do y
@@ -369,12 +325,8 @@ player_move_up_left: subroutine
         sec
         sbc player_direction_speed_table,y
         sta player_y_lo
-        bcs .no_y_hi_rollover
-        dec player_y_hi
-.no_y_hi_rollover
 	lda player_y_hi
         iny
-        sec
         sbc player_direction_speed_table,y
         sta player_y_hi
 	rts
