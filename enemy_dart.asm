@@ -362,6 +362,20 @@ dart_spawn: subroutine
         
         
 dart_cycle: subroutine
+
+	; check for player collision
+        lda #$08
+        sta collision_0_w
+        lda #$04
+        sta collision_0_h
+        jsr player_collision_detect
+        cmp #$00
+        beq .no_collision
+        lda #4
+        sta player_damage
+        jsr player_take_damage
+        jmp .despawn
+.no_collision
 	
         ; set region for actang
         lda enemy_ram_ex,x
