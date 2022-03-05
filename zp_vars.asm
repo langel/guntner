@@ -140,6 +140,8 @@ phase_end_game		byte
 
 temp00	byte
 temp01	byte
+temp02	byte
+temp03	byte
 
 pal_fade_c	byte
 pal_fade_offset	byte

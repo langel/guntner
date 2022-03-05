@@ -62,6 +62,7 @@ enemy_get_direction_of_player:
         sec
         sbc player_y_hi
         bcc .top_quadrant
+.bottom_quadrant
         sta collision_0_h
         jmp .y_quadrant_done
 .top_quadrant
@@ -73,17 +74,35 @@ enemy_get_direction_of_player:
         sta collision_0_h
 .y_quadrant_done
 	; quadrant is now in temp00
+        
 .calc_deltas
-        ; calc y diff
+	; need absolute values
+; calc y diff
 	lda player_y_hi
         sec
         sbc collision_0_y
+        bcc .player_y_less_than
+.player_y_greater_than
+        bcs .calc_y_done
+.player_y_less_than
+	lda collision_0_y
+        sec
+        sbc player_y_hi
+.calc_y_done
         sta collision_0_h
         tay
-	; calc x diff
+; calc x diff
 	lda player_x_hi
         sec
         sbc collision_0_x
+        bcc .player_x_less_than
+.player_x_greater_than
+        bcs .calc_x_done
+.player_x_less_than
+	lda collision_0_x
+        sec
+        sbc player_x_hi
+.calc_x_done
         sta collision_0_w
         tax
         
@@ -113,7 +132,7 @@ enemy_get_direction_of_player:
         bcs .q_smaller
         cmp collision_1_y
         bcc .q_larger
-.q_smaller
+.q_smaller ; S * 2.5 > L
 	lsr collision_1_h
         lda collision_1_x
         clc
@@ -121,7 +140,7 @@ enemy_get_direction_of_player:
         cmp collision_1_y
         bcc .region1
         bcs .region0
-.q_larger
+.q_larger ; S * 2.5 < L
         lda collision_1_x
         asl
         asl
@@ -152,13 +171,12 @@ enemy_get_direction_of_player:
         adc #12
         sta temp01
 .result_lookup
+	; XXX isn't temp01 already in the accumulator?
 	lda temp00
         clc
         adc temp01
         tax
         lda ARCTANG_TRANSLATION_LOOKUP_TABLE,x
-        tax
-        lda ARCTANG_TRANSLATION_LOOKUP_TABLE2,x
         ; restore enemy_ram_offset
 	ldx collision_1_w
         rts
@@ -179,36 +197,125 @@ ARCTANG_TRANSLATION_LOOKUP_TABLE:
 	byte  6, 6,18,18
         
 
-ARCTANG_TRANSLATION_LOOKUP_TABLE2:
-	byte $40, $35, $2b, $20, $16, $0b
-        byte $00, $f5, $eb, $e0, $d6, $cb
-        byte $c0, $b5, $ab, $a0, $96, $8b
-        byte $80, $75, $6b, $60, $56, $4b
         
-        
-        ; each region is 15 degrees
-ARCTANG_DART_VELOCITY_TABLE:
+ARCTANG_VELOCITY_3.333_TABLE:
 	; 3.333 pixels per frame
-        ; x lo byte, hi byte
+        ; lo byte, hi byte
 	byte  85, 3
         byte  56, 3
         byte 227, 2
         byte  91, 2
         byte 171, 1
         byte 221, 0
-        ; y lo byte, hi byte
         byte   0, 0
-        byte 221, 0
-        byte 171, 1
-        byte  91, 2
-        byte 227, 2
-        byte  56, 3
         
+ARCTANG_VELOCITY_2.5_TABLE:
+	byte 127, 2
+        byte 104, 2
+        byte  43, 2
+        byte 197, 1
+        byte  64, 1
+        byte 166, 0
+        byte   0, 0
+        
+ARCTANG_VELOCITY_1.25_TABLE:
+	byte  64, 1
+	byte  53, 1
+        byte  20, 1
+        byte 225, 0
+        byte 161, 0
+        byte  81, 0
+        byte   0, 0
+	
+        
+ARCTANG_REGION_TO_X_VELOCITY_TABLE:
+	byte 0, 1, 2, 3, 4, 5
+        byte 6, 5, 4, 3, 2, 1
+	byte 0, 1, 2, 3, 4, 5
+        byte 6, 5, 4, 3, 2, 1
+        
+ARCTANG_REGION_X_PLUS_OR_MINUS_TABLE:
+	; 1 = plus
+        ; 0 = minus
+        byte 1, 1, 1, 1, 1, 1
+        byte 0, 0, 0, 0, 0, 0
+        byte 0, 0, 0, 0, 0, 0
+        byte 1, 1, 1, 1, 1, 1
+        
+ARCTANG_REGION_TO_Y_VELOCITY_TABLE:
+        byte 6, 5, 4, 3, 2, 1
+	byte 0, 1, 2, 3, 4, 5
+        byte 6, 5, 4, 3, 2, 1
+	byte 0, 1, 2, 3, 4, 5
+        
+ARCTANG_REGION_Y_PLUS_OR_MINUS_TABLE:
+	; 1 = plus
+        ; 0 = minus
+        byte 0, 0, 0, 0, 0, 0
+        byte 0, 0, 0, 0, 0, 0
+        byte 1, 1, 1, 1, 1, 1
+        byte 1, 1, 1, 1, 1, 1
 
 ; arctang movement is 16-bit
 ; oam ram x,y = high byte
 ; enemy ram x,y = low byte
 
+        
+arctang_update_x: subroutine
+        ; temp00 = hi
+        ; temp01 = lo
+        ; temp02 = region
+        ldx temp02
+        lda ARCTANG_REGION_TO_X_VELOCITY_TABLE,x
+        asl
+        tay
+        lda ARCTANG_REGION_X_PLUS_OR_MINUS_TABLE,x
+        jmp arctang_16bit_maths
+        
+
+arctang_update_y: subroutine
+        ; temp00 = hi
+        ; temp01 = lo
+        ; temp02 = region
+        ldx temp02
+        lda ARCTANG_REGION_TO_Y_VELOCITY_TABLE,x
+        asl
+        tay
+        lda ARCTANG_REGION_Y_PLUS_OR_MINUS_TABLE,x
+        jmp arctang_16bit_maths
+        
+        
+arctang_16bit_maths: subroutine
+	; a = plus or minus
+        ; y = velocity table offset
+        cmp #0
+        bne .velocity_add
+.velocity_sub
+	; lo byte
+	lda temp01
+        sec 
+        sbc ARCTANG_VELOCITY_3.333_TABLE,y
+        sta temp01
+        ; hi byte
+        iny
+	lda temp00
+        sbc ARCTANG_VELOCITY_3.333_TABLE,y
+        sta temp00
+        jmp .done_x
+.velocity_add
+	; lo byte
+        lda temp01
+        clc
+        adc ARCTANG_VELOCITY_3.333_TABLE,y
+        sta temp01
+        ; hi byte
+	iny
+	lda temp00
+        adc ARCTANG_VELOCITY_3.333_TABLE,y
+        sta temp00
+.done_x
+	rts
+        
 
 dart_spawn: subroutine
 	lda #$10
@@ -216,70 +323,75 @@ dart_spawn: subroutine
         tay
         lda ENEMY_HITPOINTS_TABLE,y
         sta enemy_ram_hp,x 
-	; y = parent enemy_ram_offset
+        ; x = dart enemy_oam_offset
+        txa
+        pha ; store x on stack
+        sec
+        sbc #$a0
+        asl
+        clc
+        adc #$80
+        tax
+	; y = parent enemy_oam_offset
         ; only works if called by a parent cycle routine
         ldy enemy_oam_offset
         lda oam_ram_x,y
         clc
         adc #$05
-        sta enemy_ram_x,x
-        ;sta collision_0_x
+        sta collision_0_x
+        sta oam_ram_x,x
         lda oam_ram_y,y
         clc
         adc #$02
-        sta enemy_ram_y,x
-        ;sta collision_0_y
-        ; set direction
-        ;tya
-        ;clc
-        ;adc #$10
-        ;sta enemy_ram_ex,x
+        sta collision_0_y
+        sta oam_ram_y,x
         jsr enemy_get_direction_of_player
-        ;ldx enemy_ram_offset
+        tay
+        pla ; pull x from stack
+        tax
+        tya
         sta enemy_ram_ex,x
-        ; reset pattern counter
+        ; reset stuff
         lda #0
+        sta enemy_ram_x,x
+        sta enemy_ram_y,x
         sta enemy_ram_pc,x
 	rts
+
+        
         
         
 dart_cycle: subroutine
-	dec enemy_ram_x,x
-	dec enemy_ram_y,x
-        inc enemy_ram_pc,x
-	dec enemy_ram_x,x
-	dec enemy_ram_y,x
-        inc enemy_ram_pc,x
-        ; find sprite x with sine_of_scale
-        ; a = sine max = enemy_ram_pc
-        ; x = angle pos = enemy_ram_ex
-        ldy enemy_ram_pc,x
+	
+        ; set region for actang
         lda enemy_ram_ex,x
-        tax
-        tya
-        jsr sine_of_scale
-        asl
-        ldx enemy_ram_offset
+        sta temp02 ; region
+        
+        ; set x byte for arctang
+        lda oam_ram_x,y 
+        sta temp00 ; hi byte
+	lda enemy_ram_x,x 
+        sta temp01 ; lo byte
+        jsr arctang_update_x
         ldy enemy_oam_offset
-        clc
-        adc enemy_ram_x,x
+        lda temp00
         sta oam_ram_x,y
-        ; find sprite y with sine_of_scale
-        ; a = sine max = enemy_ram_pc
-        ; x = angle pos = enemy_ram_ex
-        ldy enemy_ram_pc,x
-        lda enemy_ram_ex,x
-        clc
-        adc #$c0
-        tax
-        tya
-        jsr sine_of_scale
-        asl
-        ldx enemy_ram_offset
+	ldx enemy_ram_offset
+        lda temp01
+        sta enemy_ram_x,x
+        
+        ; set y byte for arctang
+        lda oam_ram_y,y 
+        sta temp00 ; hi byte
+	lda enemy_ram_y,x 
+        sta temp01 ; lo byte
+        jsr arctang_update_y
         ldy enemy_oam_offset
-        clc
-        adc enemy_ram_y,x
+        lda temp00
         sta oam_ram_y,y
+	ldx enemy_ram_offset
+        lda temp01
+        sta enemy_ram_y,x
 
 	; check for despawn
         lda oam_ram_x,y
