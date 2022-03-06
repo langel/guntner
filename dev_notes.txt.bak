@@ -314,6 +314,3 @@ tab makes indent -- shift-tab does not deindent
 search all code for string (undefined labels are easy to find)
 git status / diff
 git pull changes maybe overwritten by current open file?
-nesdefs.dasm
-	MASK_BG_CLIP should be MASK_BG_ENABLE
-	MASK_SPR_CLIP should be MASK_SPR_ENABLE
