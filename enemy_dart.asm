@@ -1,26 +1,16 @@
-
-; can we move in 16 different directions?
-; 1
-; darts are being fired from sandbox2 spawn currently
-; only 8 on screen at a time
-; enemy_ram_offset is $a0 .. $d8
-; 2
-; put enemy direction in enemy_ram_ex
-; use sine scaler to get position
-
-; 128 possible angles
-;   4 quadrants
-;  32 angles per quadrant
+; quadrants
 ; 
-;  3 | 2
+;  0 | 1
 ;  --+--
-;  1 | 0
+;  2 | 3
 
-;  direction  7bit 8bit
-; 12 o'clock  $00  $00
-;  3 o'clock  $20  $40
-;  6 o'clock  $40  $80
-;  9 o'clock  $60  $c0
+; 24 angular regions total
+; 6 regions per quadrant
+;  direction  
+; 12 o'clock  6
+;  3 o'clock  0
+;  6 o'clock  18
+;  9 o'clock  12
 
 enemy_get_direction_of_player:
 ; references these zp vars
@@ -34,78 +24,46 @@ enemy_get_direction_of_player:
 ;	collision_1_x	= "small"
 ;	collision_1_y	= "large"
 ;	collision_1_h	= "half"
-;	collision_1_w	= enemy_ram_offset x register cache
+;	collision_1_w	= enemy_ram_offset x register storage/cache
 ;	temp00 		= quadrant
 ;	temp01 		= region
-; returns a = direction for sine scaler
+; returns a = direction (or region)
 	stx collision_1_w
 	; find quadrant
         lda #0
         sta temp00
-; x quadrants
-        lda collision_0_x
-        sec
-        sbc player_x_hi
-        bcc .left_quadrant
-.right_quadrant
-        sta collision_0_w
-        jmp .x_quadrant_done
-.left_quadrant
-        inc temp00
-	lda player_x_hi
-        sec
-        sbc collision_0_x
-        sta collision_0_w
-.x_quadrant_done
 ; y quadrants
-        lda collision_0_y
+        lda player_y_hi
         sec
-        sbc player_y_hi
+        sbc collision_0_y
         bcc .top_quadrant
 .bottom_quadrant
-        sta collision_0_h
+        inc temp00
+        inc temp00
         jmp .y_quadrant_done
 .top_quadrant
-        inc temp00
-        inc temp00
-	lda player_y_hi
-        sec
-        sbc collision_0_y
-        sta collision_0_h
-.y_quadrant_done
-	; quadrant is now in temp00
-        
-.calc_deltas
-	; need absolute values
-; calc y diff
-	lda player_y_hi
-        sec
-        sbc collision_0_y
-        bcc .player_y_less_than
-.player_y_greater_than
-        bcs .calc_y_done
-.player_y_less_than
 	lda collision_0_y
         sec
         sbc player_y_hi
-.calc_y_done
+.y_quadrant_done
         sta collision_0_h
         tay
-; calc x diff
-	lda player_x_hi
+; x quadrants
+        lda player_x_hi
         sec
         sbc collision_0_x
-        bcc .player_x_less_than
-.player_x_greater_than
-        bcs .calc_x_done
-.player_x_less_than
+        bcc .left_quadrant
+.right_quadrant
+        inc temp00
+        jmp .x_quadrant_done
+.left_quadrant
 	lda collision_0_x
         sec
         sbc player_x_hi
-.calc_x_done
+.x_quadrant_done
         sta collision_0_w
         tax
-        
+	; quadrant is now in temp00
    	; start finding that region
         cpx collision_0_h
         bcs .x_greater_or_equal_y

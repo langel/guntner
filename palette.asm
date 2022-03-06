@@ -175,68 +175,20 @@ palette_fade_out_update: subroutine
 	; 12 + 32 x 7 = 236 cycles
 palette_render: subroutine
 	PPU_SETADDR $3f00
+        ldx #0
+        ldy #8
+.loop
 	lda palette_cache
         sta PPU_DATA
-        lda palette_cache+1
+        inx
+        lda palette_cache,x
         sta PPU_DATA
-        lda palette_cache+2
+        inx
+        lda palette_cache,x
         sta PPU_DATA
-        lda palette_cache+3
+        inx
+        lda palette_cache,x
         sta PPU_DATA
-	lda palette_cache
-        sta PPU_DATA
-        lda palette_cache+4
-        sta PPU_DATA
-        lda palette_cache+5
-        sta PPU_DATA
-        lda palette_cache+6
-        sta PPU_DATA
-	lda palette_cache
-        sta PPU_DATA
-        lda palette_cache+7
-        sta PPU_DATA
-        lda palette_cache+8
-        sta PPU_DATA
-        lda palette_cache+9
-        sta PPU_DATA
-	lda palette_cache
-        sta PPU_DATA
-        lda palette_cache+10
-        sta PPU_DATA
-        lda palette_cache+11
-        sta PPU_DATA
-        lda palette_cache+12
-        sta PPU_DATA
-	lda palette_cache
-        sta PPU_DATA
-        lda palette_cache+13
-        sta PPU_DATA
-        lda palette_cache+14
-        sta PPU_DATA
-        lda palette_cache+15
-        sta PPU_DATA
-	lda palette_cache
-        sta PPU_DATA
-        lda palette_cache+16
-        sta PPU_DATA
-        lda palette_cache+17
-        sta PPU_DATA
-        lda palette_cache+18
-        sta PPU_DATA
-	lda palette_cache
-        sta PPU_DATA
-        lda palette_cache+19
-        sta PPU_DATA
-        lda palette_cache+20
-        sta PPU_DATA
-        lda palette_cache+21
-        sta PPU_DATA
-	lda palette_cache
-        sta PPU_DATA
-        lda palette_cache+22
-        sta PPU_DATA
-        lda palette_cache+23
-        sta PPU_DATA
-        lda palette_cache+24
-        sta PPU_DATA
+        dey
+        bne .loop
 	rts
