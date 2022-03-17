@@ -1,15 +1,5 @@
 
 
-;boss_x		byte
-;boss_y		byte
-;boss_hp		byte
-;boss_v0		byte
-;boss_v1		byte
-;boss_v2		byte
-;boss_v3		byte
-;boss_v4		byte
-;boss_v5		byte
-
 ; things the bat entities need to know
 ; boss_x  : center offset
 ; boss_y  : center offset
@@ -17,7 +7,7 @@
 ; boss_v1 : 
 ; boss_v2 : vamp x osc offset
 ; boss_v3 :
-; boss_v4 ; bat circle size
+; state_v4 ; bat circle size
 ; boss_v5 ; bat half circle size / offset to center
 
 ; states
@@ -87,8 +77,11 @@ boss_vamp_bat_cycle: subroutine
         ; update y pos
         lda enemy_ram_ac,x
         clc
-        adc enemy_ram_ac,x
-        adc wtf
+        adc #$40
+        ;clc
+        ;adc enemy_ram_ac,x
+        ;clc
+        ;adc wtf
         tax
         lda state_v4
         jsr sine_of_scale
@@ -140,16 +133,6 @@ boss_vamp_spawn: subroutine
         clc
         adc #$20
         sta enemy_ram_ex,x
-        PPU_SETADDR $3F15
-        lda #$12
-        sta PPU_DATA
-        PPU_SETADDR $3F19
-        lda #$15
-        sta PPU_DATA
-        lda #$00
-        sta PPU_DATA
-        lda #$37
-        sta PPU_DATA
         ; XXX not sure if we need this here
         lda #$0d
         sta state_v0 ; target count of bat underlings; d = 13
@@ -261,7 +244,7 @@ boss_vamp_cycle: subroutine
         adc #$04 ; add half of vampire size and subtract half of bat size?
         sta boss_y
 	; tiles
-        lda #$27
+        lda #$9c
         jsr sprite_4_set_sprite
         ; palette
         lda #$02

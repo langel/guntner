@@ -251,6 +251,8 @@ sprite0_done:
         nop	; how much prg space we using?
         
         
+	include "arctang.asm"
+        nop	; how much prg space we using?
 	include "collision_detection.dasm"
         nop	; how much prg space we using?
 

@@ -27,32 +27,6 @@ sandbox_init: subroutine
         
  
         
-        jsr get_enemy_slot_1_sprite
-        tax
-        jsr chomps_spawn
-        jsr get_enemy_slot_1_sprite
-        tax
-        ;jsr spark_spawn
-        jsr get_enemy_slot_1_sprite
-        tax
-        ;jsr spark_spawn
-        jsr get_enemy_slot_1_sprite
-        tax
-        ;jsr spark_spawn
-        jsr get_enemy_slot_1_sprite
-        tax
-        jsr spark_spawn
-        jsr get_enemy_slot_1_sprite
-        tax
-        jsr zigzag_spawn
-        
-	jsr get_enemy_slot_1_sprite
-        tax
-        ;jsr bat_spawn
-        
-	jsr get_enemy_slot_1_sprite
-        tax
-        ;jsr skeet_spawn
         
 	jsr get_enemy_slot_4_sprite
         tax
@@ -65,14 +39,6 @@ sandbox_init: subroutine
         tax
 	;jsr starglasses_spawn
         
-	;jsr get_enemy_slot_1_sprite
-        ;tax
-        ;jsr birb_spawn
-        
-	;jsr get_enemy_slot_2_sprite
-        ;tax
-        ;jsr maggs_spawn
-        
         ;lda #$40
         lda #$ff
         sta player_health
@@ -80,6 +46,7 @@ sandbox_init: subroutine
 	;jsr get_enemy_slot_1_sprite
         ;tax
         ;jsr powerup_spawn
+        jsr starfield_draw_dash_top_bar_nametable0
         jsr render_enable
         jsr palette_fade_in_init
         
