@@ -317,3 +317,7 @@ git pull changes maybe overwritten by current open file?
 nesdefs.dasm
 	MASK_BG_CLIP should be MASK_BG_ENABLE
 	MASK_SPR_CLIP should be MASK_SPR_ENABLE
+	
+	
+	
+	so many bits #nesdev #GunTneR [ !ks for info ]
