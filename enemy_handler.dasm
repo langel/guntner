@@ -141,7 +141,8 @@ enemy_death: subroutine
         sta enemy_ram_pc,x
         sta enemy_ram_ac,x
         sta enemy_ram_hc,x
-        sta enemy_ram_ex,x
+        ; XXX is it ok to let this carry over?
+        ;sta enemy_ram_ex,x
         rts
         
         

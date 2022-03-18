@@ -81,8 +81,8 @@ cart_start:	subroutine
         ;sta game_mode
         
         ;jsr options_screen_init
-        ;jsr sandbox_init
-        jsr sandbox2_init
+        jsr sandbox_init
+        ;jsr sandbox2_init
         
         
 .endless
@@ -266,6 +266,10 @@ sprite0_done:
         nop	; how much prg space we using?
 	include "enemy_handler.dasm"
         nop	; how much prg space we using?
+
+	include "enemy_boss_vamp.asm"
+        nop	; how much prg space we using?
+        
 	include "enemy_bat.asm"
         nop	; how much prg space we using?
 	include "enemy_birb.asm"
@@ -291,9 +295,6 @@ sprite0_done:
 	include "enemy_starglasses.asm"
         nop	; how much prg space we using?
 	include "enemy_zigzag.asm"
-        nop	; how much prg space we using?
-
-	include "enemy_boss_vamp.asm"
         nop	; how much prg space we using?
         
 	include "enemy_test.asm"

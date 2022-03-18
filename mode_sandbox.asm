@@ -47,8 +47,8 @@ sandbox_init: subroutine
         ;tax
         ;jsr powerup_spawn
         jsr starfield_draw_dash_top_bar_nametable0
-        jsr render_enable
         jsr palette_fade_in_init
+        jsr render_enable
         
         rts
         

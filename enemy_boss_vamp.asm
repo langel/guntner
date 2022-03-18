@@ -3,12 +3,14 @@
 ; things the bat entities need to know
 ; boss_x  : center offset
 ; boss_y  : center offset
-; boss_v0 : state
-; boss_v1 : 
-; boss_v2 : vamp x osc offset
-; boss_v3 :
+; state_v0 : state
+; state_v1 : 
+; state_v2 : vamp x osc offset
+; state_v3 :
 ; state_v4 ; bat circle size
-; boss_v5 ; bat half circle size / offset to center
+; state_v5 ; 
+
+; XXX state var for bats being visible?
 
 ; states
 ; 0 : coming on screen from the left
@@ -21,24 +23,13 @@
 ; 7 : vampire blows out bats
 
 boss_vamp_bat_spawn: subroutine
-	; a = animation counter
+	; a = animation counter for ex
 	; x = bat slot in enemy ram
-        ; y = boss slot in enemy ram
-        ; stash boss slot in pattern counter
-        sta enemy_ram_ac,x
 	lda #$09
         sta enemy_ram_type,x
         tay
         lda ENEMY_HITPOINTS_TABLE,y
         sta enemy_ram_hp,x 
-        lda enemy_ram_y,y
-        tya
-        sta enemy_ram_pc,x
-        txa
-        lsr
-        clc
-        adc #$20
-        sta enemy_ram_ex,x
 	rts
         
         
@@ -63,19 +54,30 @@ boss_vamp_bat_cycle: subroutine
         jmp .done
 .not_dead
         ; update x pos
-        lda enemy_ram_ac,x
-        tax
+        lda enemy_ram_ex,x
+        sta temp01 ; position on circle
         lda state_v4
+        cmp enemy_ram_ac,x
+        bcc .use_vamp_circle_size
+        lda enemy_ram_ac,x
+        inc enemy_ram_ac,x
+        inc enemy_ram_ac,x
+        inc enemy_ram_ac,x
+.use_vamp_circle_size
+	sta temp02 ; size of circle
+        lsr
+        sta temp03 ; half of circle size
+        lda temp02
+        ldx temp01
         jsr sine_of_scale
         clc
         adc boss_x
         sec
-        sbc state_v5
+        sbc temp03 ; XXX this might need to be calculated per bat
 	ldx enemy_ram_offset
-        sta enemy_ram_x,x
         sta oam_ram_x,y
         ; update y pos
-        lda enemy_ram_ac,x
+        lda temp01
         clc
         adc #$40
         ;clc
@@ -83,18 +85,16 @@ boss_vamp_bat_cycle: subroutine
         ;clc
         ;adc wtf
         tax
-        lda state_v4
+        lda temp02
         jsr sine_of_scale
         clc
         adc boss_y
         sec
-        sbc state_v5
+        sbc temp03
 	ldx enemy_ram_offset
-        sta enemy_ram_x,x
         sta oam_ram_y,y
-        ; update animation
-        inc enemy_ram_ac,x
-        lda enemy_ram_ac,x
+        ; interpret animation
+        lda enemy_ram_ex,x
         lsr
         lsr
         and #%00000011
@@ -116,6 +116,90 @@ boss_vamp_bat_cycle: subroutine
 .done
 	jmp update_enemies_handler_next
 	
+        
+BOSS_VAMP_STATE_TABLE: 
+	.word boss_vamp_state_idle_update
+        .word boss_vamp_state_suck_bats
+        .word boss_vamp_state_attack
+        .word boss_vamp_state_blow_bats
+        
+boss_vamp_update_delegator:
+	lda state_v0
+        asl
+        tax
+        lda BOSS_VAMP_STATE_TABLE,x
+        sta temp00
+        inx
+        lda BOSS_VAMP_STATE_TABLE,x
+        sta temp01
+        jmp (temp00)
+        
+        
+        
+boss_vamp_state_idle_update: subroutine
+	lda state_v4
+	; calc x
+        clc
+        lda #$03
+        adc state_v2
+        sta state_v2 ; x sine
+        lsr
+        tay
+	ldx enemy_ram_offset
+        lda enemy_ram_x,x
+        clc
+        adc sine_4bits,y
+        sta boss_x
+        ldy enemy_oam_offset
+	sta oam_ram_x,y
+	sta oam_ram_x+8,y
+	clc
+	adc #$07
+	sta oam_ram_x+4,y
+	sta oam_ram_x+12,y
+        lda boss_x
+        clc
+        adc #$05 ; add half of vampire size and subtract half of bat size?
+        sta boss_x
+	; calc y
+        lda enemy_ram_ac,x
+        tax
+	lda sine_table,x
+	lsr
+	ldx enemy_ram_offset
+	clc
+        adc enemy_ram_y,x
+        sta boss_y
+        jsr sprite_4_set_y
+        lda boss_y
+        clc
+        adc #$04 ; add half of vampire size and subtract half of bat size?
+        sta boss_y
+        rts
+        
+        
+boss_vamp_state_suck_bats: subroutine
+	dec state_v4
+        bne .done
+        inc state_v0
+.done
+	rts
+        
+        
+boss_vamp_state_attack: subroutine
+	inc state_v0
+	rts
+        
+        
+boss_vamp_state_blow_bats: subroutine
+	inc state_v4
+        lda #$40
+        cmp state_v4
+        bne .done
+        lda #$00
+        sta state_v0
+.done
+	rts
 
         
 boss_vamp_spawn: subroutine
@@ -128,19 +212,12 @@ boss_vamp_spawn: subroutine
         sta enemy_ram_x,x
         lda #$15
         sta enemy_ram_y,x 
-        txa
-        lsr
-        clc
-        adc #$20
-        sta enemy_ram_ex,x
         ; XXX not sure if we need this here
         lda #$0d
-        sta state_v0 ; target count of bat underlings; d = 13
+        sta temp00 ; target count of bat underlings; d = 13
         lda #$00
-        sta state_v1
-        txa
-        tay
-        sty state_v3
+        sta temp01
+        sta temp02
         lda #$40
         sta state_v4 ; minimum bat circle size
 .bat_spawn_loop
@@ -148,15 +225,17 @@ boss_vamp_spawn: subroutine
 	; x = slot in enemy ram 
         ; y = boss slot in ram  / v3
         ; stash boss slot in pattern counter
-	jsr get_enemy_slot_1_sprite
-        tax
-        lda state_v1
+	;jsr get_enemy_slot_1_sprite
+        ldx temp02
+        lda temp01
+        sta enemy_ram_ex,x
         clc
         adc #$14
-        sta state_v1
-        ldy state_v3
-        jsr boss_vamp_bat_spawn
-	dec state_v0
+        sta temp01
+        lda #$08
+        adc temp02
+        sta temp02
+	dec temp00
         beq .done
         jmp .bat_spawn_loop
 .done
@@ -190,8 +269,9 @@ boss_vamp_cycle: subroutine
                
 .not_dead    
         inc enemy_ram_ac,x
-        lda #$40
-        lda state_v0
+        bne .dont_inc_state
+        inc state_v0
+.dont_inc_state
         lda enemy_ram_ac,x
         asl
         asl
@@ -203,48 +283,44 @@ boss_vamp_cycle: subroutine
 .shrink_bat_circle
 	dec state_v4
 .bat_circle_adjust_done
-	lda state_v4
-        lsr
-        sta state_v5 ; half of bat circle size
-	; calc x
-        inc state_v2 ; x sine
-        inc state_v2 ; x sine
-        inc state_v2 ; x sine
-        lda state_v2
-        lsr
-        tay
-	ldx enemy_ram_offset
-        lda enemy_ram_x,x
+
+	; BAT UPDATE LOOP
+        lda #$00
+        sta temp00
+.bat_update_loop
+	ldx temp00
+        ; update animation
+        inc enemy_ram_ex,x
+        ; respawn if slot is empty
+        lda enemy_ram_type,x
+        cmp #$00
+        bne .dont_respawn_bat
+        lda enemy_ram_ex,x
+        jsr boss_vamp_bat_spawn
+.dont_respawn_bat
+        lda #$08
         clc
-        adc sine_4bits,y
-        sta boss_x
-        ldy enemy_oam_offset
-	sta oam_ram_x,y
-	sta oam_ram_x+8,y
-	clc
-	adc #$07
-	sta oam_ram_x+4,y
-	sta oam_ram_x+12,y
-        lda boss_x
-        clc
-        adc #$05 ; add half of vampire size and subtract half of bat size?
-        sta boss_x
-	; calc y
+        adc temp00
+        sta temp00
+        cmp #$68
+        bne .bat_update_loop
+        
+        jsr boss_vamp_update_delegator
+        
+; sprite tiles
         lda enemy_ram_ac,x
-        tax
-	lda sine_table,x
-	lsr
-	ldx enemy_ram_offset
-	clc
-        adc enemy_ram_y,x
-        sta boss_y
-        jsr sprite_4_set_y
-        lda boss_y
+        lsr
+        lsr
+        lsr
+        and #$03
+        cmp #$03
+        bne .good_frame
+        lda #$01
+.good_frame
+        asl
         clc
-        adc #$04 ; add half of vampire size and subtract half of bat size?
-        sta boss_y
-	; tiles
-        lda #$9c
+        adc #$9a
+        ;lda #$9c
         jsr sprite_4_set_sprite
         ; palette
         lda #$02
@@ -252,9 +328,10 @@ boss_vamp_cycle: subroutine
         sta oam_ram_att+4,y
         sta oam_ram_att+8,y
         sta oam_ram_att+12,y
+        
 .now_lets_add_eyes
 	ldx #$fc
-        lda #$36
+        lda #$a9
         sta oam_ram_spr,x
         lda #$01
         sta oam_ram_att,x
@@ -268,13 +345,19 @@ boss_vamp_cycle: subroutine
         cmp player_x_hi
         bcc .looking_right
 .looking_left
-        lda #$26
+        lda #$99
         sta oam_ram_spr,x
 	inc oam_ram_x,x
 .looking_right
 	; find y
         lda oam_ram_y,y
         sta oam_ram_y,x
+        lda oam_ram_spr,y
+        cmp #$9a
+        bne .dont_adjust_for_open_mouth
+        dec oam_ram_y,x
+.dont_adjust_for_open_mouth
+        lda oam_ram_y,x
         clc
         adc #$1c
         sec
@@ -285,7 +368,7 @@ boss_vamp_cycle: subroutine
         bcs .looking_up
 .looking_across
 	lda oam_ram_spr,x
-        cmp #$26
+        cmp #$99
         beq .adjust_for_left_looking
 	inc oam_ram_x,x
         jmp .done
