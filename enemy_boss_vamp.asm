@@ -4,7 +4,7 @@
 ; boss_x  : center offset
 ; boss_y  : center offset
 ; state_v0 : state
-; state_v1 :  
+; state_v1 : spawn x to target
 ; state_v2 : vamp x osc offset
 ; state_v3 : mouth position ( 0 = closed ; < 8 midframe ; > 8 open )
 ; state_v4 : bat circle size / other states counter
@@ -153,7 +153,7 @@ boss_vamp_calc_boss_x_y: subroutine
         tay
         lda enemy_ram_x,x
         clc
-        adc sine_4bits,y
+        adc sine_6bits,y
         sta boss_x
         ldy enemy_oam_offset
         jsr boss_vamp_plot_x
@@ -190,6 +190,13 @@ boss_vamp_plot_y:; jsr sprite_4_set_y
         
         
 boss_vamp_state_idle_update: subroutine
+	; update x home pos
+        lda enemy_ram_x,x
+        cmp #$40
+        bcs .dont_inc_x
+        inc enemy_ram_x,x
+        inc state_v1
+.dont_inc_x
 	; update x pos sine offset
         clc
         lda #$03
@@ -251,7 +258,7 @@ boss_vamp_state_shake: subroutine
         jsr sprite_4_set_y
         ; counter
 	inc state_v4
-        lda #20
+        lda #15
         cmp state_v4
         bcs .done
 .setup_next_state
@@ -276,7 +283,7 @@ boss_vamp_state_lunge: subroutine
         lda oam_ram_y,y
         jsr sprite_4_set_y
 	inc state_v4
-        lda #$15
+        lda #$14
         cmp state_v4
         bcs .done
 .setup_next_state
@@ -306,7 +313,7 @@ boss_vamp_state_retreat: subroutine
         lda #$00
         sta state_v4
         inc state_v5 ; show bats
-        lda #$60
+        lda state_v1 ; x home on the way to #$60
         sta enemy_ram_x,x
         lda #$15
         sta enemy_ram_y,x 
@@ -335,8 +342,11 @@ boss_vamp_spawn: subroutine
         tay
         lda ENEMY_HITPOINTS_TABLE,y
         sta enemy_ram_hp,x 
-        lda #$60
+        ; set spawn x
+        lda #$00
+        sta state_v1
         sta enemy_ram_x,x
+        ; set spawn y
         lda #$15
         sta enemy_ram_y,x 
         ; bats are visible
