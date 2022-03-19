@@ -9,7 +9,7 @@
 ; state_v3 : mouth position ( 0 = closed ; < 8 midframe ; > 8 open )
 ; state_v4 : bat circle size / other states counter
 ; state_v5 : bat visibility
-; state_v6 :
+; state_v6 : rng target
 
 ; states
 ; 0 : coming on screen from the left
@@ -153,7 +153,7 @@ boss_vamp_calc_boss_x_y: subroutine
         tay
         lda enemy_ram_x,x
         clc
-        adc sine_6bits,y
+        adc sine_5bits,y
         sta boss_x
         ldy enemy_oam_offset
         jsr boss_vamp_plot_x
@@ -197,13 +197,20 @@ boss_vamp_state_idle_update: subroutine
         inc enemy_ram_x,x
         inc state_v1
 .dont_inc_x
+.done_with_x
 	; update x pos sine offset
         clc
         lda #$03
         adc state_v2
         jsr boss_vamp_calc_boss_x_y
+.next_state_check
         inc enemy_ram_ac,x
+        lda enemy_ram_ac,x
+        cmp state_v6
         bne .dont_inc_state
+.setup_next_state
+	lda rng0
+        sta state_v6
         inc state_v0
 .dont_inc_state
         lda enemy_ram_ac,x
@@ -360,6 +367,9 @@ boss_vamp_spawn: subroutine
         sta temp02
         lda #$40
         sta state_v4 ; minimum bat circle size
+        ; rando target
+        lda #$80
+        sta state_v6
 .bat_spawn_loop
 	; a = animation counter / v1
 	; x = slot in enemy ram 
