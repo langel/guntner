@@ -18,7 +18,7 @@ sandbox_init: subroutine
         lda #7
         jsr state_update_set_addr
         
-        ; XXX maybe boss vars should be state vars
+        ; boss uses state vars
         lda #$00
         sta state_v0
         sta state_v1

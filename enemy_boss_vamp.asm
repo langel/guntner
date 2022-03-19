@@ -4,13 +4,12 @@
 ; boss_x  : center offset
 ; boss_y  : center offset
 ; state_v0 : state
-; state_v1 : 
+; state_v1 :  
 ; state_v2 : vamp x osc offset
-; state_v3 :
-; state_v4 ; bat circle size
-; state_v5 ; 
-
-; XXX state var for bats being visible?
+; state_v3 : mouth position ( 0 = closed ; < 8 midframe ; > 8 open )
+; state_v4 : bat circle size / other states counter
+; state_v5 : bat visibility
+; state_v6 :
 
 ; states
 ; 0 : coming on screen from the left
@@ -53,6 +52,9 @@ boss_vamp_bat_cycle: subroutine
         sta enemy_ram_type,x
         jmp .done
 .not_dead
+	lda state_v5
+        cmp #$00
+        beq .bats_not_visible
         ; update x pos
         lda enemy_ram_ex,x
         sta temp01 ; position on circle
@@ -73,7 +75,7 @@ boss_vamp_bat_cycle: subroutine
         clc
         adc boss_x
         sec
-        sbc temp03 ; XXX this might need to be calculated per bat
+        sbc temp03 
 	ldx enemy_ram_offset
         sta oam_ram_x,y
         ; update y pos
@@ -115,15 +117,23 @@ boss_vamp_bat_cycle: subroutine
         jsr enemy_set_palette
 .done
 	jmp update_enemies_handler_next
+        
+.bats_not_visible
+	lda #$ff
+        sta oam_ram_y,y
+        bne .done
+	
 	
         
 BOSS_VAMP_STATE_TABLE: 
 	.word boss_vamp_state_idle_update
         .word boss_vamp_state_suck_bats
-        .word boss_vamp_state_attack
+        .word boss_vamp_state_shake
+        .word boss_vamp_state_lunge
+        .word boss_vamp_state_retreat
         .word boss_vamp_state_blow_bats
         
-boss_vamp_update_delegator:
+boss_vamp_update_state_delegator:
 	lda state_v0
         asl
         tax
@@ -132,34 +142,24 @@ boss_vamp_update_delegator:
         inx
         lda BOSS_VAMP_STATE_TABLE,x
         sta temp01
+        ldx enemy_ram_offset
         jmp (temp00)
         
         
-        
-boss_vamp_state_idle_update: subroutine
-	lda state_v4
+boss_vamp_calc_boss_x_y: subroutine
 	; calc x
-        clc
-        lda #$03
-        adc state_v2
         sta state_v2 ; x sine
         lsr
         tay
-	ldx enemy_ram_offset
         lda enemy_ram_x,x
         clc
         adc sine_4bits,y
         sta boss_x
         ldy enemy_oam_offset
-	sta oam_ram_x,y
-	sta oam_ram_x+8,y
-	clc
-	adc #$07
-	sta oam_ram_x+4,y
-	sta oam_ram_x+12,y
+        jsr boss_vamp_plot_x
         lda boss_x
         clc
-        adc #$05 ; add half of vampire size and subtract half of bat size?
+        adc #$04 ; add half of vampire size and subtract half of bat size?
         sta boss_x
 	; calc y
         lda enemy_ram_ac,x
@@ -173,29 +173,156 @@ boss_vamp_state_idle_update: subroutine
         jsr sprite_4_set_y
         lda boss_y
         clc
-        adc #$04 ; add half of vampire size and subtract half of bat size?
+        adc #$08 ; add half of vampire size and subtract half of bat size?
         sta boss_y
+	rts
+        
+boss_vamp_plot_x: subroutine
+	sta oam_ram_x,y
+	sta oam_ram_x+8,y
+	clc
+	adc #$07
+	sta oam_ram_x+4,y
+	sta oam_ram_x+12,y
+        rts
+
+boss_vamp_plot_y:; jsr sprite_4_set_y
+        
+        
+boss_vamp_state_idle_update: subroutine
+	; update x pos sine offset
+        clc
+        lda #$03
+        adc state_v2
+        jsr boss_vamp_calc_boss_x_y
+        inc enemy_ram_ac,x
+        bne .dont_inc_state
+        inc state_v0
+.dont_inc_state
+        lda enemy_ram_ac,x
+        asl
+        asl
+        cmp #$80
+        bcs .shrink_bat_circle
+.grow_bat_circle
+	inc state_v4
+        jmp .bat_circle_adjust_done
+.shrink_bat_circle
+	dec state_v4
+.bat_circle_adjust_done
         rts
         
         
 boss_vamp_state_suck_bats: subroutine
-	dec state_v4
-        bne .done
-        inc state_v0
+	lda state_v4
+        sec
+        sbc #$05
+        sta state_v4
+        bcs .done
+.setup_next_state
+        inc state_v0 ; next state
+        lda #$00
+        sta state_v4
+        dec state_v5 ; hide bats
+        lda oam_ram_x,y
+        sec
+        sbc #$04
+        sta boss_x
+        lda oam_ram_y,y
+        sec
+        sbc #$04
+        sta boss_y
 .done
 	rts
         
         
-boss_vamp_state_attack: subroutine
+boss_vamp_state_shake: subroutine
+	; x shake
+	lda rng0
+        and #%00000111
+        clc
+        adc boss_x
+        jsr boss_vamp_plot_x
+        ; y shake
+	lda rng1
+        and #%00000111
+        clc
+        adc boss_y
+        jsr sprite_4_set_y
+        ; counter
+	inc state_v4
+        lda #20
+        cmp state_v4
+        bcs .done
+.setup_next_state
+	; next state
 	inc state_v0
+        ; reset v4 counter
+        lda #$00
+        sta state_v4
+        ; load arctang dir into v6
+        jsr enemy_get_direction_of_player
+        sta enemy_ram_ex,x
+        ldy enemy_oam_offset
+.done
+	rts
+        
+boss_vamp_state_lunge: subroutine
+	jsr enemy_update_arctang_path
+	jsr enemy_update_arctang_path
+        ldy enemy_oam_offset
+        lda oam_ram_x,y
+        jsr boss_vamp_plot_x
+        lda oam_ram_y,y
+        jsr sprite_4_set_y
+	inc state_v4
+        lda #$15
+        cmp state_v4
+        bcs .done
+.setup_next_state
+	lda enemy_ram_ex,x
+        sec
+        sbc #12
+        bcs .valid_range
+        adc #24
+.valid_range
+	sta enemy_ram_ex,x
+	inc state_v0
+.done
+	rts
+        
+boss_vamp_state_retreat: subroutine
+	jsr enemy_update_arctang_path
+	jsr enemy_update_arctang_path
+        ldy enemy_oam_offset
+        lda oam_ram_x,y
+        jsr boss_vamp_plot_x
+        lda oam_ram_y,y
+        jsr sprite_4_set_y
+	dec state_v4
+        bne .done
+.setup_next_state
+	inc state_v0
+        lda #$00
+        sta state_v4
+        inc state_v5 ; show bats
+        lda #$60
+        sta enemy_ram_x,x
+        lda #$15
+        sta enemy_ram_y,x 
+        jsr boss_vamp_calc_boss_x_y
+.done
 	rts
         
         
 boss_vamp_state_blow_bats: subroutine
 	inc state_v4
+	inc state_v4
+	inc state_v4
         lda #$40
         cmp state_v4
-        bne .done
+        bcs .done
+.setup_next_state
         lda #$00
         sta state_v0
 .done
@@ -212,9 +339,12 @@ boss_vamp_spawn: subroutine
         sta enemy_ram_x,x
         lda #$15
         sta enemy_ram_y,x 
-        ; XXX not sure if we need this here
+        ; bats are visible
+        lda #$01
+        sta state_v5
+        ; target count of bat underlings; d = 13
         lda #$0d
-        sta temp00 ; target count of bat underlings; d = 13
+        sta temp00 
         lda #$00
         sta temp01
         sta temp02
@@ -225,7 +355,6 @@ boss_vamp_spawn: subroutine
 	; x = slot in enemy ram 
         ; y = boss slot in ram  / v3
         ; stash boss slot in pattern counter
-	;jsr get_enemy_slot_1_sprite
         ldx temp02
         lda temp01
         sta enemy_ram_ex,x
@@ -255,41 +384,52 @@ boss_vamp_cycle: subroutine
         jsr enemy_get_damage_this_frame
         cmp #$00
         bne .not_dead
+        
 .is_dead       
+	; kill bats if visible
+	lda state_v5 
+        cmp #$01
+        bne .dont_kill_bats
+        ; setup bat killing loop
+        lda #$00
+        sta temp00
+.bat_kill_loop
+	ldx temp00
+        lda enemy_ram_type,x
+        cmp #$09
+        bne .dont_kill_bat
+        lda #$01
+        sta enemy_ram_type,x
+.dont_kill_bat
+        lda #$08
+        clc
+        adc temp00
+        sta temp00
+        cmp #$68
+        bne .bat_kill_loop
+.dont_kill_bats
 	inc phase_kill_count
 	; give points
-        lda #$ff
         lda enemy_ram_type,x
         jsr enemy_give_points
+        ; move eyes sprite offscreen
+	ldx #$fc
+        lda #$ff
+        sta oam_ram_y,x
         ; change it into crossbones!
         jsr sfx_enemy_death
         lda #$01
+	ldx enemy_ram_offset
         sta enemy_ram_type,x
         jmp sprite_4_cleanup_for_next
-               
 .not_dead    
-        inc enemy_ram_ac,x
-        bne .dont_inc_state
-        inc state_v0
-.dont_inc_state
-        lda enemy_ram_ac,x
-        asl
-        asl
-        cmp #$80
-        bcs .shrink_bat_circle
-.grow_bat_circle
-	inc state_v4
-        jmp .bat_circle_adjust_done
-.shrink_bat_circle
-	dec state_v4
-.bat_circle_adjust_done
 
 	; BAT UPDATE LOOP
         lda #$00
         sta temp00
 .bat_update_loop
 	ldx temp00
-        ; update animation
+        ; update circle position
         inc enemy_ram_ex,x
         ; respawn if slot is empty
         lda enemy_ram_type,x
@@ -304,8 +444,9 @@ boss_vamp_cycle: subroutine
         sta temp00
         cmp #$68
         bne .bat_update_loop
-        
-        jsr boss_vamp_update_delegator
+
+; state behavior     
+        jsr boss_vamp_update_state_delegator
         
 ; sprite tiles
         lda enemy_ram_ac,x

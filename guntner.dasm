@@ -322,6 +322,7 @@ sprite0_done:
 	include "apu_sfx.asm"
         nop	; how much prg space we using?
 
+;f14c - with arctang now
 ;e7be
 ;e8b6 newnewnew
 ;ea9f bookmark new

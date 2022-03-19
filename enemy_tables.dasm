@@ -66,7 +66,8 @@ ENEMY_PLAYER_COLLISION_TABLE:
         byte #$07 ; skully
         byte #$00 ; powerups
         byte #$03 ; bat
-        byte #$40 ; vampire head
+        ;byte #$40 ; vampire head
+        byte #$04 ; vampire head
         byte #$04 ; vamp bat
         byte #$07 ; skeet
         byte #$03 ; zigzag
