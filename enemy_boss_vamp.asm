@@ -10,6 +10,10 @@
 ; state_v4 : bat circle size / other states counter
 ; state_v5 : bat visibility
 ; state_v6 : rng target
+; state_v7 : mouth frame current
+; enemy_ram_pc : mouth frame target
+; enemy_ram_ac : idle_update counter
+; enemy_ram_ex : arctang direction
 
 ; states
 ; 0 : coming on screen from the left
@@ -469,7 +473,7 @@ boss_vamp_cycle: subroutine
         jsr boss_vamp_update_state_delegator
         
 ; sprite tiles
-        lda enemy_ram_ac,x
+        lda state_v7
         lsr
         lsr
         lsr

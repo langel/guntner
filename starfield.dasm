@@ -55,7 +55,9 @@ starfield_scroll: subroutine
         sbc scroll_speed
         bcs .samepage
         inc scroll_page
-        dec state_v7 ; XXX need to set this at transition time
+        ; XXX pretty sure this does nothing
+        ; and gets instantiated with bg2spr_init
+        ;dec state_v7 ; XXX need to set this at transition time
         ; XXX ^ should not use state variables unless we own state
 .samepage
 	sta scroll_x
@@ -80,6 +82,7 @@ starfield_scroll: subroutine
         
 
 
+; XXX this will definitely go before release
 starfield_debugger: subroutine
 	; dash cache meter is $108-$118
         ; scroll page
