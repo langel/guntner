@@ -232,6 +232,11 @@ boss_vamp_state_idle_update: subroutine
         
         
 boss_vamp_state_suck_bats: subroutine
+	; open mouth
+	lda #$40
+        sta enemy_ram_pc,x
+        lda #$10
+        sta state_v7
 	lda state_v4
         sec
         sbc #$05
@@ -255,6 +260,9 @@ boss_vamp_state_suck_bats: subroutine
         
         
 boss_vamp_state_shake: subroutine
+	; close mouth
+        lda #$00
+        sta enemy_ram_pc,x
 	; x shake
 	lda rng0
         and #%00000111
@@ -329,6 +337,13 @@ boss_vamp_state_retreat: subroutine
         lda #$15
         sta enemy_ram_y,x 
         jsr boss_vamp_calc_boss_x_y
+	; open mouth then close
+; state_v7 : mouth frame current
+; enemy_ram_pc : mouth frame target
+	lda #$00
+        sta enemy_ram_pc,x
+        lda #$20
+        sta state_v7
 .done
 	rts
         
@@ -356,6 +371,7 @@ boss_vamp_spawn: subroutine
         ; set spawn x
         lda #$00
         sta state_v1
+        sta state_v7 ; mouth closed
         sta enemy_ram_x,x
         ; set spawn y
         lda #$15
@@ -448,6 +464,20 @@ boss_vamp_cycle: subroutine
         jmp sprite_4_cleanup_for_next
 .not_dead    
 
+	; MOUTH HANDLER
+; state_v7 : mouth frame current
+; enemy_ram_pc : mouth frame target
+	lda state_v7
+        cmp enemy_ram_pc,x
+        beq .mouth_is_fine
+        bcs .mouth_close
+.mouth_open
+	inc state_v7
+        bne .mouth_is_fine
+.mouth_close
+	dec state_v7
+.mouth_is_fine
+
 	; BAT UPDATE LOOP
         lda #$00
         sta temp00
@@ -469,10 +499,10 @@ boss_vamp_cycle: subroutine
         cmp #$68
         bne .bat_update_loop
 
-; state behavior     
+; STATE behavior     
         jsr boss_vamp_update_state_delegator
         
-; sprite tiles
+	; SPRITE tiles
         lda state_v7
         lsr
         lsr
@@ -480,7 +510,7 @@ boss_vamp_cycle: subroutine
         and #$03
         cmp #$03
         bne .good_frame
-        lda #$01
+        lda #$02
 .good_frame
         asl
         clc
@@ -493,7 +523,13 @@ boss_vamp_cycle: subroutine
         sta oam_ram_att+4,y
         sta oam_ram_att+8,y
         sta oam_ram_att+12,y
+        cmp #$02
+        beq .not_hit
+        lda #$20
+        sta state_v7
+.not_hit
         
+        ; EYE SPRITE
 .now_lets_add_eyes
 	ldx #$fc
         lda #$a9
@@ -518,7 +554,7 @@ boss_vamp_cycle: subroutine
         lda oam_ram_y,y
         sta oam_ram_y,x
         lda oam_ram_spr,y
-        cmp #$9a
+        cmp #$9e
         bne .dont_adjust_for_open_mouth
         dec oam_ram_y,x
 .dont_adjust_for_open_mouth

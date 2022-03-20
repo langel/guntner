@@ -42,6 +42,11 @@ sandbox_init: subroutine
         ;lda #$40
         lda #$ff
         sta player_health
+        ; XXX for vamp testing
+        lda #$f0
+        sta player_x_hi
+        lda #$08
+        sta player_y_hi
         
 	;jsr get_enemy_slot_1_sprite
         ;tax
