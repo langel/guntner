@@ -33,6 +33,8 @@ boss_vamp_bat_spawn: subroutine
         tay
         lda ENEMY_HITPOINTS_TABLE,y
         sta enemy_ram_hp,x 
+        lda #$20
+        sta state_v7
 	rts
         
         
@@ -177,7 +179,7 @@ boss_vamp_calc_boss_x_y: subroutine
         jsr sprite_4_set_y
         lda boss_y
         clc
-        adc #$08 ; add half of vampire size and subtract half of bat size?
+        adc #$0a ; add half of vampire size and subtract half of bat size?
         sta boss_y
 	rts
         
