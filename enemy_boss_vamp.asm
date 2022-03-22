@@ -5,7 +5,7 @@
 ; boss_y  : center offset
 ; state_v0 : state
 ; state_v1 : spawn x to target
-; state_v2 : vamp x osc offset
+; state_v2 : x sine position
 ; state_v3 : mouth position ( 0 = closed ; < 8 midframe ; > 8 open )
 ; state_v4 : bat circle size / other states counter
 ; state_v5 : bat visibility
@@ -15,15 +15,7 @@
 ; enemy_ram_ac : idle_update counter
 ; enemy_ram_ex : arctang direction
 
-; states
-; 0 : coming on screen from the left
-; 1 : move up and down with throbbing circle
-; 2 : circle becomes shield
-; 3 : shield oscillation
-; 4 : shield attacks player
-; 5 : vampire sucks in bats
-; 6 : vampire lunges at player and back
-; 7 : vampire blows out bats
+
 
 boss_vamp_bat_spawn: subroutine
 	; a = animation counter for ex
@@ -129,7 +121,7 @@ boss_vamp_bat_cycle: subroutine
         sta oam_ram_y,y
         bne .done
 	
-	
+        
         
 BOSS_VAMP_STATE_TABLE: 
 	.word boss_vamp_state_idle_update
@@ -152,14 +144,15 @@ boss_vamp_update_state_delegator:
         jmp (temp00)
         
         
+        
 boss_vamp_calc_boss_x_y: subroutine
 	; calc x
-        sta state_v2 ; x sine
+        lda state_v2 ; x sine
         lsr
         tay
         lda enemy_ram_x,x
         clc
-        adc sine_5bits,y
+        adc sine_6bits,y
         sta boss_x
         ldy enemy_oam_offset
         jsr boss_vamp_plot_x
@@ -193,6 +186,15 @@ boss_vamp_plot_x: subroutine
         rts
 
 boss_vamp_plot_y:; jsr sprite_4_set_y
+
+boss_vamp_x_target_new: subroutine
+	lda rng2
+        lsr
+        lsr
+        clc
+        adc #$20
+        sta state_v1
+	rts
         
         
 boss_vamp_state_idle_update: subroutine
@@ -208,6 +210,7 @@ boss_vamp_state_idle_update: subroutine
         clc
         lda #$03
         adc state_v2
+        sta state_v2
         jsr boss_vamp_calc_boss_x_y
 .next_state_check
         inc enemy_ram_ac,x
@@ -230,6 +233,26 @@ boss_vamp_state_idle_update: subroutine
 .shrink_bat_circle
 	dec state_v4
 .bat_circle_adjust_done
+	; BAT UPDATE LOOP
+        lda #$00
+        sta temp00
+.bat_update_loop
+	ldx temp00
+        ; update circle position
+        inc enemy_ram_ex,x
+        ; respawn if slot is empty
+        lda enemy_ram_type,x
+        cmp #$00
+        bne .dont_respawn_bat
+        lda enemy_ram_ex,x
+        jsr boss_vamp_bat_spawn
+.dont_respawn_bat
+        lda #$08
+        clc
+        adc temp00
+        sta temp00
+        cmp #$68
+        bne .bat_update_loop
         rts
         
         
@@ -480,26 +503,6 @@ boss_vamp_cycle: subroutine
 	dec state_v7
 .mouth_is_fine
 
-	; BAT UPDATE LOOP
-        lda #$00
-        sta temp00
-.bat_update_loop
-	ldx temp00
-        ; update circle position
-        inc enemy_ram_ex,x
-        ; respawn if slot is empty
-        lda enemy_ram_type,x
-        cmp #$00
-        bne .dont_respawn_bat
-        lda enemy_ram_ex,x
-        jsr boss_vamp_bat_spawn
-.dont_respawn_bat
-        lda #$08
-        clc
-        adc temp00
-        sta temp00
-        cmp #$68
-        bne .bat_update_loop
 
 ; STATE behavior     
         jsr boss_vamp_update_state_delegator
