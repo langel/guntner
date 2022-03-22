@@ -321,3 +321,26 @@ nesdefs.dasm
 	
 	
 	so many bits #nesdev #GunTneR [ !ks for info ]
+	
+	
+Things left to program:
+	Enemy Flight Patterns
+	Cut Scenes
+		Alien Face
+		Space Station Dock
+		Dimensional Portal
+	Power Ups
+		Mushroom
+		Rapid Fire
+		Gloved Fist Shield
+	Music Generation
+	Enemies
+		Ceil/Floor Bugs
+		Ike's Mom
+		Shake Off Amoeba
+		
+	Bosses:
+		Skully (follows)
+		Invisible Swordsman
+		--done--Galactic Space Vampire
+		Xyzkyquf (spell?!)
