@@ -83,20 +83,20 @@ dashboard_bg_tiles:
         hex b1b1b1b1b1b1b1b1
         hex b318197830b1b21d
         ; row 3 : middle hud frames
-	hex 1dd0d1d1d1d1d1c3
-        hex d1d1a4d3d1d1d1d1
-        hex d1d1d1d1a4d3d1d1
-        hex c3d1d1d1d1d1d21d
+        hex 1db8b9b9b9b9b9b7
+        hex b9b9a4bbb9b9b9b9
+        hex b9b9b9b9a4bbb9b9
+        hex b7b9b9b9b9b9ba1d
         ; row 4 : wave, score, time
 	hex 1db05048415345b1
 	hex b1b1b2b0b1b1b1b1
 	hex b1b1b1b2b2b0b1b1
 	hex b1b1b1b1b1b1b21d
 	; row 5 : bottom hud frames
-	hex 1dc0c1c1c1c1c1c1
-	hex c1c1c2c0c1c1c1c1
-	hex c1c1c1c1c2c0c1c1
-	hex c1c1c1c1c1c1c21d
+        hex 1db4b5b5b5b5b5b5
+	hex b5b5b6b4b5b5b5b5
+	hex b5b5b5b5b6b4b5b5
+        hex b5b5b5b5b5b5b61d
 
 
 ; DASHBOARD messages

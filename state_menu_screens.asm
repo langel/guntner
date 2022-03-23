@@ -43,23 +43,17 @@ menu_screens_init: subroutine
 ; G u n T n e R
 
 ; BIG TITLE
-	PPU_SETADDR $2040
+	PPU_SETADDR $2060
         ldy #$00
 big_title_loop:
 	lda guntner_title_name_table,y
 	sta PPU_DATA
         iny
         bne big_title_loop
-        ldy #$c0
-big_title_loop2:
-	lda guntner_title_name_table+#$40,y
-        sta PPU_DATA
-        iny
-        bne big_title_loop2
 
 ; hud bar on title screen
 	PPU_SETADDR $22c0
-        lda #$1d
+        lda #$b9
         ldy #$20
 .set_top_bar
 	sta PPU_DATA
@@ -199,7 +193,7 @@ title_screen_set_rudy_y: subroutine
         asl
         asl
         clc
-        adc #$87
+        adc #$7f
         sta player_y_hi
         jmp set_player_sprite
         
@@ -221,17 +215,14 @@ options_screen_set_rudy_y: subroutine
 ; STRINGS AND NAMETABLES
                 
 menu_screen_tile_data:
-	.hex 2189
-	.byte "G u n T n e R"
-        .byte #$00
-        .hex 2208
+        .hex 21e8
 	.byte "  Please  START "
         .byte #$00
-        .hex 2248
+        .hex 2228
         .byte "  Much  Options "
         .byte #$00
         .hex 22d7
-	.byte " v2.1a "
+	.byte " v2.1e "
         .byte #$00
         .hex 2304
 	.byte "(c)MMXXII puke7, LoBlast"
@@ -260,32 +251,22 @@ menu_screen_tile_data:
         
                 
 guntner_title_name_table:
-	.byte $02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$05,$00,$00,$00
-	.byte $00,$00,$00,$06,$07,$08,$09,$0a,$0a,$0a,$0a,$0a,$0a,$0a,$0a,$0b
-	.byte $0c,$0a,$0a,$0a,$0a,$0a,$0a,$0a,$0a,$0b,$0c,$0d,$0e,$00,$00,$00
-	.byte $00,$00,$00,$0f,$10,$00,$11,$12,$13,$14,$15,$16,$17,$18,$19,$12
-	.byte $13,$16,$17,$18,$19,$1a,$1b,$1c,$1d,$12,$13,$1e,$0f,$00,$00,$00
-	.byte $00,$00,$00,$0f,$1f,$20,$21,$12,$13,$22,$15,$23,$24,$25,$15,$12
-	.byte $13,$23,$24,$25,$15,$12,$26,$27,$15,$12,$28,$29,$2a,$00,$00,$00
-	.byte $00,$00,$00,$0f,$10,$23,$15,$12,$13,$22,$15,$23,$15,$22,$15,$12
-	.byte $13,$23,$15,$22,$15,$12,$2b,$2c,$2d,$12,$13,$22,$2e,$00,$00,$00
-	.byte $00,$00,$00,$0f,$10,$23,$15,$2f,$30,$31,$32,$33,$0e,$34,$15,$12
-	.byte $13,$33,$0e,$34,$15,$2f,$30,$31,$32,$12,$35,$36,$0f,$00,$00,$00
-	.byte $00,$00,$00,$0f,$37,$38,$15,$00,$00,$00,$00,$00,$00,$00,$00,$12
-	.byte $13,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$22,$0f,$00,$00,$00
-	.byte $00,$00,$00,$39,$3a,$3a,$3b,$00,$00,$00,$00,$00,$00,$00,$3c,$3a
-	.byte $3a,$3d,$00,$00,$00,$00,$00,$00,$00,$00,$00,$3e,$3a,$3d,$00,$00
-  hex b1b1e0a0a1c5b1d2e4c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1f1d0b1b1b1b1b1b1
-  hex b1b1b2b0b1b1b1b1f4f5a1a1a1a1a1a2a0a1a1a1a1a1a1f2f3b1d2c1c1e2b1b1
-  hex b1b1b2b0b1b1d2d0b1d5d2a0a1c5b1b2b0b1d2a0a1c5d2a0a1c5b2a0a1a3b1b1
-  hex b1b1b2b0b1b1b2b0b1b3b2b0b1b3b1b2b0b1b2b0b1b3b1b0b1b1b2b0b1b3b1b1
-  hex b1b1b2b0b1b1b2b0b1b3b2b0b1b3b1b2b0b1b2b0b1b3b1b0b1b1b2b0b1b3b1b1
-  hex b1b1b2b0b1d5b2b0b1b3b2b0b1b3b1b2b0b1b2b0b1b3b1d0c5b1b2d0c1e3b1b1
-  hex b1b1b2b0b1b3b2b0b1b3b2b0b1b3b1b2b0b1b2b0b1b3b1b0b1b1b2b0b1b2b1b1
-  hex b1b1b2b0b1b3d2d0d1d4d2d0b5d5b5b2b0b1d2d0b5d5d2d0d1d5b2b0b1b2b1b1
-  hex b1b1b2b0b1b3b1b1b1b1b1b1b1b1d2a0a2d0b1b1b1b1b1b1b1b1d2d0b5b2b1b1
-  hex b1b1b2c0c1c2b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b2b1b1
-  hex b1b1e1a1a1c5b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d4b1b1
+	.byte $c0,$c0,$c0,$c1,$c2,$c3,$c4,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2
+	.byte $c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c5,$c0,$c0,$c0
+	.byte $c0,$c0,$c0,$c6,$c7,$c8,$c9,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$cb
+	.byte $cc,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$cb,$cc,$cd,$ce,$c0,$c0,$c0
+	.byte $c0,$c0,$c0,$cf,$d0,$c0,$d1,$d2,$d3,$d4,$d5,$d6,$d7,$d8,$d9,$d2
+	.byte $d3,$d6,$d7,$d8,$d9,$da,$db,$dc,$dd,$d2,$d3,$de,$cf,$c0,$c0,$c0
+	.byte $c0,$c0,$c0,$cf,$df,$e0,$e1,$d2,$d3,$e2,$d5,$e3,$e4,$e5,$d5,$d2
+	.byte $d3,$e3,$e4,$e5,$d5,$d2,$e6,$e7,$d5,$d2,$e8,$e9,$ea,$c0,$c0,$c0
+	.byte $c0,$c0,$c0,$cf,$d0,$e3,$d5,$d2,$d3,$e2,$d5,$e3,$d5,$e2,$d5,$d2
+	.byte $d3,$e3,$d5,$e2,$d5,$d2,$eb,$ec,$ed,$d2,$d3,$e2,$ee,$c0,$c0,$c0
+	.byte $c0,$c0,$c0,$cf,$d0,$e3,$d5,$ef,$f0,$f1,$f2,$f3,$ce,$f4,$d5,$d2
+	.byte $d3,$f3,$ce,$f4,$d5,$ef,$f0,$f1,$f2,$d2,$f5,$f6,$cf,$c0,$c0,$c0
+	.byte $c0,$c0,$c0,$cf,$f7,$f8,$d5,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$d2
+	.byte $d3,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$e2,$cf,$c0,$c0,$c0
+	.byte $c0,$c0,$c0,$f9,$fa,$fa,$fb,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$fc,$fa
+	.byte $fa,$fd,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$fe,$fa,$fd,$c0,$c0
   
   
   
