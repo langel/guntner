@@ -333,6 +333,8 @@ Things left to program:
 		Mushroom
 		Rapid Fire
 		Gloved Fist Shield
+		3 Healths
+		1UP
 	Music Generation
 	Enemies
 		Ceil/Floor Bugs
