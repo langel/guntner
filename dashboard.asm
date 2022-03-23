@@ -93,7 +93,6 @@ dashboard_bg_tiles:
 	hex b1b1b1b2b2b0b1b1
 	hex b1b1b1b1b1b1b21d
 	; row 5 : bottom hud frames
-        ; XXX should be better defined than solid tiles
 	hex 1dc0c1c1c1c1c1c1
 	hex c1c1c2c0c1c1c1c1
 	hex c1c1c1c1c2c0c1c1
