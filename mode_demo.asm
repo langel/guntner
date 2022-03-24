@@ -39,21 +39,12 @@ demo_update: subroutine
 	jmp state_update_done
 .menu_return_buttons_not_pressed
 
-	;jsr demo_enemy_spawn
 	jsr get_enemy_slot_4_sprite
         cmp #$ff
         beq .no_enemy_spawn
         jsr starglasses_spawn
 .no_enemy_spawn
         jsr player_demo_controls
-	; push the shoot button
-        lda timer_frames_10s
-        and #$02
-        cmp #$02
-        bne .dont_shoot
-	lda #$ff
-        sta player_b_d
-.dont_shoot   
 .done
 	jsr game_update_generic
 	jmp state_update_done

@@ -243,25 +243,23 @@ sprite0_done:
 	include "state_sandbox2.asm"
         nop	; how much prg space we using?
 
-        
-	include "palette.asm"
-        nop	; how much prg space we using?
-	include "dashboard.asm"
-        nop	; how much prg space we using?
-	include "starfield.dasm"
-        nop	; how much prg space we using?
-        
-        
 	include "arctang.asm"
         nop	; how much prg space we using?
 	include "collision_detection.dasm"
         nop	; how much prg space we using?
-
+        
+	include "dashboard.asm"
+        nop	; how much prg space we using?
+	include "palette.asm"
+        nop	; how much prg space we using?
+	include "powerups.asm"
+        nop	; how much prg space we using?
+	include "starfield.dasm"
+        nop	; how much prg space we using?
+        
 	include "timer_global.dasm"
         nop	; how much prg space we using?
         
-	include "powerups.asm"
-        nop	; how much prg space we using?
         
 	include "enemy_tables.dasm"
         nop	; how much prg space we using?

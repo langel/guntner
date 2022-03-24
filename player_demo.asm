@@ -4,21 +4,6 @@
 ; controls player in demo mode    
 player_demo_controls: subroutine
 
-; PLAYER GUN
-	lda wtf
-        and #$47
-        cmp #$40
-        bne .fire_not_turbo
-        jsr player_gun_turbo_fire
-  	beq .fire_done
-.fire_not_turbo
-        and #$07
-        cmp #$00
-        bne .fire_done
-        jsr player_gun_normal_fire
-.fire_done
-
-
 ; PLAYER MOVEMENT
 	; clear player directions
         lda #$00
@@ -133,6 +118,28 @@ player_demo_controls: subroutine
 
 .done
 	jsr player_move_position
+
+; PLAYER GUN
+
+        
+	lda wtf
+        and #$47
+        cmp #$40
+        bne .fire_not_turbo
+        lda #$ff
+        sta player_a
+.fire_not_turbo
+        lda #$ff
+        sta player_b
+        lda wtf
+        and #$0f ; should be 7
+        cmp #$00
+        bne .fire_done
+        lda #$ff
+        sta player_b_d
+.fire_done
+	jsr player_bullets_check_controls
+
 	rts
 
         

@@ -10,6 +10,10 @@ player_game_reset: subroutine
         sta phase_kill_count
         sta phase_end_game
         sta player_death_flag
+        sta bomb_counter
+        sta r_bag_counter
+        sta shroom_counter
+        sta mask_shield
         sta you_dead_counter
         sta score_xx000000
         sta score_00xx0000

@@ -31,7 +31,7 @@ powerup_from_starglasses:
         sta enemy_ram_x,x
         lda oam_ram_y,y
         sta enemy_ram_y,x
-	lda #$80
+	lda #$40
         sta enemy_ram_pc,x
         lda #$02
         sta enemy_ram_hp,x
@@ -51,15 +51,6 @@ powerup_from_starglasses:
  
  
 powerups_cycle: subroutine
-        ; only calc sine every other frame
-;        lda wtf
-;        and #$00000001
-;        sta enemy_temp_temp
-;        lda enemy_slot_id
-;        and #%00000001
-;        cmp enemy_temp_temp
-;        beq .process_this_frame
-;	jmp update_enemies_handler_next
 .process_this_frame
 	ldx enemy_ram_offset
         ldy enemy_oam_offset
@@ -88,7 +79,7 @@ powerups_cycle: subroutine
         jsr enemy_death
 	jmp update_enemies_handler_next
 .reset_velocity
-        lda #$00
+        lda #$01
         sta enemy_ram_pc,x
         lda oam_ram_x,y
         sta enemy_ram_x,x
@@ -97,35 +88,36 @@ powerups_cycle: subroutine
         ; give it sfx
         jsr sfx_battery_hit
 .frame
-	lda enemy_ram_y,x
-        sta oam_ram_y,y
-        ; XXX attr shouldn't be hardcoded
-	lda #$03
-        sta oam_ram_att,y
         lda enemy_ram_pc,x
-	cmp #$ff
+	cmp #$80
         beq .max_velocity
 .sine_arc
-	lda enemy_ram_pc,x
-        lsr
-	tay
-        lda enemy_ram_x,x
-        sec
-        sbc sine_table,y
-        sec
+	ldy enemy_ram_pc,x
         iny
-        sbc sine_table,y
+        lda sine_table,y
+        sta temp00
+        dey
+        lda sine_table,y
+        sec
+        sbc temp00
+        sta temp00
+        sta enemy_ram_ac,x
         ldy enemy_oam_offset
+        lda enemy_ram_x,x
+        clc
+        adc temp00
+        sta enemy_ram_x,x
         sta oam_ram_x,y
-	ldx enemy_ram_offset
+        lda wtf
+        and #$01
+        beq .move_done
         inc enemy_ram_pc,x
         jmp .move_done
 .max_velocity
-	lda enemy_ram_x,x
+	lda oam_ram_x,y
         clc
-        adc #$03
-	sta enemy_ram_x,x
-        sta oam_ram_x,y
+        adc #$04
+	sta oam_ram_x,y
         bcc .move_done
         ; will fall off the right so minus hp
         dec enemy_ram_hp,x
@@ -145,7 +137,7 @@ powerups_cycle: subroutine
         
         
 powerup_type_handler_table:
-	.word powerup_pickup_skull
+	.word powerup_pickup_mask
         .word powerup_pickup_mushroom
 	.word powerup_pickup_plus_one
         .word powerup_pickup_bomb
@@ -166,7 +158,7 @@ powerup_type_handler_delegator:
         jmp (temp00)
         
         
-powerup_pickup_skull: subroutine
+powerup_pickup_mask: subroutine
 	rts
         
 powerup_pickup_mushroom: subroutine
@@ -187,6 +179,10 @@ powerup_pickup_bomb: subroutine
 	rts
         
 powerup_pickup_r_bag: subroutine
+	; XXX might want different lengths
+        ;     based on difficulty setting
+        lda #120
+        sta r_bag_counter
 	rts
         
 powerup_pickup_health_25: subroutine
