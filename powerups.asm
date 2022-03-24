@@ -11,6 +11,16 @@
 ; mushroom makes everything trippy
 ; machine gun does an autofire
 ; slow down makes movement unbearable
+
+; palette sprites start at $24
+; 0 - skull shield
+; 1 - mushroom
+; 2 - plus one
+; 3 - bomb
+; 4 - r bag
+; 5 - health 25%
+; 6 - health 50%
+; 7 - health full
         
 powerup_from_starglasses:
 	ldx enemy_ram_offset
@@ -25,15 +35,21 @@ powerup_from_starglasses:
         sta enemy_ram_pc,x
         lda #$02
         sta enemy_ram_hp,x
+        ; rng powerup type
+        lda rng0
+        lsr
+        and #$07
+        sta enemy_ram_ex,x
         ; sprite
-        lda #$2b
+        clc
+        adc #$24
         sta oam_ram_spr,y
         ; palette
 	lda #$03
         sta oam_ram_att,y
 	rts
-      
-        
+ 
+ 
 powerups_cycle: subroutine
         ; only calc sine every other frame
 ;        lda wtf
@@ -63,18 +79,13 @@ powerups_cycle: subroutine
         cmp #$00
         beq .frame
 .despawn_powerup
+.player_picksup_powerup
  	;; XXX needs its own sfx
         ; might want different ones by type
         jsr sfx_powerup_pickup
-        
+        lda enemy_ram_ex,x
+        jsr powerup_type_handler_delegator
         jsr enemy_death
-        lda player_health
-        clc
-        adc #$80
-        sta player_health
-        bcc .frame
-        lda #$ff
-        sta player_health
 	jmp update_enemies_handler_next
 .reset_velocity
         lda #$00
@@ -88,9 +99,6 @@ powerups_cycle: subroutine
 .frame
 	lda enemy_ram_y,x
         sta oam_ram_y,y
-        ; XXX sprite shouldn't be hardcoded
-        lda #$2b
-        sta oam_ram_spr,y
         ; XXX attr shouldn't be hardcoded
 	lda #$03
         sta oam_ram_att,y
@@ -133,4 +141,79 @@ powerups_cycle: subroutine
 .done   
 	jmp update_enemies_handler_next
         
+        
+        
+        
+powerup_type_handler_table:
+	.word powerup_pickup_skull
+        .word powerup_pickup_mushroom
+	.word powerup_pickup_plus_one
+        .word powerup_pickup_bomb
+        .word powerup_pickup_r_bag
+        .word powerup_pickup_health_25
+        .word powerup_pickup_health_50
+        .word powerup_pickup_health_100
+        
+powerup_type_handler_delegator:
+        asl
+        tax
+        lda powerup_type_handler_table,x
+        sta temp00
+        inx
+        lda powerup_type_handler_table,x
+        sta temp01
+        ldx enemy_ram_offset
+        jmp (temp00)
+        
+        
+powerup_pickup_skull: subroutine
+	rts
+        
+powerup_pickup_mushroom: subroutine
+	; XXX still need to override player controls
+        ; XXX still need to bend music
+	lda #108
+        sta shroom_counter
+	rts
+        
+powerup_pickup_plus_one: subroutine
+	inc player_lives
+	rts
+        
+bomb_damage_frame	.EQU	#29
+powerup_pickup_bomb: subroutine
+	lda #44
+        sta bomb_counter
+	rts
+        
+powerup_pickup_r_bag: subroutine
+	rts
+        
+powerup_pickup_health_25: subroutine
+        lda player_health
+        clc
+        adc #$40
+        sta player_health
+        bcc .no_max_out
+        lda #$ff
+        sta player_health
+.no_max_out
+	rts
+        
+powerup_pickup_health_50: subroutine
+        lda player_health
+        clc
+        adc #$80
+        sta player_health
+        bcc .no_max_out
+        lda #$ff
+        sta player_health
+.no_max_out
+	rts
+        
+powerup_pickup_health_100: subroutine
+	lda #$ff
+        sta player_health
+	rts
+
         

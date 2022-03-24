@@ -39,7 +39,12 @@ demo_update: subroutine
 	jmp state_update_done
 .menu_return_buttons_not_pressed
 
-	jsr demo_enemy_spawn
+	;jsr demo_enemy_spawn
+	jsr get_enemy_slot_4_sprite
+        cmp #$ff
+        beq .no_enemy_spawn
+        jsr starglasses_spawn
+.no_enemy_spawn
         jsr player_demo_controls
 	; push the shoot button
         lda timer_frames_10s

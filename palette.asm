@@ -45,6 +45,16 @@ palette_init: subroutine
         cpy #25
         bne .loop
         rts
+        
+palette_reset: subroutine
+        ldy #$00
+.loop
+	lda Palette00,y
+        sta pal_uni_bg,y
+        iny
+        cpy #25
+        bne .loop
+	rts
        
         
         
@@ -64,8 +74,35 @@ palette_next_rainbow_color: subroutine
         sbc #$0c
         rts
      
+bomb_bg_animation_table: 
+	.byte $0f,$07,$06,$05,$16,$26,$27,$28,$37,$38,$30
      
 palette_update: subroutine
+	lda shroom_counter
+        beq .no_shroom_effect
+        lda wtf
+        and #$03
+        cmp #$00
+        bne .no_shroom_effect
+        ldy #$15
+.shroom_loop
+	lda pal_bg_3_1-1,y
+        jsr palette_next_rainbow_color
+        sta pal_bg_3_1-1,y
+        dey
+        bne .shroom_loop
+        dec shroom_counter
+        bne .no_shroom_effect
+        jsr palette_reset
+        ldy #$00
+.shroom_pal_reset_loop
+	lda Palette00,y
+        sta pal_uni_bg,y
+        iny
+        cpy #25
+        bne .shroom_pal_reset_loop
+        jsr player_update_colors
+.no_shroom_effect
 	lda #$00
         cmp state_fade_in
         beq .dont_fade_in
@@ -75,6 +112,16 @@ palette_update: subroutine
         beq .dont_fade_out
         jmp palette_fade_out_update
 .dont_fade_out
+	; do bomb bg animation
+        lda bomb_counter
+        beq .normal_bg
+        lsr
+        lsr
+        tax
+        lda bomb_bg_animation_table,x
+        sta pal_uni_bg
+        dec bomb_counter
+.normal_bg
 	; do normal
         ldy #$00
 .loop

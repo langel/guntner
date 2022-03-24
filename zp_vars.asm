@@ -53,6 +53,10 @@ player_a_d	byte
 player_dir_bits	byte ; matches controller
 player_boundless	byte
 
+bomb_counter	byte ; counts down animation frames
+shroom_counter	byte ; counts down animation frames
+skull_shield	byte ; 0 = no skull shield
+
 wtf		byte
 rng0		byte
 rng1		byte

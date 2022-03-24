@@ -300,6 +300,7 @@ enemy_get_damage_this_frame: subroutine
         ; y = oam ram offset
 	lda #$00
         sta enemy_dmg_accumulator
+; handle bullet collisions
         jsr player_bullet_collision_handler
 	jsr player_collision_detect
         cmp #$00
@@ -318,8 +319,18 @@ enemy_get_damage_this_frame: subroutine
         jsr player_take_damage
         jsr sfx_player_damage
 .no_collision
+; handle bomb explosion
+	lda #bomb_damage_frame
+        cmp bomb_counter
+        bne .no_bomb_damage
+        lda enemy_dmg_accumulator
+        clc
+        adc #$10
+        sta enemy_dmg_accumulator
+.no_bomb_damage
 	; fix y register
 	ldy enemy_oam_offset
+; handle damage accumulated
         lda enemy_dmg_accumulator
         cmp #$00
         bne .hit
