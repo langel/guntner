@@ -1,9 +1,15 @@
 
 ;;;;;; Constants
 
-bullet_cooldown_length	= $14
+;;; player bullet struct
+; byte 0 : x pos
+; byte 1 : y pos
+; byte 2 : x speed
+; byte 3 : y speed
+bullet_x_vel	= $c6
+bullet_y_vel	= $c7
 
-
+; oam ram
 bullet0		= $020c
 bullet1		= $0210
 bullet2		= $0214
@@ -12,33 +18,17 @@ bullet4		= $021c
 
 player_bullet_sprite	.byte #$79
 
-controller_input	.byte #$ff
-player_power		.byte #$ff
-
-bullet_data	= 188
-
 
         
-
-
-;;; player bullet struct
-; byte 0 : x pos
-; byte 1 : y pos
-; byte 2 : x speed
-; byte 3 : y speed
-
-; bullets are sprites #$03 - #$07 
-;;; bullet directions, sprite base address
-; 03   9 o'clock -7,  0, $020c
-; 04  10 o'clock -6, -3, $0210
-; 05   8 o'clock -6. +3, $0214
-; 06  11 o'clock -3, -6, $0218
-; 07   7 o'clock -3, +6, $021c
-
-
-player_bullets_init:
-	lda #bullet_cooldown_length
-        sta bullet_cooldown
+player_bullet_next: subroutine
+	; increase bullet data offset
+        inx
+        inx
+        ; increase bullet oam offset
+        iny
+        iny
+        iny
+        iny
         rts
         
         
@@ -55,174 +45,89 @@ player_bullet_collision_handler: subroutine
         sta collision_1_w
         sta collision_1_h
         
-        lda bullet0 + 3
+        sty temp00
+        ldy #$0c
+.bullet_loop
+        lda oam_ram_x,y
         cmp #$00
-        beq .bullet0_skip
+        beq .skip_bullet
         sta collision_1_x
-        lda bullet0 + 0
+        lda oam_ram_y,y
         sta collision_1_y
         jsr detect_collision
-        cmp #$00
-        beq .bullet0_skip
+        beq .skip_bullet
         clc
         lda enemy_dmg_accumulator
         adc player_gun_str
         sta enemy_dmg_accumulator
-        jsr bullet0_despawn
-.bullet0_skip        
-
-        lda bullet1 + 3
-        cmp #$00
-        beq .bullet1_skip
-        sta collision_1_x
-        lda bullet1 + 0
-        sta collision_1_y
-        jsr detect_collision
-        cmp #$00
-        beq .bullet1_skip
-        clc
-        lda enemy_dmg_accumulator
-        adc player_gun_str
-        sta enemy_dmg_accumulator
-        jsr bullet1_despawn
-.bullet1_skip
-
-        lda bullet2 + 3
-        cmp #$00
-        beq .bullet2_skip
-        sta collision_1_x
-        lda bullet2 + 0
-        sta collision_1_y
-        jsr detect_collision
-        cmp #$00
-        beq .bullet2_skip
-        clc
-        lda enemy_dmg_accumulator
-        adc player_gun_str
-        sta enemy_dmg_accumulator
-        jsr bullet2_despawn
-.bullet2_skip
-
-        lda bullet3 + 3
-        cmp #$00
-        beq .bullet3_skip
-        sta collision_1_x
-        lda bullet3 + 0
-        sta collision_1_y
-        jsr detect_collision
-        cmp #$00
-        beq .bullet3_skip
-        clc
-        lda enemy_dmg_accumulator
-        adc player_gun_str
-        sta enemy_dmg_accumulator
-        jsr bullet3_despawn
-.bullet3_skip
-
-        lda bullet4 + 3
-        cmp #$00
-        beq .bullet4_skip
-        sta collision_1_x
-        lda bullet4 + 0
-        sta collision_1_y
-        jsr detect_collision
-        cmp #$00
-        beq .bullet4_skip
-        clc
-        lda enemy_dmg_accumulator
-        adc player_gun_str
-        sta enemy_dmg_accumulator
-        jsr bullet4_despawn
-.bullet4_skip
-	; total damage is in enemy_dmg_accumulator
-        lda enemy_dmg_accumulator
-	rts
+	; despawn bullet
+	lda #$00
+        sta oam_ram_x,y
+        lda #$ff
+        sta oam_ram_y,y
+.skip_bullet
+	iny
+        iny
+        iny
+        iny
+        cpy #$20
+        bne .bullet_loop
+        ldy temp00
+        rts
         
-        
-bullet0_despawn: subroutine
-	lda #$00
-        sta bullet0
-        sta bullet0 + 3
-        sta bullet_data+0
-        lda #$80
-        sta bullet0 + 1
-        rts
-bullet1_despawn: subroutine
-	lda #$00
-        sta bullet1
-        sta bullet1 + 3
-        sta bullet_data+4
-        lda #$80
-        sta bullet1 + 1
-        rts
-bullet2_despawn: subroutine
-	lda #$00
-        sta bullet2
-        sta bullet2 + 3
-        sta bullet_data+8
-        lda #$80
-        sta bullet2 + 1
-        rts
-bullet3_despawn: subroutine
-	lda #$00
-        sta bullet3
-        sta bullet3 + 3
-        sta bullet_data+12
-        lda #$80
-        sta bullet3 + 1
-        rts
-bullet4_despawn: subroutine
-	lda #$00
-        sta bullet4
-        sta bullet4 + 3
-        sta bullet_data+16
-        lda #$80
-        sta bullet4 + 1
-        rts
 
 
+; XXX next 2 subroutines are very redundant
         
 player_gun_normal_fire: subroutine
 	ldx #$00
+        ldy #$0c
 .bullet_loop
-	lda bullet_data,x
+	lda oam_ram_x,y
         ; check if bullet is spawned
-        cmp #$00
+        cmp #$ff
         bne .next
         ; trigger pewpew
 	jsr sfx_pewpew
         lda player_x_hi
-        sta bullet_data+0,x
+        sta oam_ram_x,y
         lda player_y_hi
         clc
         adc #$04
-        sta bullet_data+1,x
+        sta oam_ram_y,y
         lda #251
-        sta bullet_data+2,x
+        sta bullet_x_vel,x
         lda #$00
-        sta bullet_data+3,x
+        sta bullet_y_vel,x
+        ; XXX do we need this here?
         ; sprite
         lda #$79
-        sta bullet0+1,x
+        sta oam_ram_spr,y
         ; palette
         lda #$00
-        sta bullet0+2,x
+        sta oam_ram_att,y
         jmp .done
 .next
-	inx
-        inx
-        inx
-        inx
-        cpx #$14
+	jsr player_bullet_next
+        cpy #$20
         bne .bullet_loop
 .done
 	rts
         
         
+; bullets are sprites #$03 - #$07 
+;;; bullet directions, sprite base address
+; 03   9 o'clock -7,  0, $020c
+; 04  10 o'clock -6, -3, $0210
+; 05   8 o'clock -6. +3, $0214
+; 06  11 o'clock -3, -6, $0218
+; 07   7 o'clock -3, +6, $021c
+        
 player_gun_turbo_fire: subroutine
 	ldx #$00
+        ldy #$0c
 .bullet_loop
-	lda bullet_data,x
+	lda oam_ram_x,y
         ; check if bullet is spawned
         cmp #$00
         bne .next
@@ -230,74 +135,38 @@ player_gun_turbo_fire: subroutine
 	jsr sfx_pewpew
         ; set x,y position
         lda player_x_hi
-        sta bullet_data+0,x
+        sta oam_ram_x,y
         lda player_y_hi
         clc
         adc #$04
-        sta bullet_data+1,x
+        sta oam_ram_y,y
         ; direction
-        jsr player_gun_turbo_init_dir
+        lda player_gun_turbo_dir_table,x
+        sta bullet_x_vel,x
+        lda player_gun_turbo_dir_table+1,x
+        sta bullet_y_vel,x
+        ; XXX do we need this here?
         ; sprite
         lda player_bullet_sprite
-        sta bullet0+1,x
+        sta oam_ram_spr,y
         ; palette
         lda #$00
-        sta bullet0+2,x
+        sta oam_ram_att,y
         jmp .done
 .next
-	inx
-        inx
-        inx
-        inx
-        cpx #$14
+	jsr player_bullet_next
+        cpy #$20
         bne .bullet_loop
 .done
-	
 	rts
         
-player_gun_turbo_init_dir: subroutine
-	; 7,0 : 6,3 : 3,6
-	cpx #$00
-        bne .not0
-        lda #248
-        sta bullet_data+2,x
-        lda #$00
-        sta bullet_data+3,x
-        rts
-.not0
-	cpx #$04
-        bne .not1
-        lda #249
-        sta bullet_data+2,x
-        lda #252
-        sta bullet_data+3,x
-        rts
-.not1
-	cpx #$08
-        bne .not2
-        lda #252
-        sta bullet_data+2,x
-        lda #$06
-        sta bullet_data+3,x
-        rts
-.not2
-	cpx #$0c
-        bne .not3
-        lda #249
-        sta bullet_data+2,x
-        lda #$03
-        sta bullet_data+3,x
-        rts
-.not3
-	cpx #$10
-        bne .not4
-        lda #252
-        sta bullet_data+2,x
-        lda #249
-        sta bullet_data+3,x
-        rts
-.not4
-	rts
+player_gun_turbo_dir_table:
+	.byte #248, #0
+        .byte #249, #252
+        .byte #252, #6
+        .byte #249, #3
+        .byte #252, #249
+        
         
         
 player_bullets_check_controls: subroutine
@@ -345,54 +214,92 @@ player_bullets_check_controls: subroutine
 	rts
         
         
+
+        
+        
 player_bullets_update: subroutine
 	ldx #$00
+        ldy #$0c
 .bullet_loop
+	; handle mask shield
+        cpx #$00
+        bne .mask_check_done
+        lda mask_shield
+        beq .mask_check_done
+        jmp player_bullets_update_mask_shield
+.mask_check_done
 	; check if spawned
-	lda bullet_data+0,x
+	lda oam_ram_x,y
         cmp #$00
         beq .next
         ; check for despawn
         ; is x < 8
-	lda bullet_data+0,x
+	lda oam_ram_x,y
         cmp #$08
         bcc .despawn
         ; is y > 180
-	lda bullet_data+1,x
+	lda oam_ram_y,y
         cmp #180
         bcs .despawn
-              
 	; move x
-	lda bullet_data+0,x
+	lda oam_ram_x,y
         clc
-        adc bullet_data+2,x
-        sta bullet_data+0,x
-        sta bullet0+3,x
+        adc bullet_x_vel,x
+        sta oam_ram_x,y
         ; move y
-	lda bullet_data+1,x
+	lda oam_ram_y,y
         clc
-        adc bullet_data+3,x
-        sta bullet_data+1,x
-        sta bullet0+0,x
+        adc bullet_y_vel,x
+        sta oam_ram_y,y
         jmp .next
 .despawn
-	lda #$00
-        sta bullet_data+0,x
-        sta bullet_data+1,x
-        sta bullet_data+2,x
-        sta bullet_data+3,x
-        sta bullet0+0,x
-        sta bullet0+1,x
-        sta bullet0+2,x
-        sta bullet0+3,x
-	;jmp .next
+        lda #$ff
+        sta oam_ram_x,y
+        sta oam_ram_y,y
+player_bullets_update_next:
 .next
-        inx
-        inx
-        inx
-        inx
-        cpx #$14
+	jsr player_bullet_next
+        cpy #$20
         bne .bullet_loop
 .done
 	rts
 
+player_bullets_update_mask_shield: subroutine
+        inc bullet_x_vel,x
+        inc bullet_x_vel,x
+        inc bullet_x_vel,x
+        ; calc x
+        lda player_x_hi
+        sec
+        sbc #$1c
+        sta temp00
+        lda bullet_x_vel,x
+        lsr
+        tax
+        lda sine_6bits,x
+        clc
+        adc temp00
+        sta oam_ram_x,y
+        ; calc y
+        ldx #$00
+        lda player_y_hi
+        sec
+        sbc #16
+        sta temp00
+        lda bullet_x_vel,x
+        clc
+        adc #$40
+        lsr
+        tax
+        lda sine_5bits,x
+        clc
+        adc temp00
+        sta oam_ram_y,y
+        ; set attributes
+        lda #$03
+        sta oam_ram_att,y
+        ; set sprites
+        lda #$24
+        sta oam_ram_spr,y
+        ldx #$00
+        jmp player_bullets_update_next

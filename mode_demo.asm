@@ -38,7 +38,7 @@ demo_update: subroutine
 	jsr palette_fade_out_init
 	jmp state_update_done
 .menu_return_buttons_not_pressed
-
+	;jsr demo_enemy_spawn
 	jsr get_enemy_slot_4_sprite
         cmp #$ff
         beq .no_enemy_spawn
@@ -95,6 +95,8 @@ demo_enemy_spawn: subroutine
         tax
         jsr maggs_spawn
 .no_maggs_spawn
+	rts
+
         lda enemy_slot_4_next
         cmp #$ff
         beq .no_bigs_spawn

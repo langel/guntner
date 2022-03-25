@@ -64,7 +64,7 @@ powerups_cycle: subroutine
         lda #$00
         sta enemy_dmg_accumulator
         jsr player_bullet_collision_handler
-        cmp #$00
+        lda enemy_dmg_accumulator
         bne .reset_velocity
         jsr player_collision_detect
         cmp #$00
@@ -159,11 +159,18 @@ powerup_type_handler_delegator:
         
         
 powerup_pickup_mask: subroutine
+	; XXX picking up more masks does more damage?
+        lda mask_shield
+        beq .no_bomb
+        jsr powerup_pickup_bomb
+.no_bomb
+        inc mask_shield
 	rts
         
 powerup_pickup_mushroom: subroutine
 	; XXX still need to override player controls
         ; XXX still need to bend music
+        ; XXX reset pallete on player death
 	lda #108
         sta shroom_counter
 	rts

@@ -47,8 +47,6 @@ cart_start:	subroutine
         jsr palette_init
         jsr starfield_twinkle_reset
         
-        jsr player_bullets_init
-        
         jsr nametables_clear
         jsr sprite_clear
 	jsr player_game_reset
