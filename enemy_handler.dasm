@@ -323,10 +323,14 @@ enemy_get_damage_this_frame: subroutine
 	lda #bomb_damage_frame
         cmp bomb_counter
         bne .no_bomb_damage
-        lda enemy_dmg_accumulator
-        clc
-        adc #$10
-        sta enemy_dmg_accumulator
+        lda wtf
+        and #1
+        beq .no_bomb_damage
+        inc enemy_dmg_accumulator
+        ;lda enemy_dmg_accumulator
+        ;clc
+        ;adc #$10
+        ;sta enemy_dmg_accumulator
 .no_bomb_damage
 	; fix y register
 	ldy enemy_oam_offset
