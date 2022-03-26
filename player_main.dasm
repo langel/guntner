@@ -65,7 +65,10 @@ player_update_colors: subroutine
 player_take_damage: subroutine
 	; make sure iframes are not enable
         lda state_iframes
-        cmp #$00
+        beq .not_iframes
+        rts
+.not_iframes
+        lda shroom_counter
         beq .apply_damage
         rts
 .apply_damage

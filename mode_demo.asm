@@ -29,6 +29,7 @@ demo_update: subroutine
         beq .done
 
         ; some buttons return to menu
+        jmp .menu_return_buttons_not_pressed
         lda player_start_d
         ora player_a_d
         ora player_b_d
@@ -44,7 +45,9 @@ demo_update: subroutine
         beq .no_enemy_spawn
         jsr starglasses_spawn
 .no_enemy_spawn
-        jsr player_demo_controls
+        ;jsr player_demo_controls
+	jsr player_move_position
+        jsr player_bullets_check_controls
 .done
 	jsr game_update_generic
 	jmp state_update_done

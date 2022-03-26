@@ -319,6 +319,7 @@ sprite0_done:
 	include "apu_sfx.asm"
         nop	; how much prg space we using?
 
+;f258 - powerups done except sfx
 ;f267 - vampire done?
 ;f14c - with arctang now
 ;e7be

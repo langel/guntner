@@ -76,14 +76,28 @@ player_bullet_collision_handler: subroutine
         rts
         
 
-
-; XXX next 2 subroutines are very redundant
         
-player_gun_normal_fire: subroutine
+        
+; bullets are sprites #$03 - #$07 
+;;; bullet directions, sprite base address
+; 03   9 o'clock -7,  0, $020c
+; 04  10 o'clock -6, -3, $0210
+; 05   8 o'clock -6. +3, $0214
+; 06  11 o'clock -3, -6, $0218
+; 07   7 o'clock -3, +6, $021c
+
+player_gun_bullet_dir_table:
+	.byte #248, #0
+        .byte #249, #252
+        .byte #252, #6
+        .byte #249, #3
+        .byte #252, #249
+        
+player_gun_fire: subroutine
 	ldx #$00
         ldy #$0c
 .bullet_loop
-	lda oam_ram_x,y
+	lda oam_ram_y,y
         ; check if bullet is spawned
         cmp #$ff
         bne .next
@@ -95,11 +109,22 @@ player_gun_normal_fire: subroutine
         clc
         adc #$04
         sta oam_ram_y,y
-        lda #251
+        ; direction
+        lda temp00
+        cmp #$00
+        beq .one_direction
+.five_directions
+        lda player_gun_bullet_dir_table,x
         sta bullet_x_vel,x
-        lda #$00
+        lda player_gun_bullet_dir_table+1,x
         sta bullet_y_vel,x
-        ; XXX do we need this here?
+        bne .dir_done
+.one_direction
+        lda player_gun_bullet_dir_table
+        sta bullet_x_vel,x
+        lda player_gun_bullet_dir_table+1
+        sta bullet_y_vel,x
+.dir_done
         ; sprite
         lda #$79
         sta oam_ram_spr,y
@@ -115,66 +140,15 @@ player_gun_normal_fire: subroutine
 	rts
         
         
-; bullets are sprites #$03 - #$07 
-;;; bullet directions, sprite base address
-; 03   9 o'clock -7,  0, $020c
-; 04  10 o'clock -6, -3, $0210
-; 05   8 o'clock -6. +3, $0214
-; 06  11 o'clock -3, -6, $0218
-; 07   7 o'clock -3, +6, $021c
-        
-player_gun_turbo_fire: subroutine
-	ldx #$00
-        ldy #$0c
-.bullet_loop
-	lda oam_ram_x,y
-        ; check if bullet is spawned
-        cmp #$00
-        bne .next
-        ; trigger pewpew
-	jsr sfx_pewpew
-        ; set x,y position
-        lda player_x_hi
-        sta oam_ram_x,y
-        lda player_y_hi
-        clc
-        adc #$04
-        sta oam_ram_y,y
-        ; direction
-        lda player_gun_turbo_dir_table,x
-        sta bullet_x_vel,x
-        lda player_gun_turbo_dir_table+1,x
-        sta bullet_y_vel,x
-        ; XXX do we need this here?
-        ; sprite
-        lda player_bullet_sprite
-        sta oam_ram_spr,y
-        ; palette
-        lda #$00
-        sta oam_ram_att,y
-        jmp .done
-.next
-	jsr player_bullet_next
-        cpy #$20
-        bne .bullet_loop
-.done
-	rts
-        
-player_gun_turbo_dir_table:
-	.byte #248, #0
-        .byte #249, #252
-        .byte #252, #6
-        .byte #249, #3
-        .byte #252, #249
-        
-        
         
 player_bullets_check_controls: subroutine
+	lda #$01
+        sta temp00
 	; check for r_bag status
         lda r_bag_counter
         cmp #$02
         bcc .not_r_bag_turbo
-        jsr player_gun_turbo_fire
+        jsr player_gun_fire
         dec r_bag_counter
         jmp .done
 .not_r_bag_turbo
@@ -191,7 +165,7 @@ player_bullets_check_controls: subroutine
         sta player_damage
         jsr player_take_damage
 .no_turbo_damage
-        jsr player_gun_turbo_fire
+        jsr player_gun_fire
         jmp .done
 .not_turbo
 	; check if b button has been pressed
@@ -202,14 +176,16 @@ player_bullets_check_controls: subroutine
         cmp #$ff
         bne .done
         lda wtf
-        and #$03
+        and #$0f
         beq .normal_fire
 .no_r_bag_rapid
 	lda player_b_d
         cmp #$ff
         bne .done
 .normal_fire
-        jsr player_gun_normal_fire
+	lda #$00
+        sta temp00
+        jsr player_gun_fire
 .done
 	rts
         
@@ -229,8 +205,8 @@ player_bullets_update: subroutine
         jmp player_bullets_update_mask_shield
 .mask_check_done
 	; check if spawned
-	lda oam_ram_x,y
-        cmp #$00
+	lda oam_ram_y,y
+        cmp #$ff
         beq .next
         ; check for despawn
         ; is x < 8
@@ -265,9 +241,13 @@ player_bullets_update_next:
 	rts
 
 player_bullets_update_mask_shield: subroutine
+	sty temp00
+        ldy mask_shield
+.mask_shield_velocity_loop
         inc bullet_x_vel,x
-        inc bullet_x_vel,x
-        inc bullet_x_vel,x
+        dey
+        bne .mask_shield_velocity_loop
+        ldy temp00
         ; calc x
         lda player_x_hi
         sec

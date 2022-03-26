@@ -28,19 +28,32 @@ player_direction_speed_table:
 	; lo byte then hi byte
         ; straight value then diagonal value
         ; speed 1
-        byte #191,#0,#135,#0
-        ; speed 2
-        byte #0,#1,#181,#0
-        ; speed 3
         byte #192,#1,#61,#1
-        ; speed 4
-        byte #128,#2,#197,#1
-        
-        ; old speed 3
+        ; speed 2
         byte #64,#2,#151,#1
-        ; old speed 4
+        ; speed 3
+        byte #223,#2,#8,#2
+        ; speed 4
         byte #128,#3,#122,#2
         
+        
+        ; XXX OG speeds
+        ; speed 1
+        ;byte #191,#0,#135,#0
+        ; speed 2
+        ;byte #0,#1,#181,#0
+        ; speed 3
+        ;byte #192,#1,#61,#1
+        ; speed 4
+        ;byte #128,#2,#197,#1
+        
+        ; old speed 3
+        ;byte #64,#2,#151,#1
+        ; old speed 4
+        ;byte #128,#3,#122,#2
+        
+        ; speed 1
+        byte #192,#1,#61,#1
         
         
 
@@ -50,17 +63,19 @@ player_move_position: subroutine
 
 	jsr player_direction_handler
         
+        ; XXX boundless is enabled after game win
+        ;     need a check for that here
         lda player_x_hi
-        cmp #16
+        cmp #28
         bcs .right_enuff
-        lda #16
+        lda #28
         sta player_x_hi
 .right_enuff
 
         lda player_x_hi
-        cmp #232
+        cmp #221
         bcc .left_enuff
-        lda #232
+        lda #221
         sta player_x_hi
 .left_enuff
 
@@ -86,7 +101,30 @@ player_move_position: subroutine
 
 	rts
 
-
+player_invert_controls_table:
+	.byte #%0000 ; 0 not a thing
+        .byte #%0010 ; 1 right is left
+        .byte #%0001 ; 2 left is right
+        .byte #%0011 ; 3 not a thing
+        .byte #%1000 ; 4 down is up
+        .byte #%1010 ; 5 dr is ul
+        .byte #%1001 ; 6 dl is ur
+        .byte #%0111 ; 7 not a thing
+        .byte #%0100 ; 8 up is down
+        .byte #%0110 ; 9 ur is dl
+        .byte #%0101 ; a ul is dr
+        ; XXX probably could delete this
+        .byte #%1001 ; b not a thing
+        .byte #%1100 ; c not a thing
+        .byte #%1101 ; d not a thing
+        .byte #%1110 ; e not a thing
+        .byte #%1111 ; f not a thing
+        
+; %0001 right
+; %0010 left
+; %0100 down
+; %1000 up
+        
 
 player_direction_handler: subroutine
 	lda player_dir_bits
@@ -96,6 +134,15 @@ player_direction_handler: subroutine
         bne .dir_pressed
 	rts
 .dir_pressed
+	; shroom handling
+	lda shroom_counter
+        beq .not_shrooming
+	ldx player_dir_bits
+        lda player_invert_controls_table,x
+        sta player_dir_bits
+.not_shrooming
+
+
 	lda player_dir_bits
         cmp #%00001000
         bne .not_up

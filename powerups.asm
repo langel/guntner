@@ -30,10 +30,12 @@ powerup_from_starglasses:
         lda oam_ram_x,y
         sta enemy_ram_x,x
         lda oam_ram_y,y
+        clc
+        adc #$04
         sta enemy_ram_y,x
 	lda #$40
         sta enemy_ram_pc,x
-        lda #$02
+        lda #$01
         sta enemy_ram_hp,x
         ; rng powerup type
         lda rng0
@@ -159,11 +161,8 @@ powerup_type_handler_delegator:
         
         
 powerup_pickup_mask: subroutine
-	; XXX picking up more masks does more damage?
-        lda mask_shield
-        beq .no_bomb
-        jsr powerup_pickup_bomb
-.no_bomb
+        inc mask_shield
+        inc mask_shield
         inc mask_shield
 	rts
         

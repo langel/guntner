@@ -78,6 +78,7 @@ bomb_bg_animation_table:
 	.byte $0f,$07,$06,$05,$16,$26,$27,$28,$37,$38,$30
      
 palette_update: subroutine
+; shroom
 	lda shroom_counter
         beq .no_shroom_effect
         lda wtf
@@ -103,16 +104,18 @@ palette_update: subroutine
         bne .shroom_pal_reset_loop
         jsr player_update_colors
 .no_shroom_effect
+; fade in
 	lda #$00
         cmp state_fade_in
         beq .dont_fade_in
         jmp palette_fade_in_update
 .dont_fade_in
+; fade out
 	cmp state_fade_out
         beq .dont_fade_out
         jmp palette_fade_out_update
 .dont_fade_out
-	; do bomb bg animation
+; bomb
         lda bomb_counter
         beq .normal_bg
         lsr
