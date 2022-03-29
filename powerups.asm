@@ -5,12 +5,6 @@
 ; only need to use rise and fall arc
 ; must capture max fall velocity (4px/frame)
 ; rise and fall needs full 8bit range
-        
-; POWER UP TYPES
-; battery (partial and full) fill meter
-; mushroom makes everything trippy
-; machine gun does an autofire
-; slow down makes movement unbearable
 
 ; palette sprites start at $24
 ; 0 - skull shield

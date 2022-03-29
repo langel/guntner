@@ -35,25 +35,23 @@ Palette00:		; 25 bytes
 
         
 palette_init: subroutine
-	ldy #$00
+	ldy #25
 .loop
 	lda Palette00,y
         sta pal_uni_bg,y
         lda #$00
         sta palette_cache,y
-        iny
-        cpy #25
-        bne .loop
+        dey
+        bpl .loop
         rts
         
 palette_reset: subroutine
-        ldy #$00
+        ldy #25
 .loop
 	lda Palette00,y
         sta pal_uni_bg,y
-        iny
-        cpy #25
-        bne .loop
+        dey
+        bpl .loop
 	rts
        
         
@@ -85,23 +83,22 @@ palette_update: subroutine
         and #$03
         cmp #$00
         bne .no_shroom_effect
-        ldy #$15
+        ldy #$14
 .shroom_loop
-	lda pal_bg_3_1-1,y
+	lda pal_bg_3_1,y
         jsr palette_next_rainbow_color
-        sta pal_bg_3_1-1,y
+        sta pal_bg_3_1,y
         dey
-        bne .shroom_loop
+        bpl .shroom_loop
         dec shroom_counter
         bne .no_shroom_effect
         jsr palette_reset
-        ldy #$00
+        ldy #25
 .shroom_pal_reset_loop
 	lda Palette00,y
         sta pal_uni_bg,y
-        iny
-        cpy #25
-        bne .shroom_pal_reset_loop
+        dey
+        bpl .shroom_pal_reset_loop
         jsr player_update_colors
 .no_shroom_effect
 ; fade in
@@ -126,13 +123,12 @@ palette_update: subroutine
         dec bomb_counter
 .normal_bg
 	; do normal
-        ldy #$00
+        ldy #25
 .loop
         lda pal_uni_bg,y
         sta palette_cache,y
-        iny
-        cpy #25
-        bne .loop
+        dey
+        bpl .loop
 	rts
         
         
@@ -200,7 +196,7 @@ palette_fade_out_update: subroutine
 	lda pal_fade_c
         and #%11110000
         sta pal_fade_offset
-	ldx #$00
+	ldx #25
 .loop
 	lda pal_uni_bg,x
         sec
@@ -209,9 +205,8 @@ palette_fade_out_update: subroutine
         lda #$0f
 .no_reset
 	sta palette_cache,x
-        inx
-        cpx #25
-        bne .loop
+        dex
+        bpl .loop
         lda pal_fade_c
         clc
         adc #$03
