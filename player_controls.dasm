@@ -74,7 +74,8 @@ player_controls_read: subroutine
         bne .joy_read_loop	; repeat if X is 0
         
         sta player_controls
-        ; XXX wtf is this?
+        ; store directions isolated
+        and #%00001111
         sta player_dir_bits 
                
         lda #$01

@@ -10,7 +10,8 @@
 ; 5 then thats down + right
 
 
-
+; XXX honestly not sure where were at now
+;     speeds should probably be onced over again
 
 ;      straight/ diag
 ;speed 1  0.75 / 0.53
@@ -24,18 +25,6 @@
 
 ; 1 / 256 = 0.00390625
 
-player_direction_speed_table:
-	; lo byte then hi byte
-        ; straight value then diagonal value
-        ; speed 1
-        byte #192,#1,#61,#1
-        ; speed 2
-        byte #64,#2,#151,#1
-        ; speed 3
-        byte #223,#2,#8,#2
-        ; speed 4
-        byte #128,#3,#122,#2
-        
         
         ; XXX OG speeds
         ; speed 1
@@ -65,6 +54,7 @@ player_move_position: subroutine
         
         ; XXX boundless is enabled after game win
         ;     need a check for that here
+        ; XXX would min() and max() functions save space?
         lda player_x_hi
         cmp #28
         bcs .right_enuff
@@ -114,26 +104,30 @@ player_invert_controls_table:
         .byte #%0110 ; 9 ur is dl
         .byte #%0101 ; a ul is dr
         ; XXX probably could delete this
-        .byte #%1001 ; b not a thing
-        .byte #%1100 ; c not a thing
-        .byte #%1101 ; d not a thing
-        .byte #%1110 ; e not a thing
-        .byte #%1111 ; f not a thing
+        ;.byte #%1001 ; b not a thing
+        ;.byte #%1100 ; c not a thing
+        ;.byte #%1101 ; d not a thing
+        ;.byte #%1110 ; e not a thing
+        ;.byte #%1111 ; f not a thing
         
 ; %0001 right
 ; %0010 left
 ; %0100 down
 ; %1000 up
-        
 
+	; speeds 1 .. 4
+player_direction_speed_table_hi:
+	; straight values
+        byte #1, #2, #2, #3
+        ; diagonal values
+        byte #1, #1, #2, #2
+player_direction_speed_table_lo:
+	; straight values
+        byte #192, #64, #223, #128
+        ; diagonal values
+        byte #61, #151, #8, #122
+        
 player_direction_handler: subroutine
-	lda player_dir_bits
-        and #%00001111
-        sta player_dir_bits
-        cmp #$00
-        bne .dir_pressed
-	rts
-.dir_pressed
 	; shroom handling
 	lda shroom_counter
         beq .not_shrooming
@@ -141,239 +135,79 @@ player_direction_handler: subroutine
         lda player_invert_controls_table,x
         sta player_dir_bits
 .not_shrooming
-
-
+        ; get diagonal or not
+        lda #$00
+        sta temp00
+        lda player_dir_bits
+        and #%0011
+        beq .not_left_or_right
+        inc temp00
+.not_left_or_right
 	lda player_dir_bits
-        cmp #%00001000
-        bne .not_up
-        jmp player_move_up
-.not_up
-	lda player_dir_bits
-        cmp #%00001001
-        bne .not_up_right
-        jmp player_move_up_right
-.not_up_right
-	lda player_dir_bits
-        cmp #%00000001
-        bne .not_right
-        jmp player_move_right
-.not_right
-	lda player_dir_bits
-        cmp #%00000101
-        bne .not_down_right
-        jmp player_move_down_right
-.not_down_right
-	lda player_dir_bits
-        cmp #%00000100
-        bne .not_down
-        jmp player_move_down
-.not_down
-	lda player_dir_bits
-        cmp #%00000110
-        bne .not_down_left
-        jmp player_move_down_left
-.not_down_left
-	lda player_dir_bits
-        cmp #%0000010
+        and #%1100
+        beq .not_up_or_down
+        inc temp00
+.not_up_or_down
+	lda temp00
+        bne .direction_found
+        rts
+.direction_found
+	sec
+        sbc #1 ; 1 for diagonal detection 
+        asl
+        asl
+	; get speed
+	clc
+        adc player_speed
+        tax 
+        ; get add/sub for each axis
+; LEFT
+        lda player_dir_bits
+        and #%0001
         bne .not_left
-        jmp player_move_left
+        lda player_x_lo
+        sec
+        sbc player_direction_speed_table_lo,x
+        sta player_x_lo
+	lda player_x_hi
+        sbc player_direction_speed_table_hi,x
+        sta player_x_hi
 .not_left
-	lda player_dir_bits
-        cmp #%00001010
-        bne .not_up_left
-        jmp player_move_up_left
-.not_up_left
-	rts
-
-
-
-player_move_up: subroutine
-	lda player_speed
-        asl
-        asl
-        tay
-        ; do y
-        lda player_y_lo
-        sec
-        sbc player_direction_speed_table,y
-        sta player_y_lo
-	lda player_y_hi
-        iny
-        sbc player_direction_speed_table,y
-        sta player_y_hi
-	lda #$ff
-	rts
-        
-player_move_up_right: subroutine
-	lda player_speed
-        asl
-        asl
-        tax
-        inx
-        inx
-        txa
-        tay
-        ; do x
+; RIGHT
+        lda player_dir_bits
+        and #%0010
+        bne .not_right
         lda player_x_lo
         clc
-        adc player_direction_speed_table,x
+        adc player_direction_speed_table_lo,x
         sta player_x_lo
 	lda player_x_hi
-        inx
-        adc player_direction_speed_table,x
+        adc player_direction_speed_table_hi,x
         sta player_x_hi
-	; do y
+.not_right
+; UP
+        lda player_dir_bits
+        and #%0100
+        bne .not_up
         lda player_y_lo
         sec
-        sbc player_direction_speed_table,y
+        sbc player_direction_speed_table_lo,x
         sta player_y_lo
 	lda player_y_hi
-        iny
-        sbc player_direction_speed_table,y
+        sbc player_direction_speed_table_hi,x
         sta player_y_hi
-	rts
-        
-player_move_right: subroutine
-	lda player_speed
-        asl
-        asl
-        tax
-        ; do x
-        lda player_x_lo
-        clc
-        adc player_direction_speed_table,x
-        sta player_x_lo
-        inx
-	lda player_x_hi
-        adc player_direction_speed_table,x
-        sta player_x_hi
-.no_x_rollover
-	rts
-        
-player_move_down_right: subroutine
-	lda player_speed
-        asl
-        asl
-        tax
-        inx
-        inx
-        txa
-        tay
-        ; do x
-        lda player_x_lo
-        clc
-        adc player_direction_speed_table,x
-        sta player_x_lo
-	lda player_x_hi
-        inx
-        adc player_direction_speed_table,x
-        sta player_x_hi
-	; do y
+.not_up
+; DOWN
+        lda player_dir_bits
+        and #%1000
+        bne .not_down
         lda player_y_lo
         clc
-        adc player_direction_speed_table,y
+        adc player_direction_speed_table_lo,x
         sta player_y_lo
 	lda player_y_hi
-        iny
-        adc player_direction_speed_table,y
+        adc player_direction_speed_table_hi,x
         sta player_y_hi
+.not_down
 	rts
         
-player_move_down: subroutine
-	lda player_speed
-        asl
-        asl
-        tax
-        tay
-	; do y
-        lda player_y_lo
-        clc
-        adc player_direction_speed_table,y
-        sta player_y_lo
-	lda player_y_hi
-        iny
-        adc player_direction_speed_table,y
-        sta player_y_hi
-        bcs .no_y_rollover
-.no_y_rollover
-	rts
-        
-player_move_down_left: subroutine
-	lda player_speed
-        asl
-        asl
-        tax
-        inx
-        inx
-        txa
-        tay
-        ; do x
-        lda player_x_lo
-        sec
-        sbc player_direction_speed_table,x
-        sta player_x_lo
-	lda player_x_hi
-        inx
-        sbc player_direction_speed_table,x
-        sta player_x_hi
-        bcc .no_x_rollover
-.no_x_rollover
-	; do y
-        lda player_y_lo
-        clc
-        adc player_direction_speed_table,y
-        sta player_y_lo
-	lda player_y_hi
-        iny
-        adc player_direction_speed_table,y
-        sta player_y_hi
-        bcs .no_y_rollover
-.no_y_rollover
-	rts
-        
-player_move_left: subroutine
-	lda player_speed
-        asl
-        asl
-        tax
-        ; do x
-        lda player_x_lo
-        sec
-        sbc player_direction_speed_table,x
-        sta player_x_lo
-	lda player_x_hi
-        inx
-        sbc player_direction_speed_table,x
-        sta player_x_hi
-        bcc .no_x_rollover
-.no_x_rollover
-	rts
-        
-player_move_up_left: subroutine
-	lda player_speed
-        asl
-        asl
-        tax
-        inx
-        inx
-        txa
-        tay
-        ; do x
-        lda player_x_lo
-        sec
-        sbc player_direction_speed_table,x
-        sta player_x_lo
-	lda player_x_hi
-        inx
-        sbc player_direction_speed_table,x
-        sta player_x_hi
-	; do y
-        lda player_y_lo
-        sec
-        sbc player_direction_speed_table,y
-        sta player_y_lo
-	lda player_y_hi
-        iny
-        sbc player_direction_speed_table,y
-        sta player_y_hi
-	rts

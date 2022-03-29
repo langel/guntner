@@ -223,6 +223,7 @@ arctang_update_x: subroutine
         ; temp00 = hi
         ; temp01 = lo
         ; temp02 = region
+        ; temp03 = velocity?
         ldx temp02
         lda ARCTANG_REGION_TO_X_VELOCITY_TABLE,x
         asl
