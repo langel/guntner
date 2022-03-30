@@ -102,7 +102,7 @@ sfx_enemy_damage: subroutine
 ; sound test 05
 sfx_battery_hit: subroutine
 	; XXX expirement
-	lda #$4c
+	lda #$80
         sta apu_temp
 	; mode and pitch
         lda #$82
@@ -125,9 +125,13 @@ sfx_battery_hit: subroutine
 	rts
         
 sfx_powerup_hit_frame: subroutine
+        inc apu_temp
 	ldx apu_temp
-        lda sine_6bits,x
+        lda sine_table,x
         beq .shutdown
+        lsr
+        lsr
+        lsr
         ora #%00010000
         sta $400c
         sta $180
@@ -136,7 +140,6 @@ sfx_powerup_hit_frame: subroutine
         sta $400e
         lda #%01111000
         sta $400f
-        inc apu_temp
         bne .done
 .shutdown
 	lda #$00
