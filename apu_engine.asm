@@ -57,6 +57,12 @@ apu_make_it_hum: subroutine
         
         
 apu_game_frame: subroutine
+	; XXX experiment
+	; powerup hit
+	lda apu_temp
+        beq .not_powerup_hit
+        jmp sfx_powerup_hit_frame
+.not_powerup_hit
 	lda sfx_frame_id
         cmp #$00
         bne .active_sfx
@@ -77,6 +83,32 @@ apu_game_frame: subroutine
 	rts
 
 
+; XXX this will definitely go before release
+apu_debugger: subroutine
+	; dash cache meter is $108-$118
+        lda player_select_d
+        beq .dont_increase_counter
+        dec apu_temp
+        bpl .dont_reset_counter
+        lda #$1f
+        sta apu_temp
+.dont_reset_counter
+	jsr sfx_battery_hit
+.dont_increase_counter
+	lda apu_temp
+        lsr
+        lsr
+        lsr
+        lsr
+        clc
+        adc #$30
+        sta $109
+        lda apu_temp
+        and #$0f
+        clc
+        adc #$30
+        sta $10a
+        rts
         
  
      

@@ -195,6 +195,8 @@ sprite0_done:
 
 	; XXX starfield debugger
         ;jsr starfield_debugger
+        ; XXX apu debugger
+        jsr apu_debugger
 
         jsr player_controls_read
         ;jsr apu_manage

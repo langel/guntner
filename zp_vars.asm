@@ -188,6 +188,8 @@ audio_frame_counter     byte
 audio_root_tone         byte
 audio_pattern_pos	byte
 audio_pattern_num       byte
+; XXX the temp?
+apu_temp		byte
 
 title_screen_color	byte
 title_rudy_pos		byte

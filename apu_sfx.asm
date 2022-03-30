@@ -101,6 +101,14 @@ sfx_enemy_damage: subroutine
         
 ; sound test 05
 sfx_battery_hit: subroutine
+	; XXX expirement
+	lda #$4c
+        sta apu_temp
+	; mode and pitch
+        lda #$82
+        sta $400e
+        rts
+        
 	; turn on counter / set volume
         lda #$0f
         sta $400c
@@ -108,8 +116,32 @@ sfx_battery_hit: subroutine
         lda #$82
         sta $400e
         ; set envelope
-        lda #$08
+        ;lda #$0a
+        lda apu_temp
+        asl
+        asl
+        asl
         sta $400f
+	rts
+        
+sfx_powerup_hit_frame: subroutine
+	ldx apu_temp
+        lda sine_6bits,x
+        beq .shutdown
+        ora #%00010000
+        sta $400c
+        sta $180
+	; mode and pitch
+        lda #$82
+        sta $400e
+        lda #%01111000
+        sta $400f
+        inc apu_temp
+        bne .done
+.shutdown
+	lda #$00
+        sta apu_temp
+.done
 	rts
         
 ; sound test 06
