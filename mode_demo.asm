@@ -19,7 +19,6 @@ demo_init:
         jsr starfield_bg_init
         jsr render_enable
         jsr palette_fade_in_init
-        jsr audio_init_song
         rts
         
         
@@ -51,7 +50,6 @@ demo_update: subroutine
         jsr player_bullets_check_controls
 .done
 	jsr game_update_generic
-        jsr apu_game_music_frame
 	jmp state_update_done
         
         

@@ -4,12 +4,14 @@ apu_init: subroutine
         ; Init $4000-4013
         ldy #$13
 .loop  
-	lda apu_default_register_values,y
+	lda apu_init_register_values,y
         sta $4000,y
         dey
         bpl .loop
  
         ; We have to skip over $4014 (OAMDMA)
+        ; XXX we could probable write #$02 to OAMDMA
+        ;     then this loop could shrink a bit
         lda #$0f
         sta $4015
         lda #$40
@@ -17,12 +19,27 @@ apu_init: subroutine
    
         rts
         
-apu_default_register_values:
+apu_init_register_values:
         .byte $30,$08,$00,$00
         .byte $30,$08,$00,$00
         .byte $80,$00,$00,$00
         .byte $30,$00,$00,$00
         .byte $00,$00,$00,$00
+        
+        
+apu_update: subroutine
+; MUSIC
+; SFX Pulse 2
+; SFX Noise
+; MIX and Write to APU
+; RNG updates
+	lda apu_rng0
+        jsr PrevRandom
+        sta apu_rng0
+	lda apu_rng1
+        jsr NextRandom
+        sta apu_rng1
+	rts
         
         
 ; XXX this is awful
@@ -110,6 +127,12 @@ apu_debugger: subroutine
         sta $10a
         rts
         
+        
+; TRIANGLE CHANNEL
+;$4008  CRRR RRRR 	Length counter halt / linear counter control (C), linear counter load (R)
+;$4009 	---- ---- 	Unused
+;$400A 	TTTT TTTT 	Timer low (T)
+;$400B 	LLLL LTTT 	Length counter load (L), timer high (T) 
  
      
 ; NOISE CHANNEL
@@ -301,36 +324,41 @@ periodTableHi:
 ;00-0F  10,254, 20,  2, 40,  4, 80,  6, 160,  8, 60, 10, 14, 12, 26, 14,
 ;10-1F  12, 16, 24, 18, 48, 20, 96, 22, 192, 24, 72, 26, 16, 28, 32, 30
 
-; 00  10
-; 01 254
-; 02  20
-; 03   2
-; 04  40
-; 05   4
-; 06  80
-; 07   6
-; 08 160
-; 09   8
-; 0a  60
-; 0b  10
-; 0c  14
-; 0d  12
-; 0e  26
-; 0f  14
-; 10  12
-; 11  16
-; 12  24
-; 13  18
-; 14  48
-; 15  20
-; 16  96
-; 17  22
-; 18 192
-; 19  24
-; 1a  72
-; 1b  26
-; 1c  16
-; 1d  28
-; 1e  32
-; 1f  30
+; envelope length table again
+; column order:
+; 	id from table above
+;	duration in ticks
+;	actual register value
+; 00  10  00
+; 01 254  08
+; 02  20  10
+; 03   2  18
+; 04  40  20
+; 05   4  28
+; 06  80  30
+; 07   6  38
+; 08 160  40
+; 09   8  48
+; 0a  60  50
+; 0b  10  58
+; 0c  14  60
+; 0d  12  68
+; 0e  26  70
+; 0f  14  78
+; 10  12  80
+; 11  16  88
+; 12  24  90
+; 13  18  98
+; 14  48  a0
+; 15  20  a8
+; 16  96  b0
+; 17  22  b8
+; 18 192  c0
+; 19  24  c8
+; 1a  72  d0
+; 1b  26  d8
+; 1c  16  e0
+; 1d  28  e8
+; 1e  32  f0
+; 1f  30  f8
   
