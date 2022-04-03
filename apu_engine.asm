@@ -178,6 +178,21 @@ apu_game_music_init: subroutine
         sta audio_frame_counter
 	rts
         
+audio_init_song: subroutine
+        ; music init
+        lda #$70
+        ;lda #$30
+        sta audio_frame_counter
+        lda #$02
+        sta audio_root_tone
+        lda #$04
+        sta audio_pattern_pos
+        lda #$30
+        sta rng1
+        lda #$44
+        sta rng2
+        rts
+        
 apu_game_music_frame: subroutine
 	lda phase_current
         clc
@@ -286,36 +301,36 @@ periodTableHi:
 ;00-0F  10,254, 20,  2, 40,  4, 80,  6, 160,  8, 60, 10, 14, 12, 26, 14,
 ;10-1F  12, 16, 24, 18, 48, 20, 96, 22, 192, 24, 72, 26, 16, 28, 32, 30
 
-; 00  10  00
-; 01 254  08
-; 02  20  10
-; 03   2  18
-; 04  40  20
-; 05   4  28
-; 06  80  30
-; 07   6  38
-; 08 160  40
-; 09   8  48
-; 0a  60  50
-; 0b  10  58
-; 0c  14  60
-; 0d  12  68
-; 0e  26  70
-; 0f  14  78
-; 10  12  80
-; 11  16  88
-; 12  24  90
-; 13  18  98
-; 14  48  a0
-; 15  20  a8
-; 16  96  b0
-; 17  22  b8
-; 18 192  c0
-; 19  24  c8
-; 1a  72  d0
-; 1b  26  d8
-; 1c  16  e0
-; 1d  28  e8
-; 1e  32  f0
-; 1f  30  f8
+; 00  10
+; 01 254
+; 02  20
+; 03   2
+; 04  40
+; 05   4
+; 06  80
+; 07   6
+; 08 160
+; 09   8
+; 0a  60
+; 0b  10
+; 0c  14
+; 0d  12
+; 0e  26
+; 0f  14
+; 10  12
+; 11  16
+; 12  24
+; 13  18
+; 14  48
+; 15  20
+; 16  96
+; 17  22
+; 18 192
+; 19  24
+; 1a  72
+; 1b  26
+; 1c  16
+; 1d  28
+; 1e  32
+; 1f  30
   
