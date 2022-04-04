@@ -125,6 +125,12 @@ apu_debugger: subroutine
         clc
         adc #$30
         sta $10a
+        ; pulse1 vol
+        lda $400c
+        and #$0f
+        clc
+        adc #$30
+        sta $10c
         rts
         
         
@@ -150,6 +156,9 @@ apu_debugger: subroutine
 ;$4003 / $4007	LLLL LTTT	Length counter load (L), timer high (T)
         
 apu_trigger_title_screen_chord: subroutine
+	; used hardware enevelope is 1 second
+        ; 64 frame fade
+        ; triangle cuts off at 32 frames
 	;rts
         ; setup pulse 1
 	lda #%10001111
