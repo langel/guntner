@@ -9,6 +9,7 @@
 ; $300 entity data
 ; $400-7ff sine scale tables
 
+spare_stack	EQU	$150
 top_of_stack	EQU	$1e0
 ;unused_ram	EQU	$3e0
 ;more_free_ram	EQU	$400
@@ -195,6 +196,7 @@ sprite0_done:
 
 	; XXX starfield debugger
         ;jsr starfield_debugger
+        jsr apu_update
         ; XXX apu debugger
         jsr apu_debugger
 

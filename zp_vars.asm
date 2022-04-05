@@ -188,6 +188,7 @@ audio_frame_counter     byte
 audio_root_tone         byte
 audio_pattern_pos	byte
 audio_pattern_num       byte
+api_tri_counter		byte
 apu_rng0		byte
 apu_rng1		byte
 ; XXX the temp?

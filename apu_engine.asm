@@ -1,4 +1,48 @@
+        
+; PULSE CHANNELS
+;$4000 / $4004	DDLC VVVV	Duty (D), envelope loop / length counter halt (L), constant volume (C), volume/envelope (V)
+;$4001 / $4005	EPPP NSSS	Sweep unit: enabled (E), period (P), negate (N), shift (S)
+;$4002 / $4006	TTTT TTTT	Timer low (T)
+;$4003 / $4007	LLLL LTTT	Length counter load (L), timer high (T)
+        
+APU_PULSE1_VOL		= $4000
+APU_PULSE1_SWEEP	= $4001
+APU_PULSE1_TIMER_LO	= $4002
+APU_PULSE1_TIMER_HI	= $4003
+APU_PULSE2_VOL		= $4004
+APU_PULSE2_SWEEP	= $4005
+APU_PULSE2_TIMER_LO	= $4006
+APU_PULSE2_TIMER_HI	= $4007
 
+; TRIANGLE CHANNEL
+;$4008  CRRR RRRR 	Length counter halt / linear counter control (C), linear counter load (R)
+;$4009 	---- ---- 	Unused
+;$400A 	TTTT TTTT 	Timer low (T)
+;$400B 	LLLL LTTT 	Length counter load (L), timer high (T) 
+ 
+APU_TRI_CONTROL		= $4008
+APU_TRI_UNUSED		= $4009
+APU_TRI_TIMER_LO	= $400a
+APU_TRI_TIMER_HI	= $400b
+     
+; NOISE CHANNEL
+;$400C	--LC VVVV	Envelope loop / length counter halt (L), constant volume (C), volume/envelope (V)
+;$400D	---- ----	Unused
+;$400E	L--- PPPP	Loop noise (L), noise period (P)
+;$400F	LLLL L---	Length counter load (L)
+        
+
+
+APU_NOISE_VOL   = $400C
+APU_NOISE_FREQ  = $400E
+APU_NOISE_TIMER = $400F
+DMC_FREQ	= $4010
+APU_STATUS	= $4015
+APU_DMC_CTRL    = $4010
+APU_CHAN_CTRL   = $4015
+APU_FRAME       = $4017
+
+apu_cache	=	$0140
   
 apu_init: subroutine
         ; Init $4000-4013
@@ -32,6 +76,40 @@ apu_update: subroutine
 ; SFX Pulse 2
 ; SFX Noise
 ; MIX and Write to APU
+; Triangle Counter
+        lda wtf
+        ;cmp #$80
+        and #%00010000
+        sta apu_temp
+        cmp #$00
+        beq .triangle_disabled
+        bne .triangle_enabled
+        lda #$00
+        cmp api_tri_counter
+        beq .triangle_skip
+        dec api_tri_counter
+        bne .triangle_enabled
+.triangle_disabled
+	; turn off sound
+        lda #$01
+        sta $4008
+        jmp .triangle_skip
+.triangle_enabled
+	lda #$7f
+        sta $4008
+        lda $014a
+        sta $400a
+        lda $014b
+        sta $400b
+	;lda #%01111111
+        ;sta $4008
+        ;ldx #$10
+        ;lda periodTableLo,x
+        ;sta $400a
+        ;lda periodTableHi,x
+        ;ora #%00001000
+        ;sta $400b
+.triangle_skip
 ; RNG updates
 	lda apu_rng0
         jsr PrevRandom
@@ -134,27 +212,7 @@ apu_debugger: subroutine
         rts
         
         
-; TRIANGLE CHANNEL
-;$4008  CRRR RRRR 	Length counter halt / linear counter control (C), linear counter load (R)
-;$4009 	---- ---- 	Unused
-;$400A 	TTTT TTTT 	Timer low (T)
-;$400B 	LLLL LTTT 	Length counter load (L), timer high (T) 
- 
-     
-; NOISE CHANNEL
-;$400C	--LC VVVV	Envelope loop / length counter halt (L), constant volume (C), volume/envelope (V)
-;$400D	---- ----	Unused
-;$400E	L--- PPPP	Loop noise (L), noise period (P)
-;$400F	LLLL L---	Length counter load (L)
-        
 
-        
-; PULSE CHANNELS
-;$4000 / $4004	DDLC VVVV	Duty (D), envelope loop / length counter halt (L), constant volume (C), volume/envelope (V)
-;$4001 / $4005	EPPP NSSS	Sweep unit: enabled (E), period (P), negate (N), shift (S)
-;$4002 / $4006	TTTT TTTT	Timer low (T)
-;$4003 / $4007	LLLL LTTT	Length counter load (L), timer high (T)
-        
 apu_trigger_title_screen_chord: subroutine
 	; used hardware enevelope is 1 second
         ; 64 frame fade
@@ -192,6 +250,7 @@ apu_trigger_title_screen_chord: subroutine
         sta $4007
         ; setup triangle
 	lda #%01111111
+        sta $0148
         sta $4008
         lda rng2
         and #%00001111
@@ -199,9 +258,11 @@ apu_trigger_title_screen_chord: subroutine
         adc #$08
         tax
         lda periodTableLo,x
+        sta $014a
         sta $400a
         lda periodTableHi,x
         ora #%00001000
+        sta $014b
         sta $400b
 	rts
         
