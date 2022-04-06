@@ -82,7 +82,7 @@ powerups_cycle: subroutine
         ; will wrap to the left so add hp
         inc enemy_ram_hp,x
         ; give it sfx
-        jsr sfx_battery_hit
+        jsr sfx_powerup_hit
 .frame
         lda enemy_ram_pc,x
 	cmp #$80

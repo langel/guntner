@@ -315,7 +315,7 @@ apu_debugger: subroutine
         lda #$1f
         sta apu_temp
 .dont_reset_counter
-	jsr sfx_battery_hit
+	jsr sfx_powerup_hit
 .dont_increase_counter
 	lda apu_temp
         lsr
@@ -336,8 +336,8 @@ apu_debugger: subroutine
         clc
         adc #$30
         sta $10c
-        ; status register
-	lda $4015
+        ; noise volume
+	lda $14c
         lsr
         lsr
         lsr
@@ -345,7 +345,7 @@ apu_debugger: subroutine
         clc
         adc #$30
         sta $10e
-	lda $4015
+	lda $14c
         and #$0f
         clc
         adc #$30

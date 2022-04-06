@@ -4,7 +4,6 @@
 ; sound test 00
 sfx_pewpew: subroutine
 	; pulse 2
-	;rts
 	lda #%10001111
         sta $4004
         lda #%10000010
@@ -20,7 +19,6 @@ sfx_pewpew: subroutine
 ; sound test 01
 sfx_player_damage: subroutine
 	; noise
-	;rts
         lda #%00001111
         sta $400c
         lda #%00001111
@@ -31,8 +29,6 @@ sfx_player_damage: subroutine
         
 ; sound test 02
 sfx_player_death: subroutine
-	; noise and?
-        ;rts
         ; setup pulse 1
 	lda #%10001111
         sta $4000
@@ -90,7 +86,6 @@ sfx_player_death_frame: subroutine
 ; sound test 04
 sfx_enemy_damage: subroutine
 	; pulse 2
-	;rts
 	lda #%10001111
         sta $4004
         lda #%10000010
@@ -104,16 +99,14 @@ sfx_enemy_damage: subroutine
 	rts
         
 ; sound test 05
-sfx_battery_hit: subroutine
+sfx_powerup_hit: subroutine
 	lda #%00011111
         sta apu_cache+$c
         lda #$82
         sta apu_cache+$e
-        ;lda #$ff
-        ;sta $400f
         lda #%01111000
         sta $400f
-        lda #$40
+        lda #$20
         sta apu_noi_counter
         lda #$04
         sta apu_noi_envelope

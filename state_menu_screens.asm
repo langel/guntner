@@ -496,7 +496,7 @@ options_screen_sfx_handler: subroutine
 .not03
 	cmp #$04
         bne .not04
-        jsr sfx_battery_hit
+        jsr sfx_powerup_hit
 .not04
 	cmp #$05
         bne .not05
