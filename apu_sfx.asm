@@ -103,35 +103,35 @@ sfx_player_death: subroutine
         lda #%00001001
         sta $4007
         ; setup noise handler
-	lda #$02
+	lda #$01
         sta sfx_noi_update_type
         lda #$00
-        sta audio_noise_volume
+        sta sfx_temp00 ; volume
         lda #$80
-        sta audio_noise_pitch
+        sta sfx_temp01 ; pitch
+        ;sta sfx_noi_counter
 	rts
         
 sfx_player_death_update: subroutine
-        lda audio_noise_volume
+        lda sfx_temp00 ; vol
         lsr
         lsr
         lsr
         lsr
         and #%00010000
-        sta $400c 
-        lda audio_noise_pitch
+        sta apu_cache+$c
+        lda sfx_temp01 ; pitch
         lsr
         lsr
         lsr
-        sta $400e
-        lda #%01111000
-        sta $400f
-        inc audio_noise_pitch
-        inc audio_noise_volume
-        inc audio_noise_volume
+        sta apu_cache+$e
+        inc sfx_temp01 ; pitch
+        inc sfx_temp00 ; vol
+        inc sfx_temp00 ; vol
         bne .dont_kill_player_death_sound
+        lda #$10
+        sta apu_cache+$c
         lda #$00
-        sta $400c
         sta sfx_noi_update_type
 .dont_kill_player_death_sound
 	rts
@@ -200,20 +200,20 @@ sfx_powerup_pickup: subroutine
 	lda #$03
         sta sfx_pu2_update_type
         lda #$00
-        sta sfx_counter
+        sta sfx_temp00 ; counter
 	rts
         
 sfx_powerup_pickup_arp:
  .byte	#$1a, #$1d, #$21, #$26
 
 sfx_powerup_pickup_update: subroutine
-	lda sfx_counter
+	lda sfx_temp00 ; counter
         lsr
         lsr
         cmp #$04
         beq .end_sound
         tax
-        lda sfx_counter
+        lda sfx_temp00 ; counter
         and #%00000011
         bne .dont_trigger
         lda audio_root_tone
@@ -231,7 +231,7 @@ sfx_powerup_pickup_update: subroutine
         sta $4007
         
 .dont_trigger
-        inc sfx_counter
+        inc sfx_temp00 ; counter
 	rts
 .end_sound
 	lda #$00

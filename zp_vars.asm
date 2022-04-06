@@ -177,15 +177,7 @@ pal_spr_3_1	byte
 pal_spr_3_2	byte
 pal_spr_3_3	byte
 
-sfx_counter		byte
-audio_noise_pitch	byte
-audio_noise_volume	byte
-; XXX these are for music
-; XXX could user better names?
-audio_frame_counter     byte
-audio_root_tone         byte
-audio_pattern_pos	byte
-audio_pattern_num       byte
+
 apu_pu1_counter		byte
 apu_pu1_envelope	byte
 apu_pu1_last_hi		byte
@@ -195,8 +187,17 @@ apu_pu2_envelope	byte
 apu_pu2_last_hi		byte
 apu_noi_counter		byte ; !!! must update apu_env_run if moved
 apu_noi_envelope	byte
+; utility variables
 apu_rng0		byte
 apu_rng1		byte
+sfx_temp00		byte
+sfx_temp01		byte
+; XXX these are for music
+; XXX could user better names?
+audio_frame_counter     byte
+audio_root_tone         byte
+audio_pattern_pos	byte
+audio_pattern_num       byte
 ; counters to mask other channel audio
 sfx_pu2_counter		byte
 sfx_noi_counter		byte
