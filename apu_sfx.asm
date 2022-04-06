@@ -121,29 +121,6 @@ sfx_battery_hit: subroutine
         sta sfx_noi_counter
         rts
 
-sfx_powerup_hit_frame: subroutine
-	rts
-        inc apu_temp
-	ldx apu_temp
-        lda sine_table,x
-        beq .shutdown
-        lsr
-        lsr
-        lsr
-        ora #%00010000
-        sta $400c
-        sta $180
-	; mode and pitch
-        lda #$82
-        sta $400e
-        lda #%01111000
-        sta $400f
-        bne .done
-.shutdown
-	lda #$00
-        sta apu_temp
-.done
-	rts
         
 ; sound test 06
 sfx_powerup_pickup: subroutine
