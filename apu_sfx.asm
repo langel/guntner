@@ -13,6 +13,8 @@ sfx_pewpew: subroutine
         sta $4006
         lda #%00010000
         sta $4007
+        lda #$10
+        sta sfx_pu2_counter
 	rts
 
 ; sound test 01
@@ -97,34 +99,30 @@ sfx_enemy_damage: subroutine
         sta $4006
         lda #%00010001
         sta $4007
+        lda #$10
+        sta sfx_pu2_counter
 	rts
         
 ; sound test 05
 sfx_battery_hit: subroutine
-	; XXX expirement
-	lda #$80
-        sta apu_temp
-	; mode and pitch
+	lda #%00011111
+        sta apu_cache+$c
         lda #$82
-        sta $400e
-        rts
-        
-	; turn on counter / set volume
-        lda #$0f
-        sta $400c
-	; mode and pitch
-        lda #$82
-        sta $400e
-        ; set envelope
-        ;lda #$0a
-        lda apu_temp
-        asl
-        asl
-        asl
+        sta apu_cache+$e
+        ;lda #$ff
+        ;sta $400f
+        lda #%01111000
         sta $400f
-	rts
-        
+        lda #$40
+        sta apu_noi_counter
+        lda #$04
+        sta apu_noi_envelope
+        lda #$16
+        sta sfx_noi_counter
+        rts
+
 sfx_powerup_hit_frame: subroutine
+	rts
         inc apu_temp
 	ldx apu_temp
         lda sine_table,x

@@ -199,6 +199,8 @@ apu_noi_counter		byte ; !!! must update apu_env_run if moved
 apu_noi_envelope	byte
 apu_rng0		byte
 apu_rng1		byte
+sfx_pu2_counter		byte
+sfx_noi_counter		byte
 ; XXX the temp?
 apu_temp		byte
 

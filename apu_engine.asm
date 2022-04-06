@@ -116,15 +116,49 @@ apu_env_run: subroutine
         sta temp01
         jmp (temp00)
 apu_env_table_lo:
-	.byte #<apu_env_0
+	.byte #<apu_env_lin_long
+	.byte #<apu_env_lin_short
+	.byte #<apu_env_lin_tiny
+        .byte #<apu_env_exp_long
+        .byte #<apu_env_exp_short
 apu_env_table_hi:
-	.byte #>apu_env_0
-apu_env_0: subroutine
+	.byte #>apu_env_lin_long
+	.byte #>apu_env_lin_short
+	.byte #>apu_env_lin_tiny
+        .byte #>apu_env_exp_long
+        .byte #>apu_env_exp_short
+apu_env_lin_long: subroutine
 	; #$40 counter = 63 frames / 1 second
         lda apu_pu1_counter,x
         lsr
         lsr
         and #%00001111
+	rts
+apu_env_lin_short: subroutine
+	; #$20 counter = 31 frames / 0.5 second
+        lda apu_pu1_counter,x
+        lsr
+        and #%00001111
+	rts
+apu_env_lin_tiny: subroutine
+	; #$10 counter = 15 frames / 0.25 second
+        lda apu_pu1_counter,x
+        and #%00001111
+	rts
+apu_env_exp_long: subroutine
+	; #$40 counter =~ 54 frames / 1 second
+        ldy apu_pu1_counter,x
+        lda sine_table+$c0,y
+        lsr
+        lsr
+        lsr
+	rts
+apu_env_exp_short: subroutine
+	; #$20 counter =~ 28 frames / 0.5 second
+        ldy apu_pu1_counter,x
+        lda sine_7bits+$60,y
+        lsr
+        lsr
 	rts
         
         
@@ -177,6 +211,21 @@ apu_update: subroutine
 	lda #$7f
         sta apu_cache+8
 .triangle_skip
+; Noise Counter
+	lda apu_noi_counter
+        beq .noise_skip
+        dec apu_noi_counter
+        bne .noise_enabled
+.noise_disabled
+	lda #%00010000
+        sta apu_cache+12
+        jmp .noise_skip
+.noise_enabled
+	ldx #$07
+        jsr apu_env_run
+        ora #%00010000
+        sta apu_cache+12
+.noise_skip
 ; copy cache to apu
 	ldy #$07
 .cache_to_apu_loop
@@ -191,6 +240,15 @@ apu_update: subroutine
 	lda apu_rng1
         jsr NextRandom
         sta apu_rng1
+; SFX counter updates
+	lda sfx_pu2_counter
+        beq .skip_sfx_pu2_dec
+        dec sfx_pu2_counter
+.skip_sfx_pu2_dec
+	lda sfx_noi_counter
+        beq .skip_sfx_noi_dec
+        dec sfx_noi_counter
+.skip_sfx_noi_dec
 	rts
         
         
@@ -226,11 +284,6 @@ apu_make_it_hum: subroutine
         
         
 apu_game_frame: subroutine
-	; XXX experiment
-	; powerup hit
-	lda apu_temp
-        beq .not_powerup_hit
-        jmp sfx_powerup_hit_frame
 .not_powerup_hit
 	lda sfx_frame_id
         cmp #$00
@@ -406,9 +459,8 @@ apu_game_music_frame: subroutine
         jsr apu_set_pitch
 .no_pulse_lead
 	; pulse 2
-        lda #%00000010
-       	bit $4015
-        beq .no_pulse_rhythm
+        lda sfx_pu2_counter
+        bne .no_pulse_rhythm
         lda #$04
         and rng1
         bit audio_pattern_pos
