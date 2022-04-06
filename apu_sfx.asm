@@ -4,6 +4,7 @@
 ; sound test 00
 sfx_pewpew: subroutine
 	; pulse 2
+	;rts
 	lda #%10001111
         sta $4004
         lda #%10000010
@@ -49,7 +50,6 @@ sfx_player_death: subroutine
         sta $4007
         ; setup noise handler
 	lda #$02
-        sta audio_noise_mode
         sta sfx_frame_id
         lda #$00
         sta audio_noise_volume
@@ -78,7 +78,6 @@ sfx_player_death_frame: subroutine
         bne .dont_kill_player_death_sound
         lda #$00
         sta $400c
-        sta audio_noise_mode
         sta sfx_frame_id
 .dont_kill_player_death_sound
 	rts
@@ -161,9 +160,7 @@ sfx_powerup_pickup_frame: subroutine
         
 ; sound test 03
 sfx_enemy_death: subroutine
-	; enemy death is noise mode 1
         lda #$01
-        sta audio_noise_mode
         sta sfx_frame_id
         lda #$0f
         sta audio_noise_pitch
@@ -191,7 +188,6 @@ sfx_enemy_death_frame: subroutine
         bne .dont_kill_enemy_death_sound
         lda #$00
         sta $400c
-        sta audio_noise_mode
         sta sfx_frame_id
 .dont_kill_enemy_death_sound
 	rts

@@ -371,8 +371,6 @@ options_screen_update: subroutine
         
 .dont_start_game
 	jsr options_screen_set_rudy_y
-        ; XXX main NMI game loop should handle this?
-	jsr apu_game_frame
 ; check if option changes
 	lda player_down_d
         cmp #$00

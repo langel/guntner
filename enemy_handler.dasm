@@ -108,12 +108,15 @@ sprite_4_cleanup_for_next: subroutine
 	
         
 clear_all_enemies: subroutine
+	; XXX clears entire page and then some
 	ldx #$00
         txa
 .enemy_loop
 	sta enemy_ram_type,x
         inx
         bne .enemy_loop
+        ; XXX only clears enemy sprites
+        lda #$ff
 	ldx #$20
 .sprite_loop
 	sta $0200,x
@@ -124,13 +127,12 @@ clear_all_enemies: subroutine
         
 enemy_death: subroutine
         ; clear OAM data
-        lda enemy_oam_offset
-        tax
+        ldy enemy_oam_offset
         lda #$ff
-        sta oam_ram_x,x
-        sta oam_ram_y,x
-        sta oam_ram_spr,x
-        sta oam_ram_att,x
+        sta oam_ram_x,y
+        sta oam_ram_y,y
+        sta oam_ram_spr,y
+        sta oam_ram_att,y
         ; clear enemy data
         lda #$00
 	ldx enemy_ram_offset
@@ -141,8 +143,8 @@ enemy_death: subroutine
         sta enemy_ram_pc,x
         sta enemy_ram_ac,x
         sta enemy_ram_hc,x
-        ; XXX is it ok to let this carry over?
-        ;sta enemy_ram_ex,x
+        ; enemy_ram_ex is allowed to carry over
+        ; entities using _ex should set it on spawn
         rts
         
         

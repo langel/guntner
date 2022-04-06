@@ -336,7 +336,7 @@ apu_debugger: subroutine
         clc
         adc #$30
         sta $10c
-        ; noise volume
+        ; noise envelope volume
 	lda $14c
         lsr
         lsr
@@ -345,11 +345,11 @@ apu_debugger: subroutine
         clc
         adc #$30
         sta $10e
-	lda $14c
+	lda $4015
         and #$0f
         clc
         adc #$30
-        sta $10f
+        sta $14c
         rts
         
         
@@ -394,11 +394,7 @@ apu_trigger_title_screen_chord: subroutine
 	rts
         
         
-        ; XXX this is probably garbage
-apu_game_music_init: subroutine
-	lda #$ff
-        sta audio_frame_counter
-	rts
+  
         
 audio_init_song: subroutine
         ; music init

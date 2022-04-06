@@ -181,7 +181,6 @@ sprite0_wait:
         
         
         ; must be game mode
-        jsr apu_game_frame
 	jsr player_bullets_update
         jsr starfield_update
         

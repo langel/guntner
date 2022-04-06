@@ -179,7 +179,6 @@ pal_spr_3_3	byte
 
 sfx_frame_id		byte
 sfx_counter		byte
-audio_noise_mode	byte
 audio_noise_pitch	byte
 audio_noise_volume	byte
 ; XXX these are for music

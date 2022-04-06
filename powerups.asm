@@ -70,8 +70,8 @@ powerups_cycle: subroutine
  	;; XXX needs its own sfx
         ; might want different ones by type
         jsr sfx_powerup_pickup
-        lda enemy_ram_ex,x
-        jsr powerup_type_handler_delegator
+        ldy enemy_ram_ex,x
+        jsr powerup_pickup_delegator
         jsr enemy_death
 	jmp update_enemies_handler_next
 .reset_velocity
@@ -132,26 +132,32 @@ powerups_cycle: subroutine
         
         
         
-powerup_type_handler_table:
-	.word powerup_pickup_mask
-        .word powerup_pickup_mushroom
-	.word powerup_pickup_plus_one
-        .word powerup_pickup_bomb
-        .word powerup_pickup_r_bag
-        .word powerup_pickup_health_25
-        .word powerup_pickup_health_50
-        .word powerup_pickup_health_100
-        
-powerup_type_handler_delegator:
-        asl
-        tax
-        lda powerup_type_handler_table,x
+powerup_pickup_table_lo:
+	.byte #<powerup_pickup_mask
+	.byte #<powerup_pickup_mushroom
+	.byte #<powerup_pickup_plus_one
+	.byte #<powerup_pickup_bomb
+	.byte #<powerup_pickup_r_bag
+	.byte #<powerup_pickup_health_25
+	.byte #<powerup_pickup_health_50
+	.byte #<powerup_pickup_health_100
+powerup_pickup_table_hi:
+	.byte #>powerup_pickup_mask
+	.byte #>powerup_pickup_mushroom
+	.byte #>powerup_pickup_plus_one
+	.byte #>powerup_pickup_bomb
+	.byte #>powerup_pickup_r_bag
+	.byte #>powerup_pickup_health_25
+	.byte #>powerup_pickup_health_50
+	.byte #>powerup_pickup_health_100
+powerup_pickup_delegator: subroutine
+	; y = powerup type
+        lda powerup_pickup_table_lo,y
         sta temp00
-        inx
-        lda powerup_type_handler_table,x
+        lda powerup_pickup_table_hi,y
         sta temp01
-        ldx enemy_ram_offset
         jmp (temp00)
+        
         
         
 powerup_pickup_mask: subroutine
@@ -190,10 +196,7 @@ powerup_pickup_health_25: subroutine
         clc
         adc #$40
         sta player_health
-        bcc .no_max_out
-        lda #$ff
-        sta player_health
-.no_max_out
+        bcs powerup_pickup_health_100
 	rts
         
 powerup_pickup_health_50: subroutine
@@ -201,10 +204,7 @@ powerup_pickup_health_50: subroutine
         clc
         adc #$80
         sta player_health
-        bcc .no_max_out
-        lda #$ff
-        sta player_health
-.no_max_out
+        bcs powerup_pickup_health_100
 	rts
         
 powerup_pickup_health_100: subroutine
