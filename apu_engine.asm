@@ -31,11 +31,10 @@ APU_TRI_TIMER_HI	= $400b
 ;$400E	L--- PPPP	Loop noise (L), noise period (P)
 ;$400F	LLLL L---	Length counter load (L)
         
-
-
 APU_NOISE_VOL   = $400C
 APU_NOISE_FREQ  = $400E
 APU_NOISE_TIMER = $400F
+
 DMC_FREQ	= $4010
 APU_STATUS	= $4015
 APU_DMC_CTRL    = $4010
@@ -44,24 +43,23 @@ APU_FRAME       = $4017
 
 apu_cache	=	$0140
   
+  
 apu_init: subroutine
         ; Init $4000-4013
         ldy #$13
 .loop  
 	lda apu_init_register_values,y
+        sta apu_cache,y
         sta $4000,y
         dey
         bpl .loop
- 
         ; We have to skip over $4014 (OAMDMA)
-        ; XXX we could probable write #$02 to OAMDMA
-        ;     then this loop could shrink a bit
         lda #$0f
         sta $4015
         lda #$40
         sta $4017
-   
         rts
+        
         
 apu_init_register_values:
         .byte $30,$08,$00,$00
@@ -70,46 +68,122 @@ apu_init_register_values:
         .byte $30,$00,$00,$00
         .byte $00,$00,$00,$00
         
+octoscale:
+	.byte $00,$02,$03,$05,$06,$08,$09,$0b
+	.byte $0c,$0e,$0f,$11,$12,$14,$15,$17
+        .byte $18,$1a,$1b,$1d,$1e,$20,$21,$23
+   
+periodTableLo:
+  ;      A   A#  B   C   C#  D   D#  E   F   F#  G   G#
+  .byte $f1,$7f,$13,$ad,$4d,$f3,$9d,$4c,$00,$b8,$74,$34
+  .byte $f8,$bf,$89,$56,$26,$f9,$ce,$a6,$80,$5c,$3a,$1a
+  .byte $fb,$df,$c4,$ab,$93,$7c,$67,$52,$3f,$2d,$1c,$0c
+  .byte $fd,$ef,$e1,$d5,$c9,$bd,$b3,$a9,$9f,$96,$8e,$86
+  .byte $7e,$77,$70,$6a,$64,$5e,$59,$54,$4f,$4b,$46,$42
+  .byte $3f,$3b,$38,$34,$31,$2f,$2c,$29,$27,$25,$23,$21
+  .byte $1f,$1d,$1b,$1a,$18,$17,$15,$14
+periodTableHi:
+  .byte $07,$07,$07,$06,$06,$05,$05,$05,$05,$04,$04,$04
+  .byte $03,$03,$03,$03,$03,$02,$02,$02,$02,$02,$02,$02
+  .byte $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01
+  .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+  .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+  .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+  .byte $00,$00,$00,$00,$00,$00,$00,$00
+        
+apu_set_pitch: subroutine
+	; x = pitch table offset
+        ; y = channel low byte offset
+        lda periodTableLo,x
+        sta apu_cache+0,y
+        lda periodTableHi,x
+        ora #%11111000
+        sta apu_cache+1,y
+        rts
+        
+       
+apu_env_run: subroutine
+	; x = channel counter offset
+        ;     envelope type is byte after
+        ; #$00 = pu1
+        ; #$04 = pu2
+        ; #$07 = noise
+        ; returns 4-bit volume in a
+        ldy apu_pu1_envelope,x
+        lda apu_env_table_lo,y
+        sta temp00
+        lda apu_env_table_hi,y
+        sta temp01
+        jmp (temp00)
+apu_env_table_lo:
+	.byte #<apu_env_0
+apu_env_table_hi:
+	.byte #>apu_env_0
+apu_env_0: subroutine
+	; #$40 counter = 63 frames / 1 second
+        lda apu_pu1_counter,x
+        lsr
+        lsr
+        and #%00001111
+	rts
+        
         
 apu_update: subroutine
 ; MUSIC
 ; SFX Pulse 2
 ; SFX Noise
 ; MIX and Write to APU
+
+; Pulse Channels Counter / Envelope
+	ldx #$00
+.pulse_channels_loop
+        lda apu_pu1_counter,x
+        beq .pulse_skip
+        dec apu_pu1_counter,x
+        bne .pulse_enabled
+.pulse_disabled
+	lda #$30
+        sta $4000,x
+        jmp .pulse_skip
+.pulse_enabled
+        jsr apu_env_run
+        ora #%10110000
+        sta $4000,x
+        lda #$08
+        sta $4001,x
+        lda apu_cache+2,x
+        sta $4002,x
+        lda apu_cache+3,x
+        cmp apu_pu1_last_hi,x
+        beq .pulse_skip
+        sta $4003,x
+        sta apu_pu1_last_hi,x
+.pulse_skip
+	cpx #$00
+        bne .pulse_channels_done
+        ldx #$04
+        bne .pulse_channels_loop
+.pulse_channels_done
 ; Triangle Counter
-        lda wtf
-        ;cmp #$80
-        and #%00010000
-        sta apu_temp
-        cmp #$00
-        beq .triangle_disabled
-        bne .triangle_enabled
-        lda #$00
-        cmp api_tri_counter
+        lda apu_tri_counter
         beq .triangle_skip
-        dec api_tri_counter
+        dec apu_tri_counter
         bne .triangle_enabled
 .triangle_disabled
-	; turn off sound
-        lda #$01
-        sta $4008
+        lda #$00
+        sta apu_cache+8
         jmp .triangle_skip
 .triangle_enabled
 	lda #$7f
-        sta $4008
-        lda $014a
-        sta $400a
-        lda $014b
-        sta $400b
-	;lda #%01111111
-        ;sta $4008
-        ;ldx #$10
-        ;lda periodTableLo,x
-        ;sta $400a
-        ;lda periodTableHi,x
-        ;ora #%00001000
-        ;sta $400b
+        sta apu_cache+8
 .triangle_skip
+; copy cache to apu
+	ldy #$07
+.cache_to_apu_loop
+	lda apu_cache+8,y
+        sta $4000+8,y
+        dey
+        bpl .cache_to_apu_loop
 ; RNG updates
 	lda apu_rng0
         jsr PrevRandom
@@ -209,63 +283,65 @@ apu_debugger: subroutine
         clc
         adc #$30
         sta $10c
+        ; status register
+	lda $4015
+        lsr
+        lsr
+        lsr
+        lsr
+        clc
+        adc #$30
+        sta $10e
+	lda $4015
+        and #$0f
+        clc
+        adc #$30
+        sta $10f
         rts
         
         
 
 apu_trigger_title_screen_chord: subroutine
-	; used hardware enevelope is 1 second
-        ; 64 frame fade
+	; used hardware enevelope was 1 second
+        ; ~ 64 frame fade
         ; triangle cuts off at 32 frames
-	;rts
-        ; setup pulse 1
-	lda #%10001111
-        sta $4000
+        ; setup pulse 1 + 2
+        lda #$40
+        sta apu_pu1_counter
+        sta apu_pu2_counter
         lda #$00
-        sta $4001
+        sta apu_pu1_envelope
+        sta apu_pu2_envelope
+        ; pulse 1 pitch
         lda rng0
         and #%00001111
         clc
         adc #$10
         tax
-        lda periodTableLo,x
-        sta $4002
-        lda periodTableHi,x
-        ora #%00001000
-        sta $4003
-        ; setup pulse 2
-	lda #%10001111
-        sta $4004
-        lda #$00
-        sta $4005
+        ldy #$02
+        jsr apu_set_pitch
+        ; pulse 2 pitch
         lda rng1
         and #%00001111
         clc
         adc #$08
         tax
-        lda periodTableLo,x
-        sta $4006
-        lda periodTableHi,x
-        ora #%00001000
-        sta $4007
+        ldy #$06
+        jsr apu_set_pitch
         ; setup triangle
-	lda #%01111111
-        sta $0148
-        sta $4008
+        lda #$20
+        sta apu_tri_counter
         lda rng2
         and #%00001111
         clc
         adc #$08
         tax
-        lda periodTableLo,x
-        sta $014a
-        sta $400a
-        lda periodTableHi,x
-        ora #%00001000
-        sta $014b
-        sta $400b
+        ldy #$0a
+        jsr apu_set_pitch
 	rts
         
+        
+        ; XXX this is probably garbage
 apu_game_music_init: subroutine
 	lda #$ff
         sta audio_frame_counter
@@ -287,9 +363,7 @@ audio_init_song: subroutine
         rts
         
 apu_game_music_frame: subroutine
-	lda phase_current
-        clc
-        adc #$11
+        lda #$11
         clc
         adc audio_frame_counter
         sta audio_frame_counter
@@ -315,10 +389,10 @@ apu_game_music_frame: subroutine
         and #%0000001
         cmp #$00
         bne .no_pulse_lead
-	lda #%10000011
-        sta $4000
+        lda #$20
+        sta apu_pu1_counter
         lda #$00
-        sta $4001
+        sta apu_pu1_envelope
         lda rng2
         and #%00000111
         clc
@@ -328,51 +402,43 @@ apu_game_music_frame: subroutine
         clc
         adc #$0c
         tax
-        lda periodTableLo,x
-        sta $4002
-        lda periodTableHi,x
-        ora #%01000000
-        sta $4003
+        ldy #$02
+        jsr apu_set_pitch
 .no_pulse_lead
+	; pulse 2
+        lda #%00000010
+       	bit $4015
+        beq .no_pulse_rhythm
+        lda #$04
+        and rng1
+        bit audio_pattern_pos
+        beq .no_pulse_rhythm
+        lda #$10
+        sta apu_pu2_counter
+        lda #$00
+        sta apu_pu2_envelope
+        ldx audio_root_tone
+        lda octoscale,x
+        clc
+        adc #$18
+        tax
+        ldy #$06
+        jsr apu_set_pitch
+.no_pulse_rhythm
 	; triangle
-	lda #%00001111
-        sta $4008
+	lda #$03
+        sta apu_tri_counter
         lda audio_root_tone
         clc
         adc #$18
         tax
-        lda periodTableLo,x
-        sta $400a
-        lda periodTableHi,x
-        ;ora #%01010000
-        sta $400b
+        ldy #$0a
+        jsr apu_set_pitch
         dec audio_pattern_pos
 .do_nothing
 	;dec audio_frame_counter
 	rts
         
-octoscale:
-	.byte $00,$02,$03,$05,$06,$08,$09,$0b
-	.byte $0c,$0e,$0f,$11,$12,$14,$15,$17
-        .byte $18,$1a,$1b,$1d,$1e,$20,$21,$23
-   
-periodTableLo:
-  ;      A   A#  B   C   C#  D   D#  E   F   F#  G   G#
-  .byte $f1,$7f,$13,$ad,$4d,$f3,$9d,$4c,$00,$b8,$74,$34
-  .byte $f8,$bf,$89,$56,$26,$f9,$ce,$a6,$80,$5c,$3a,$1a
-  .byte $fb,$df,$c4,$ab,$93,$7c,$67,$52,$3f,$2d,$1c,$0c
-  .byte $fd,$ef,$e1,$d5,$c9,$bd,$b3,$a9,$9f,$96,$8e,$86
-  .byte $7e,$77,$70,$6a,$64,$5e,$59,$54,$4f,$4b,$46,$42
-  .byte $3f,$3b,$38,$34,$31,$2f,$2c,$29,$27,$25,$23,$21
-  .byte $1f,$1d,$1b,$1a,$18,$17,$15,$14
-periodTableHi:
-  .byte $07,$07,$07,$06,$06,$05,$05,$05,$05,$04,$04,$04
-  .byte $03,$03,$03,$03,$03,$02,$02,$02,$02,$02,$02,$02
-  .byte $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01
-  .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-  .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-  .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-  .byte $00,$00,$00,$00,$00,$00,$00,$00
   
   
         

@@ -188,7 +188,15 @@ audio_frame_counter     byte
 audio_root_tone         byte
 audio_pattern_pos	byte
 audio_pattern_num       byte
-api_tri_counter		byte
+apu_pu1_counter		byte
+apu_pu1_envelope	byte
+apu_pu1_last_hi		byte
+apu_tri_counter		byte ; !!! this order for x offset
+apu_pu2_counter		byte
+apu_pu2_envelope	byte
+apu_pu2_last_hi		byte
+apu_noi_counter		byte ; !!! must update apu_env_run if moved
+apu_noi_envelope	byte
 apu_rng0		byte
 apu_rng1		byte
 ; XXX the temp?
