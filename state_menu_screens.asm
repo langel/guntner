@@ -475,39 +475,8 @@ options_screen_sfx_handler: subroutine
         bne .trigger_sound
 	jmp state_update_done
 .trigger_sound
-	lda options_sound_id
-        cmp #$00
-        bne .not00
-        jsr sfx_pewpew
-.not00
- 	cmp #$01
-        bne .not01
-        jsr sfx_player_damage
-.not01
-	cmp #$02
-        bne .not02
-        jsr sfx_player_death
-.not02
-	cmp #$03
-        bne .not03
-        jsr sfx_enemy_death
-.not03
-	cmp #$04
-        bne .not04
-        jsr sfx_powerup_hit
-.not04
-	cmp #$05
-        bne .not05
-        jsr sfx_powerup_pickup
-.not05
-	cmp #$06
-        bne .not06
-        jsr sfx_player_death
-.not06
-	cmp #$07
-        bne .not07
-        jsr sfx_player_death
-.not07
+	ldx options_sound_id
+        jsr sfx_test_delegator
 	jmp state_update_done
         
 

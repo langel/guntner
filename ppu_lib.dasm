@@ -91,6 +91,23 @@ sprite_clear:
 	rts
         
         
+; HEX views
+get_char_hi: subroutine
+	; a = value in / hex char out
+        lsr
+        lsr
+        lsr
+        lsr
+        clc
+        adc #$30
+        rts
+get_char_lo: subroutine
+	; a = value in / hex char out
+        and #$0f
+        clc
+        adc #$30
+        rts
+        
         
 ;;;;; namtetable_tile_planter
 ;;;;; data set address <address> - set 16-bit PPU address

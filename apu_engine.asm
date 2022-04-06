@@ -121,12 +121,14 @@ apu_env_table_lo:
 	.byte #<apu_env_lin_tiny
         .byte #<apu_env_exp_long
         .byte #<apu_env_exp_short
+        .byte #<apu_env_exp_tiny
 apu_env_table_hi:
 	.byte #>apu_env_lin_long
 	.byte #>apu_env_lin_short
 	.byte #>apu_env_lin_tiny
         .byte #>apu_env_exp_long
         .byte #>apu_env_exp_short
+        .byte #>apu_env_exp_tiny
 apu_env_lin_long: subroutine
 	; #$40 counter = 63 frames / 1 second
         lda apu_pu1_counter,x
@@ -160,6 +162,14 @@ apu_env_exp_short: subroutine
         lsr
         lsr
 	rts
+apu_env_exp_tiny: subroutine
+	; #$10 counter =~ 15 frames / 0.25 second
+        ldy apu_pu1_counter,x
+        lda apu_env_exp_tiny_table,y
+	rts
+apu_env_exp_tiny_table:
+	.byte $00,$01,$01,$01,$01,$01,$01,$01,
+        .byte $01,$01,$02,$03,$08,$0b,$0f
         
         
 apu_update: subroutine
@@ -168,6 +178,11 @@ apu_update: subroutine
 ; SFX Noise
 ; MIX and Write to APU
 
+; SFX Update Delegator
+	ldx sfx_pu2_update_type
+	jsr sfx_update_delegator
+	ldx sfx_noi_update_type
+	jsr sfx_update_delegator
 ; Pulse Channels Counter / Envelope
 	ldx #$00
 .pulse_channels_loop
@@ -269,40 +284,8 @@ apu_make_it_hum: subroutine
         sta $4007
 	rts
         
-	lda #%00001111
-        sta $400c
-        lda #%00000100
-        sta $400e
-        lda #%01111000
-        sta $400f
-        
-; enemy death*
-; enemy damage*
-; player fires*
-; player damage*
-; player death*
-        
-        
-apu_game_frame: subroutine
-.not_powerup_hit
-	lda sfx_frame_id
-        cmp #$00
-        bne .active_sfx
-        rts
-.active_sfx
-	cmp #$01
-        bne .not_enemy_death
-        jmp sfx_enemy_death_frame
-.not_enemy_death
-	cmp #$02
-        bne .not_player_death
-        jmp sfx_player_death_frame
-.not_player_death
-	cmp #$03
-        bne .not_powerup_pickup
-    	jmp sfx_powerup_pickup_frame
-.not_powerup_pickup
-	rts
+
+
 
 
 ; XXX this will definitely go before release
@@ -315,15 +298,10 @@ apu_debugger: subroutine
         lda #$1f
         sta apu_temp
 .dont_reset_counter
-	jsr sfx_powerup_hit
+	jsr sfx_player_death
 .dont_increase_counter
 	lda apu_temp
-        lsr
-        lsr
-        lsr
-        lsr
-        clc
-        adc #$30
+        jsr get_char_hi
         sta $109
         lda apu_temp
         and #$0f
@@ -332,24 +310,25 @@ apu_debugger: subroutine
         sta $10a
         ; pulse1 vol
         lda $400c
-        and #$0f
-        clc
-        adc #$30
+        jsr get_char_lo
         sta $10c
         ; noise envelope volume
 	lda $14c
-        lsr
-        lsr
-        lsr
-        lsr
-        clc
-        adc #$30
+        jsr get_char_hi
         sta $10e
-	lda $4015
-        and #$0f
+	lda $14c
+        jsr get_char_lo ; XXX does this save enough?
+        sta $10f
+        ; sfx update type
+        lda sfx_pu2_update_type
         clc
         adc #$30
-        sta $14c
+        sta $111
+        ; sfx update type
+        lda sfx_noi_update_type
+        clc
+        adc #$30
+        sta $113
         rts
         
         

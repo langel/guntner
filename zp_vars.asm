@@ -177,7 +177,6 @@ pal_spr_3_1	byte
 pal_spr_3_2	byte
 pal_spr_3_3	byte
 
-sfx_frame_id		byte
 sfx_counter		byte
 audio_noise_pitch	byte
 audio_noise_volume	byte
@@ -198,8 +197,12 @@ apu_noi_counter		byte ; !!! must update apu_env_run if moved
 apu_noi_envelope	byte
 apu_rng0		byte
 apu_rng1		byte
+; counters to mask other channel audio
 sfx_pu2_counter		byte
 sfx_noi_counter		byte
+; table offsets for update subroutines
+sfx_pu2_update_type	byte
+sfx_noi_update_type	byte
 ; XXX the temp?
 apu_temp		byte
 

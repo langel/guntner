@@ -117,6 +117,7 @@ nmi_handler: subroutine
         inc nmi_lockout
         
 ; PPU vBLANK STUFF
+	; RENDER	va cycles
         jmp (state_render_addr_lo)
 state_render_done:
 	; OAM DMA	513 cycles

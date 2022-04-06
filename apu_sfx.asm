@@ -1,6 +1,52 @@
 ; these should only use Pulse 2 and Noise channels
 ; unless its a non-music moment (like player death)
 
+
+sfx_update_delegator: subroutine
+        ; x = update offset
+        lda sfx_update_table_lo,x
+        sta temp00
+        lda sfx_update_table_hi,x
+        sta temp01
+        jmp (temp00)
+sfx_update_table_lo:
+	.byte #<sfx_do_nothing
+	.byte #<sfx_player_death_update
+        .byte #<sfx_enemy_death_update
+        .byte #<sfx_powerup_pickup_update
+sfx_update_table_hi:
+	.byte #>sfx_do_nothing
+	.byte #>sfx_player_death_update
+        .byte #>sfx_enemy_death_update
+        .byte #>sfx_powerup_pickup_update
+sfx_do_nothing: subroutine
+	rts
+        
+        
+sfx_test_delegator: subroutine
+	; x = sound effect id
+        lda sfx_test_table_lo,x
+        sta temp00
+        lda sfx_test_table_hi,x
+        sta temp01
+        jmp (temp00)
+sfx_test_table_lo:
+	.byte #<sfx_pewpew
+        .byte #<sfx_player_damage
+        .byte #<sfx_player_death
+        .byte #<sfx_enemy_damage
+        .byte #<sfx_enemy_death
+        .byte #<sfx_powerup_hit
+        .byte #<sfx_powerup_pickup
+sfx_test_table_hi:
+	.byte #>sfx_pewpew
+        .byte #>sfx_player_damage
+        .byte #>sfx_player_death
+        .byte #>sfx_enemy_damage
+        .byte #>sfx_enemy_death
+        .byte #>sfx_powerup_hit
+        .byte #>sfx_powerup_pickup
+
 ; sound test 00
 sfx_pewpew: subroutine
 	; pulse 2
@@ -9,7 +55,9 @@ sfx_pewpew: subroutine
         sta $4004
         lda #%10000010
         sta $4005
-        lda #$08
+        lda rng0
+        and #$3f
+        ora #$08
         sta $4006
         lda #%00010000
         sta $4007
@@ -20,12 +68,18 @@ sfx_pewpew: subroutine
 ; sound test 01
 sfx_player_damage: subroutine
 	; noise
-        lda #%00001111
-        sta $400c
-        lda #%00001111
-        sta $400e
-        lda #%00010000
-        sta $400f
+        lda rng0
+        and #$8f
+        ora #$0c
+        ;eor #$03
+        ;ora #$0a
+        sta apu_cache+$e
+        lda #$10
+        sta apu_noi_counter
+        lda #$02
+        sta apu_noi_envelope
+        lda #$10
+        sta sfx_noi_counter
         rts
         
 ; sound test 02
@@ -50,14 +104,14 @@ sfx_player_death: subroutine
         sta $4007
         ; setup noise handler
 	lda #$02
-        sta sfx_frame_id
+        sta sfx_noi_update_type
         lda #$00
         sta audio_noise_volume
         lda #$80
         sta audio_noise_pitch
 	rts
         
-sfx_player_death_frame: subroutine
+sfx_player_death_update: subroutine
         lda audio_noise_volume
         lsr
         lsr
@@ -78,18 +132,20 @@ sfx_player_death_frame: subroutine
         bne .dont_kill_player_death_sound
         lda #$00
         sta $400c
-        sta sfx_frame_id
+        sta sfx_noi_update_type
 .dont_kill_player_death_sound
 	rts
         
-; sound test 04
+        
+        
+; sound test 03
 sfx_enemy_damage: subroutine
 	; pulse 2
 	lda #%10001111
         sta $4004
         lda #%10000010
         sta $4005
-        lda #$08
+        lda rng0
         sta $4006
         lda #%00010001
         sta $4007
@@ -97,14 +153,39 @@ sfx_enemy_damage: subroutine
         sta sfx_pu2_counter
 	rts
         
-; sound test 05
-sfx_powerup_hit: subroutine
+        
+; sound test 04
+sfx_enemy_death: subroutine
 	lda #%00011111
         sta apu_cache+$c
+        lda #$0f
+        sta apu_cache+$e
+	lda #$02
+        sta apu_noi_envelope
+        sta sfx_noi_update_type
+        lda #$10
+        sta apu_noi_counter
+        rts
+        
+sfx_enemy_death_update: subroutine
+	lda apu_cache+$c
+        sta apu_cache+$e
+        and #%00001111
+        beq sfx_noi_update_clear
+        rts
+
+sfx_noi_update_clear: subroutine
+	lda #$00
+        sta sfx_noi_update_type
+        rts
+
+
+        
+        
+; sound test 05
+sfx_powerup_hit: subroutine
         lda #$82
         sta apu_cache+$e
-        lda #%01111000
-        sta $400f
         lda #$20
         sta apu_noi_counter
         lda #$04
@@ -117,7 +198,7 @@ sfx_powerup_hit: subroutine
 ; sound test 06
 sfx_powerup_pickup: subroutine
 	lda #$03
-        sta sfx_frame_id
+        sta sfx_pu2_update_type
         lda #$00
         sta sfx_counter
 	rts
@@ -125,7 +206,7 @@ sfx_powerup_pickup: subroutine
 sfx_powerup_pickup_arp:
  .byte	#$1a, #$1d, #$21, #$26
 
-sfx_powerup_pickup_frame: subroutine
+sfx_powerup_pickup_update: subroutine
 	lda sfx_counter
         lsr
         lsr
@@ -154,40 +235,5 @@ sfx_powerup_pickup_frame: subroutine
 	rts
 .end_sound
 	lda #$00
-        sta sfx_frame_id
+        sta sfx_pu2_update_type
         rts
-
-        
-; sound test 03
-sfx_enemy_death: subroutine
-        lda #$01
-        sta sfx_frame_id
-        lda #$0f
-        sta audio_noise_pitch
-        sta audio_noise_volume
-	rts
-        ; XXX wtf?
-	lda #%00001111
-        sta $400c
-        lda #%00000100
-        sta $400e
-        lda #%01111000
-        sta $400f
-	rts
-
-sfx_enemy_death_frame: subroutine
-        lda audio_noise_pitch
-        sta $400e
-        lda audio_noise_volume
-        and #%00010000
-        sta $400c
-        lda #%01111000
-        sta $400f
-        dec audio_noise_pitch
-        dec audio_noise_volume
-        bne .dont_kill_enemy_death_sound
-        lda #$00
-        sta $400c
-        sta sfx_frame_id
-.dont_kill_enemy_death_sound
-	rts
