@@ -29,15 +29,6 @@ starglasses_spawn: subroutine
 
 ;;; HANDLING STARGLASSES
 starglasses_cycle: subroutine
-	lda #bomb_damage_frame
-        cmp bomb_counter
-        bne .no_bomb
-        ; change it into crossbones!
-        jsr sfx_enemy_death
-        lda #$01
-        sta enemy_ram_type,x
-        jmp sprite_4_cleanup_for_next
-.no_bomb
         lda #$10
         sta collision_0_w
         sta collision_0_h
@@ -48,10 +39,16 @@ starglasses_cycle: subroutine
 	inc phase_kill_count
         lda enemy_ram_type,x
         jsr enemy_give_points
-        ; XXX maybe a different sound effect
         jsr sfx_enemy_death
+        lda bomb_counter
+        beq .death_not_by_bomb
+        lda #$01
+        sta enemy_ram_type,x
+        bne .death_cleanup_sprites
+.death_not_by_bomb
         ; spawn powerup
         jsr powerup_from_starglasses
+.death_cleanup_sprites
         jmp sprite_4_cleanup_for_next
 .not_dead
 .x_decide_action

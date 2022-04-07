@@ -67,9 +67,6 @@ powerups_cycle: subroutine
         beq .frame
 .despawn_powerup
 .player_picksup_powerup
- 	;; XXX needs its own sfx
-        ; might want different ones by type
-        jsr sfx_powerup_pickup
         ldy enemy_ram_ex,x
         jsr powerup_pickup_delegator
         jsr enemy_death
@@ -178,10 +175,10 @@ powerup_pickup_plus_one: subroutine
 	inc player_lives
 	rts
         
-bomb_damage_frame	.EQU	#29
 powerup_pickup_bomb: subroutine
-	lda #44
-        sta bomb_counter
+	; bomb_counter set inside sfx call
+        ; 1hp enemy damage every other frame
+	jsr sfx_powerup_bomb
 	rts
         
 powerup_pickup_r_bag: subroutine
@@ -192,6 +189,11 @@ powerup_pickup_r_bag: subroutine
 	rts
         
 powerup_pickup_health_25: subroutine
+
+ 	;; XXX needs its own sfx
+        ; might want different ones by type
+        jsr sfx_powerup_pickup
+        
         lda player_health
         clc
         adc #$40
@@ -200,6 +202,11 @@ powerup_pickup_health_25: subroutine
 	rts
         
 powerup_pickup_health_50: subroutine
+
+ 	;; XXX needs its own sfx
+        ; might want different ones by type
+        jsr sfx_powerup_pickup
+        
         lda player_health
         clc
         adc #$80
@@ -208,6 +215,11 @@ powerup_pickup_health_50: subroutine
 	rts
         
 powerup_pickup_health_100: subroutine
+
+ 	;; XXX needs its own sfx
+        ; might want different ones by type
+        jsr sfx_powerup_pickup
+        
 	lda #$ff
         sta player_health
 	rts

@@ -7,11 +7,12 @@
 ; $100 6502 stack
 ; $200 PPU OAM sprite data
 ; $300 entity data
-; $400 entity arctang data
-; $480-7ff sine scale tables
+; $400-7ff sine scale tables
 
 spare_stack	EQU	$150
 top_of_stack	EQU	$1e0
+;unused_ram	EQU	$3e0
+;more_free_ram	EQU	$400
 
 
 ;;;;; NES CARTRIDGE HEADER

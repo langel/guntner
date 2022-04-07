@@ -14,11 +14,13 @@ sfx_update_table_lo:
 	.byte #<sfx_player_death_update
         .byte #<sfx_enemy_death_update
         .byte #<sfx_powerup_pickup_update
+        .byte #<sfx_powerup_bomb_update
 sfx_update_table_hi:
 	.byte #>sfx_do_nothing
 	.byte #>sfx_player_death_update
         .byte #>sfx_enemy_death_update
         .byte #>sfx_powerup_pickup_update
+        .byte #>sfx_powerup_bomb_update
 sfx_do_nothing: subroutine
 	rts
         
@@ -175,6 +177,8 @@ sfx_enemy_death_update: subroutine
         rts
 
 sfx_noi_update_clear: subroutine
+	lda #%00010000
+        sta apu_cache+$c
 	lda #$00
         sta sfx_noi_update_type
         rts
@@ -193,6 +197,25 @@ sfx_powerup_hit: subroutine
         lda #$16
         sta sfx_noi_counter
         rts
+        
+
+; sound test 06
+sfx_powerup_bomb: subroutine
+	lda #44
+        sta bomb_counter
+	lda #$04
+        sta sfx_noi_update_type
+	rts
+        
+sfx_powerup_bomb_update: subroutine
+	lda bomb_counter
+	and #%00001111
+        ora #%00010000
+        sta apu_cache+$c
+        lda bomb_counter
+        sta apu_cache+$e
+        beq sfx_noi_update_clear
+	rts
 
         
 ; sound test 06

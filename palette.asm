@@ -120,7 +120,6 @@ palette_update: subroutine
         tax
         lda bomb_bg_animation_table,x
         sta pal_uni_bg
-        dec bomb_counter
 .normal_bg
 	; do normal
         ldy #25
