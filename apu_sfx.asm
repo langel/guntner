@@ -13,16 +13,18 @@ sfx_update_table_lo:
 	.byte #<sfx_do_nothing
 	.byte #<sfx_player_death_update
         .byte #<sfx_enemy_death_update
-        .byte #<sfx_powerup_pickup_update
+        .byte #<sfx_powerup_battery_update
         .byte #<sfx_powerup_bomb_update
+        .byte #<sfx_powerup_1up_update
 sfx_update_table_hi:
 	; XXX can probably remove this table
         ;     get all subroutines on same page
 	.byte #>sfx_do_nothing
 	.byte #>sfx_player_death_update
         .byte #>sfx_enemy_death_update
-        .byte #>sfx_powerup_pickup_update
+        .byte #>sfx_powerup_battery_update
         .byte #>sfx_powerup_bomb_update
+        .byte #>sfx_powerup_1up_update
 sfx_do_nothing: subroutine
 	rts
         
@@ -273,16 +275,59 @@ sfx_powerup_mask: subroutine
 ; sound test 08
 sfx_powerup_1up: subroutine
 	; imperial jingle
-        
+        ; root note -- x - x x X
+        lda #$00
+        sta sfx_temp00
+        lda #$05
+        sta sfx_pu2_update_type
+        rts
+sfx_powerup_1up_update: subroutine
+	lda sfx_temp00
+        beq .trigger_lower_note
+        cmp #$10
+        beq .trigger_lower_note
+        cmp #$18
+        beq .trigger_lower_note
+        cmp #$20
+        beq .trigger_higher_note
+        bne .done
+.trigger_lower_note
+	lda audio_root_tone
+        clc
+        adc #$18
+        bne .trigger_note
+.trigger_higher_note
+        lda #$00
+        sta sfx_pu2_update_type
+	lda audio_root_tone
+        clc
+        adc #$24
+.trigger_note
+        tax
+	lda #%10000011
+        sta $4004
+        lda #$00
+        sta $4005
+        lda periodTableLo,x
+        sta $4006
+        lda periodTableHi,x
+        ora #%01000000
+        sta $4007
+        lda #$10
+        sta sfx_pu2_counter
+.done
+	inc sfx_temp00
+	rts
+       
         
 ; sound test 09
 sfx_powerup_battery_25: subroutine
-        lda #$10
+        lda #$08
         sta sfx_temp00 ; counter
         bne sfx_powerup_battery_set_update_type
 ; sound test 0a
 sfx_powerup_battery_50: subroutine
-        lda #$08
+        lda #$04
         sta sfx_temp00 ; counter
         bne sfx_powerup_battery_set_update_type
 ; sound test 0b
@@ -295,26 +340,24 @@ sfx_powerup_battery_set_update_type:
         rts
         
         
-sfx_powerup_pickup_arp:
+sfx_powerup_battery_arp:
  .byte	#$18, #$1c, #$1f, #$24
 
-sfx_powerup_pickup_update: subroutine
-	lda sfx_temp00 ; counter
+sfx_powerup_battery_update: subroutine
+	lda sfx_temp00
+        and #%00000011
+        bne .dont_trigger
+        lda sfx_temp00
         lsr
         lsr
-        lsr
-        sta sfx_temp01
         cmp #$04
         beq .end_sound
         tax
-        lda sfx_temp00 ; counter
-        and #%00000111
-        bne .dont_trigger
         lda audio_root_tone
         clc
-        adc sfx_powerup_pickup_arp,x
+        adc sfx_powerup_battery_arp,x
         tax
-	lda #%10000111
+	lda #%10000011
         sta $4004
         lda #$00
         sta $4005
@@ -323,6 +366,8 @@ sfx_powerup_pickup_update: subroutine
         lda periodTableHi,x
         ora #%01000000
         sta $4007
+        lda #$10
+        sta sfx_pu2_counter
 .dont_trigger
         inc sfx_temp00 ; counter
 	rts

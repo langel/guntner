@@ -53,7 +53,7 @@ demo_update: subroutine
 .done
 	jsr game_update_generic
         ; XXX testing
-        ;jsr apu_game_music_frame
+        jsr apu_game_music_frame
 	jmp state_update_done
         
         

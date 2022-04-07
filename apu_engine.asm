@@ -305,7 +305,8 @@ apu_debugger: subroutine
         sta apu_temp
 .dont_reset_counter
 	;jsr sfx_powerup_mushroom
-        jsr powerup_pickup_mushroom
+        ;jsr powerup_pickup_mushroom
+        jsr sfx_powerup_1up
 .dont_increase_counter
 	lda apu_temp
         jsr get_char_hi

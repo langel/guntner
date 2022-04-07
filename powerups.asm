@@ -230,8 +230,8 @@ powerup_pickup_health_25: subroutine
         lda player_health
         clc
         adc #$40
-        sta player_health
         bcs powerup_player_max_energy
+        sta player_health
 	rts
         
 powerup_pickup_health_50: subroutine
@@ -239,8 +239,8 @@ powerup_pickup_health_50: subroutine
         lda player_health
         clc
         adc #$80
-        sta player_health
         bcs powerup_player_max_energy
+        sta player_health
 	rts
         
 powerup_pickup_health_100: subroutine
