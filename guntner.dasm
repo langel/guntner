@@ -202,6 +202,8 @@ sprite0_done:
 
         jsr player_controls_read
         ;jsr apu_manage
+        jsr powerup_bomb_update
+        jsr powerup_mushroom_update
         jsr palette_update
 	inc wtf	; frame counter  
 	jsr timer_update ; update global time

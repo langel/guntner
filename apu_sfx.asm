@@ -16,6 +16,8 @@ sfx_update_table_lo:
         .byte #<sfx_powerup_pickup_update
         .byte #<sfx_powerup_bomb_update
 sfx_update_table_hi:
+	; XXX can probably remove this table
+        ;     get all subroutines on same page
 	.byte #>sfx_do_nothing
 	.byte #>sfx_player_death_update
         .byte #>sfx_enemy_death_update
@@ -39,20 +41,33 @@ sfx_test_table_lo:
         .byte #<sfx_enemy_damage
         .byte #<sfx_enemy_death
         .byte #<sfx_powerup_hit
-        .byte #<sfx_powerup_pickup
+        .byte #<sfx_powerup_bomb
+        .byte #<sfx_powerup_mushroom
+        .byte #<sfx_powerup_mask
+        .byte #<sfx_powerup_1up
+        .byte #<sfx_powerup_battery_25
+        .byte #<sfx_powerup_battery_50
+        .byte #<sfx_powerup_battery_100
 sfx_test_table_hi:
+	; XXX can probably remove this table
+        ;     get all subroutines on same page
 	.byte #>sfx_pewpew
         .byte #>sfx_player_damage
         .byte #>sfx_player_death
         .byte #>sfx_enemy_damage
         .byte #>sfx_enemy_death
         .byte #>sfx_powerup_hit
-        .byte #>sfx_powerup_pickup
+        .byte #>sfx_powerup_bomb
+        .byte #>sfx_powerup_mushroom
+        .byte #>sfx_powerup_mask
+        .byte #>sfx_powerup_1up
+        .byte #>sfx_powerup_battery_25
+        .byte #>sfx_powerup_battery_50
+        .byte #>sfx_powerup_battery_100
 
 ; sound test 00
 sfx_pewpew: subroutine
 	; pulse 2
-	;rts
 	lda #%10001111
         sta $4004
         lda #%10000010
@@ -73,8 +88,6 @@ sfx_player_damage: subroutine
         lda rng0
         and #$8f
         ora #$0c
-        ;eor #$03
-        ;ora #$0a
         sta apu_cache+$e
         lda #$10
         sta apu_noi_counter
@@ -209,35 +222,93 @@ sfx_powerup_bomb: subroutine
         
 sfx_powerup_bomb_update: subroutine
 	lda bomb_counter
-	and #%00001111
+        and #%00001111
         ora #%00010000
         sta apu_cache+$c
         lda bomb_counter
+        ora #$0d
         sta apu_cache+$e
+        lda bomb_counter
         beq sfx_noi_update_clear
 	rts
 
-        
-; sound test 06
-sfx_powerup_pickup: subroutine
-	lda #$03
-        sta sfx_pu2_update_type
-        lda #$00
-        sta sfx_temp00 ; counter
+; sound test 07
+sfx_powerup_mushroom: subroutine
+	; slow pu2 sweep up
+	lda #%10001111
+        sta $4004
+        lda #%11111001
+        sta $4005
+        lda audio_root_tone
+        clc
+        adc #12
+        tax
+        lda periodTableLo,x
+        sta $4006
+        lda periodTableHi,x
+        ora #%01000000
+        sta $4007
+        lda #$10
+        sta sfx_pu2_counter
+	rts
+
+; sound test 08
+sfx_powerup_mask: subroutine
+	; XXX not exactly satisfied
+	; fast pu2 sweep up
+	lda #%10001111
+        sta $4004
+        lda #%10101010
+        sta $4005
+        lda rng0
+        and #$3f
+        ora #$08
+        sta $4006
+        lda #%00010100
+        sta $4007
+        lda #$10
+        sta sfx_pu2_counter
 	rts
         
+; sound test 08
+sfx_powerup_1up: subroutine
+	; imperial jingle
+        
+        
+; sound test 09
+sfx_powerup_battery_25: subroutine
+        lda #$10
+        sta sfx_temp00 ; counter
+        bne sfx_powerup_battery_set_update_type
+; sound test 0a
+sfx_powerup_battery_50: subroutine
+        lda #$08
+        sta sfx_temp00 ; counter
+        bne sfx_powerup_battery_set_update_type
+; sound test 0b
+sfx_powerup_battery_100: subroutine
+        lda #$00
+        sta sfx_temp00 ; counter
+sfx_powerup_battery_set_update_type:
+	lda #$03
+        sta sfx_pu2_update_type
+        rts
+        
+        
 sfx_powerup_pickup_arp:
- .byte	#$1a, #$1d, #$21, #$26
+ .byte	#$18, #$1c, #$1f, #$24
 
 sfx_powerup_pickup_update: subroutine
 	lda sfx_temp00 ; counter
         lsr
         lsr
+        lsr
+        sta sfx_temp01
         cmp #$04
         beq .end_sound
         tax
         lda sfx_temp00 ; counter
-        and #%00000011
+        and #%00000111
         bne .dont_trigger
         lda audio_root_tone
         clc
@@ -252,7 +323,6 @@ sfx_powerup_pickup_update: subroutine
         lda periodTableHi,x
         ora #%01000000
         sta $4007
-        
 .dont_trigger
         inc sfx_temp00 ; counter
 	rts

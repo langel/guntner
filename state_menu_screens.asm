@@ -460,10 +460,10 @@ options_screen_sfx_handler: subroutine
 	lda options_sound_id
         cmp #$ff
         bne .sound_id_no_reset
-        lda #$06
+        lda #$0b
         sta options_sound_id
 .sound_id_no_reset
-	cmp #$07
+	cmp #$0c
         bne .sound_id_not_maxed
         lda #$00
         sta options_sound_id

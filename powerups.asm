@@ -161,65 +161,91 @@ powerup_pickup_mask: subroutine
         inc mask_shield
         inc mask_shield
         inc mask_shield
+        jsr sfx_powerup_mask
 	rts
+        
         
 powerup_pickup_mushroom: subroutine
 	; XXX still need to override player controls
-        ; XXX still need to bend music
-        ; XXX reset pallete on player death
-	lda #108
+	lda #$7f
         sta shroom_counter
 	rts
+powerup_mushroom_update: subroutine
+	lda wtf
+        and #$03
+        bne .shroom_done
+	lda shroom_counter
+        beq .shroom_done
+        dec shroom_counter
+        bne .audio_bend_up_or_down
+.end_of_shroom
+        jsr palette_reset
+        jsr player_update_colors
+        lda #$00
+        sta shroom_mod
+        rts
+.audio_bend_up_or_down
+        cmp #$3f
+        bcc .down
+.up
+	inc shroom_mod
+        bne .shroom_done
+.down
+	dec shroom_mod
+.shroom_done
+	rts
+        
         
 powerup_pickup_plus_one: subroutine
 	inc player_lives
+        jsr sfx_powerup_1up
 	rts
+        
         
 powerup_pickup_bomb: subroutine
 	; bomb_counter set inside sfx call
         ; 1hp enemy damage every other frame
 	jsr sfx_powerup_bomb
 	rts
+powerup_bomb_update: subroutine
+	lda bomb_counter
+        beq .bomb_done
+        dec bomb_counter
+        lda sfx_noi_update_type
+        bne .bomb_done
+        lda #$04
+        sta sfx_noi_update_type
+.bomb_done
+	rts
+        
         
 powerup_pickup_r_bag: subroutine
-	; XXX might want different lengths
-        ;     based on difficulty setting
         lda #120
         sta r_bag_counter
 	rts
         
-powerup_pickup_health_25: subroutine
-
- 	;; XXX needs its own sfx
-        ; might want different ones by type
-        jsr sfx_powerup_pickup
         
+powerup_pickup_health_25: subroutine
+        jsr sfx_powerup_battery_25
         lda player_health
         clc
         adc #$40
         sta player_health
-        bcs powerup_pickup_health_100
+        bcs powerup_player_max_energy
 	rts
         
 powerup_pickup_health_50: subroutine
-
- 	;; XXX needs its own sfx
-        ; might want different ones by type
-        jsr sfx_powerup_pickup
-        
+        jsr sfx_powerup_battery_50
         lda player_health
         clc
         adc #$80
         sta player_health
-        bcs powerup_pickup_health_100
+        bcs powerup_player_max_energy
 	rts
         
 powerup_pickup_health_100: subroutine
-
- 	;; XXX needs its own sfx
-        ; might want different ones by type
-        jsr sfx_powerup_pickup
-        
+        jsr sfx_powerup_battery_100
+powerup_player_max_energy:
 	lda #$ff
         sta player_health
 	rts

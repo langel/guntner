@@ -109,16 +109,6 @@ game_update_generic: subroutine
 
 .player_not_dead
 
-.bomb_handling
-	lda bomb_counter
-        beq .bomb_done
-        dec bomb_counter
-        lda sfx_noi_update_type
-        bne .bomb_done
-        lda #$04
-        sta sfx_noi_update_type
-.bomb_done
-
 .healing_with_time
 	lda player_health
         cmp #$ff

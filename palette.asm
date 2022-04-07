@@ -90,16 +90,7 @@ palette_update: subroutine
         sta pal_bg_3_1,y
         dey
         bpl .shroom_loop
-        dec shroom_counter
-        bne .no_shroom_effect
-        jsr palette_reset
-        ldy #25
-.shroom_pal_reset_loop
-	lda Palette00,y
-        sta pal_uni_bg,y
-        dey
-        bpl .shroom_pal_reset_loop
-        jsr player_update_colors
+        
 .no_shroom_effect
 ; fade in
 	lda #$00

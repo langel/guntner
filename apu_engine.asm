@@ -201,6 +201,8 @@ apu_update: subroutine
         lda #$08
         sta $4001,x
         lda apu_cache+2,x
+        clc
+        adc shroom_mod
         sta $4002,x
         lda apu_cache+3,x
         cmp apu_pu1_last_hi,x
@@ -220,11 +222,15 @@ apu_update: subroutine
         bne .triangle_enabled
 .triangle_disabled
         lda #$00
-        sta apu_cache+8
+        sta $4008
         jmp .triangle_skip
 .triangle_enabled
 	lda #$7f
-        sta apu_cache+8
+        sta $4008
+        lda apu_cache+$a
+        clc
+        adc shroom_mod
+        sta $400a
 .triangle_skip
 ; Noise Counter
 	lda apu_noi_counter
@@ -242,10 +248,10 @@ apu_update: subroutine
         sta apu_cache+12
 .noise_skip
 ; copy cache to apu
-	ldy #$07
+	ldy #$05
 .cache_to_apu_loop
-	lda apu_cache+8,y
-        sta $4000+8,y
+	lda apu_cache+$b,y
+        sta $4000+$b,y
         dey
         bpl .cache_to_apu_loop
 ; RNG updates
@@ -298,7 +304,8 @@ apu_debugger: subroutine
         lda #$1f
         sta apu_temp
 .dont_reset_counter
-	jsr sfx_player_death
+	;jsr sfx_powerup_mushroom
+        jsr powerup_pickup_mushroom
 .dont_increase_counter
 	lda apu_temp
         jsr get_char_hi
