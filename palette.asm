@@ -83,7 +83,7 @@ palette_update: subroutine
         and #$03
         cmp #$00
         bne .no_shroom_effect
-        ldy #$14
+        ldy #$0e
 .shroom_loop
 	lda pal_bg_3_1,y
         jsr palette_next_rainbow_color
