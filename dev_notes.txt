@@ -329,12 +329,13 @@ Things left to program:
 		Alien Face
 		Space Station Dock
 		Dimensional Portal
-	Power Ups
-		Mushroom
-		Rapid Fire
-		Gloved Fist Shield
-		3 Healths
-		1UP
+	Power Ups 
+		-done- Mushroom
+		-done- Rapid Fire
+		-done- Shield
+		-done- 3 Healths
+		-done- 1UP
+		-done- Bomb
 	Music Generation
 	Enemies
 		Ceil/Floor Bugs
