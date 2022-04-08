@@ -91,29 +91,7 @@ player_move_position: subroutine
 
 	rts
 
-player_invert_controls_table:
-	.byte #%0000 ; 0 not a thing
-        .byte #%0010 ; 1 right is left
-        .byte #%0001 ; 2 left is right
-        .byte #%0011 ; 3 not a thing
-        .byte #%1000 ; 4 down is up
-        .byte #%1010 ; 5 dr is ul
-        .byte #%1001 ; 6 dl is ur
-        .byte #%0111 ; 7 not a thing
-        .byte #%0100 ; 8 up is down
-        .byte #%0110 ; 9 ur is dl
-        .byte #%0101 ; a ul is dr
-        ; XXX probably could delete this
-        ;.byte #%1001 ; b not a thing
-        ;.byte #%1100 ; c not a thing
-        ;.byte #%1101 ; d not a thing
-        ;.byte #%1110 ; e not a thing
-        ;.byte #%1111 ; f not a thing
-        
-; %0001 right
-; %0010 left
-; %0100 down
-; %1000 up
+
 
 	; speeds 1 .. 4
 player_direction_speed_table_hi:
@@ -131,9 +109,30 @@ player_direction_handler: subroutine
 	; shroom handling
 	lda shroom_counter
         beq .not_shrooming
-	ldx player_dir_bits
-        lda player_invert_controls_table,x
-        sta player_dir_bits
+        ; shroom right
+        lda #%0010000
+        bit shroom_mod
+        bne .shroom_not_right
+        dec player_x_hi
+.shroom_not_right
+        ; shroom left
+        lda #%0001000
+        bit shroom_mod
+        bne .shroom_not_left
+        inc player_x_hi
+.shroom_not_left
+        ; shroom up
+        lda #%0000010
+        bit shroom_mod
+        bne .shroom_not_up
+        dec player_y_hi
+.shroom_not_up
+        ; shroom down
+        lda #%0000100
+        bit shroom_mod
+        bne .shroom_not_down
+        inc player_y_hi
+.shroom_not_down
 .not_shrooming
         ; get diagonal or not
         lda #$00
