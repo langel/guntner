@@ -87,9 +87,15 @@ game_update_generic: subroutine
         ; GO BACK TO TITLE SCREEN AFTER DEATH SEQUENCE
         jmp .done
 .trigger_fadeout
+        ; demo mode has different behaviour
+        lda demo_true
+        cmp #$ff
+        beq .return_to_title_screen
+     	; do not return to title if game is not over
         lda player_lives
         cmp #$00
         bne .done
+.return_to_title_screen
         ; GO BACK TO TITLE SCREEN 
         ; AFTER DEATH SEQUENCE
 	lda #0

@@ -3,8 +3,6 @@
 
 demo_init:
 	jsr game_init_generic
-        lda #1
-        sta player_lives
         lda #5
         jsr state_update_set_addr
         lda #$ff
@@ -26,34 +24,30 @@ demo_init:
         
 
 demo_update: subroutine
-	lda player_lives
-        cmp #$00
-        beq .done
-
         ; some buttons return to menu
-        jmp .menu_return_buttons_not_pressed
-        lda player_start_d
-        ora player_a_d
-        ora player_b_d
+        lda player_start
+        ora player_a
+        ora player_b
         cmp #$ff
         bne .menu_return_buttons_not_pressed
         lda #0
 	jsr palette_fade_out_init
 	jmp state_update_done
 .menu_return_buttons_not_pressed
-	;jsr demo_enemy_spawn
+	jsr demo_enemy_spawn
 	jsr get_enemy_slot_4_sprite
         cmp #$ff
         beq .no_enemy_spawn
-        jsr starglasses_spawn
 .no_enemy_spawn
-        ;jsr player_demo_controls
-	jsr player_move_position
+	lda player_health
+        cmp #$00
+        beq .done
+        jsr player_demo_controls
         jsr player_bullets_check_controls
 .done
 	jsr game_update_generic
         ; XXX testing
-        jsr apu_game_music_frame
+        ;jsr apu_game_music_frame
 	jmp state_update_done
         
         
@@ -102,7 +96,6 @@ demo_enemy_spawn: subroutine
         tax
         jsr maggs_spawn
 .no_maggs_spawn
-	rts
 
         lda enemy_slot_4_next
         cmp #$ff

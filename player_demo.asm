@@ -84,7 +84,7 @@ player_demo_controls: subroutine
         sta rng0
         lsr
         clc
-        adc #$60
+        adc #$5e
         sta player_demo_x
         cmp player_x_hi
         bcs .player_going_left
