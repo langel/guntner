@@ -239,11 +239,9 @@ sfx_powerup_mushroom: subroutine
 	; slow pu2 sweep up
 	lda #%10001111
         sta $4004
-        lda #%11111001
+        lda #%10101010
         sta $4005
         lda audio_root_tone
-        clc
-        adc #12
         tax
         lda periodTableLo,x
         sta $4006
@@ -260,7 +258,7 @@ sfx_powerup_mask: subroutine
 	; fast pu2 sweep up
 	lda #%10001111
         sta $4004
-        lda #%10101010
+        lda #%11111001
         sta $4005
         lda rng0
         and #$3f

@@ -198,7 +198,7 @@ sprite0_done:
         ;jsr starfield_debugger
         jsr apu_update
         ; XXX apu debugger
-        jsr apu_debugger
+        ;jsr apu_debugger
 
         jsr player_controls_read
         ;jsr apu_manage
@@ -325,6 +325,8 @@ sprite0_done:
 	include "apu_sfx.asm"
         nop	; how much prg space we using?
 
+
+;f37d - new audio engine and powerup sfx
 ;f162 - rewrote player movement
 ;f258 - powerups done except sfx
 ;f267 - vampire done?
