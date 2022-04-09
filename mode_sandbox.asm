@@ -39,6 +39,10 @@ sandbox_init: subroutine
         tax
 	;jsr starglasses_spawn
         
+	jsr get_enemy_slot_4_sprite
+        tax
+        jsr ant_spawn
+        
         ;lda #$40
         lda #$ff
         sta player_health

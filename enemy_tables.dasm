@@ -15,6 +15,7 @@
 ; 0e dumbface
 ; 0f galger
 ; 10 dart
+; 11 ant
 
 ENEMY_HITPOINTS_TABLE:
 	byte #$00
@@ -34,6 +35,7 @@ ENEMY_HITPOINTS_TABLE:
         byte #$10 ; dumface
         byte #$02 ; galger
         byte #$01 ; dart
+        byte #$01 ; ant
         
         
 ENEMY_PLAYER_POINTS_TABLE:
@@ -55,6 +57,7 @@ ENEMY_PLAYER_POINTS_TABLE:
         byte #$00,#$00,#$00,#$72 ; dumbface
         byte #$00,#$00,#$00,#$11 ; galger
         byte #$00,#$00,#$00,#$00 ; dart
+        byte #$00,#$00,#$00,#$00 ; ant
         
 
 ENEMY_PLAYER_COLLISION_TABLE:
@@ -75,6 +78,7 @@ ENEMY_PLAYER_COLLISION_TABLE:
         byte #$05 ; dumbface
         byte #$00 ; galger
         byte #$20 ; dart
+        byte #$20 ; ant
         
 
 ENEMY_METHODS_LOOKUP_TABLE:
@@ -95,5 +99,6 @@ ENEMY_METHODS_LOOKUP_TABLE:
         word dumbface_cycle
         word galger_cycle
         word dart_cycle
+        word ant_cycle
         
         
