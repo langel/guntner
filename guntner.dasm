@@ -81,8 +81,8 @@ cart_start:	subroutine
         ;sta game_mode
         
         ;jsr options_screen_init
-        jsr sandbox_init
-        ;jsr sandbox2_init
+        ;jsr sandbox_init
+        jsr sandbox2_init
         
         
 .endless

@@ -43,6 +43,16 @@ dart_spawn: subroutine
 	rts
 
         
+dart_direction_to_sprite_table:
+	.byte $c0,$c1,$c2,$c3,$c4,$c5
+        .byte $c6,$c5,$c4,$c3,$c2,$c1
+	.byte $c0,$c1,$c2,$c3,$c4,$c5
+        .byte $c6,$c5,$c4,$c3,$c2,$c1
+dart_direction_to_attribute_table:
+	.byte $00,$00,$00,$00,$00,$00
+        .byte $40,$40,$40,$40,$40,$40
+        .byte $c0,$c0,$c0,$c0,$c0,$c0
+        .byte $80,$80,$80,$80,$80,$80
         
         
 dart_cycle: subroutine
@@ -71,9 +81,15 @@ dart_cycle: subroutine
         cmp sprite_0_y
         bcs .despawn
         
-	lda #$6a
+	;lda #$6a
+        lda enemy_ram_ex,x
+        tax
+        lda dart_direction_to_sprite_table,x
         sta oam_ram_spr,y
-        lda #0
+        lda dart_direction_to_attribute_table,x
+        ldx enemy_ram_offset
+        clc
+        adc #$01
         jsr enemy_set_palette
 .done	
 	jmp update_enemies_handler_next
