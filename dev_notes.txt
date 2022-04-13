@@ -1,11 +1,99 @@
-optimization marks:
+	
+	
+	
+	so many bits #nesdev #GunTneR [ !ks for info ]
+	
+	
+Things left to program:
+	Enemy Flight Patterns
+	Cut Scenes
+		Alien Face
+		Space Station Dock
+		Dimensional Portal
+	Power Ups 
+		-done- Mushroom
+		-done- Rapid Fire
+		-done- Shield
+		-done- 3 Healths
+		-done- 1UP
+		-done- Bomb
+	Music Generation
+	Enemies
+		Ceil/Floor Bugs
+		Ike's Mom
+		Shake Off Amoeba
+		
+	Bosses:
+		Skully (follows)
+		Invisible Swordsman
+		--done--Galactic Space Vampire
+		Xyzkyquf (spell?!)
+		
+	REFACTORS:
+		arctang variable velocities
+		player movement shrinkage with tables
+		sfx jump table 
 
-	e6aa - nop after title_screen.dasm
 
+prototype the FINAL BOSS (proof of concept) which also relies on stars as sprites
+MANY new enemy flight paths
+
+
+Kickstarter 100 / January 2022
+
+top tier puke's little helpers
+Alan Berndt (BGT) - discord
+	nothing yet
+Douglas Glover - discord DM
+	bomb and shield powerups
+Caylen Williams - email
+	SWORDTNER!!
+Nadiim 'Dimo' Nafei - kickstarter messages + discord DM
+	old Egyptian stuff
+Michael DuFault (MicroD) - discord
+	chomps enemy -- still needs improvements
+
+cave dingle - MicroD + BGT
+discord DM - Doug
+emails - Justin + Caylen
+
+source:
+  - cartridge shells
+  - rom chips
+     - 8kb chr rom
+     - 16kb program rom
+  - lockout chips
+     - cic can be made from attiny13 : https://mousebitelabs.com/2020/09/11/nes-reproduction-quick-guide-custom-pcb/
+  - PCB design (gerber)
+
+Label / Promo Art Asset
 
 
 nes dev "stars, please" #GunTneR [ !ks for info ]
 
+ship only self-heals when not in motion?
+
+Fix Enemy Death Counter Bug
+Fix Starfield glitchiness
+Better Music Generator
+  
+player spawn sequence/animation (starfield speed up)
+
+game difficulty (selection and lookup tables)
+	Kids' Gloves
+	Basic Bean
+	Mega Gooderest
+	A-OK #1 Expert
+
+
+moar enemies
+	uzi that shoots bullets
+	middle finger (boss?)
+  - enemies that spawn smaller enemies
+
+
+
+ ===== THIS IS OLD DOWN BELOW =====
 
 nametable plan:
 $2000 : Title Screen / Starfield / (Cut Scene Text maybe?)
@@ -304,7 +392,6 @@ so get the 16 range
 8bit Workship IDE problems
 
 ctrl-r refreshed but could be Redo (after ctrl-z undo)
-remember cursor position in each file (probably just needs focus / can't delete highlights but it remembers those)
 new file placeholder text doesn't go away
 various forms: enter does not submit
 file order is what? (think we know now)
@@ -317,33 +404,3 @@ git pull changes maybe overwritten by current open file?
 nesdefs.dasm
 	MASK_BG_CLIP should be MASK_BG_ENABLE
 	MASK_SPR_CLIP should be MASK_SPR_ENABLE
-	
-	
-	
-	so many bits #nesdev #GunTneR [ !ks for info ]
-	
-	
-Things left to program:
-	Enemy Flight Patterns
-	Cut Scenes
-		Alien Face
-		Space Station Dock
-		Dimensional Portal
-	Power Ups 
-		-done- Mushroom
-		-done- Rapid Fire
-		-done- Shield
-		-done- 3 Healths
-		-done- 1UP
-		-done- Bomb
-	Music Generation
-	Enemies
-		Ceil/Floor Bugs
-		Ike's Mom
-		Shake Off Amoeba
-		
-	Bosses:
-		Skully (follows)
-		Invisible Swordsman
-		--done--Galactic Space Vampire
-		Xyzkyquf (spell?!)
