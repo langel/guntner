@@ -299,6 +299,10 @@ sprite0_done:
         nop	; how much prg space we using?
 	include "enemy_starglasses.asm"
         nop	; how much prg space we using?
+        
+	include "enemy_throber.asm"
+        nop	; how much prg space we using?
+
 	include "enemy_zigzag.asm"
         nop	; how much prg space we using?
         

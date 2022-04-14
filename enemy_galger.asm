@@ -97,6 +97,7 @@ galger_cycle: subroutine
         jsr get_enemy_slot_4_sprite
         cmp #$ff
         beq .dont_shoot
+.shoot
         jsr dart_spawn
         ldy enemy_oam_offset
 .dont_shoot

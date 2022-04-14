@@ -44,6 +44,10 @@ dart_spawn: subroutine
 
         
 dart_direction_to_sprite_table:
+	.byte $b0,$b1,$b2,$b3,$b4,$b5
+        .byte $b6,$b5,$b4,$b3,$b2,$b1
+	.byte $b0,$b1,$b2,$b3,$b4,$b5
+        .byte $b6,$b5,$b4,$b3,$b2,$b1
 	.byte $c0,$c1,$c2,$c3,$c4,$c5
         .byte $c6,$c5,$c4,$c3,$c2,$c1
 	.byte $c0,$c1,$c2,$c3,$c4,$c5
@@ -70,8 +74,6 @@ dart_cycle: subroutine
         jsr player_take_damage
         jmp .despawn
 .no_collision
-	; handle direction movement
-	jsr enemy_update_arctang_path
 
 	; check for despawn
         lda oam_ram_x,y
@@ -81,7 +83,11 @@ dart_cycle: subroutine
         cmp sprite_0_y
         bcs .despawn
         
+	; handle direction movement
+	jsr enemy_update_arctang_path
+        
 	;lda #$6a
+        ; sprite and attributes
         lda enemy_ram_ex,x
         tax
         lda dart_direction_to_sprite_table,x

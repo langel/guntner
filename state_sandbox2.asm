@@ -19,6 +19,11 @@ sandbox2_init: subroutine
 	jsr get_enemy_slot_4_sprite
         tax
 	;jsr boss_vamp_spawn
+        ;jsr ant_spawn
+        
+	jsr get_enemy_slot_4_sprite
+        tax
+        ;jsr throber_spawn
         
         jsr sandbox2_phase_next
         
@@ -60,6 +65,7 @@ sandbox2_update: subroutine
 	lda phase_kill_count
         cmp #16
         bne .dont_next_state
+        ;jmp .dont_next_state
         lda phase_state
         cmp #0
         bne .dont_next_state

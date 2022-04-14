@@ -36,6 +36,7 @@ ENEMY_HITPOINTS_TABLE:
         byte #$02 ; galger
         byte #$01 ; dart
         byte #$01 ; ant
+        byte #$01 ; throber
         
         
 ENEMY_PLAYER_POINTS_TABLE:
@@ -58,6 +59,7 @@ ENEMY_PLAYER_POINTS_TABLE:
         byte #$00,#$00,#$00,#$11 ; galger
         byte #$00,#$00,#$00,#$00 ; dart
         byte #$00,#$00,#$00,#$00 ; ant
+        byte #$00,#$00,#$00,#$00 ; throber
         
 
 ENEMY_PLAYER_COLLISION_TABLE:
@@ -79,6 +81,7 @@ ENEMY_PLAYER_COLLISION_TABLE:
         byte #$00 ; galger
         byte #$20 ; dart
         byte #$20 ; ant
+        byte #$20 ; thorber
         
 
 ENEMY_METHODS_LOOKUP_TABLE:
@@ -100,5 +103,6 @@ ENEMY_METHODS_LOOKUP_TABLE:
         word galger_cycle
         word dart_cycle
         word ant_cycle
+        word throber_cycle
         
         
