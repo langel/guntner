@@ -94,10 +94,11 @@ galger_cycle: subroutine
         and #$1f
         cmp #$00
         bne .dont_shoot
-        jsr get_enemy_slot_4_sprite
-        cmp #$ff
-        beq .dont_shoot
 .shoot
+	lda oam_ram_x,y
+        sta collision_0_x
+        lda oam_ram_y,y
+        sta collision_0_y
         jsr dart_spawn
         ldy enemy_oam_offset
 .dont_shoot

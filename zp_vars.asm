@@ -103,7 +103,6 @@ state_v7		byte
 state_sprite0	byte
 state_fade_in	byte
 state_fade_out	byte
-state_tripmode	byte
 state_iframes	byte
 
 state_render_addr_lo	byte

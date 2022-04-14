@@ -16,6 +16,7 @@
 ; 0f galger
 ; 10 dart
 ; 11 ant
+; 12 throber
 
 ENEMY_HITPOINTS_TABLE:
 	byte #$00

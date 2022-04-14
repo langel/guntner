@@ -46,6 +46,7 @@ sine_table:
 	hex 676a6d707376797c
 
 
+; 40 bytes
 sine_init: subroutine
 	ldx #$00
         ldy #$00
@@ -72,7 +73,7 @@ sine_init: subroutine
         rts
        
 
-
+; 61 bytes
 sine_of_scale: subroutine
 	; returns scaled value of sine table
 	; a = sine max

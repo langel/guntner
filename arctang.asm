@@ -24,11 +24,13 @@ enemy_get_direction_of_player:
 ;	collision_1_x	= "small"
 ;	collision_1_y	= "large"
 ;	collision_1_h	= "half"
-;	collision_1_w	= enemy_ram_offset x register storage/cache
 ;	temp00 		= quadrant
 ;	temp01 		= region
+;	temp02		= x register stash
+;	temp03		= y register stash
 ; returns a = direction (or region)
-	stx collision_1_w
+	stx temp02
+        sty temp03
 	; find quadrant
         lda #0
         sta temp00
@@ -136,7 +138,8 @@ enemy_get_direction_of_player:
         tax
         lda ARCTANG_TRANSLATION_LOOKUP_TABLE,x
         ; restore enemy_ram_offset
-	ldx collision_1_w
+	ldx temp02
+        ldy temp03
         rts
 
 ;  0 = right

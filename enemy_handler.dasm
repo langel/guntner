@@ -433,9 +433,33 @@ enemy_give_points: subroutine
 ; 1 sprite can occupy all slots
 ; 2 sprite can occupy 12 slots
 ; 4 sprite restricted to their 8 slots
+
+slot_offset_to_oam_offset_table:
+	; 16 slots using 1 sprite
+	.byte $20, $24, $28, $2c, $30, $34, $38, $3c
+        .byte $40, $44, $48, $4c, $50, $54, $58, $5c
+        ; 4 slots using 2 sprites
+        .byte $60, $68, $70, $78
+        ; 8 slots using 4 sprites
+        .byte $80, $90, $a0, $b0, $c0, $d0, $e0, $f0
+
+get_oam_offset_from_slot_offset: subroutine
+	; x = slot offset
+        ; returns oam offset in y
+        stx temp00
+        txa
+        lsr
+        lsr
+        lsr
+        tax
+        ldy slot_offset_to_oam_offset_table,x
+        ldx temp00
+        rts
         
-get_enemy_slots_next:
-        
+get_enemy_slot_cache_next:
+        ; XXX should be refactored to use subroutines below
+        ;     also do we even need this?
+        ; XXX should either remove this or use it more!
 ;get_enemy_slot_1_sprite: subroutine
 	; returns enemy_ram offset
         lda #$00
@@ -495,7 +519,23 @@ get_enemy_slots_next:
 	rts
         
 
-
+get_enemy_slot_next: subroutine
+	; returns enemy_ram_offset in x
+        lda #$d8
+.slot_loop
+	tax
+        stx temp00
+        lda $0300,x
+        beq .slot_found
+        lda temp00
+        sec
+        sbc #$08
+        bmi .slot_loop
+.no_slot
+	ldx #$ff
+.slot_found
+	rts
+        
 
 get_enemy_slot_1_sprite: subroutine
 	; returns enemy_ram offset

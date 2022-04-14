@@ -314,7 +314,6 @@ boss_vamp_state_shake: subroutine
         ; load arctang dir into v6
         jsr enemy_get_direction_of_player
         sta enemy_ram_ex,x
-        ldy enemy_oam_offset
 .done
 	rts
         
