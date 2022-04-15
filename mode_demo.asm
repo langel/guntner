@@ -2,18 +2,14 @@
 
 
 demo_init:
+  ; SCROLL SPEED
+  	lda #$07
+        sta scroll_speed_cache
 	jsr game_init_generic
         lda #5
         jsr state_update_set_addr
         lda #$ff
         sta demo_true
-  ; SCROLL SPEED
-  	lda #$07
-        sta scroll_speed
-        asl
-        asl
-        asl
-        sta scroll_speed_m
         jsr starfield_bg_init
         jsr render_enable
         jsr palette_fade_in_init

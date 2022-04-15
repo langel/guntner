@@ -90,22 +90,23 @@ player_take_damage: subroutine
         
         
 set_player_sprite: subroutine
-	lda player_y_hi
-        sta $204
-        sta $208
+	; sprite
+        lda #$8e
+        sta oam_ram_rudy+5
+        lda #$8f
+        sta oam_ram_rudy+1
+        ; x pos
         lda player_x_hi
         sta $207
         clc
         adc #$08
         sta $20b
-        
+        ; attributes
         lda #$40
-; attributes
         sta $206
         sta $20a
         
         lda player_health
-        cmp #$00
         bne .not_dead
 .is_dead
 	lda player_dead_tile
@@ -115,22 +116,22 @@ set_player_sprite: subroutine
 .not_dead
 	; check and decrement iframe counter
 	lda state_iframes
-        cmp #$00
         beq .not_iframes
         dec state_iframes
         ; flash rudy based on iframe counter
         lsr
         lsr
-        and #1
+        and #$01
         beq .not_iframes
-        lda #$8d
-        sta oam_ram_rudy+5
-        sta oam_ram_rudy+1
+        ; y pos
+	lda #$ff
+        sta $204
+        sta $208
         rts
 .not_iframes
-        lda #$8e
-        sta oam_ram_rudy+5
-        lda #$8f
-        sta oam_ram_rudy+1
+        ; y pos
+	lda player_y_hi
+        sta $204
+        sta $208
         rts
         

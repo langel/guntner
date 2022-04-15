@@ -13,7 +13,7 @@ scroll_y	byte
 scroll_page	byte
 ppu_mask_cache	byte ; used to enable various rendering scenarios
 scroll_speed	byte
-scroll_speed_m	byte
+scroll_speed_cache	byte
 bg_tile_default	byte
 player_health	byte
 player_lives	byte

@@ -46,6 +46,8 @@ detect_collision: subroutine
         
 player_collision_detect: subroutine
 	; returns true/false in a
+        lda state_iframes
+        bne .no_collision
 	clc
         lda collision_0_x
         adc collision_0_w

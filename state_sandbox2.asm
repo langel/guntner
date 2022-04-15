@@ -1,13 +1,13 @@
 
 
 sandbox2_init: subroutine
-        ;jsr game_init
-        jsr game_init_generic
+
   ; SCROLL SPEED
   	;lda #$27
         lda #$03
-        sta scroll_speed
+        sta scroll_speed_cache
         
+        jsr game_init_generic
         jsr starfield_bg_init
         jsr dashboard_init
         

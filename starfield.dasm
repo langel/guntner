@@ -21,22 +21,27 @@ star_cache		EQU 	208
 ;		- bg to sprite
 ;		- sprite to bg
 
-                
-STARFIELD_STATE_UPDATE_FUNCTION_TABLE:
-	.word starfield_bg_update
-	.word starfield_spr_update
-        .word starfield_bg2spr_update
-        .word starfield_sprmsg_update
-        .word starfield_spr2bg_update
-        
+
+; XXX might could remove hi byte table if all on same page
+starfield_update_state_function_lo:
+	.byte <starfield_bg_update
+	.byte <starfield_spr_update
+        .byte <starfield_bg2spr_update
+        .byte <starfield_sprmsg_update
+        .byte <starfield_spr2bg_update
+starfield_update_state_function_hi:
+	.byte >starfield_bg_update
+	.byte >starfield_spr_update
+        .byte >starfield_bg2spr_update
+        .byte >starfield_sprmsg_update
+        .byte >starfield_spr2bg_update
+	        
 starfield_update: subroutine
 	lda starfield_state
-        asl
         tax
-	lda STARFIELD_STATE_UPDATE_FUNCTION_TABLE,x
+	lda starfield_update_state_function_lo,x
         sta temp00
-        inx
-	lda STARFIELD_STATE_UPDATE_FUNCTION_TABLE,x
+	lda starfield_update_state_function_hi,x
         sta temp01
         jmp (temp00)
 
@@ -44,15 +49,12 @@ starfield_update: subroutine
 
 death_scroll_speed: subroutine
         lda scroll_speed
-        cmp #$00
         beq .scroll_slow_done
-	dec scroll_speed_m
-        lda scroll_speed_m
-        lsr
-        lsr
-        lsr
-        sta scroll_speed
+        lda wtf
+        and #$07
+        bne .scroll_slow_done
         ; slow down stars
+	dec scroll_speed
 .scroll_slow_done
 	rts
         
@@ -65,8 +67,9 @@ starfield_draw_dash_top_bar_nametable0: subroutine
 .tile_dash_set_page1
         sta PPU_DATA
         dey
-        bne .tile_dash_set_page1
+        bpl .tile_dash_set_page1
         rts
+           
         
         
 starfield_scroll: subroutine

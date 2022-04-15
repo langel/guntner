@@ -9,14 +9,10 @@ game_init_generic: subroutine
         
         ;jsr starfield_bg_init
         
-        ; draw dashbar top bar on title screen page
-	PPU_SETADDR $22c0
-        lda #$04
-        ldy #$24
-.set_top_bar
-	sta PPU_DATA
-        dey
-        bne .set_top_bar
+ 	jsr starfield_draw_dash_top_bar_nametable0
+        
+        lda scroll_speed_cache
+        sta scroll_speed
         
         jsr timer_reset
 	jsr player_game_reset
@@ -48,13 +44,15 @@ game_update_generic: subroutine
         bne .player_not_dead
         
 .player_dead_anim
-        jsr death_scroll_speed
         lda player_death_flag
         cmp #$00
         bne .death_already_set
         lda #$01
         sta player_death_flag
         jsr sfx_player_death
+        lda scroll_speed
+        sta scroll_speed_cache
+        ;jsr death_scroll_set_speed_m
         dec player_lives
         lda player_lives
         cmp #$00
@@ -73,6 +71,7 @@ game_update_generic: subroutine
         jsr dashboard_message_set
         jmp .done
 .death_already_set
+        jsr death_scroll_speed
 	inc you_dead_counter
         lda you_dead_counter
         cmp #80
@@ -112,6 +111,9 @@ game_update_generic: subroutine
         lda #$00
         sta player_death_flag
         sta you_dead_counter
+        ; revert scroll speed
+        lda scroll_speed_cache
+        sta scroll_speed
 
 .player_not_dead
 
