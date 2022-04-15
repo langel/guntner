@@ -603,8 +603,13 @@ starfield_sprmsg_table:
         .byte "       PHASE 1x COMPLETED       "	; 2100
         .byte "       moar text for test       "	; 2140
         .byte "       no i won't shutup        "	; 2180
-starfield_sprmsg_rows_table:
-	.word $2101, $2141, $2181
+        .byte "         Another PHASE          "	; 2100
+        .byte "       C O M P L E T E D        "	; 2140
+        .byte "       how did you do it?       "	; 2180
+starfield_sprmsg_rows_table_hi:
+	.byte $21, $21, $21
+starfield_sprmsg_rows_table_lo:
+        .byte $01, $41, $81
 starfield_msgscroll_setup_populate_message: subroutine
 	; frame 8-a
 	lda #$61
@@ -614,11 +619,26 @@ starfield_msgscroll_setup_populate_message: subroutine
 	sbc #8
         sta temp00
         ; load message
+        ; XXX this should be a lookup table
+        ;     so we can handle more than a few messages
         asl
         asl
         asl
         asl
         asl
+        ; which message?
+        sta temp01
+        lda phase_current
+        and #1
+        beq .message_set1
+.message_set0
+	lda temp01
+        bne .message_set_done
+.message_set1
+	lda #$60
+        clc
+        adc temp01
+.message_set_done
         tax
         ldy #32
 .msg_loop
@@ -628,13 +648,10 @@ starfield_msgscroll_setup_populate_message: subroutine
         dey
         bne .msg_loop
         ; load nametable address
-        lda temp00
-        asl
-        tax
-        lda starfield_sprmsg_rows_table,x
+        ldx temp00
+        lda starfield_sprmsg_rows_table_lo,x
         sta state_v0
-        inx
-        lda starfield_sprmsg_rows_table,x
+        lda starfield_sprmsg_rows_table_hi,x
         sta state_v1
         ; set start scroll position for next msgscroll step
         lda #$80
@@ -697,30 +714,25 @@ starfield_msgscroll_cleanup_msg: subroutine
 	lda starfield_var0
         sec
         sbc #$0f
-        asl
         tax
-        lda starfield_sprmsg_rows_table,x
+        lda starfield_sprmsg_rows_table_lo,x
         sta state_v0
-        inx
-        lda starfield_sprmsg_rows_table,x
+        lda starfield_sprmsg_rows_table_hi,x
         sta state_v1
 	rts
         
 starfield_msgscroll_cleanup_reinstate_dash: subroutine
 	; frame 11
-	; XXX redundant with starfield_draw_dash_top_bar_nametable0
         lda #>dash_page1_top_bar
-        sta state_v1
-        sta state_v4
+        sta state_v1 ; nametable hi
         lda 1+#<dash_page1_top_bar
-        sta state_v0
-        sta state_v5
+        sta state_v0 ; nametable lo
         lda dash_top_bar_tile
         ldy #$20
 .loop
 	sta starfield_msg_cache,y
         dey
-        bne .loop
+        bpl .loop
         lda #232
         sta scroll_y
         lda #MASK_BG|MASK_SPR

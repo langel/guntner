@@ -25,16 +25,16 @@ dart_spawn: subroutine
         sta enemy_ram_ex,x
         tax
         lda dart_direction_to_sprite_table,x
+        clc
+        adc #$b0
         sta oam_ram_spr,y
 .done
 	rts
 
         
 dart_direction_to_sprite_table:
-	.byte $b0,$b1,$b2,$b3,$b4,$b5
-        .byte $b6,$b5,$b4,$b3,$b2,$b1
-	.byte $b0,$b1,$b2,$b3,$b4,$b5
-        .byte $b6,$b5,$b4,$b3,$b2,$b1
+	.byte 0,1,2,3,4,5,6,5,4,3,2,1
+	.byte 0,1,2,3,4,5,6,5,4,3,2,1
 dart_direction_to_attribute_table:
 	.byte $00,$00,$00,$00,$00,$00
         .byte $40,$40,$40,$40,$40,$40
