@@ -14,6 +14,8 @@ dart_spawn: subroutine
         sta enemy_ram_x,x ; sub pixel pos
         sta enemy_ram_y,x ; sub pixel pos
         sta enemy_ram_pc,x
+        lda #3
+        sta enemy_ram_ac,x ; velocity id
         jsr get_oam_offset_from_slot_offset
         lda collision_0_x
         sta oam_ram_x,y

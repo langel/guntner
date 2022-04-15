@@ -1,5 +1,6 @@
 ;;;; Constants
 
+; XXX these constants don't need to be in the ROM
 STARFIELD_MASK		.byte #%00111111 ; star probability
 STARFIELD_COL0_START	.byte #$00
 STARFIELD_COL1_START	.byte #$07
@@ -19,6 +20,26 @@ star_cache		EQU 	208
 ;	- transitions
 ;		- bg to sprite
 ;		- sprite to bg
+
+                
+STARFIELD_STATE_UPDATE_FUNCTION_TABLE:
+	.word starfield_bg_update
+	.word starfield_spr_update
+        .word starfield_bg2spr_update
+        .word starfield_sprmsg_update
+        .word starfield_spr2bg_update
+        
+starfield_update: subroutine
+	lda starfield_state
+        asl
+        tax
+	lda STARFIELD_STATE_UPDATE_FUNCTION_TABLE,x
+        sta temp00
+        inx
+	lda STARFIELD_STATE_UPDATE_FUNCTION_TABLE,x
+        sta temp01
+        jmp (temp00)
+
 
 
 death_scroll_speed: subroutine
@@ -57,7 +78,7 @@ starfield_scroll: subroutine
         inc scroll_page
         ; XXX pretty sure this does nothing
         ; and gets instantiated with bg2spr_init
-        ;dec state_v7 ; XXX need to set this at transition time
+        dec starfield_var0 ; XXX need to set this at transition time
         ; XXX ^ should not use state variables unless we own state
 .samepage
 	sta scroll_x
@@ -125,7 +146,7 @@ starfield_debugger: subroutine
         adc #$30
         sta $111
         ; transition frame
-        lda state_v7
+        lda starfield_var0
         clc
         adc #$30
         sta $113
@@ -234,28 +255,6 @@ starfield_bg_init: subroutine
 
         
         
-        
-        
-        
-                
-STARFIELD_STATE_UPDATE_FUNCTION_TABLE:
-	.word starfield_bg_update
-	.word starfield_spr_update
-        .word starfield_bg2spr_update
-        .word starfield_sprmsg_update
-        .word starfield_spr2bg_update
-        
-starfield_update: subroutine
-	lda starfield_state
-        asl
-        tax
-	lda STARFIELD_STATE_UPDATE_FUNCTION_TABLE,x
-        sta temp00
-        inx
-	lda STARFIELD_STATE_UPDATE_FUNCTION_TABLE,x
-        sta temp01
-        jmp (temp00)
-
 
 
 
@@ -324,11 +323,11 @@ starfield_bg2spr_init: subroutine
         cmp #$20
         bne .do_the_full_monty
         lda #1
-        sta state_v7
+        sta starfield_var0
 	rts
 .do_the_full_monty
 	lda #2
-        sta state_v7
+        sta starfield_var0
         rts
         
         
@@ -356,16 +355,15 @@ starfield_bg2spr_update: subroutine
         lda scroll_x
         cmp state_v6
         bcs .done
-        lda state_v7
+        lda starfield_var0
         cmp #0
         bne .done
         ; setup next starfield state
-        lda #3
-        sta starfield_state
+        inc starfield_state
         lda #0
         sta scroll_x
         sta scroll_page
-        sta state_v7
+        sta starfield_var0
         lda #4 ; starfield_sprmsg_render
         jsr state_render_set_addr
 .done	
@@ -498,7 +496,7 @@ starfield_sprmsg_render: subroutine
         ; state_v0 nametable high address
         ; state_v1 nametable low address
         ; write from msg_cache to nametable
-	lda state_v7
+	lda starfield_var0
         cmp #0
         bne .not_tile_left_border
         jsr starfield_tile_left_border
@@ -521,7 +519,7 @@ starfield_sprmsg_render: subroutine
 
 starfield_sprmsg_update: subroutine
         jsr starfield_spr_update
-	lda state_v7
+	lda starfield_var0
         asl
         tax
         lda starfield_msgscroll_setup_table,x
@@ -529,7 +527,7 @@ starfield_sprmsg_update: subroutine
         inx
         lda starfield_msgscroll_setup_table,x
         sta temp01
-        inc state_v7
+        inc starfield_var0
         jmp (temp00)
 starfield_msgscroll_setup_table:
 	.word starfield_msgscroll_setup_clear_msg_cache		; 1
@@ -569,7 +567,7 @@ starfield_dashboard_rows_table:
         
 starfield_msgscroll_setup_clear_dash_space: subroutine
 	; frame 2-7
-	ldx state_v7
+	ldx starfield_var0
         dex
         dex ; off by 1? this works!
         txa
@@ -592,7 +590,7 @@ starfield_msgscroll_setup_populate_message: subroutine
 	; frame 8-a
 	lda #$61
         sta scroll_y
-        lda state_v7
+        lda starfield_var0
         sec
 	sbc #8
         sta temp00
@@ -642,7 +640,7 @@ starfield_msgscroll_scrollup: subroutine
         beq .next_msgscroll_step
         stx state_v6
         ; keep msgscroll step locked here until done
-        dec state_v7
+        dec starfield_var0
 .next_msgscroll_step
 	rts
         
@@ -654,7 +652,7 @@ starfield_msgscroll_wait: subroutine
         cmp state_v6
         beq .next_msgscroll_step
         ; keep msgscroll step locked here until done
-        dec state_v7
+        dec starfield_var0
 .next_msgscroll_step
 	rts
         
@@ -671,13 +669,13 @@ starfield_msgscroll_upandout: subroutine
         bcc .next_msgscroll_step
         stx state_v6
         ; keep msgscroll step locked here until done
-        dec state_v7
+        dec starfield_var0
 .next_msgscroll_step
 	rts
         
 starfield_msgscroll_cleanup_msg: subroutine
 	; frame f-10 (frame e clears out bottom row)
-	lda state_v7
+	lda starfield_var0
         sec
         sbc #$0f
         asl
@@ -755,7 +753,7 @@ starfield_spr2bg_update: subroutine
         sec
         sbc scroll_speed
         sta state_v6
-        bne .done
+        bpl .done
 .goto_next_state
         lda #0
         sta starfield_state ; starfield_bg_update

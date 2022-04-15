@@ -42,11 +42,9 @@ sandbox2_phase_next: subroutine
         
 sandbox2_update: subroutine
 	lda phase_state
-        cmp #0
         bne .dont_spawn
 	lda wtf
         and #$07
-        cmp #$0
         bne .dont_spawn
         lda state_v5
         cmp #0
@@ -68,7 +66,6 @@ sandbox2_update: subroutine
         ; XXX test line here
         ;jmp .dont_next_state
         lda phase_state
-        cmp #0
         bne .dont_next_state
         inc phase_current
         inc phase_state

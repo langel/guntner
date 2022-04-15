@@ -157,6 +157,8 @@ ARCTANG_TRANSLATION_LOOKUP_TABLE:
 	byte  7, 5,17,19
 	byte  6, 6,18,18
         
+        
+        
 
         
 ARCTANG_VELOCITY_3.333_TABLE:
@@ -187,7 +189,35 @@ ARCTANG_VELOCITY_1.25_TABLE:
         byte 161, 0
         byte  81, 0
         byte   0, 0
-	
+        
+arctang_velocity_3.333_lo:
+	byte  85,  56, 227,  91, 171, 221
+        byte   0, 221, 171,  91, 227,  56
+arctang_velocity_3.333_hi:
+	byte   3,   3,   2,   2,   1,   0
+        byte   0,   0,   1,   2,   2,   3
+        
+enemy_update_arctang_position:
+	; updates both x and y position given:
+        ;	- enemy_ram_ex holds region/direction
+        ;	- enemy_ram_x/y holds lo bytes
+        ;	- oam_ram_x/y holds hi bytes
+
+        ; get arctang direction
+        lda enemy_ram_ex,x
+        cmp #12
+        bcc .dont_adjust_x_dir
+        sec
+        sbc #12
+.dont_adjust_x_dir
+	sta temp00 ; velocity table pos
+        tay
+        
+        
+        ldy enemy_oam_offset
+	ldx enemy_ram_offset
+	rts
+        
         
 ARCTANG_REGION_TO_X_VELOCITY_TABLE:
 	byte 0, 1, 2, 3, 4, 5
