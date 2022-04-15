@@ -523,34 +523,51 @@ starfield_sprmsg_render: subroutine
 starfield_sprmsg_update: subroutine
         jsr starfield_spr_update
 	lda starfield_var0
-        asl
         tax
-        lda starfield_msgscroll_setup_table,x
+        lda starfield_msgscroll_setup_table_lo,x
         sta temp00
-        inx
-        lda starfield_msgscroll_setup_table,x
+        lda starfield_msgscroll_setup_table_hi,x
         sta temp01
         inc starfield_var0
         jmp (temp00)
-starfield_msgscroll_setup_table:
-	.word starfield_msgscroll_setup_clear_msg_cache		; 1
-        .word starfield_msgscroll_setup_clear_dash_space	; 2
-        .word starfield_msgscroll_setup_clear_dash_space	; 3
-        .word starfield_msgscroll_setup_clear_dash_space	; 4
-        .word starfield_msgscroll_setup_clear_dash_space	; 5
-        .word starfield_msgscroll_setup_clear_dash_space	; 6
-        .word starfield_msgscroll_setup_clear_dash_space	; 7
-        .word starfield_msgscroll_setup_populate_message	; 8
-        .word starfield_msgscroll_setup_populate_message	; 9
-        .word starfield_msgscroll_setup_populate_message	; a
-        .word starfield_msgscroll_scrollup			; b
-        .word starfield_msgscroll_wait				; c
-        .word starfield_msgscroll_upandout			; d
-	.word starfield_msgscroll_setup_clear_msg_cache		; e
-        .word starfield_msgscroll_cleanup_msg			; f
-        .word starfield_msgscroll_cleanup_msg			; 10
-        .word starfield_msgscroll_cleanup_reinstate_dash	; 11
-        .word starfield_msgscroll_done				; 12
+starfield_msgscroll_setup_table_lo:
+	.byte <starfield_msgscroll_setup_clear_msg_cache	; 1	; 1
+        .byte <starfield_msgscroll_setup_clear_dash_space	; 2
+        .byte <starfield_msgscroll_setup_clear_dash_space	; 3
+        .byte <starfield_msgscroll_setup_clear_dash_space	; 4
+        .byte <starfield_msgscroll_setup_clear_dash_space	; 5
+        .byte <starfield_msgscroll_setup_clear_dash_space	; 6
+        .byte <starfield_msgscroll_setup_clear_dash_space	; 7
+        .byte <starfield_msgscroll_setup_populate_message	; 8
+        .byte <starfield_msgscroll_setup_populate_message	; 9
+        .byte <starfield_msgscroll_setup_populate_message	; a
+        .byte <starfield_msgscroll_scrollup			; b
+        .byte <starfield_msgscroll_wait				; c
+        .byte <starfield_msgscroll_upandout			; d
+	.byte <starfield_msgscroll_setup_clear_msg_cache	; e	; e
+        .byte <starfield_msgscroll_cleanup_msg			; f
+        .byte <starfield_msgscroll_cleanup_msg			; 10
+        .byte <starfield_msgscroll_cleanup_reinstate_dash	; 11
+        .byte <starfield_msgscroll_done				; 12
+starfield_msgscroll_setup_table_hi:
+	.byte >starfield_msgscroll_setup_clear_msg_cache	; 1	; 1
+        .byte >starfield_msgscroll_setup_clear_dash_space	; 2
+        .byte >starfield_msgscroll_setup_clear_dash_space	; 3
+        .byte >starfield_msgscroll_setup_clear_dash_space	; 4
+        .byte >starfield_msgscroll_setup_clear_dash_space	; 5
+        .byte >starfield_msgscroll_setup_clear_dash_space	; 6
+        .byte >starfield_msgscroll_setup_clear_dash_space	; 7
+        .byte >starfield_msgscroll_setup_populate_message	; 8
+        .byte >starfield_msgscroll_setup_populate_message	; 9
+        .byte >starfield_msgscroll_setup_populate_message	; a
+        .byte >starfield_msgscroll_scrollup			; b
+        .byte >starfield_msgscroll_wait				; c
+        .byte >starfield_msgscroll_upandout			; d
+	.byte >starfield_msgscroll_setup_clear_msg_cache	; e	; e
+        .byte >starfield_msgscroll_cleanup_msg			; f
+        .byte >starfield_msgscroll_cleanup_msg			; 10
+        .byte >starfield_msgscroll_cleanup_reinstate_dash	; 11
+        .byte >starfield_msgscroll_done				; 12
         
 starfield_msgscroll_setup_clear_msg_cache: subroutine
 	; frame 1 / e
@@ -565,21 +582,20 @@ starfield_msgscroll_setup_clear_msg_cache: subroutine
         sta ppu_mask_cache
         rts
 
-starfield_dashboard_rows_table: 
-	.word $22c1, $22e1, $2301, $2321, $2341, $2361
-        
+
+
+starfield_dashboard_rows_table_hi:
+	.byte $22, $22, $23, $23, $23, $23
+starfield_dashboard_rows_table_lo:
+	.byte $c1, $e1, $01, $21, $41, $61
 starfield_msgscroll_setup_clear_dash_space: subroutine
 	; frame 2-7
 	ldx starfield_var0
         dex
         dex ; off by 1? this works!
-        txa
-        asl
-        tax
-        lda starfield_dashboard_rows_table,x
+        lda starfield_dashboard_rows_table_lo,x
         sta state_v0
-        inx
-        lda starfield_dashboard_rows_table,x
+        lda starfield_dashboard_rows_table_hi,x
         sta state_v1
 	rts
 
@@ -756,7 +772,7 @@ starfield_spr2bg_update: subroutine
         sec
         sbc scroll_speed
         sta state_v6
-        bpl .done
+        bcs .done
 .goto_next_state
         lda #0
         sta starfield_state ; starfield_bg_update

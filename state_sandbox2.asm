@@ -30,6 +30,7 @@ sandbox2_init: subroutine
 	rts
         
         
+        ; XXX called from starfield message scroll done
 sandbox2_phase_next: subroutine
         ; enemy spawn decounter
         lda #16
