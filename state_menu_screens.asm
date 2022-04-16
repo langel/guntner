@@ -1,7 +1,6 @@
 
 menu_screens_init: subroutine
 
-        jsr WaitSync	; wait for VSYNC
         jsr render_disable
 	jsr sprite_clear
         jsr state_sprite0_disable

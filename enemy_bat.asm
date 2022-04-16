@@ -1,4 +1,5 @@
 
+; 187 bytes
 
 bat_spawn: subroutine
 	; x = slot in enemy ram
@@ -69,10 +70,10 @@ bat_cycle: subroutine
         ; only calc sine every other frame
         lda wtf
         and #$00000001
-        sta enemy_temp_temp
+        sta temp00
         lda enemy_slot_id
         and #%00000001
-        cmp enemy_temp_temp
+        cmp temp00
         beq .process_sine_pos
         jmp .done
 .process_sine_pos

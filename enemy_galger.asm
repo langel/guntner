@@ -91,17 +91,17 @@ galger_cycle: subroutine
 	; time to shoot a dart?
 	inc enemy_ram_ac,x
         lda enemy_ram_ac,x
-        and #$1f
+        and #$3f
         cmp #$00
-        bne .dont_shoot
-.shoot
+        bne .dont_fire
+.dart_fire
 	lda oam_ram_x,y
         sta collision_0_x
         lda oam_ram_y,y
         sta collision_0_y
         jsr dart_spawn
         ldy enemy_oam_offset
-.dont_shoot
+.dont_fire
         ldx enemy_ram_offset
         
 	jsr arc_leg

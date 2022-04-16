@@ -51,6 +51,19 @@ sprite_4_set_sprite: subroutine
 	sta oam_ram_spr+12,y
         rts
         
+sprite_4_set_sprite_flip: subroutine
+	; a = top left tile id
+        ; y = oam ram offset
+	sta oam_ram_spr+8,y
+        clc
+        adc #$01
+	sta oam_ram_spr+12,y
+        adc #$0f
+	sta oam_ram_spr+0,y
+	adc #$01
+	sta oam_ram_spr+4,y
+        rts
+        
 sprite_4_set_sprite_mirror: subroutine
 	; a = top left tile id
         ; y = oam ram offset

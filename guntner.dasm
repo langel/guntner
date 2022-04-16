@@ -63,15 +63,8 @@ cart_start:	subroutine
 	lda #$37
         sta player_color2
 	jsr player_update_colors
-        lda #MASK_BG|MASK_SPR
-        sta ppu_mask_cache
         
-        jsr WaitSync
-        jsr WaitSync
-        jsr WaitSync
         
-        ; XXX probably don't need this
-        jsr state_sprite0_disable
 ;============================== M O D E   I N I T   H E R E
 	;jsr game_init
 	;jsr menu_screens_init
@@ -83,6 +76,11 @@ cart_start:	subroutine
         ;jsr options_screen_init
         ;jsr sandbox_init
         jsr sandbox2_init
+        
+        ; XXX why does this need to exist here?
+        ;     shouldn't render_enable handle this?
+        lda #MASK_BG|MASK_SPR
+        sta ppu_mask_cache
         
         
 .endless
