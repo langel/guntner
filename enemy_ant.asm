@@ -8,7 +8,6 @@ ant_spawn: subroutine
         sta enemy_ram_hp,x 
         lda #$20
         sta enemy_ram_x,x ; x pos
-        sta enemy_ram_pc,x ; pattern counter
         sta enemy_ram_ac,x ; animation counter
         txa
         lsr
@@ -19,12 +18,15 @@ ant_spawn: subroutine
 .dash_ant
 	sta enemy_ram_ex,x
 	lda #$06
-        sta enemy_ram_y,x ; y pos
+        sta enemy_ram_y,x ; y ant pos
+        lda #$0e
+        sta enemy_ram_pc,x ; y dart origin
    	rts
 .ceiling_ant
 	sta enemy_ram_ex,x
         lda #$a7
-        sta enemy_ram_y,x ; y pos
+        sta enemy_ram_y,x ; y ant pos
+        sta enemy_ram_pc,x ; y dart origin
    	rts
         
 ant_cycle: subroutine
@@ -67,7 +69,7 @@ ant_cycle: subroutine
         bne .done
         lda enemy_ram_x,x
         sta collision_0_x
-        lda enemy_ram_y,x
+        lda enemy_ram_pc,x
         sta collision_0_y
         jsr dart_spawn
 .done
