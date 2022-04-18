@@ -163,14 +163,13 @@ sprite0_wait:
         lda #$00
         sta PPU_SCROLL
         sta PPU_SCROLL
-        
-        
 	; HUD POSITIONING
         ; XXX horizontal scroll solution
         ;bit PPU_STATUS
         ;lda #$00
         ;sta PPU_SCROLL
         ;sta PPU_SCROLL
+        
 	; set bg pos to page 2 for dashboard
 	lda #$01|#CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL

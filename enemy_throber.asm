@@ -31,7 +31,7 @@ throber_cycle: subroutine
         jsr sprite_4_set_x
         lda enemy_ram_y,x
         jsr sprite_4_set_y
-        lda #$02
+        lda #$03
         jsr enemy_set_palette
         sta oam_ram_att+4,y
         sta oam_ram_att+8,y

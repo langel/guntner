@@ -46,9 +46,9 @@ dart_cycle: subroutine
 	; check for player collision
         lda #$04
         sta collision_0_w
-        lda #$04
         sta collision_0_h
         lda oam_ram_x,y
+        clc
         adc #$02
         sta collision_0_x
         lda oam_ram_y,y

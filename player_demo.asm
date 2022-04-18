@@ -66,12 +66,6 @@ player_demo_controls: subroutine
 .player_y_equal
 	iny
 .player_y_done
-	; XXX player_movement does this add 2 too
-	; add 2 to y position for collision detection
-	lda player_y_hi
-        clc
-        adc #$02
-	sta player_coll_y
 ; check if both coordinates are met
 	cpy #$02
         beq .set_demo_new_target

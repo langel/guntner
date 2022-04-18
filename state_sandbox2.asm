@@ -73,6 +73,8 @@ sandbox2_update: subroutine
         bne .dont_next_state
         ; XXX test line here
         ;jmp .dont_next_state
+        jsr get_enemy_slot_1_count
+        bne .dont_next_state
         lda phase_state
         bne .dont_next_state
         inc phase_current

@@ -28,7 +28,8 @@ player_x_hi	byte
 player_x_lo	byte
 player_y_hi	byte
 player_y_lo	byte
-player_coll_y	byte ; player_x plus 2 because collision box
+player_coll_x	byte ; player_x plus 2 because collision box
+player_coll_y	byte ; player_y plus 3 because collision box
 player_gun_str	byte
 bullet_cooldown byte ; count frames until next bullet
 player_speed	byte ; 2 bit value 0..3 translates to 1..4

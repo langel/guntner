@@ -135,11 +135,12 @@ game_update_generic: subroutine
 	jsr player_change_speed
         ; XXX is this default damage from enemies?
         ; XXX actually seems like a testing mechanic
-        lda #$04
-        sta player_damage
+        ;lda #$04
+        ;sta player_damage
 ;; XXX FORCE QUICK DEATH
         ;jsr player_take_damage
 .done
+	jsr player_collision_update
         jsr update_enemies
         jsr set_player_sprite
 	rts

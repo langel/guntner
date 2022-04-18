@@ -62,7 +62,7 @@ galger_spawn: subroutine
         sta enemy_ram_ex,x
         lda #108
         sta enemy_ram_x,x
-        lda #228
+        lda #225
         sta enemy_ram_y,x
         lda #$c0
         sta enemy_ram_pc,x 

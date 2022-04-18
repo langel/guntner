@@ -42,7 +42,18 @@ detect_collision: subroutine
 	lda #$00
         rts
         
-    
+
+player_collision_update: subroutine
+	ldx player_x_hi
+        inx
+        inx
+        stx player_coll_x
+        ldx player_y_hi
+        inx
+        inx
+        stx player_coll_y
+	rts
+        
         
 player_collision_detect: subroutine
 	; returns true/false in a
@@ -55,8 +66,8 @@ player_collision_detect: subroutine
         cmp player_x_hi
         bcc .no_collision
         clc
-        lda player_x_hi
-        adc #$0d ; player width
+        lda player_coll_x
+        adc #$0b ; player width
         cmp collision_0_x
         bcc .no_collision
         clc
@@ -66,7 +77,7 @@ player_collision_detect: subroutine
         bcc .no_collision
         clc 
         lda player_coll_y
-        adc #$06 ; player height
+        adc #$03 ; player height
         cmp collision_0_y
         bcc .no_collision
 .collision
