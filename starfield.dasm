@@ -12,6 +12,8 @@ starfield_sprite	.byte	#$6b
 starfield_msg_cache	=	$03e0	; 32 bytes for string data
 
 star_cache		EQU 	208
+star_oam_start		EQU	$40
+star_oam_end		EQU	<(star_oam_start+$80)
 
 
 ;	POSSIBLE STARFIELD STATES
@@ -302,7 +304,7 @@ starfield_bg2spr_init: subroutine
         lda #2
         sta starfield_state
         ; distribute star sprites
-	ldx #$80
+	ldx #star_oam_start
         lda scroll_x
         and #7
         sta temp00
@@ -318,6 +320,7 @@ starfield_bg2spr_init: subroutine
         inx
         inx
         inx
+        cpx #star_oam_end
         bne .loop
         ; log destination of nametable0 cleared
         lda scroll_x
@@ -384,7 +387,7 @@ starfield_spr_get_position: subroutine
         asl
         asl
         clc
-        adc #$80
+        adc #star_oam_start
         tax ; oam ram offset
       	stx state_v2
 	; scroll_x decides which sprite and x position
@@ -403,8 +406,7 @@ starfield_spr_init: subroutine
         sta starfield_state
         lda #$03
         jsr state_render_set_addr
-        ; work with top half of sprites
-	lda #$80
+	lda #star_oam_start
         sta temp00
         lda #$00
         sta temp01
@@ -425,6 +427,7 @@ starfield_spr_init: subroutine
         clc
         adc temp00
         sta temp00
+        ;cmp #star_oam_end ; XXX ?!?!
         bcc .set_each_star
         jsr nametables_clear
         ; XXX this might need a state variable set to a tile
@@ -437,7 +440,7 @@ starfield_spr_update: subroutine
         jsr starfield_twinkle_colors
         jsr starfield_twinkle_spr
         ; cycle through all star sprites
-	lda #$80
+	lda #star_oam_start
         sta temp00
 .scroll_loop
 	ldx temp00
@@ -452,7 +455,8 @@ starfield_spr_update: subroutine
         clc
         adc temp00
         sta temp00
-        bcc .scroll_loop
+        cmp #star_oam_end
+        bne .scroll_loop
 	rts
         
                 
@@ -765,7 +769,7 @@ starfield_spr2bg_update: subroutine
         jsr starfield_spr_update
         ; cycle through all star sprites
         ; if x < 8 move off screen
-	lda #$80
+	lda #star_oam_start
         sta temp00
 .loop
 	ldx temp00
@@ -778,8 +782,9 @@ starfield_spr2bg_update: subroutine
 	lda #$04
         clc
         adc temp00
-        sta temp00
-        bcc .loop
+        sta temp00 
+        cmp #star_oam_end
+        bne .loop
         lda state_v6
         sec
         sbc scroll_speed
