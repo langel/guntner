@@ -118,6 +118,8 @@ galger_cycle: subroutine
 .done	
 	jmp update_enemies_handler_next
         
+        
+        
                 
 arc_leg: subroutine
         ; set x position

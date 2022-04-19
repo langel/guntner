@@ -115,15 +115,12 @@ state_update_addr_hi	byte
 nametable_tile_planter_addr_lo	byte
 nametable_tile_planter_addr_hi	byte
 
-enemy_temp_addr_lo	byte
-enemy_temp_addr_hi	byte
 enemy_ram_offset	byte
 enemy_oam_offset	byte
 enemy_slot_id		byte
 enemy_slot_1_next	byte
 enemy_slot_2_next	byte
 enemy_slot_4_next	byte
-enemy_temp_temp		byte
 enemy_dmg_accumulator	byte
 boss_x		byte
 boss_y		byte
@@ -139,6 +136,7 @@ player_bullet_collision_temp_x	byte
 you_dead_counter	byte
 
 phase_kill_count	byte
+phase_enemy_downcount	byte
 phase_current		byte
 phase_state		byte
 phase_temp_addr_lo	byte

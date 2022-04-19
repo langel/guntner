@@ -57,19 +57,7 @@ zigzag_cycle: subroutine
         lda #$08
         sta collision_0_w
         sta collision_0_h
-        jsr enemy_get_damage_this_frame
-        cmp #$00
-        bne .not_dead
-.is_dead
-	inc phase_kill_count
-        lda enemy_ram_type,x
-        jsr enemy_give_points    
-        ; change it into crossbones!
-        jsr sfx_enemy_death
-        lda #$01
-        sta enemy_ram_type,x
-        jmp .done
-.not_dead
+        jsr enemy_handle_damage_and_death
 	; animation
         inc enemy_ram_ac,x
         lda enemy_ram_ac,x

@@ -22,9 +22,10 @@ powerup_from_starglasses:
 	lda #$06
         sta enemy_ram_type,x
         lda oam_ram_x,y
+        clc
+        adc #$04
         sta enemy_ram_x,x
         lda oam_ram_y,y
-        clc
         adc #$04
         sta enemy_ram_y,x
 	lda #$40
@@ -43,6 +44,7 @@ powerup_from_starglasses:
         ; palette
 	lda #$03
         sta oam_ram_att,y
+        jmp update_enemies_handler_next
 	rts
  
  

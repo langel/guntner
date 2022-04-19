@@ -23,19 +23,8 @@ skully_cycle: subroutine
         lda #$10
         sta collision_0_w
         sta collision_0_h
-        jsr enemy_get_damage_this_frame
-        cmp #$00
-        bne .not_dead
-.is_dead
-	inc phase_kill_count
-        lda enemy_ram_type,x
-        jsr enemy_give_points    
-        ; change it into crossbones!
-        jsr sfx_enemy_death
-        lda #$01
-        sta enemy_ram_type,x
-        jmp sprite_4_cleanup_for_next
-.not_dead
+        jsr enemy_handle_damage_and_death
+        
         ldx enemy_ram_offset
         ldy enemy_oam_offset
         lda #$01 ; set mirror flag
@@ -96,8 +85,8 @@ skully_cycle: subroutine
         jsr enemy_set_palette
         jmp .palette_done
 .mirrored
-        lda #$03
-        jsr enemy_set_palette_mirror
+        lda #$43
+        jsr enemy_set_palette
 .palette_done
         sta oam_ram_att+4,y
         sta oam_ram_att+8,y

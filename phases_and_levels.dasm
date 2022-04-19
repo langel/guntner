@@ -68,12 +68,12 @@ phase_next: subroutine
         
 phase01_init: subroutine
 	lda #$01
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop
 	jsr get_enemy_slot_1_sprite
         tax
 	jsr birb_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop
         rts
         
@@ -88,12 +88,12 @@ phase01_cycle: subroutine
                 
 phase02_init: subroutine
 	lda #$02
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop
 	jsr get_enemy_slot_2_sprite
         tax
 	jsr maggs_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop
         rts
         
@@ -109,12 +109,12 @@ phase02_cycle: subroutine
                 
 phase03_init: subroutine
 	lda #$02
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop
 	jsr get_enemy_slot_4_sprite
         tax
 	jsr starglasses_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop
         rts
         
@@ -130,12 +130,12 @@ phase03_cycle: subroutine
                 
 phase04_init: subroutine
 	lda #$01
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop
 	jsr get_enemy_slot_4_sprite
         tax
 	jsr skully_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop
         rts
         
@@ -151,30 +151,30 @@ phase04_cycle: subroutine
         
 phase05_init: subroutine
 	lda #$02
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop
 	jsr get_enemy_slot_4_sprite
         tax
 	jsr starglasses_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop
         
 	lda #$02
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop2
 	jsr get_enemy_slot_2_sprite
         tax
 	jsr maggs_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop2
         
 	lda #$04
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop3
 	jsr get_enemy_slot_1_sprite
         tax
 	jsr birb_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop3
         rts
         
@@ -190,21 +190,21 @@ phase05_cycle: subroutine
         
 phase06_init: subroutine
 	lda #$08
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop
 	jsr get_enemy_slot_1_sprite
         tax
 	jsr birb_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop
         
 	lda #$04
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop2
 	jsr get_enemy_slot_2_sprite
         tax
 	jsr maggs_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop2
         rts
         
@@ -219,21 +219,21 @@ phase06_cycle: subroutine
         
 phase07_init: subroutine
 	lda #$0c
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop
 	jsr get_enemy_slot_1_sprite
         tax
 	jsr birb_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop
         
 	lda #$03
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop2
 	jsr get_enemy_slot_4_sprite
         tax
 	jsr skully_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop2
         rts
         
@@ -248,30 +248,30 @@ phase07_cycle: subroutine
         
 phase08_init: subroutine
 	lda #$0c
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop
 	jsr get_enemy_slot_1_sprite
         tax
 	jsr birb_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop
         
 	lda #$01
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop2
 	jsr get_enemy_slot_4_sprite
         tax
 	jsr skully_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop2
         
 	lda #$02
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop3
 	jsr get_enemy_slot_2_sprite
         tax
 	jsr maggs_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop3
         rts
         
@@ -286,39 +286,39 @@ phase08_cycle: subroutine
         
 phase09_init: subroutine
 	lda #$10
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop
 	jsr get_enemy_slot_1_sprite
         tax
 	jsr birb_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop
         
 	lda #$06
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop2
 	jsr get_enemy_slot_4_sprite
         tax
 	jsr skully_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop2
         
 	lda #$04
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop3
 	jsr get_enemy_slot_2_sprite
         tax
 	jsr maggs_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop3
         
 	lda #$02
-        sta enemy_temp_temp
+        sta phase_enemy_downcount
 .phase_spawn_loop4
 	jsr get_enemy_slot_4_sprite
         tax
 	jsr starglasses_spawn
-        dec enemy_temp_temp
+        dec phase_enemy_downcount
         bne .phase_spawn_loop4
         rts
         

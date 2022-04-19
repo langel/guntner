@@ -252,7 +252,7 @@ dashboard_update: subroutine
        
 ; SCORE
         ldx #$07
-        ldy #$00
+        ldy #$03
 .score_display_loop
 	lda score_000000xx,y
         and #%00001111
@@ -269,9 +269,8 @@ dashboard_update: subroutine
         dex
         sta dash_cache+$2c,x
         dex
-        iny
-        cpy #$04
-        bne .score_display_loop
+        dey
+        bpl .score_display_loop
         
         
 ; TIMER	

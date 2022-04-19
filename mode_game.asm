@@ -45,10 +45,8 @@ game_update_generic: subroutine
         
 .player_dead_anim
         lda player_death_flag
-        cmp #$00
         bne .death_already_set
-        lda #$01
-        sta player_death_flag
+        inc player_death_flag
         jsr sfx_player_death
         lda scroll_speed
         sta scroll_speed_cache
@@ -141,7 +139,7 @@ game_update_generic: subroutine
         ;jsr player_take_damage
 .done
 	jsr player_collision_update
-        jsr update_enemies
+        jsr enemies_update_all
         jsr set_player_sprite
 	rts
         

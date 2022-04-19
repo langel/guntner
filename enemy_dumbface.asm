@@ -85,14 +85,14 @@ dumbface_cycle: subroutine
 .frame2
 	lda #$20
         jsr sprite_4_set_sprite_mirror
-        lda #$01
-        jsr enemy_set_palette_mirror
+        lda #$41
+        jsr enemy_set_palette
 	jmp .frame_done
 .frame3
 	lda #$22
         jsr sprite_4_set_sprite_mirror
-        lda #$01
-        jsr enemy_set_palette_mirror
+        lda #$41
+        jsr enemy_set_palette
 .frame_done
         sta oam_ram_att+4,y
         sta oam_ram_att+8,y

@@ -84,26 +84,48 @@ ENEMY_PLAYER_COLLISION_TABLE:
         byte #$20 ; ant
         byte #$20 ; thorber
         
+        
+        
+enemy_update_table_lo:
+        byte 00 ; should do nothing
+        byte <crossbones_cycle    
+        byte <birb_cycle
+        byte <maggs_cycle
+        byte <starglasses_cycle
+        byte <skully_cycle
+        byte <powerups_cycle
+        byte <bat_cycle
+        byte <boss_vamp_cycle
+        byte <boss_vamp_bat_cycle
+        byte <skeet_cycle
+        byte <zigzag_cycle
+        byte <chomps_cycle
+        byte <spark_cycle
+        byte <dumbface_cycle
+        byte <galger_cycle
+        byte <dart_cycle
+        byte <ant_cycle
+        byte <throber_cycle
 
-ENEMY_METHODS_LOOKUP_TABLE:
-        hex 0000 ; should do nothing
-        word crossbones_cycle
-        word birb_cycle
-        word maggs_cycle
-        word starglasses_cycle
-        word skully_cycle
-        word powerups_cycle
-        word bat_cycle
-        word boss_vamp_cycle
-        word boss_vamp_bat_cycle
-        word skeet_cycle
-        word zigzag_cycle
-        word chomps_cycle
-        word spark_cycle
-        word dumbface_cycle
-        word galger_cycle
-        word dart_cycle
-        word ant_cycle
-        word throber_cycle
+enemy_update_table_hi:
+        byte 00 ; should do nothing
+        byte >crossbones_cycle    
+        byte >birb_cycle
+        byte >maggs_cycle
+        byte >starglasses_cycle
+        byte >skully_cycle
+        byte >powerups_cycle
+        byte >bat_cycle
+        byte >boss_vamp_cycle
+        byte >boss_vamp_bat_cycle
+        byte >skeet_cycle
+        byte >zigzag_cycle
+        byte >chomps_cycle
+        byte >spark_cycle
+        byte >dumbface_cycle
+        byte >galger_cycle
+        byte >dart_cycle
+        byte >ant_cycle
+        byte >throber_cycle
         
         

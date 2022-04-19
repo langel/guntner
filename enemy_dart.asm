@@ -73,21 +73,17 @@ dart_cycle: subroutine
         
 	; handle direction movement
 	jsr enemy_update_arctang_path
-        
         ; attributes
         lda enemy_ram_ex,x
         tax
         lda dart_direction_to_attribute_table,x
-        ldx enemy_ram_offset
         clc
         adc #$01
-        jsr enemy_set_palette
+        sta oam_ram_att,y
+        
 .done	
 	jmp update_enemies_handler_next
 .despawn
-        lda #$00
-        sta enemy_ram_type,x
-        lda #$ff
-        sta oam_ram_y,y
+        jsr enemy_death
         jmp .done
 	

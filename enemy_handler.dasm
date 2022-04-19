@@ -103,20 +103,17 @@ sprite_4_set_y: subroutine
 sprite_4_cleanup_for_next: subroutine
 	lda #$04 ; move first sprite over 4 pixels
         clc
-	adc $0200+$03,y
-        sta $0200+$03,y
+	adc oam_ram_x,y
+        sta oam_ram_x,y
 	lda #$04 ; move first sprite down 3 pixels
         clc
-        adc $0200+$00,y
-        sta $0200+$00,y
+        adc oam_ram_y,y
+        sta oam_ram_y,y
         ; move other sprites off screen
 	lda #$ff
-        sta $0200+$04,y
-        sta $0200+$08,y
-        sta $0200+$0c,y
-        sta $0200+$07,y
-        sta $0200+$0b,y
-        sta $0200+$0f,y
+        sta oam_ram_y+4,y
+        sta oam_ram_y+8,y
+        sta oam_ram_y+12,y
 	jmp update_enemies_handler_next
 	
         
@@ -161,11 +158,32 @@ enemy_death: subroutine
         rts
         
         
+enemy_spawn_generic:
+	; x = type id
+	; x is set by enemy spawner
+	lda #$11
+        sta enemy_ram_type,x 
+        tay
+        lda ENEMY_HITPOINTS_TABLE,y
+        sta enemy_ram_hp,x 
         
-update_enemies: subroutine
+        
+enemy_slot_offset_to_oam_offset:
+	; slots leftshift 3 times to get enemy_ram_offset
+        ; 1 sprite slots :
+        byte $20,$24,$28,$2c,$30,$34,$38,$3c
+        byte $40,$44,$48,$4c,$50,$54,$58,$5c
+        ; 2 sprite slots :
+        byte $60,$68,$70,$78
+        ; 4 sprite slots :
+        byte $80,$90,$a0,$b0,$c0,$d0,$e0,$f0
+        ; null terminater
+        byte $00
+        
+        
+enemies_update_all: subroutine
 	; if player is dead despawn
 	lda player_health
-        cmp #$00
         beq player_dead_enemies_despawn
 	; cycle through all the slots
 	lda #$00
@@ -178,15 +196,12 @@ update_enemies: subroutine
 	; get enemy type
         lda enemy_ram_type,x
         ; not defined go next slot
-        cmp #$00
         beq .handler_next
-        asl
         tax
-        lda ENEMY_METHODS_LOOKUP_TABLE,x
-        sta enemy_temp_addr_lo
-        inx
-        lda ENEMY_METHODS_LOOKUP_TABLE,x
-        sta enemy_temp_addr_hi
+        lda enemy_update_table_lo,x
+        sta temp00
+        lda enemy_update_table_hi,x
+        sta temp01
         ; setup collision detection enemy origin pos
 	ldx enemy_ram_offset
         ldy enemy_oam_offset
@@ -194,80 +209,56 @@ update_enemies: subroutine
         sta collision_0_x
         lda oam_ram_y,y
         sta collision_0_y
-        jmp (enemy_temp_addr_lo)
+        jmp (temp00)
 update_enemies_handler_next:
 .handler_next
         ; go to next enemy slot
         inc enemy_slot_id
-	lda #$08
-        clc
-        adc enemy_ram_offset
-        cmp #$e0
-        beq .handler_core_end
+        lda enemy_slot_id
+        asl
+        asl
+        asl
         sta enemy_ram_offset
-.check_for_1_sprite
-        ; if ram offset under $80 it is 1 sprite
-        lda enemy_oam_offset
-        cmp #$60
-        bcs .check_for_2_sprites
-        clc
-        adc #$04
+        ldx enemy_slot_id
+        lda enemy_slot_offset_to_oam_offset,x
         sta enemy_oam_offset
-        jmp .handler_loop
-.check_for_2_sprites
-        ; if ram offset under $a0 it is 2 sprite
-        cmp #$80
-        bcs .it_is_4_sprites
-        clc
-        adc #$08
-        sta enemy_oam_offset
-        jmp .handler_loop
-.it_is_4_sprites      
-        ; else it is 4 sprites
-        clc
-        adc #$10
-        sta enemy_oam_offset
-        jmp .handler_loop
-.handler_core_end
-	rts
+        bne .handler_loop
+        rts
+        
+        
         
              
 player_dead_enemies_despawn: subroutine
+	; enemies slide off left side of screen
+        ; after player dies
+	inc player_death_flag
+	inc player_death_flag
+	inc player_death_flag
 	lda player_death_flag
-        cmp #$00
-        bne .dont_init
-        lda #$10
-        sta enemy_temp_temp
-.dont_init
-	inc enemy_temp_temp
-	inc enemy_temp_temp
-	inc enemy_temp_temp
-	lda enemy_temp_temp
         lsr
         lsr
         lsr
-        sta enemy_ram_offset
-        ldx #$23
+        lsr
+        sta temp00
+        ldx #$20
 .loop
-        lda $0200,x
-        cmp #$00
-        ;beq .do_nothing
+        lda oam_ram_x,x
+        beq .do_nothing
         sec
-        sbc enemy_ram_offset
+        sbc temp00
         bmi .despawn
-        sta $0200,x
+        sta oam_ram_x,x
         jmp .do_nothing
 .despawn
-	lda #$ff
-        sta $0200-3,x
 	lda #$00
-        sta $0200,x
+        sta oam_ram_x,x
+	lda #$ff
+        sta oam_ram_y,x
 .do_nothing
         inx
         inx
         inx
         inx
-        cpx #$03
         bne .loop
         rts
         
@@ -283,15 +274,12 @@ enemy_spawn_random_y_pos: subroutine
         
         
 crossbones_cycle: subroutine
-	ldx enemy_ram_offset
         inc enemy_ram_hp,x
         lda enemy_ram_hp,x
         lsr
         lsr
         lsr
         sta enemy_ram_y,x
-        tay
-        ldy enemy_oam_offset
         lda oam_ram_y,y
         sec
         sbc enemy_ram_y,x
@@ -318,21 +306,19 @@ enemy_get_damage_this_frame: subroutine
 ; handle bullet collisions
         jsr player_bullet_collision_handler
 	jsr player_collision_detect
-        cmp #$00
         beq .no_collision
 ; handle player collision
-	lda enemy_dmg_accumulator
-        clc
-        adc #$02
-        sta enemy_dmg_accumulator
-        ; XXX this number is sus
-        ; player sprites don't always change at death
+	; player damage
         ldy enemy_ram_type,x
         lda ENEMY_PLAYER_COLLISION_TABLE,y
         ldy enemy_ram_ex,x
         sta player_damage
         jsr player_take_damage
         jsr sfx_player_damage
+	lda enemy_dmg_accumulator
+        clc
+        adc #$02
+        sta enemy_dmg_accumulator
 .no_collision
 ; handle bomb explosion
         lda bomb_counter
@@ -346,7 +332,6 @@ enemy_get_damage_this_frame: subroutine
 	ldy enemy_oam_offset
 ; handle damage accumulated
         lda enemy_dmg_accumulator
-        cmp #$00
         bne .hit
 	lda enemy_ram_hp,x
         rts
@@ -365,6 +350,113 @@ enemy_get_damage_this_frame: subroutine
         rts
         
         
+        
+enemy_handle_damage_and_death: subroutine
+	; x = enemy ram offset
+        ; y = oam ram offset
+	lda #$00
+        sta enemy_dmg_accumulator
+; handle bullet collisions
+        jsr player_bullet_collision_handler
+	jsr player_collision_detect
+        beq .no_collision
+; handle player collision
+	; player damage
+        ldy enemy_ram_type,x
+        lda ENEMY_PLAYER_COLLISION_TABLE,y
+        ldy enemy_ram_ex,x
+        sta player_damage
+        jsr player_take_damage
+        jsr sfx_player_damage
+	lda enemy_dmg_accumulator
+        clc
+        adc #$02
+        sta enemy_dmg_accumulator
+.no_collision
+; handle bomb explosion
+        lda bomb_counter
+        beq .no_bomb_damage
+        lda wtf
+        and #1
+        beq .no_bomb_damage
+        inc enemy_dmg_accumulator
+.no_bomb_damage
+	; fix y register
+	ldy enemy_oam_offset
+; handle damage accumulated
+        lda enemy_dmg_accumulator
+        bne .hit
+        rts
+.hit
+	lda enemy_ram_hp,x
+        sec
+        sbc enemy_dmg_accumulator
+        sta enemy_ram_hp,x
+        bcc .dead
+	
+        lda #ENEMY_HIT_PALETTE_FRAMES
+	sta enemy_ram_hc,x
+	jsr sfx_enemy_damage
+        rts
+.dead
+	inc phase_kill_count
+        jsr sfx_enemy_death
+	; handle point bonus
+	lda enemy_ram_type,x
+        asl
+        asl
+        clc
+        adc #$03
+        tay ; enemy points counter
+        ldx #$03 ; score bytes counter
+        clc
+.score_loop
+        lda ENEMY_PLAYER_POINTS_TABLE,y
+        adc score_000000xx,x
+        sta score_000000xx,x
+        dey
+	dex
+	bne .score_loop
+        ldx enemy_ram_offset
+        ldy enemy_oam_offset
+; 4 sprite cleanup
+	cpx #$80
+        bcc .not_4_sprite
+	lda #$04 ; move first sprite over 4 pixels
+        clc
+	adc oam_ram_x,y
+        sta oam_ram_x,y
+	lda #$04 ; move first sprite down 3 pixels
+        clc
+        adc oam_ram_y,y
+        sta oam_ram_y,y
+        ; move other sprites off screen
+	lda #$ff
+        sta oam_ram_y+4,y
+        sta oam_ram_y+8,y
+        sta oam_ram_y+12,y
+.not_4_sprite
+; starglasses 
+        lda enemy_ram_type,x
+        cmp #$04
+        bne .not_starglasses
+        lda bomb_counter
+        bne .not_starglasses
+        ; spawn powerup
+        pla 
+        pla
+        jmp powerup_from_starglasses
+.not_starglasses
+        ; change it into crossbones!
+        lda #$01
+        sta enemy_ram_type,x
+        sta enemy_ram_hp,x
+        ; return to enemy handler not cycle
+        pla
+        pla
+        jmp crossbones_cycle
+        
+        
 enemy_set_palette: subroutine
 	; checks/handles hit palette counter
         ; a = enemy normal palette
@@ -372,44 +464,21 @@ enemy_set_palette: subroutine
         ; y = oam ram offset
         ; leaves correct palette id in a
         ; can be applied to extra sprites of larger enemy
-        sta enemy_temp_temp
+        sta temp00
         lda enemy_ram_hc,x
-        cmp #$00
         beq .use_enemy_palette
 .use_hit_palette
 	dec enemy_ram_hc,x
-        lda enemy_temp_temp
+        lda temp00
         and #%11111100
         sta oam_ram_att,y
         rts
 .use_enemy_palette
-	lda enemy_temp_temp
+	lda temp00
         sta oam_ram_att,y
         rts
         
-enemy_set_palette_mirror: subroutine
-	; XXX might not need this
-        ; XXX above routine uses `ora` now
-	; checks/handles hit palette counter
-        ; a = enemy normal palette
-	; x = enemy ram offset
-        ; y = oam ram offset
-        ; leaves correct palette id in a
-        ; can be applied to extra sprites of larger enemy
-        sta enemy_temp_temp
-        lda enemy_ram_hc,x
-        cmp #$00
-        beq .use_enemy_palette
-.use_hit_palette
-	dec enemy_ram_hc,x
-	lda #$40
-        sta oam_ram_att,y
-        rts
-.use_enemy_palette
-	lda enemy_temp_temp
-        ora #$40
-        sta oam_ram_att,y
-        rts
+        
         
         
 enemy_give_points: subroutine
@@ -421,22 +490,19 @@ enemy_give_points: subroutine
         clc
         adc #$03
         tay ; enemy points counter
-        ldx #$00 ; score bytes counter
+        ldx #$03 ; score bytes counter
+        clc
 .score_loop
         lda ENEMY_PLAYER_POINTS_TABLE,y
-        dey
-        clc
         adc score_000000xx,x
         sta score_000000xx,x
-        bcc .no_carry
-        inc score_000000xx+1,x
-.no_carry
-	inx
-        cpx #$04
+        dey
+	dex
 	bne .score_loop
         ldx temp00
         ldy temp01
         rts
+
 
 
 ; 16 1 sprite enemies

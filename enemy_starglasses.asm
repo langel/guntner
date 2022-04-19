@@ -32,25 +32,8 @@ starglasses_cycle: subroutine
         lda #$10
         sta collision_0_w
         sta collision_0_h
-        jsr enemy_get_damage_this_frame
-        cmp #$00
-        bne .not_dead
-.is_dead
-	inc phase_kill_count
-        lda enemy_ram_type,x
-        jsr enemy_give_points
-        jsr sfx_enemy_death
-        lda bomb_counter
-        beq .death_not_by_bomb
-        lda #$01
-        sta enemy_ram_type,x
-        bne .death_cleanup_sprites
-.death_not_by_bomb
-        ; spawn powerup
-        jsr powerup_from_starglasses
-.death_cleanup_sprites
-        jmp sprite_4_cleanup_for_next
-.not_dead
+        jsr enemy_handle_damage_and_death
+        
 .x_decide_action
 	; calc x
         lda enemy_ram_x,x
