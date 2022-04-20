@@ -123,22 +123,27 @@ boss_vamp_bat_cycle: subroutine
 	
         
         
-BOSS_VAMP_STATE_TABLE: 
-	.word boss_vamp_state_idle_update
-        .word boss_vamp_state_suck_bats
-        .word boss_vamp_state_shake
-        .word boss_vamp_state_lunge
-        .word boss_vamp_state_retreat
-        .word boss_vamp_state_blow_bats
+boss_vamp_state_lo:
+	.byte <boss_vamp_state_idle_update
+        .byte <boss_vamp_state_suck_bats
+        .byte <boss_vamp_state_shake
+        .byte <boss_vamp_state_lunge
+        .byte <boss_vamp_state_retreat
+        .byte <boss_vamp_state_blow_bats
+boss_vamp_state_hi:
+	.byte >boss_vamp_state_idle_update
+        .byte >boss_vamp_state_suck_bats
+        .byte >boss_vamp_state_shake
+        .byte >boss_vamp_state_lunge
+        .byte >boss_vamp_state_retreat
+        .byte >boss_vamp_state_blow_bats
         
 boss_vamp_update_state_delegator:
 	lda state_v0
-        asl
         tax
-        lda BOSS_VAMP_STATE_TABLE,x
+        lda boss_vamp_state_lo,x
         sta temp00
-        inx
-        lda BOSS_VAMP_STATE_TABLE,x
+        lda boss_vamp_state_hi,x
         sta temp01
         ldx enemy_ram_offset
         jmp (temp00)
@@ -485,7 +490,7 @@ boss_vamp_cycle: subroutine
         lda #$01
 	ldx enemy_ram_offset
         sta enemy_ram_type,x
-        jmp sprite_4_cleanup_for_next
+        ;jmp sprite_4_cleanup_for_next
 .not_dead    
 
 	; MOUTH HANDLER

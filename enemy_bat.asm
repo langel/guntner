@@ -25,6 +25,7 @@ bat_cycle: subroutine
         lda #$05
         sta collision_0_h
         jsr enemy_handle_damage_and_death
+        
 	; adjust all counters
 	inc enemy_ram_x,x
         ; update animation

@@ -100,21 +100,7 @@ sprite_4_set_y: subroutine
 	sta oam_ram_y+12,y
 	rts
         
-sprite_4_cleanup_for_next: subroutine
-	lda #$04 ; move first sprite over 4 pixels
-        clc
-	adc oam_ram_x,y
-        sta oam_ram_x,y
-	lda #$04 ; move first sprite down 3 pixels
-        clc
-        adc oam_ram_y,y
-        sta oam_ram_y,y
-        ; move other sprites off screen
-	lda #$ff
-        sta oam_ram_y+4,y
-        sta oam_ram_y+8,y
-        sta oam_ram_y+12,y
-	jmp update_enemies_handler_next
+        
 	
         
 clear_all_enemies: subroutine
@@ -297,6 +283,30 @@ crossbones_cycle: subroutine
         
         
   
+
+        
+enemy_give_points: subroutine
+        ; a = enemy type
+        stx temp00
+        sty temp01
+        asl
+        asl
+        clc
+        adc #$03
+        tay ; enemy points counter
+        ldx #$03 ; score bytes counter
+        clc
+.score_loop
+        lda ENEMY_PLAYER_POINTS_TABLE,y
+        adc score_000000xx,x
+        sta score_000000xx,x
+        dey
+	dex
+	bne .score_loop
+        ldx temp00
+        ldy temp01
+        rts
+
                 
 enemy_get_damage_this_frame: subroutine
 	; x = enemy ram offset
@@ -457,6 +467,7 @@ enemy_handle_damage_and_death: subroutine
         jmp crossbones_cycle
         
         
+        
 enemy_set_palette: subroutine
 	; checks/handles hit palette counter
         ; a = enemy normal palette
@@ -480,29 +491,6 @@ enemy_set_palette: subroutine
         
         
         
-        
-enemy_give_points: subroutine
-        ; a = enemy type
-        stx temp00
-        sty temp01
-        asl
-        asl
-        clc
-        adc #$03
-        tay ; enemy points counter
-        ldx #$03 ; score bytes counter
-        clc
-.score_loop
-        lda ENEMY_PLAYER_POINTS_TABLE,y
-        adc score_000000xx,x
-        sta score_000000xx,x
-        dey
-	dex
-	bne .score_loop
-        ldx temp00
-        ldy temp01
-        rts
-
 
 
 ; 16 1 sprite enemies

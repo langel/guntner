@@ -28,22 +28,8 @@ maggs_cycle: subroutine
         sta collision_0_w
         lda #$05
         sta collision_0_h
-        jsr enemy_get_damage_this_frame
-        cmp #$00
-        bne .not_dead
-.is_dead
-	lda #$f0
-        ldy enemy_oam_offset
-        sta oam_ram_y+4,y
-	inc phase_kill_count
-        lda enemy_ram_type,x
-        jsr enemy_give_points    
-        ; change it into crossbones!
-        jsr sfx_enemy_death
-        lda #$01
-        sta enemy_ram_type,x
-        jmp .done
-.not_dead
+        jsr enemy_handle_damage_and_death
+        
 	; sprite
         lda enemy_ram_ac,x
         lsr

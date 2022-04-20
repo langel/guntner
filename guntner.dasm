@@ -68,13 +68,13 @@ cart_start:	subroutine
 ;============================== M O D E   I N I T   H E R E
 	;jsr game_init
 	;jsr menu_screens_init
-        jsr demo_init
+        ;jsr demo_init
         ;jsr cut_scene_00_init
         ;lda #$0a
         ;sta game_mode
         
         ;jsr options_screen_init
-        ;jsr sandbox_init
+        jsr sandbox_init
    	;jsr sandbox2_init
         
         ; XXX why does this need to exist here?
