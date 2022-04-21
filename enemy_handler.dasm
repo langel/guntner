@@ -144,16 +144,6 @@ enemy_death: subroutine
         rts
         
         
-enemy_spawn_generic:
-	; x = type id
-	; x is set by enemy spawner
-	lda #$11
-        sta enemy_ram_type,x 
-        tay
-        lda ENEMY_HITPOINTS_TABLE,y
-        sta enemy_ram_hp,x 
-        
-        
 enemy_slot_offset_to_oam_offset:
 	; slots leftshift 3 times to get enemy_ram_offset
         ; 1 sprite slots :

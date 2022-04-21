@@ -4,7 +4,7 @@
 ;  --+--
 ;  2 | 3
 
-; 24 angular regions total
+; 24 angular regions total (0-23)
 ; 6 regions per quadrant
 ;  direction  
 ; 12 o'clock  6
@@ -159,28 +159,7 @@ ARCTANG_TRANSLATION_LOOKUP_TABLE:
         
         
         
-        
-enemy_update_arctang_position:
-	; updates both x and y position given:
-        ;	- enemy_ram_ex holds region/direction
-        ;	- enemy_ram_x/y holds lo bytes
-        ;	- oam_ram_x/y holds hi bytes
 
-        ; get arctang direction
-        lda enemy_ram_ex,x
-        cmp #12
-        bcc .dont_adjust_x_dir
-        sec
-        sbc #12
-.dont_adjust_x_dir
-	sta temp00 ; velocity table pos
-        tay
-        
-        
-        ldy enemy_oam_offset
-	ldx enemy_ram_offset
-	rts
-        
         
 
 ; arctang movement is 16-bit
@@ -269,6 +248,21 @@ ARCTANG_REGION_Y_PLUS_OR_MINUS_TABLE:
         byte 1, 1, 1, 1, 1, 1
 
 arctang_velocity_tables:
+	; region id = angle degrees
+        ; 0 = 0
+        ; 1 = 15
+        ; 2 = 30
+        ; 3 = 45
+        ; 4 = 60
+        ; 5 = 75
+arctang_velocity_6.66:
+	byte 168, 6
+        byte 109, 6
+        byte 193, 5
+        byte 119, 4
+        byte  84, 3
+        byte 183, 1
+        byte   0, 0
 arctang_velocity_3.33:
 	byte  85, 3
         byte  56, 3
