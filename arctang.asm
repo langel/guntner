@@ -255,6 +255,7 @@ arctang_velocity_tables:
         ; 3 = 45
         ; 4 = 60
         ; 5 = 75
+        ; 6 = 90
 arctang_velocity_6.66:
 	byte 168, 6
         byte 109, 6
@@ -262,6 +263,14 @@ arctang_velocity_6.66:
         byte 119, 4
         byte  84, 3
         byte 183, 1
+        byte   0, 0
+arctang_velocity_4.5:
+	byte 127, 4
+        byte  88, 4
+        byte 229, 3
+        byte  46, 3
+        byte  64, 2
+        byte  42, 1
         byte   0, 0
 arctang_velocity_3.33:
 	byte  85, 3
@@ -279,6 +288,14 @@ arctang_velocity_2.5:
         byte  64, 1
         byte 166, 0
         byte   0, 0
+arctang_velocity_1.75:
+	byte 191, 1
+        byte 176, 1
+        byte 131, 1
+        byte  61, 1
+        byte 223, 0
+        byte 115, 0
+        byte   0, 0
 arctang_velocity_1.25:
 	byte  64, 1
 	byte  53, 1
@@ -287,8 +304,32 @@ arctang_velocity_1.25:
         byte 161, 0
         byte  81, 0
         byte   0, 0
+arctang_velocity_0.75:
+	byte 191, 0
+        byte 184, 0
+        byte 166, 0
+        byte 135, 0
+        byte  96, 0
+        byte  49, 0
+        byte   0, 0
+arctang_velocity_0.33:
+	byte  84, 0
+        byte  81, 0
+        byte  73, 0
+        byte  59, 0
+        byte  42, 0
+        byte  22, 0
+        byte   0, 0
+arctang_velocities_lo:
+	byte #<arctang_velocity_6.66
+	byte #<arctang_velocity_4.5
+	byte #<arctang_velocity_3.33
+	byte #<arctang_velocity_2.5
+	byte #<arctang_velocity_1.75
+	byte #<arctang_velocity_1.25
+	byte #<arctang_velocity_0.75
+	byte #<arctang_velocity_0.33
         
-
 
 enemy_update_arctang_path:
 	; updates both x and y position given:

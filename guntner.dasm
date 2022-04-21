@@ -77,8 +77,8 @@ cart_start:	subroutine
         ;sta game_mode
         
         ;jsr options_screen_init
-        jsr sandbox_init
-   	;jsr sandbox2_init
+        ;jsr sandbox_init
+   	jsr sandbox2_init
         
         ; XXX why does this need to exist here?
         ;     shouldn't render_enable handle this?
