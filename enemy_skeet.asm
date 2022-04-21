@@ -127,7 +127,7 @@ skeet_cycle: subroutine
         lda #$d2
         ldy enemy_oam_offset
         jsr enemy_set_palette
-        jmp .check_cross_top
+        bcc .go_done
 .go_right_up
 	lda enemy_ram_x,x
         clc
@@ -141,13 +141,7 @@ skeet_cycle: subroutine
         lda #$a2
         ldy enemy_oam_offset
         jsr enemy_set_palette
-.check_cross_top
-	lda enemy_ram_y,x
-        cmp #$ba
         bcc .go_done
-        lda sprite_0_y
-        sta enemy_ram_y,x
-        jmp .go_done
 .go_right_down
 	lda enemy_ram_x,x
         clc
@@ -157,7 +151,7 @@ skeet_cycle: subroutine
         ldy enemy_oam_offset
         lda #$22
         jsr enemy_set_palette
-        jmp .check_cross_bottom
+        bcc .go_done
 .go_left_down
 	lda enemy_ram_x,x
         sec
@@ -167,16 +161,12 @@ skeet_cycle: subroutine
         ldy enemy_oam_offset
         lda #$62
         jsr enemy_set_palette
-.check_cross_bottom
-	lda enemy_ram_y,x
-        cmp sprite_0_y
-        bcc .go_done
-        lda #$00
-        sta enemy_ram_y,x
 .go_done
         lda enemy_ram_x,x
         sta oam_ram_x,y
         lda enemy_ram_y,x
+        jsr enemy_fix_y_visible
+        sta enemy_ram_y,x
         sta oam_ram_y,y       
 .done
 	jmp update_enemies_handler_next

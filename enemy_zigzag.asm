@@ -119,40 +119,30 @@ zigzag_cycle: subroutine
         dec enemy_ram_y,x
         lda #$d1
         jsr enemy_set_palette
-        jmp .check_cross_top
+        bcc .go_done
 .go_right_up
 	inc enemy_ram_x,x
         dec enemy_ram_y,x
         lda #$a1
         jsr enemy_set_palette
-.check_cross_top
-	lda enemy_ram_y,x
-        cmp #$ba
         bcc .go_done
-        lda sprite_0_y
-        sta enemy_ram_y,x
-        jmp .go_done
 .go_right_down
 	inc enemy_ram_x,x
         inc enemy_ram_y,x
         lda #$21
         jsr enemy_set_palette
-        jmp .check_cross_bottom
+        bcc .go_done
 .go_left_down
         dec enemy_ram_x,x
         inc enemy_ram_y,x
         lda #$61
         jsr enemy_set_palette
-.check_cross_bottom
-	lda enemy_ram_y,x
-        cmp sprite_0_y
-        bcc .go_done
-        lda #$00
-        sta enemy_ram_y,x
 .go_done
         lda enemy_ram_x,x
         sta oam_ram_x,y
         lda enemy_ram_y,x
+        jsr enemy_fix_y_visible
+        sta enemy_ram_y,x
         sta oam_ram_y,y       
 .done
 	jmp update_enemies_handler_next

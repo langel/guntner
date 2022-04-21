@@ -100,7 +100,28 @@ sprite_4_set_y: subroutine
 	sta oam_ram_y+12,y
 	rts
         
-        
+
+enemy_fix_y_visible: subroutine
+	; a = y position to check
+	; returns new y position in a
+        cmp #255-8
+        bcc .not_wrapped_from_top
+        sta temp00
+        lda #255
+        sec
+        sbc sprite_0_y
+        sta temp01
+        lda temp00
+        sec
+        sbc temp01
+        rts
+.not_wrapped_from_top
+	cmp sprite_0_y
+        bcc .not_wrapped_from_bottom
+        sec
+        sbc sprite_0_y
+.not_wrapped_from_bottom
+	rts
 	
         
 clear_all_enemies: subroutine
@@ -465,6 +486,7 @@ enemy_set_palette: subroutine
         ; y = oam ram offset
         ; leaves correct palette id in a
         ; can be applied to extra sprites of larger enemy
+        clc ; set carry for branching on return
         sta temp00
         lda enemy_ram_hc,x
         beq .use_enemy_palette

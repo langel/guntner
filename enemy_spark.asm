@@ -55,10 +55,10 @@ spark_cycle: subroutine
         bne .dir_done
         lda sprite_0_y
         sta enemy_ram_y,x
-        jmp .dir_done
+        bne .dir_done
 .go_right
 	inc enemy_ram_x,x
-        jmp .dir_done
+        bne .dir_done
 .go_down
 	inc enemy_ram_y,x
 	lda enemy_ram_y,x
@@ -72,9 +72,7 @@ spark_cycle: subroutine
         sta oam_ram_att,y
         ; sprite
         jsr get_next_random
-        lsr
-        lsr
-        and #%00000011
+        and #$03
         clc
         adc #$6c
         sta oam_ram_spr,y

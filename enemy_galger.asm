@@ -181,7 +181,7 @@ arc_leg: subroutine
 arc_leg_init:
 	; increase arc leg id
         inc enemy_ram_ex,x
-        lda #$06 ; tmep value should be stashed somewhere!?!?
+        lda #$06 ; temp value should be stashed somewhere!?!?
         cmp enemy_ram_ex,x
         bne .dont_wrap
         lda #$00
