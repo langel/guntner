@@ -122,7 +122,9 @@ boss_vamp_bat_cycle: subroutine
         bne .done
 	
         
-        
+        ; I VANT TO
+        ; SUCK YOUR
+        ; BLEEDS !!
 boss_vamp_state_lo:
 	.byte <boss_vamp_state_idle_update
         .byte <boss_vamp_state_suck_bats
@@ -323,7 +325,9 @@ boss_vamp_state_shake: subroutine
 	rts
         
 boss_vamp_state_lunge: subroutine
-	jsr enemy_update_arctang_path
+	;jsr enemy_update_arctang_path
+        lda #<arctang_velocity_1.25
+        sta arctang_velocity_lo
 	jsr enemy_update_arctang_path
         ldy enemy_oam_offset
         lda oam_ram_x,y
@@ -347,7 +351,9 @@ boss_vamp_state_lunge: subroutine
 	rts
         
 boss_vamp_state_retreat: subroutine
-	jsr enemy_update_arctang_path
+	;jsr enemy_update_arctang_path
+        lda #<arctang_velocity_1.25
+        sta arctang_velocity_lo
 	jsr enemy_update_arctang_path
         ldy enemy_oam_offset
         lda oam_ram_x,y

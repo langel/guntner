@@ -159,43 +159,6 @@ ARCTANG_TRANSLATION_LOOKUP_TABLE:
         
         
         
-
-        
-ARCTANG_VELOCITY_3.333_TABLE:
-	; 3.333 pixels per frame
-        ; lo byte, hi byte
-	byte  85, 3
-        byte  56, 3
-        byte 227, 2
-        byte  91, 2
-        byte 171, 1
-        byte 221, 0
-        byte   0, 0
-        
-ARCTANG_VELOCITY_2.5_TABLE:
-	byte 127, 2
-        byte 104, 2
-        byte  43, 2
-        byte 197, 1
-        byte  64, 1
-        byte 166, 0
-        byte   0, 0
-        
-ARCTANG_VELOCITY_1.25_TABLE:
-	byte  64, 1
-	byte  53, 1
-        byte  20, 1
-        byte 225, 0
-        byte 161, 0
-        byte  81, 0
-        byte   0, 0
-        
-arctang_velocity_3.333_lo:
-	byte  85,  56, 227,  91, 171, 221
-        byte   0, 221, 171,  91, 227,  56
-arctang_velocity_3.333_hi:
-	byte   3,   3,   2,   2,   1,   0
-        byte   0,   0,   1,   2,   2,   3
         
 enemy_update_arctang_position:
 	; updates both x and y position given:
@@ -219,52 +182,22 @@ enemy_update_arctang_position:
 	rts
         
         
-ARCTANG_REGION_TO_X_VELOCITY_TABLE:
-	byte 0, 1, 2, 3, 4, 5
-        byte 6, 5, 4, 3, 2, 1
-	byte 0, 1, 2, 3, 4, 5
-        byte 6, 5, 4, 3, 2, 1
-        
-ARCTANG_REGION_X_PLUS_OR_MINUS_TABLE:
-	; 1 = plus
-        ; 0 = minus
-        byte 1, 1, 1, 1, 1, 1
-        byte 0, 0, 0, 0, 0, 0
-        byte 0, 0, 0, 0, 0, 0
-        byte 1, 1, 1, 1, 1, 1
-        
-ARCTANG_REGION_TO_Y_VELOCITY_TABLE:
-        byte 6, 5, 4, 3, 2, 1
-	byte 0, 1, 2, 3, 4, 5
-        byte 6, 5, 4, 3, 2, 1
-	byte 0, 1, 2, 3, 4, 5
-        
-ARCTANG_REGION_Y_PLUS_OR_MINUS_TABLE:
-	; 1 = plus
-        ; 0 = minus
-        byte 0, 0, 0, 0, 0, 0
-        byte 0, 0, 0, 0, 0, 0
-        byte 1, 1, 1, 1, 1, 1
-        byte 1, 1, 1, 1, 1, 1
 
 ; arctang movement is 16-bit
 ; oam ram x,y = high byte
 ; enemy ram x,y = low byte
 
-        
 arctang_update_x: subroutine
         ; temp00 = hi
         ; temp01 = lo
         ; temp02 = region
-        ; temp03 = velocity?
         ldx temp02
         lda ARCTANG_REGION_TO_X_VELOCITY_TABLE,x
         asl
         tay
         lda ARCTANG_REGION_X_PLUS_OR_MINUS_TABLE,x
-        jmp arctang_16bit_maths
+        bpl arctang_16bit_maths
         
-
 arctang_update_y: subroutine
         ; temp00 = hi
         ; temp01 = lo
@@ -274,39 +207,93 @@ arctang_update_y: subroutine
         asl
         tay
         lda ARCTANG_REGION_Y_PLUS_OR_MINUS_TABLE,x
-        jmp arctang_16bit_maths
-        
+        bpl arctang_16bit_maths
         
 arctang_16bit_maths: subroutine
 	; a = plus or minus
         ; y = velocity table offset
-        cmp #0
         bne .velocity_add
 .velocity_sub
 	; lo byte
 	lda temp01
         sec 
-        sbc ARCTANG_VELOCITY_3.333_TABLE,y
+        sbc (arctang_velocity_lo),y
         sta temp01
         ; hi byte
-        iny
 	lda temp00
-        sbc ARCTANG_VELOCITY_3.333_TABLE,y
+        iny
+        sbc (arctang_velocity_lo),y
         sta temp00
         jmp .done_x
 .velocity_add
 	; lo byte
         lda temp01
         clc
-        adc ARCTANG_VELOCITY_3.333_TABLE,y
+        adc (arctang_velocity_lo),y
         sta temp01
         ; hi byte
-	iny
 	lda temp00
-        adc ARCTANG_VELOCITY_3.333_TABLE,y
+        iny
+        adc (arctang_velocity_lo),y
         sta temp00
 .done_x
 	rts
+        
+
+; XXX !important
+;     reduce cycle counts by keeping these
+;     tables on the same page
+ARCTANG_REGION_TO_X_VELOCITY_TABLE:
+	byte 0, 1, 2, 3, 4, 5
+        byte 6, 5, 4, 3, 2, 1
+	byte 0, 1, 2, 3, 4, 5
+        byte 6, 5, 4, 3, 2, 1
+ARCTANG_REGION_TO_Y_VELOCITY_TABLE:
+        byte 6, 5, 4, 3, 2, 1
+	byte 0, 1, 2, 3, 4, 5
+        byte 6, 5, 4, 3, 2, 1
+	byte 0, 1, 2, 3, 4, 5
+ARCTANG_REGION_X_PLUS_OR_MINUS_TABLE:
+	; 1 = plus
+        ; 0 = minus
+        byte 1, 1, 1, 1, 1, 1
+        byte 0, 0, 0, 0, 0, 0
+        byte 0, 0, 0, 0, 0, 0
+        byte 1, 1, 1, 1, 1, 1
+ARCTANG_REGION_Y_PLUS_OR_MINUS_TABLE:
+	; 1 = plus
+        ; 0 = minus
+        byte 0, 0, 0, 0, 0, 0
+        byte 0, 0, 0, 0, 0, 0
+        byte 1, 1, 1, 1, 1, 1
+        byte 1, 1, 1, 1, 1, 1
+
+arctang_velocity_tables:
+arctang_velocity_3.33:
+	byte  85, 3
+        byte  56, 3
+        byte 227, 2
+        byte  91, 2
+        byte 171, 1
+        byte 221, 0
+        byte   0, 0
+arctang_velocity_2.5:
+	byte 127, 2
+        byte 104, 2
+        byte  43, 2
+        byte 197, 1
+        byte  64, 1
+        byte 166, 0
+        byte   0, 0
+arctang_velocity_1.25:
+	byte  64, 1
+	byte  53, 1
+        byte  20, 1
+        byte 225, 0
+        byte 161, 0
+        byte  81, 0
+        byte   0, 0
+        
 
 
 enemy_update_arctang_path:

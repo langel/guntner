@@ -72,6 +72,8 @@ dart_cycle: subroutine
         bcs .despawn
         
 	; handle direction movement
+        lda #<arctang_velocity_3.33
+        sta arctang_velocity_lo
 	jsr enemy_update_arctang_path
         ; attributes
         lda enemy_ram_ex,x

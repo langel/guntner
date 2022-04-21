@@ -125,6 +125,9 @@ enemy_dmg_accumulator	byte
 boss_x		byte
 boss_y		byte
 
+arctang_velocity_lo	byte
+arctang_velocity_hi	byte
+
 player_color0	byte
 player_color1	byte
 player_color2	byte
