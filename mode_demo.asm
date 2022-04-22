@@ -50,7 +50,7 @@ demo_update: subroutine
         
         
 demo_enemy_spawn: subroutine
-	;jmp .no_1_sprite_spawn
+	; 1 sprite enemy slots
         lda enemy_slot_1_next
         cmp #$ff
         beq .no_1_sprite_spawn
@@ -65,8 +65,6 @@ demo_enemy_spawn: subroutine
         cmp #$02
         beq .spawn_skeet
         cmp #$03
-        beq .spawn_chomps
-        cmp #$04
         beq .spawn_spark
         jsr birb_spawn
         rts
@@ -86,13 +84,23 @@ demo_enemy_spawn: subroutine
 	jsr spark_spawn
         rts
 .no_1_sprite_spawn
+
+	; 2 sprite enemy slots
         lda enemy_slot_2_next
         cmp #$ff
-        beq .no_maggs_spawn
+        beq .4_sprite_slots
         tax
+        lda wtf
+        and #$01
+        beq .no_maggs_spawn
         jsr maggs_spawn
+        rts
 .no_maggs_spawn
+	jsr chomps_spawn
+	rts
 
+	; 4 sprite enemy slots
+.4_sprite_slots
         lda enemy_slot_4_next
         cmp #$ff
         beq .no_bigs_spawn
