@@ -1,5 +1,7 @@
 	
 	
+spawning refactor
+	phase method to spawn formations
 remove enemy_get_damage_this_frame
 ant shoots dart from butt 
 sprite stars handled by enemy_handler?
