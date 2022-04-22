@@ -1,5 +1,12 @@
 	
 	
+remove enemy_get_damage_this_frame
+ant shoots dart from butt 
+sprite stars handled by enemy_handler?
+scroll_x_hi & scroll_x_lo
+	
+	
+
 	
 	so many bits #nesdev #GunTneR [ !ks for info ]
 	
@@ -43,7 +50,7 @@ Kickstarter 100 / January 2022
 
 top tier puke's little helpers
 Alan Berndt (BGT) - discord
-	nothing yet
+	sprites (throber and elephant)
 Douglas Glover - discord DM
 	bomb and shield powerups
 Caylen Williams - email
