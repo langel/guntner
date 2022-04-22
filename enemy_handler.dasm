@@ -167,12 +167,12 @@ enemy_death: subroutine
         
 enemy_slot_offset_to_oam_offset:
 	; slots leftshift 3 times to get enemy_ram_offset
-        ; 1 sprite slots :
+        ; 1 sprite slots : start at $300
         byte $20,$24,$28,$2c,$30,$34,$38,$3c
         byte $40,$44,$48,$4c,$50,$54,$58,$5c
-        ; 2 sprite slots :
+        ; 2 sprite slots : start at $390
         byte $60,$68,$70,$78
-        ; 4 sprite slots :
+        ; 4 sprite slots : start at $3b0
         byte $80,$90,$a0,$b0,$c0,$d0,$e0,$f0
         ; null terminater
         byte $00
@@ -183,11 +183,11 @@ enemies_update_all: subroutine
 	lda player_health
         beq player_dead_enemies_despawn
 	; cycle through all the slots
-	lda #$00
-        sta enemy_slot_id
-        sta enemy_ram_offset
-        lda #$20
-        sta enemy_oam_offset
+	ldx #$00
+        stx enemy_slot_id
+        stx enemy_ram_offset
+        ldy enemy_slot_offset_to_oam_offset,x
+        sty enemy_oam_offset
 .handler_loop
         ldx enemy_ram_offset
 	; get enemy type
@@ -217,8 +217,8 @@ update_enemies_handler_next:
         asl
         sta enemy_ram_offset
         ldx enemy_slot_id
-        lda enemy_slot_offset_to_oam_offset,x
-        sta enemy_oam_offset
+        ldy enemy_slot_offset_to_oam_offset,x
+        sty enemy_oam_offset
         bne .handler_loop
         rts
         
@@ -228,10 +228,13 @@ update_enemies_handler_next:
 player_dead_enemies_despawn: subroutine
 	; enemies slide off left side of screen
         ; after player dies
-	inc player_death_flag
-	inc player_death_flag
-	inc player_death_flag
-	lda player_death_flag
+        lda #$05
+        clc
+        adc player_death_flag
+        bcc .carry_clear
+        lda #$ff
+.carry_clear
+        sta player_death_flag
         lsr
         lsr
         lsr

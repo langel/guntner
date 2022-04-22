@@ -30,7 +30,7 @@ sandbox2_init: subroutine
 	jsr get_enemy_slot_4_sprite
         tax
         ldx #$c8
-        ;jsr throber_spawn
+        jsr throber_spawn
         
         jsr sandbox2_phase_next
         

@@ -128,9 +128,19 @@ game_update_generic: subroutine
         inc player_health
 .no_heal
 
-	; XXX maybe move this functions contents to here
-        ; seems like speed gets reset when it shouldn't
-	jsr player_change_speed
+player_change_speed:
+	lda player_select_d
+        cmp #$00
+        beq .read_select_done
+        ; update speed
+        inc player_speed
+        lda player_speed
+        cmp #$04
+        bne .read_select_done
+        lda #$00
+        sta player_speed
+.read_select_done
+        
         ; XXX is this default damage from enemies?
         ; XXX actually seems like a testing mechanic
         ;lda #$04

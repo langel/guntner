@@ -36,7 +36,7 @@ throber_cycle: subroutine
         ldx enemy_ram_offset
         cmp #$05
         bcc .do_movement
-        cmp #$07
+        cmp #$05
         bne .dont_change_dir
         jsr enemy_get_direction_of_player
         sta enemy_ram_ex,x

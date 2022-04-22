@@ -15,7 +15,6 @@ chomps_spawn: subroutine
         sta enemy_ram_y,x ; y pos
    	rts
         
-           
         
         
 chomps_cycle: subroutine
@@ -25,35 +24,32 @@ chomps_cycle: subroutine
         sta collision_0_h
         jsr enemy_handle_damage_and_death
         
-        ; update pattern
+        ; x movement
         inc enemy_ram_pc,x
-        inc enemy_ram_pc,x
-        
-        ; set x position
-        ; get x pattern position
-        ; add it to base x position
-        lda enemy_ram_pc,x
+        inc enemy_ram_ac,x
+        inc enemy_ram_ac,x
+        lda enemy_ram_ac,x
         tax
         lda sine_table,x
-        lsr
-        lsr
-        lsr
         sta temp00
-	ldx enemy_ram_offset
-        inc enemy_ram_x,x
+        lsr
+        lsr
+        ldx enemy_ram_offset
         clc
-        adc enemy_ram_x,x
-        sta oam_ram_x+4,y
-        sec
-        sbc #$01
-        sta oam_ram_x,y
+        adc enemy_ram_pc,x
+        sta enemy_ram_x,x
         
-        ; set y position
+        
+        
+        ; winder sprite
+        lda enemy_ram_x,x
+        sta oam_ram_x,y
+        clc
+        adc #$01
+        sta oam_ram_x+4,y
         lda enemy_ram_y,x
         sta oam_ram_y,y
         sta oam_ram_y+4,y
-        
-        ; winder sprite
         lda wtf
         lsr
         lsr
@@ -61,18 +57,33 @@ chomps_cycle: subroutine
         clc
         adc #$cc
         sta oam_ram_spr,y
+        
         ; mouth sprite
-        lda enemy_ram_ac,x
+        lda enemy_ram_pc,x
         clc
-        adc #$02
-        sta enemy_ram_ac,x
-        lda temp00
+        adc #$20
+        asl
+        tax
+        lda sine_table,x
+        ldx enemy_ram_offset
         lsr
         lsr
         lsr
+        lsr
+        lsr
+        lsr
+        clc
+        adc #$bc
+        sta oam_ram_spr+4,y
+        
+        
+        bne .frame_done
+        
+        
         clc 
         adc #$bc
         sta oam_ram_spr+4,y
+        
 .frame_done
         lda #$02
         jsr enemy_set_palette

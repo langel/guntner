@@ -113,6 +113,8 @@ demo_enemy_spawn: subroutine
         beq .spawn_starglasses
         cmp #$01
         beq .spawn_skully
+        cmp #$02
+        beq .spawn_throber
         jsr dumbface_spawn
         jmp .no_bigs_spawn
 .spawn_skully
@@ -120,6 +122,9 @@ demo_enemy_spawn: subroutine
         jmp .no_bigs_spawn
 .spawn_starglasses
         jsr starglasses_spawn
+        jmp .no_bigs_spawn
+.spawn_throber
+	jsr throber_spawn
 .no_bigs_spawn
 	rts
         

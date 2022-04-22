@@ -13,25 +13,10 @@
 ; debouncing required for menu
 ; all keys
 
-; deboucning required for game
+; debouncing required for game
 ; select, start, a
 
 
-player_change_speed: subroutine
-	lda player_select_d
-        cmp #$00
-        beq .read_select_done
-        ; update speed
-        inc player_speed
-        lda player_speed
-        cmp #$04
-        bne .read_select_done
-        lda #$00
-        sta player_speed
-.read_select_done
-	rts
-        
-        
 player_pause: subroutine
 	lda phase_end_game
         cmp #$01

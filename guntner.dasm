@@ -13,6 +13,7 @@ spare_stack	EQU	$150
 top_of_stack	EQU	$1e0
 ;unused_ram	EQU	$3e0
 ;more_free_ram	EQU	$400
+end_of_ram 	EQU 	$0800
 
 
 ;;;;; NES CARTRIDGE HEADER
@@ -71,13 +72,13 @@ cart_start:	subroutine
 ;============================== M O D E   I N I T   H E R E
 	;jsr game_init
 	;jsr menu_screens_init
-        jsr demo_init
+        ;jsr demo_init
         ;jsr cut_scene_00_init
         ;lda #$0a
         ;sta game_mode
         
         ;jsr options_screen_init
-        ;jsr sandbox_init
+        jsr sandbox_init
    	;jsr sandbox2_init
         
         ; XXX why does this need to exist here?
@@ -258,6 +259,8 @@ sprite0_done:
         nop	; how much prg space we using?
 	include "powerups.asm"
         nop	; how much prg space we using?
+	include "sine.dasm"
+        nop	; how much prg space we using?
 	include "starfield.dasm"
         nop	; how much prg space we using?
         
@@ -309,7 +312,6 @@ sprite0_done:
 	include "enemy_test.asm"
 
 
-
 	include "phases_and_levels.dasm"
         nop	; how much prg space we using?
 	include "phase_table.dasm"
@@ -344,9 +346,8 @@ sprite0_done:
         
 ; LOOKUP TABLES AT TOP OF RAM
         org $fe00
-	include "sine.dasm"
+	include "tables_at_top_of_rom.asm"
         nop	; how much prg space we using?
-
 
 .	byte "hello n00b good for you"
         nop	; how much prg space we using?
