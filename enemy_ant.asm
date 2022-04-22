@@ -6,8 +6,9 @@ ant_spawn: subroutine
         tay
         lda ENEMY_HITPOINTS_TABLE,y
         sta enemy_ram_hp,x 
-        lda #$20
+        lda #$f7
         sta enemy_ram_x,x ; x pos
+        lda #$00
         sta enemy_ram_ac,x ; animation counter
         txa
         lsr
@@ -29,15 +30,41 @@ ant_spawn: subroutine
         sta enemy_ram_pc,x ; y dart origin
    	rts
         
+        
 ant_cycle: subroutine
 	lda wtf
         lsr
         lsr
+        and #$3f
+        cmp #$37
+        bcc .normal_walking
+.stop_and_shoot
+	lda wtf
+        lsr
+        and #$01
+        asl
+        clc
+        adc #$e8
+        sta enemy_ram_ac,x
+        lda wtf
+        cmp #$f5
+        bne .dont_advance
+.dart_fire
+        lda enemy_ram_x,x
+        sta collision_0_x
+        lda enemy_ram_pc,x
+        sta collision_0_y
+        jsr dart_spawn
+        ldx enemy_ram_offset
+        ldy enemy_oam_offset
+        bne .dont_advance
+        
+.normal_walking
         and #$03
         asl
         clc
 	adc #$e0
-        sta temp00
+        sta enemy_ram_ac,x
         lda wtf
         and #$03
         bne .dont_advance
@@ -50,12 +77,12 @@ ant_cycle: subroutine
         lda enemy_ram_ex,x
         bne .ceiling_ant
 .dash_ant
-	lda temp00
+	lda enemy_ram_ac,x
         jsr sprite_4_set_sprite
 	lda #$01
         bne .ant_pos_done
 .ceiling_ant
-	lda temp00
+	lda enemy_ram_ac,x
         jsr sprite_4_set_sprite_flip
         lda #$81
 .ant_pos_done
@@ -63,15 +90,6 @@ ant_cycle: subroutine
         sta oam_ram_att+4,y
         sta oam_ram_att+8,y
         sta oam_ram_att+12,y
-.dart_fire
-	lda wtf
-        and #$3f
-        bne .done
-        lda enemy_ram_x,x
-        sta collision_0_x
-        lda enemy_ram_pc,x
-        sta collision_0_y
-        jsr dart_spawn
 .done
 	jmp update_enemies_handler_next
         

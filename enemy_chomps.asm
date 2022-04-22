@@ -57,7 +57,7 @@ chomps_cycle: subroutine
         lsr
         and #$03
         clc
-        adc #$cc
+        adc #$34
         sta oam_ram_spr,y
         
         ; mouth sprite
@@ -66,15 +66,15 @@ chomps_cycle: subroutine
         adc #$d0
         cmp #$80
         bcs .not_closed
-	lda #$dd
+	lda #$38
         bne .sprite_done
 .not_closed
         cmp #$a0
         bcs .half_open
-	lda #$de
+	lda #$48
         bne .sprite_done
 .half_open
-	lda #$df
+	lda #$49
         ;bne .sprite_done
 .sprite_done
         sta oam_ram_spr+4,y
