@@ -37,7 +37,7 @@ ENEMY_HITPOINTS_TABLE:
         byte #$02 ; galger
         byte #$01 ; dart
         byte #$01 ; ant
-        byte #$01 ; throber
+        byte #$09 ; throber
         
         
 ENEMY_PLAYER_POINTS_TABLE:

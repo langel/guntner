@@ -16,7 +16,13 @@ throber_spawn: subroutine
         sta enemy_ram_ex,x
    	rts
         
+        
 throber_cycle: subroutine
+        lda #$10
+        sta collision_0_w
+        sta collision_0_h
+        jsr enemy_handle_damage_and_death
+        
 	inc enemy_ram_pc,x
         lda enemy_ram_pc,x
         lsr
