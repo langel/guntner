@@ -170,9 +170,9 @@ enemy_slot_offset_to_oam_offset:
         ; 1 sprite slots : start at $300
         byte $20,$24,$28,$2c,$30,$34,$38,$3c
         byte $40,$44,$48,$4c,$50,$54,$58,$5c
-        ; 2 sprite slots : start at $390
+        ; 2 sprite slots : start at $380
         byte $60,$68,$70,$78
-        ; 4 sprite slots : start at $3b0
+        ; 4 sprite slots : start at $3a0
         byte $80,$90,$a0,$b0,$c0,$d0,$e0,$f0
         ; null terminater
         byte $00

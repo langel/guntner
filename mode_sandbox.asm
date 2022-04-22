@@ -27,13 +27,13 @@ sandbox_init: subroutine
         
  
         
+        ldx #$80
+        jsr chomps_spawn
+        ldx #$88
+        jsr chomps_spawn
         ldx #$90
         jsr chomps_spawn
         ldx #$98
-        jsr chomps_spawn
-        ldx #$a0
-        jsr chomps_spawn
-        ldx #$a8
         jsr chomps_spawn
         
 	jsr get_enemy_slot_4_sprite

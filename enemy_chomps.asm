@@ -25,21 +25,23 @@ chomps_cycle: subroutine
         jsr enemy_handle_damage_and_death
         
         ; x movement
-        inc enemy_ram_pc,x
+        inc enemy_ram_pc,x ; actualy x origin position
         inc enemy_ram_ac,x
         inc enemy_ram_ac,x
+        lda wtf
+        and #$01
+        bne .no_extra_inc
+        inc enemy_ram_ac,x
+.no_extra_inc
         lda enemy_ram_ac,x
         tax
         lda sine_table,x
-        sta temp00
         lsr
         lsr
         ldx enemy_ram_offset
         clc
         adc enemy_ram_pc,x
         sta enemy_ram_x,x
-        
-        
         
         ; winder sprite
         lda enemy_ram_x,x
@@ -59,29 +61,22 @@ chomps_cycle: subroutine
         sta oam_ram_spr,y
         
         ; mouth sprite
-        lda enemy_ram_pc,x
+        lda enemy_ram_ac,x
         clc
-        adc #$20
-        asl
-        tax
-        lda sine_table,x
-        ldx enemy_ram_offset
-        lsr
-        lsr
-        lsr
-        lsr
-        lsr
-        lsr
-        clc
-        adc #$bc
-        sta oam_ram_spr+4,y
-        
-        
-        bne .frame_done
-        
-        
-        clc 
-        adc #$bc
+        adc #$d0
+        cmp #$80
+        bcs .not_closed
+	lda #$dd
+        bne .sprite_done
+.not_closed
+        cmp #$a0
+        bcs .half_open
+	lda #$de
+        bne .sprite_done
+.half_open
+	lda #$df
+        ;bne .sprite_done
+.sprite_done
         sta oam_ram_spr+4,y
         
 .frame_done
