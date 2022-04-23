@@ -19,7 +19,7 @@
 ; 12 throber
 ; 13 uzi
 ; 14 bullet
-; 15 lariat
+; 15 larsso
 
 ENEMY_HITPOINTS_TABLE:
 	byte #$00
@@ -43,7 +43,7 @@ ENEMY_HITPOINTS_TABLE:
         byte #$80 ; throber
         byte #$20 ; uzi
         byte #$07 ; bullet
-        byte #$20 ; lariat
+        byte #$20 ; larsso
         
         
 ENEMY_PLAYER_POINTS_TABLE:
@@ -69,7 +69,7 @@ ENEMY_PLAYER_POINTS_TABLE:
         byte #$00,#$00,#$00,#$00 ; throber
         byte #$00,#$00,#$00,#$00 ; uzi
         byte #$00,#$00,#$00,#$00 ; bullet
-        byte #$00,#$00,#$00,#$00 ; lariat
+        byte #$00,#$00,#$00,#$00 ; larsso
         
 
 ENEMY_PLAYER_COLLISION_TABLE:
@@ -94,7 +94,7 @@ ENEMY_PLAYER_COLLISION_TABLE:
         byte #$01 ; throber
         byte #$20 ; uzi
         byte #$01 ; bullet
-        byte #$01 ; lariat
+        byte #$01 ; larsso
         
         
         
@@ -120,7 +120,7 @@ enemy_update_table_lo:
         byte <throber_cycle
         byte <uzi_cycle
         byte <bullet_cycle
-        byte <lariat_cycle
+        byte <lasso_cycle
 
 enemy_update_table_hi:
         byte 00 ; should do nothing
@@ -144,6 +144,6 @@ enemy_update_table_hi:
         byte >throber_cycle
         byte >uzi_cycle
         byte >bullet_cycle
-        byte >lariat_cycle
+        byte >lasso_cycle
         
         

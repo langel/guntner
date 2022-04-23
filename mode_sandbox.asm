@@ -97,10 +97,10 @@ sandbox_update: subroutine
 .no_enemy_spawn
 	lda wtf
         bne .no_noose
-	jsr get_enemy_slot_2_sprite
+	jsr get_enemy_slot_4_sprite
         cmp #$ff
         beq .no_noose
-        jsr lariat_spawn
+        jsr lasso_spawn
         
 .no_noose
 	; read user controls even in demo mode!
