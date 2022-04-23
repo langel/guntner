@@ -38,6 +38,7 @@ sandbox_init: subroutine
         
 	jsr get_enemy_slot_4_sprite
         tax
+        jsr uzi_spawn
 	;jsr boss_vamp_spawn
         
 	jsr get_enemy_slot_4_sprite

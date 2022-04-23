@@ -306,6 +306,9 @@ sprite0_done:
 	include "enemy_throber.asm"
         nop	; how much prg space we using?
 
+	include "enemy_uzi.asm"
+        nop	; how much prg space we using?
+
 	include "enemy_zigzag.asm"
         nop	; how much prg space we using?
         

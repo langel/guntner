@@ -17,6 +17,8 @@
 ; 10 dart
 ; 11 ant
 ; 12 throber
+; 13 uzi
+; 14 bullet
 
 ENEMY_HITPOINTS_TABLE:
 	byte #$00
@@ -38,6 +40,8 @@ ENEMY_HITPOINTS_TABLE:
         byte #$01 ; dart
         byte #$01 ; ant
         byte #$80 ; throber
+        byte #$20 ; uzi
+        byte #$07 ; bullet
         
         
 ENEMY_PLAYER_POINTS_TABLE:
@@ -61,6 +65,8 @@ ENEMY_PLAYER_POINTS_TABLE:
         byte #$00,#$00,#$00,#$00 ; dart
         byte #$00,#$00,#$00,#$00 ; ant
         byte #$00,#$00,#$00,#$00 ; throber
+        byte #$00,#$00,#$00,#$00 ; uzi
+        byte #$00,#$00,#$00,#$00 ; bullet
         
 
 ENEMY_PLAYER_COLLISION_TABLE:
@@ -83,6 +89,8 @@ ENEMY_PLAYER_COLLISION_TABLE:
         byte #$20 ; dart
         byte #$20 ; ant
         byte #$01 ; throber
+        byte #$20 ; uzi
+        byte #$01 ; bullet
         
         
         
@@ -106,6 +114,8 @@ enemy_update_table_lo:
         byte <dart_cycle
         byte <ant_cycle
         byte <throber_cycle
+        byte <uzi_cycle
+        byte <bullet_cycle
 
 enemy_update_table_hi:
         byte 00 ; should do nothing
@@ -127,5 +137,7 @@ enemy_update_table_hi:
         byte >dart_cycle
         byte >ant_cycle
         byte >throber_cycle
+        byte >uzi_cycle
+        byte >bullet_cycle
         
         
