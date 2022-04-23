@@ -28,6 +28,7 @@ dart_spawn: subroutine
         clc
         adc #$b0
         sta oam_ram_spr,y
+        ; XXX trigger sfx?
 .done
 	rts
 
@@ -55,7 +56,6 @@ dart_cycle: subroutine
         adc #$02
         sta collision_0_y
         jsr player_collision_detect
-        cmp #$00
         beq .no_collision
         lda #4
         sta player_damage

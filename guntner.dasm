@@ -284,15 +284,15 @@ sprite0_done:
         nop	; how much prg space we using?
 	include "enemy_chomps.asm"
         nop	; how much prg space we using?
-        
 	include "enemy_dart.asm"
         nop	; how much prg space we using?
-
 	include "enemy_dumbface.asm"
         nop
 	include "enemy_galger.asm"
         nop
 	include "enemy_maggs.asm"
+        nop	; how much prg space we using?
+	include "enemy_lariat.asm"
         nop	; how much prg space we using?
 	include "enemy_skeet.asm"
         nop	; how much prg space we using
@@ -302,13 +302,10 @@ sprite0_done:
         nop	; how much prg space we using?
 	include "enemy_starglasses.asm"
         nop	; how much prg space we using?
-        
 	include "enemy_throber.asm"
         nop	; how much prg space we using?
-
 	include "enemy_uzi.asm"
         nop	; how much prg space we using?
-
 	include "enemy_zigzag.asm"
         nop	; how much prg space we using?
         
@@ -352,7 +349,7 @@ sprite0_done:
 	include "tables_at_top_of_rom.asm"
         nop	; how much prg space we using?
 
-.	byte "hello n00b good for you"
+.	byte "hello n00b good for you n00b n0b"
         nop	; how much prg space we using?
 
 ;;;;; CPU VECTORS
