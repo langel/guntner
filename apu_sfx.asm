@@ -1,4 +1,4 @@
-; these should only use Pulse 2 and Noise channels
+	; these should only use Pulse 2 and Noise channels
 ; unless its a non-music moment (like player death)
 
 
@@ -50,6 +50,8 @@ sfx_test_table_lo:
         .byte #<sfx_powerup_battery_25
         .byte #<sfx_powerup_battery_50
         .byte #<sfx_powerup_battery_100
+        .byte #<sfx_shoot_dart
+        .byte #<sfx_shoot_bullet
 sfx_test_table_hi:
 	; XXX can probably remove this table
         ;     get all subroutines on same page
@@ -66,6 +68,8 @@ sfx_test_table_hi:
         .byte #>sfx_powerup_battery_25
         .byte #>sfx_powerup_battery_50
         .byte #>sfx_powerup_battery_100
+        .byte #>sfx_shoot_dart
+        .byte #>sfx_shoot_bullet
 
 ; sound test 00
 sfx_pewpew: subroutine
@@ -372,4 +376,37 @@ sfx_powerup_battery_update: subroutine
 .end_sound
 	lda #$00
         sta sfx_pu2_update_type
+        rts
+
+; sound test 0c
+sfx_shoot_dart: subroutine
+	; pulse 2
+	lda #%00001111
+        sta $4000
+        lda #%10000011
+        sta $4001
+        lda rng0
+        and #$3f
+        ora #$08
+        sta $4002
+        lda #%00001000
+        sta $4003
+        lda #$10
+        sta sfx_pu2_counter
+	rts
+        
+; sound test 0d
+sfx_shoot_bullet: subroutine
+	lda #%00011111
+        sta apu_cache+$c
+        lda wtf
+        and #$03
+        clc
+        adc #$09
+        sta apu_cache+$e
+	lda #$04
+        sta apu_noi_envelope
+        lda #$20
+        sta apu_noi_counter
+        rts
         rts

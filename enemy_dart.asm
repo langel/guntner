@@ -29,6 +29,7 @@ dart_spawn: subroutine
         adc #$b0
         sta oam_ram_spr,y
         ; XXX trigger sfx?
+        jsr sfx_shoot_dart
 .done
 	rts
 
