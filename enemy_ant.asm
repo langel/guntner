@@ -39,15 +39,28 @@ ant_cycle: subroutine
         cmp #$37
         bcc .normal_walking
 .stop_and_shoot
+	; frames default to spazzing
+        ; frames f0-f5 butt up
+        ; frame f5 shoot dart
+        ; frames f6-ff butt down
 	lda wtf
+        cmp #$f9
+        bcs .butt_down
+        cmp #$f8
+        bcs .dart_fire
+        cmp #$f0
+        bcs .butt_up
+.butt_shake
         lsr
         and #$01
         asl
         clc
         adc #$e8
         sta enemy_ram_ac,x
-        lda wtf
-        cmp #$f5
+        bne .dont_advance
+.butt_up
+	lda #$ea
+        sta enemy_ram_ac,x
         bne .dont_advance
 .dart_fire
         lda enemy_ram_x,x
@@ -57,6 +70,10 @@ ant_cycle: subroutine
         jsr dart_spawn
         ldx enemy_ram_offset
         ldy enemy_oam_offset
+        bne .dont_advance
+.butt_down
+	lda #$e8
+        sta enemy_ram_ac,x
         bne .dont_advance
         
 .normal_walking
