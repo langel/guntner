@@ -292,7 +292,7 @@ sprite0_done:
         nop
 	include "enemy_maggs.asm"
         nop	; how much prg space we using?
-	include "enemy_lariat.asm"
+	include "enemy_lasso.asm"
         nop	; how much prg space we using?
 	include "enemy_skeet.asm"
         nop	; how much prg space we using
@@ -333,7 +333,7 @@ sprite0_done:
 	include "apu_sfx.asm"
         nop	; how much prg space we using?
 
-
+;f6e3 - ant/lasso/throber/uzi
 ;f37d - new audio engine and powerup sfx
 ;f162 - rewrote player movement
 ;f258 - powerups done except sfx
