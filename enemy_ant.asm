@@ -20,7 +20,7 @@ ant_spawn: subroutine
 	sta enemy_ram_ex,x
 	lda #$06
         sta enemy_ram_y,x ; y ant pos
-        lda #$0e
+        lda #$0c
         sta enemy_ram_pc,x ; y dart origin
    	rts
 .ceiling_ant
@@ -40,9 +40,9 @@ ant_cycle: subroutine
         bcc .normal_walking
 .stop_and_shoot
 	; frames default to spazzing
-        ; frames f0-f5 butt up
-        ; frame f5 shoot dart
-        ; frames f6-ff butt down
+        ; frames f0-f8 butt up
+        ; frame f8 shoot dart
+        ; frames f9-ff butt down
 	lda wtf
         cmp #$f9
         bcs .butt_down
