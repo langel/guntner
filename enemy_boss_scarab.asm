@@ -106,12 +106,12 @@ boss_scarab_cycle: subroutine
         
 ; WINGS
 	; twitch offset
-        lda wtf
-        lsr
-        and #$01
-        sta temp01
         lda rng0
-        and #$01
+        lsr
+        and #$03
+        sta temp01
+        lda rng1
+        and temp01
         sta temp02
         
 	; top middle
