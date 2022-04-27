@@ -2,8 +2,6 @@
 	
 spawning refactor
 	phase method to spawn formations
-remove enemy_get_damage_this_frame
-ant shoots dart from butt 
 sprite stars handled by enemy_handler?
 scroll_x_hi & scroll_x_lo
 	
@@ -28,18 +26,17 @@ Things left to program:
 		-done- Bomb
 	Music Generation
 	Enemies
-		Ceil/Floor Bugs
 		Ike's Mom
 		Shake Off Amoeba
 		
 	Bosses:
 		Skully (follows)
 		Invisible Swordsman
+		--done--Scarab Beetle
 		--done--Galactic Space Vampire
 		Xyzkyquf (spell?!)
 		
 	REFACTORS:
-		arctang variable velocities
 		player movement shrinkage with tables
 		sfx jump table 
 
@@ -54,7 +51,7 @@ top tier puke's little helpers
 Alan Berndt (BGT) - discord
 	sprites (throber and elephant)
 Douglas Glover - discord DM
-	bomb and shield powerups
+	bomb and shield powerups (and firing mah laser?)
 Caylen Williams - email
 	SWORDTNER!!
 Nadiim 'Dimo' Nafei - kickstarter messages + discord DM
