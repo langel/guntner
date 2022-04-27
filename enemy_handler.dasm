@@ -415,6 +415,8 @@ enemy_handle_damage_and_death: subroutine
         adc #$08
         cmp #$e0
         bne .boss_dead_kill_all
+        lda #$00
+        sta boss_dmg_handle_true
 .not_boss_death
 	; handle point bonus
 	lda enemy_ram_type,x

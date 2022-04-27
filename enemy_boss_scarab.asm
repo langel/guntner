@@ -109,10 +109,10 @@ boss_scarab_cycle: subroutine
         lda rng0
         lsr
         and #$03
-        sta temp01
+        sta temp01 ; x offset
         lda rng1
         and temp01
-        sta temp02
+        sta temp02 ; y offset
         
 	; top middle
 	lda #$10
@@ -128,7 +128,7 @@ boss_scarab_cycle: subroutine
         jsr sprite_4_set_x
         lda state_v5
         sec
-        sbc #$d
+        sbc #$c
         sbc temp02
         jsr sprite_4_set_y
         lda #$80
@@ -143,7 +143,7 @@ boss_scarab_cycle: subroutine
         jsr sprite_4_set_x
         lda state_v5
         sec
-        sbc #$1d
+        sbc #$1c
         sbc temp02
         jsr sprite_4_set_y
         lda #$60
@@ -158,7 +158,7 @@ boss_scarab_cycle: subroutine
         jsr sprite_4_set_x
         lda state_v5
         clc
-        adc #$d
+        adc #$c
         adc temp02
         jsr sprite_4_set_y
         lda #$80
@@ -173,7 +173,7 @@ boss_scarab_cycle: subroutine
         jsr sprite_4_set_x
         lda state_v5
         clc
-        adc #$1d
+        adc #$1c
         adc temp02
         jsr sprite_4_set_y
         lda #$60
@@ -216,8 +216,7 @@ boss_scarab_cycle: subroutine
         sta state_v1
 .dont_change_freq
 	lda wtf
-        ;and state_v1
-        and #$03
+        and state_v1
         bne .done
         
 .dart_fire
