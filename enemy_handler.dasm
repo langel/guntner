@@ -337,58 +337,6 @@ enemy_give_points: subroutine
         ldy temp01
         rts
 
-                
-enemy_get_damage_this_frame: subroutine
-	; x = enemy ram offset
-        ; y = oam ram offset
-	lda #$00
-        sta enemy_dmg_accumulator
-; handle bullet collisions
-        jsr player_bullet_collision_handler
-	jsr player_collision_detect
-        beq .no_collision
-; handle player collision
-	; player damage
-        ldy enemy_ram_type,x
-        lda ENEMY_PLAYER_COLLISION_TABLE,y
-        ldy enemy_ram_ex,x
-        sta player_damage
-        jsr player_take_damage
-        jsr sfx_player_damage
-	lda enemy_dmg_accumulator
-        clc
-        adc #$02
-        sta enemy_dmg_accumulator
-.no_collision
-; handle bomb explosion
-        lda bomb_counter
-        beq .no_bomb_damage
-        lda wtf
-        and #1
-        beq .no_bomb_damage
-        inc enemy_dmg_accumulator
-.no_bomb_damage
-	; fix y register
-	ldy enemy_oam_offset
-; handle damage accumulated
-        lda enemy_dmg_accumulator
-        bne .hit
-	lda enemy_ram_hp,x
-        rts
-.hit
-        lda #ENEMY_HIT_PALETTE_FRAMES
-	sta enemy_ram_hc,x
-	jsr sfx_enemy_damage
-	lda enemy_ram_hp,x
-        sec
-        sbc enemy_dmg_accumulator
-        bcc .dead
-        sta enemy_ram_hp,x
-        rts
-.dead
-     	lda #$00
-        rts
-        
         
         
 enemy_handle_damage_and_death: subroutine

@@ -34,22 +34,9 @@ boss_vamp_bat_cycle: subroutine
         lda #$08
         sta collision_0_w
         sta collision_0_h
-        jsr enemy_get_damage_this_frame
-        cmp #$00
-        bne .not_dead
-.is_dead
-	inc phase_kill_count
         
-        lda enemy_ram_type,x
-        jsr enemy_give_points
+        jsr enemy_handle_damage_and_death
         
-        ; change it into crossbones!
-        jsr sfx_enemy_death
-        lda #$01
-	ldx enemy_ram_offset
-        sta enemy_ram_type,x
-        jmp .done
-.not_dead
 	lda state_v5
         cmp #$00
         beq .bats_not_visible
@@ -454,49 +441,11 @@ boss_vamp_cycle: subroutine
         sta collision_0_w
         lda #$10
         sta collision_0_h
-        jsr enemy_get_damage_this_frame
-        ; XXX this has been rewritten?
-        cmp #$00
-        bne .not_dead
         
-.is_dead       
-	; kill bats if visible
-	lda state_v5 
-        cmp #$01
-        bne .dont_kill_bats
-        ; setup bat killing loop
-        lda #$00
-        sta temp00
-.bat_kill_loop
-	ldx temp00
-        lda enemy_ram_type,x
-        cmp #$09
-        bne .dont_kill_bat
-        lda #$01
-        sta enemy_ram_type,x
-.dont_kill_bat
-        lda #$08
-        clc
-        adc temp00
-        sta temp00
-        cmp #$68
-        bne .bat_kill_loop
-.dont_kill_bats
-	inc phase_kill_count
-	; give points
-        lda enemy_ram_type,x
-        jsr enemy_give_points
-        ; move eyes sprite offscreen
-	ldx #$fc
-        lda #$ff
-        sta oam_ram_y,x
-        ; change it into crossbones!
-        jsr sfx_enemy_death
-        lda #$01
-	ldx enemy_ram_offset
-        sta enemy_ram_type,x
-        ;jmp sprite_4_cleanup_for_next
-.not_dead    
+        inc boss_dmg_handle_true
+        jsr enemy_handle_damage_and_death
+        dec boss_dmg_handle_true
+        
 
 	; MOUTH HANDLER
 ; state_v7 : mouth frame current

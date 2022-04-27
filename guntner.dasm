@@ -336,6 +336,7 @@ sprite0_done:
 	include "apu_sfx.asm"
         nop	; how much prg space we using?
 
+;f7e3 - scarab boss
 ;f6e3 - ant/lasso/throber/uzi
 ;f37d - new audio engine and powerup sfx
 ;f162 - rewrote player movement
