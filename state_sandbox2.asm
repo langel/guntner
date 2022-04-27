@@ -20,16 +20,16 @@ sandbox2_init: subroutine
         tax
 	;jsr boss_vamp_spawn
         ldx #$d0
-        jsr ant_spawn
+        ;jsr ant_spawn
         
 	jsr get_enemy_slot_4_sprite
         tax
         ldx #$d8
-        jsr ant_spawn
+       ; jsr ant_spawn
         
 	jsr get_enemy_slot_4_sprite
         tax
-        jsr throber_spawn
+        ;jsr throber_spawn
         
         jsr sandbox2_phase_next
         

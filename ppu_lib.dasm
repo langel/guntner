@@ -21,6 +21,9 @@ ClearRAM: subroutine
         rts
 
 
+do_nothing: subroutine
+	rts
+
 ; disable PPU drawing and NMI
 render_enable:
         lda #MASK_BG|MASK_SPR

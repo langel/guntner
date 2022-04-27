@@ -122,6 +122,7 @@ enemy_slot_1_next	byte
 enemy_slot_2_next	byte
 enemy_slot_4_next	byte
 enemy_dmg_accumulator	byte
+boss_dmg_handle_true	byte
 boss_x		byte
 boss_y		byte
 

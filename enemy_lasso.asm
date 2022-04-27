@@ -69,11 +69,11 @@ lasso_cycle: subroutine
         jsr enemy_handle_damage_and_death
         
         ; sprites
-        lda #$58
+        lda #$59
         sta oam_ram_spr,y
-        lda #$68
+        lda #$69
         sta oam_ram_spr+4,y
-        lda #$78
+        lda #$6a
         sta oam_ram_spr+8,y
         sta oam_ram_spr+$c,y
         

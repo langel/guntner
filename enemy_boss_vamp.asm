@@ -455,6 +455,7 @@ boss_vamp_cycle: subroutine
         lda #$10
         sta collision_0_h
         jsr enemy_get_damage_this_frame
+        ; XXX this has been rewritten?
         cmp #$00
         bne .not_dead
         

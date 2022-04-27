@@ -34,7 +34,7 @@ uzi_cycle: subroutine
         sta enemy_ram_y,x
         jsr sprite_4_set_y
 ; sprite
-        lda #$be
+        lda #$ec
         jsr sprite_4_set_sprite
 ; palette
 	lda #$01
@@ -110,7 +110,7 @@ bullet_cycle: subroutine
 	lda wtf
         and #$01
         clc
-        adc #$de
+        adc #$ee
         sta oam_ram_spr,y
         lda enemy_ram_x,x
         adc #$03

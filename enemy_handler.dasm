@@ -100,6 +100,22 @@ sprite_4_set_y: subroutine
 	sta oam_ram_y+12,y
 	rts
         
+sprite_4_dead_cleanup: subroutine
+	lda #$04 ; move first sprite over 4 pixels
+        clc
+	adc oam_ram_x,y
+        sta oam_ram_x,y
+	lda #$04 ; move first sprite down 3 pixels
+        clc
+        adc oam_ram_y,y
+        sta oam_ram_y,y
+        ; move other sprites off screen
+	lda #$ff
+        sta oam_ram_y+4,y
+        sta oam_ram_y+8,y
+        sta oam_ram_y+12,y
+        rts
+        
 
 enemy_fix_y_visible: subroutine
 	; a = y position to check
@@ -283,7 +299,7 @@ crossbones_cycle: subroutine
         lda oam_ram_y,y
         sec
         sbc enemy_ram_y,x
-        bcc .crossbones_death
+        bmi .crossbones_death
         sta oam_ram_y,y
         lda #$0b
         sta oam_ram_spr,y
@@ -298,7 +314,7 @@ crossbones_cycle: subroutine
         
   
 
-        
+; XXX this seems to be included below    
 enemy_give_points: subroutine
         ; a = enemy type
         stx temp00
@@ -423,8 +439,35 @@ enemy_handle_damage_and_death: subroutine
 	jsr sfx_enemy_damage
         rts
 .dead
+	; XXX should only do this on smaller enemies
 	inc phase_kill_count
         jsr sfx_enemy_death
+        ; boss death check
+        lda boss_dmg_handle_true
+        beq .not_boss_death
+        lda #$00
+.boss_dead_kill_all
+	tax
+        lda #$01
+        sta enemy_ram_type,x
+        txa
+	cmp #$a0
+        bcc .not_4_sprites
+        sta temp00
+        lsr
+        lsr
+        lsr
+        tax
+        ldy enemy_slot_offset_to_oam_offset,x
+        ldx temp00
+        jsr sprite_4_dead_cleanup
+        lda temp00
+.not_4_sprites
+        clc
+        adc #$08
+        cmp #$e0
+        bne .boss_dead_kill_all
+.not_boss_death
 	; handle point bonus
 	lda enemy_ram_type,x
         asl
@@ -446,19 +489,7 @@ enemy_handle_damage_and_death: subroutine
 ; 4 sprite cleanup
 	cpx #$80
         bcc .not_4_sprite
-	lda #$04 ; move first sprite over 4 pixels
-        clc
-	adc oam_ram_x,y
-        sta oam_ram_x,y
-	lda #$04 ; move first sprite down 3 pixels
-        clc
-        adc oam_ram_y,y
-        sta oam_ram_y,y
-        ; move other sprites off screen
-	lda #$ff
-        sta oam_ram_y+4,y
-        sta oam_ram_y+8,y
-        sta oam_ram_y+12,y
+        jsr sprite_4_dead_cleanup
 .not_4_sprite
 ; starglasses 
         lda enemy_ram_type,x
@@ -633,7 +664,7 @@ get_enemy_slot_next: subroutine
         lda temp00
         sec
         sbc #$08
-        bmi .slot_loop
+        bcs .slot_loop
 .no_slot
 	ldx #$ff
 .slot_found

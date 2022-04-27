@@ -20,6 +20,8 @@
 ; 13 uzi
 ; 14 bullet
 ; 15 larsso
+; 16 scarab
+; 17 do-nothing
 
 ENEMY_HITPOINTS_TABLE:
 	byte #$00
@@ -44,6 +46,8 @@ ENEMY_HITPOINTS_TABLE:
         byte #$20 ; uzi
         byte #$07 ; bullet
         byte #$20 ; larsso
+        byte #$40 ; scarab
+        byte #$00 ; do-nothing
         
         
 ENEMY_PLAYER_POINTS_TABLE:
@@ -70,6 +74,8 @@ ENEMY_PLAYER_POINTS_TABLE:
         byte #$00,#$00,#$00,#$00 ; uzi
         byte #$00,#$00,#$00,#$00 ; bullet
         byte #$00,#$00,#$00,#$00 ; larsso
+        byte #$00,#$00,#$00,#$00 ; scarab
+        byte #$00,#$00,#$00,#$00 ; do-nothing
         
 
 ENEMY_PLAYER_COLLISION_TABLE:
@@ -95,11 +101,13 @@ ENEMY_PLAYER_COLLISION_TABLE:
         byte #$20 ; uzi
         byte #$01 ; bullet
         byte #$01 ; larsso
+        byte #$20 ; scarab
+        byte #$00 ; do-nothing
         
         
         
 enemy_update_table_lo:
-        byte 00 ; should do nothing
+        byte 00 ; null enemy type
         byte <crossbones_cycle    
         byte <birb_cycle
         byte <maggs_cycle
@@ -121,9 +129,11 @@ enemy_update_table_lo:
         byte <uzi_cycle
         byte <bullet_cycle
         byte <lasso_cycle
+        byte <boss_scarab_cycle
+        byte <do_nothing
 
 enemy_update_table_hi:
-        byte 00 ; should do nothing
+        byte 00 ; null enemy type
         byte >crossbones_cycle    
         byte >birb_cycle
         byte >maggs_cycle
@@ -145,5 +155,7 @@ enemy_update_table_hi:
         byte >uzi_cycle
         byte >bullet_cycle
         byte >lasso_cycle
+        byte >boss_scarab_cycle
+        byte >do_nothing
         
         

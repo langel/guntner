@@ -1,4 +1,7 @@
 
+; set velocity after calling spawn with :
+;	lda #<arctang_velocity_3.33
+;	sta enemy_ram_pc,x
         
 
 dart_spawn: subroutine
@@ -13,22 +16,34 @@ dart_spawn: subroutine
         lda #0
         sta enemy_ram_x,x ; sub pixel pos
         sta enemy_ram_y,x ; sub pixel pos
+        ;sta enemy_ram_pc,x
+        ; velocity
+        lda #<arctang_velocity_3.33
         sta enemy_ram_pc,x
-        lda #3
-        sta enemy_ram_ac,x ; velocity id
+        ; get y register and set origin
         jsr get_oam_offset_from_slot_offset
         lda collision_0_x
         sta oam_ram_x,y
         lda collision_0_y
         sta oam_ram_y,y
         jsr enemy_get_direction_of_player
+        ; stash x
+        stx temp00
+        ; sprite
         sta enemy_ram_ex,x
         tax
         lda dart_direction_to_sprite_table,x
         clc
-        adc #$b0
+        adc #$b9
         sta oam_ram_spr,y
-        ; XXX trigger sfx?
+        ; attributes
+        lda dart_direction_to_attribute_table,x
+        clc
+        adc #$01
+        sta oam_ram_att,y
+        ; pull x
+        ldx temp00
+        ; sfx
         jsr sfx_shoot_dart
 .done
 	rts
@@ -73,16 +88,9 @@ dart_cycle: subroutine
         bcs .despawn
         
 	; handle direction movement
-        lda #<arctang_velocity_3.33
+        lda enemy_ram_pc,x
         sta arctang_velocity_lo
 	jsr enemy_update_arctang_path
-        ; attributes
-        lda enemy_ram_ex,x
-        tax
-        lda dart_direction_to_attribute_table,x
-        clc
-        adc #$01
-        sta oam_ram_att,y
         
 .done	
 	jmp update_enemies_handler_next

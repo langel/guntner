@@ -28,14 +28,15 @@ sandbox_init: subroutine
  
         
         ldx #$80
-        jsr chomps_spawn
+        ;jsr chomps_spawn
         ldx #$88
-        jsr chomps_spawn
+        ;jsr chomps_spawn
         
 	jsr get_enemy_slot_4_sprite
         tax
-        jsr uzi_spawn
+        ;jsr uzi_spawn
 	;jsr boss_vamp_spawn
+        jsr boss_scarab_spawn
         
 	jsr get_enemy_slot_4_sprite
         tax
@@ -46,25 +47,25 @@ sandbox_init: subroutine
         
 	jsr get_enemy_slot_4_sprite
         tax
-        jsr ant_spawn
+        ;jsr ant_spawn
         
 	jsr get_enemy_slot_4_sprite
         tax
-        jsr ant_spawn
+        ;jsr ant_spawn
         
 	jsr get_enemy_slot_4_sprite
         tax
         ldx #$c8
-        jsr throber_spawn
+        ;jsr throber_spawn
         
         ;lda #$40
         lda #$ff
         sta player_health
         ; XXX for vamp testing
         lda #$f0
-        sta player_x_hi
+        ;sta player_x_hi
         lda #$08
-        sta player_y_hi
+        ;sta player_y_hi
         
 	;jsr get_enemy_slot_1_sprite
         ;tax
@@ -100,7 +101,7 @@ sandbox_update: subroutine
 	jsr get_enemy_slot_4_sprite
         cmp #$ff
         beq .no_noose
-        jsr lasso_spawn
+        ;jsr lasso_spawn
         
 .no_noose
 	; read user controls even in demo mode!
