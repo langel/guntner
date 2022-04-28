@@ -43,6 +43,10 @@ cart_start:	subroutine
         ; set hud y pos
         lda #182
         sta sprite_0_y
+        lda #0
+        sec
+        sbc sprite_0_y
+        sta sprite_0_y_diff
         
         jsr sine_init
         
@@ -78,8 +82,8 @@ cart_start:	subroutine
         ;sta game_mode
         
         ;jsr options_screen_init
-        jsr sandbox_init
-   	;jsr sandbox2_init
+        ;jsr sandbox_init
+   	jsr sandbox2_init
         
         ; XXX why does this need to exist here?
         ;     shouldn't render_enable handle this?

@@ -41,7 +41,9 @@ sandbox2_phase_next: subroutine
         ; enemy spawn decounter
         lda #16
         sta state_v5
-        lda #0
+        lda #01
+        sta state_v6 ; sequence id
+        lda #$00
         sta phase_kill_count
         sta phase_state
 	rts
@@ -54,12 +56,13 @@ sandbox2_update: subroutine
         and #$07
         bne .dont_spawn
         lda state_v5
-        cmp #0
         beq .dont_spawn
         jsr get_enemy_slot_1_sprite
         cmp #$ff
         beq .dont_spawn
         jsr galger_spawn
+        lda #$00
+        sta enemy_ram_ac,x
         dec state_v5
 .dont_spawn
         

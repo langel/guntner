@@ -40,14 +40,28 @@ arc_leg_speed_dec	EQU	$407
 ; how many legs : 6		<-- saved in ex
 ; initial arc position: $c0	<-- saved in pattern counter
 
-arc_sqeuence_00:
+; height of playfield = 182px
+
+arc_sequence_begin:
+	byte	  #0, #6,
+arc_sequence_end:
+	byte	  #5, #7, #8,
+arc_sequence_x_origin:
+	byte	#160,  #232,
+arc_sequence_y_origin:
+	byte	#236,  #148,
+arc_sequences:
 ; subtract with adding
+	; sequence 00
 	.byte	#160, #236,  #96,  #96, $80, $80, $3, $0
 	.byte	 #38,  #80,  #24,  #16, $00, $00, $7, $0
 	.byte	#252,   #0,  #32,  #32, $00, $80, $6, $0
 	.byte	#240, #240,  #64,  #48, $00, $00, $5, $0
 	.byte	  #0,   #0,  #64,  #60, $00, $80, $4, $0
 	.byte	#240,  #60,  #96,  #52, $80, $c0, $0, $3
+	; sequence 01
+        byte    #48,  #0,  #64, #242, $00, $80, $0, $2
+        byte	#212, #160, #160,  #80, $00, $02, $0, $2
         
         
 galger_spawn: subroutine
@@ -58,11 +72,12 @@ galger_spawn: subroutine
         lda ENEMY_HITPOINTS_TABLE,y
         sta enemy_ram_hp,x 
         ; arc system setup
-        lda #$05
+        ldy state_v6
+        lda arc_sequence_begin,y
         sta enemy_ram_ex,x
-        lda #108
+        lda arc_sequence_x_origin,y
         sta enemy_ram_x,x
-        lda #225
+        lda arc_sequence_y_origin,y
         sta enemy_ram_y,x
         lda #$c0
         sta enemy_ram_pc,x 
@@ -78,10 +93,9 @@ galger_cycle: subroutine
         jsr enemy_handle_damage_and_death
         
 	; time to shoot a dart?
-	inc enemy_ram_ac,x
+        inc enemy_ram_ac,x
         lda enemy_ram_ac,x
         and #$3f
-        cmp #$00
         bne .dont_fire
 .dart_fire
 	lda oam_ram_x,y
@@ -95,7 +109,11 @@ galger_cycle: subroutine
         
 	jsr arc_leg
         ; current sprite
-        lda #$7f
+        lda wtf
+        and #$01
+        clc
+        ; XXX dunno if animation is good here
+        adc #$7e
         sta oam_ram_spr,y
         ; do palette
         lda enemy_ram_pc,x
@@ -126,24 +144,44 @@ arc_leg: subroutine
         
         ; set y position
         lda enemy_ram_pc,x
-        sta temp00
         clc
         adc #$c0
         sta temp00
         lda arc_leg_y_scale,x
         ldx temp00
         jsr sine_of_scale
+        
         ldx enemy_ram_offset
         clc
         adc enemy_ram_y,x
         sta oam_ram_y,y
         
+        cmp #240
+        bcc .y_under_240
+        sec
+        sbc sprite_0_y_diff
+        sta oam_ram_y,y
+        lda enemy_ram_y,x
+        sec
+        sbc sprite_0_y_diff
+        sta enemy_ram_y,x
+        bcs .y_check_done
+.y_under_240
+	cmp sprite_0_y
+        bcc .y_check_done
+        clc
+        adc sprite_0_y_diff
+        sta oam_ram_y,y
+        lda enemy_ram_y,x
+        clc
+        adc sprite_0_y_diff
+        sta enemy_ram_y,x
+.y_check_done
+        
         ; forward arc position
         lda arc_leg_arc_target,x
-        cmp #$00
         bne .non_12_oclock_target
         lda arc_leg_speed_inc,x
-        cmp #$00
         beq .speed_dec_12oclock
 .speed_inc_12oclock
         clc
@@ -178,36 +216,37 @@ arc_leg: subroutine
         rts
         
 .next_leg
-arc_leg_init:
-	; increase arc leg id
-        inc enemy_ram_ex,x
-        lda #$06 ; temp value should be stashed somewhere!?!?
+	lda state_v6 ; arc sequence id
+        tay
+	inc enemy_ram_ex,x
+        lda arc_sequence_end,y
         cmp enemy_ram_ex,x
-        bne .dont_wrap
-        lda #$00
+        bcs .dont_wrap_sequence
+        lda arc_sequence_begin,y
         sta enemy_ram_ex,x
-.dont_wrap
+.dont_wrap_sequence
+arc_leg_init:
 	lda enemy_ram_ex,x
 	; update arc data in enemy slot
         asl
         asl
         asl
         tay
-        lda arc_sqeuence_00,y
+        lda arc_sequences,y
         sta arc_leg_x_offset,x
-        lda arc_sqeuence_00+1,y
+        lda arc_sequences+1,y
         sta arc_leg_y_offset,x
-        lda arc_sqeuence_00+2,y
+        lda arc_sequences+2,y
         sta arc_leg_x_scale,x
-        lda arc_sqeuence_00+3,y
+        lda arc_sequences+3,y
         sta arc_leg_y_scale,x
-        lda arc_sqeuence_00+4,y
+        lda arc_sequences+4,y
         sta arc_leg_arc_offset,x
-        lda arc_sqeuence_00+5,y
+        lda arc_sequences+5,y
         sta arc_leg_arc_target,x
-        lda arc_sqeuence_00+6,y
+        lda arc_sequences+6,y
         sta arc_leg_speed_inc,x
-        lda arc_sqeuence_00+7,y
+        lda arc_sequences+7,y
         sta arc_leg_speed_dec,x
         ldy enemy_oam_offset
 	; update x origin
