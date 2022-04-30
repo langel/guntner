@@ -33,6 +33,11 @@ sandbox2_init: subroutine
         
         jsr sandbox2_phase_next
         
+        lda #<sandbox2_phase_next
+        sta starfield_msg_return_lo
+        lda #>sandbox2_phase_next
+        sta starfield_msg_return_hi
+        
 	rts
         
         

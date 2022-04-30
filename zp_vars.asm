@@ -113,6 +113,9 @@ state_render_addr_hi	byte
 state_update_addr_lo	byte
 state_update_addr_hi	byte
 
+starfield_msg_return_lo	byte
+starfield_msg_return_hi byte
+
 nametable_tile_planter_addr_lo	byte
 nametable_tile_planter_addr_hi	byte
 

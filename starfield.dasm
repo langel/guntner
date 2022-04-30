@@ -610,6 +610,9 @@ starfield_sprmsg_table:
         .byte "         Another PHASE          "	; 2100
         .byte "       C O M P L E T E D        "	; 2140
         .byte "       how did you do it?       "	; 2180
+        .byte "         PHASES 0x              "	; 2100
+        .byte "       C O M P L E T E D        "	; 2140
+        .byte "        please clap             "	; 2180
 starfield_sprmsg_rows_table_hi:
 	.byte $21, $21, $21
 starfield_sprmsg_rows_table_lo:
@@ -793,7 +796,7 @@ starfield_spr2bg_update: subroutine
 .goto_next_state
         lda #0
         sta starfield_state ; starfield_bg_update
-        ; XXX these needs to be more generic/abstract
+        jmp (starfield_msg_return_lo)
         jsr sandbox2_phase_next
 .done
         rts
