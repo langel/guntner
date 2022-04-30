@@ -8,9 +8,15 @@ dart_spawn: subroutine
 ; put x,y origin in:
 ;	collision_0_x
 ;	collision_0_y
+.checks
+	; dart_frame_max is set at top of enemy_handler
+        lda dart_frame_max
+        beq .done
+        dec dart_frame_max
         jsr get_enemy_slot_next
         cpx #$ff
         beq .done
+.spawn
 	lda #$10
         sta enemy_ram_type,x
         lda #0

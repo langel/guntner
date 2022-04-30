@@ -1,21 +1,4 @@
 
-        
-        
-; arc_leg properties
-; x offset from previous, y offset from previous
-; x origin, y origin, x scale, y scale
-; arc origin... or is it arc offset?
-
-; arc target, direction/speed
-
-arc_leg_x_offset	EQU	$400
-arc_leg_y_offset	EQU	$401
-arc_leg_x_scale		EQU	$402
-arc_leg_y_scale		EQU	$403
-arc_leg_arc_offset	EQU	$404
-arc_leg_arc_target	EQU	$405
-arc_leg_speed_inc	EQU	$406
-arc_leg_speed_dec	EQU	$407
 
 ; flight path built on sine table circles
 
@@ -40,16 +23,26 @@ arc_leg_speed_dec	EQU	$407
 ; how many legs : 6		<-- saved in ex
 ; initial arc position: $c0	<-- saved in pattern counter
 
+
+arc_leg_x_offset	EQU	$400
+arc_leg_y_offset	EQU	$401
+arc_leg_x_scale		EQU	$402
+arc_leg_y_scale		EQU	$403
+arc_leg_arc_offset	EQU	$404
+arc_leg_arc_target	EQU	$405
+arc_leg_speed_inc	EQU	$406
+arc_leg_speed_dec	EQU	$407
+
 ; height of playfield = 182px
 
 arc_sequence_begin:
-	byte	  #0, #6,
+	byte	  #0, #6, #8, #9,
 arc_sequence_end:
-	byte	  #5, #7, #8,
+	byte	  #5, #7, #8, #9,
 arc_sequence_x_origin:
-	byte	#160,  #232,
+	byte	#160,  #232,  #0,  #248, 
 arc_sequence_y_origin:
-	byte	#236,  #148,
+	byte	#236,  #148, #50, #102,
 arc_sequences:
 ; subtract with adding
 	; sequence 00
@@ -62,6 +55,10 @@ arc_sequences:
 	; sequence 01
         byte    #48,  #0,  #64, #242, $00, $80, $0, $2
         byte	#212, #160, #160,  #80, $00, $02, $0, $2
+        ; sequence 02
+        byte    #8,  #0, #41, #80, $00, $07, $0, $07
+        ; sequence 03
+        byte	#8, #248, #96, #96, $00, $f9, $06, $0
         
         
 galger_spawn: subroutine
@@ -93,8 +90,11 @@ galger_cycle: subroutine
         jsr enemy_handle_damage_and_death
         
 	; time to shoot a dart?
-        inc enemy_ram_ac,x
-        lda enemy_ram_ac,x
+        ;inc enemy_ram_ac,x
+        ;lda enemy_ram_ac,x
+        lda wtf
+        lda rng0
+        lsr
         and #$3f
         bne .dont_fire
 .dart_fire
