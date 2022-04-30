@@ -41,8 +41,11 @@ sandbox2_phase_next: subroutine
         ; enemy spawn decounter
         lda #16
         sta state_v5
-        lda #03
-        sta state_v6 ; sequence id
+        ; sequence id
+        inc state_v6
+        lda state_v6
+        and #$03
+        sta state_v6
         lda #$00
         sta phase_kill_count
         sta phase_state
