@@ -67,11 +67,15 @@ rng1		byte
 rng2		byte
 
 starfield_state	byte
-starfield_var0	byte
 starfield_col	byte
 starfield_page	byte
 starfield_col0	byte
 starfield_col1	byte
+starfield_trans_frame	byte
+starfield_msg_pos_lo	byte
+starfield_msg_pos_hi	byte
+starfield_msg_return_lo	byte
+starfield_msg_return_hi byte
 
 collision_0_x	byte
 collision_0_y	byte
@@ -113,8 +117,6 @@ state_render_addr_hi	byte
 state_update_addr_lo	byte
 state_update_addr_hi	byte
 
-starfield_msg_return_lo	byte
-starfield_msg_return_hi byte
 
 nametable_tile_planter_addr_lo	byte
 nametable_tile_planter_addr_hi	byte
@@ -128,6 +130,7 @@ phase_temp_addr_hi	byte
 phase_end_game		byte
 
 dart_frame_max		byte
+starglasses_count	byte
 
 enemy_ram_offset	byte
 enemy_oam_offset	byte

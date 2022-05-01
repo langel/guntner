@@ -29,6 +29,7 @@ sandbox2_init: subroutine
         
 	jsr get_enemy_slot_4_sprite
         tax
+        ;jsr boss_scarab_spawn
         ;jsr throber_spawn
         
         jsr sandbox2_phase_next
@@ -54,6 +55,8 @@ sandbox2_phase_next: subroutine
         lda #$00
         sta phase_kill_count
         sta phase_state
+        lda #$0f
+        sta phase_enemy_downcount
 	rts
         
         
@@ -73,6 +76,19 @@ sandbox2_update: subroutine
         sta enemy_ram_ac,x
         dec state_v5
 .dont_spawn
+
+	; starglasses
+        lda starglasses_count
+        bne .starglasses_done
+        lda timer_seconds_1s
+        and #$01
+        bne .starglasses_done
+        lda wtf
+        bne .starglasses_done
+        jsr get_enemy_slot_4_sprite
+        jsr starglasses_spawn
+        inc starglasses_count
+.starglasses_done
         
 	jsr game_update_generic
 	jsr player_move_position
@@ -80,7 +96,9 @@ sandbox2_update: subroutine
         
 	lda phase_kill_count
         cmp #16
-        bne .dont_next_state
+        lda phase_enemy_downcount
+        cmp #$f7
+        bcc .dont_next_state
         ; XXX test line here
         ;jmp .dont_next_state
         jsr get_enemy_slot_1_count
@@ -89,6 +107,12 @@ sandbox2_update: subroutine
         bne .dont_next_state
         inc phase_current
         inc phase_state
+        ; setup msg
+        ldx state_v6
+        lda starfield_msg_table_lo,x
+        sta starfield_msg_pos_lo
+        lda starfield_msg_table_hi,x
+        sta starfield_msg_pos_hi
         jsr starfield_bg2spr_init
 .dont_next_state
         

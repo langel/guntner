@@ -111,7 +111,8 @@ boss_scarab_cycle: subroutine
         and #$03
         sta temp01 ; x offset
         lda rng1
-        and temp01
+        and #$03
+        ora temp01
         sta temp02 ; y offset
         
 	; top middle

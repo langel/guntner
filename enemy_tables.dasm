@@ -28,7 +28,7 @@ ENEMY_HITPOINTS_TABLE:
         byte #$00
         byte #$02 ; birb
         byte #$09 ; mags
-        byte #$0b ; starglasses
+        byte #$05 ; starglasses
         byte #$20 ; skully
         byte #$00 ; powerups
         byte #$06 ; bat

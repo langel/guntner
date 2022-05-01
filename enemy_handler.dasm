@@ -390,9 +390,6 @@ enemy_handle_damage_and_death: subroutine
 	jsr sfx_enemy_damage
         rts
 .dead
-	; XXX should only do this on smaller enemies
-	inc phase_kill_count
-        jsr sfx_enemy_death
         ; boss death check
         lda boss_dmg_handle_true
         beq .not_boss_death
@@ -418,6 +415,8 @@ enemy_handle_damage_and_death: subroutine
         adc #$08
         cmp #$e0
         bne .boss_dead_kill_all
+        ; XXX boss death sfx / music?
+        ; XXX boss death state (explosion)?
         lda #$00
         sta boss_dmg_handle_true
 .not_boss_death
@@ -448,13 +447,21 @@ enemy_handle_damage_and_death: subroutine
         lda enemy_ram_type,x
         cmp #$04
         bne .not_starglasses
-        lda bomb_counter
-        bne .not_starglasses
+        ;lda bomb_counter
+        ;bne .not_starglasses
+        dec starglasses_count
         ; spawn powerup
         pla 
         pla
         jmp powerup_from_starglasses
 .not_starglasses
+	; only count smaller enemies for phase progress
+        cpx #$80
+        bcs .not_smaller_enemy
+	inc phase_kill_count
+        dec phase_enemy_downcount
+.not_smaller_enemy
+        jsr sfx_enemy_death
         ; change it into crossbones!
         lda #$01
         sta enemy_ram_type,x
