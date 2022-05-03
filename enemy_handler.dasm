@@ -196,7 +196,7 @@ enemy_slot_offset_to_oam_offset:
         
 enemies_update_all: subroutine
 	; set max darts launched per frame
-        lda #$04
+        lda #$03
         sta dart_frame_max
 	; if player is dead despawn
 	lda player_health
