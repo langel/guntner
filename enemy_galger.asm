@@ -36,15 +36,21 @@ arc_leg_speed_dec	EQU	$407
 ; height of playfield = 182px
 
 arc_sequence_begin:
-	byte	  #0, #6, #8, #9,
+	byte	  #0, #0, #6, #8, #9,
 arc_sequence_end:
-	byte	  #5, #7, #8, #9,
+	byte	  #1, #5, #7, #8, #9,
 arc_sequence_x_origin:
-	byte	#160,  #232,  #0,  #248, 
+	byte	#158, #160,  #232,  #0,  #248, 
 arc_sequence_y_origin:
-	byte	#236,  #148, #50, #102,
+	byte	#120, #236,  #148, #50, #102,
 arc_sequences:
 ; subtract with adding
+	; step data:
+        ;   xoffset, yoffset, xsize, ysize, 
+        ;   angle start, angle end, speed forward, speed back
+	; sequence Wide S
+        byte     #0,  #216, #100, #40, $80, $40, $0, $2
+        byte   #100,  #0,   #100, #40, $80, $00, $2, $0
 	; sequence 00
 	.byte	#160, #236,  #96,  #96, $80, $80, $3, $0
 	.byte	 #38,  #80,  #24,  #16, $00, $00, $7, $0

@@ -49,7 +49,8 @@ sandbox2_phase_next: subroutine
         sta state_v5
         ; sequence id
         lda phase_current
-        and #$03
+        ;and #$03
+        and #$00
         sta state_v6
         ; reset kills
         lda #$00
