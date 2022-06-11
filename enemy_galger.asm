@@ -34,29 +34,32 @@ arc_leg_speed_inc	EQU	$406
 arc_leg_speed_dec	EQU	$407
 
 ; height of playfield = 182px
+
+	; 9 sequences with 22 steps total
 arc_sequence_begin:
-	byte $00, $06, $07, $08, $0a, $0c, $0e, $10, $12
+	byte $00, $03, $09, $0a, $0b, $0d, $0f, $11, $13
 arc_sequence_end:
-	byte $05, $06, $07, $09, $0b, $0d, $0f, $11, $14
+	byte $02, $08, $09, $0a, $0c, $0e, $10, $12, $15
 arc_sequence_x_origin:
-	byte $a0, $f8, $e8, $e8, $c8, $ba, $dc, $c0, $80
+	byte $22, $a0, $f8, $e8, $c8, $ba, $dc, $c0, $80
 arc_sequence_y_origin:
-	byte $ec, $5e, $32, $b8, $84, $78, $70, $8c, $34
+	byte $a8, $ec, $5e, $32, $84, $78, $70, $8c, $34
 arc_sequences:
-	; sequence 0 : Spiral O.G.
+	; sequence 0 : Horse Shoe Loop
+	byte $00, $00, $40, $f2, $ca, $80, $00, $02
+	byte $d4, $a0, $a0, $50, $80, $02, $00, $02
+	byte $30, $00, $40, $f2, $00, $c8, $00, $02
+	; sequence 1 : Spiral O.G.
 	byte $a0, $ec, $60, $60, $40, $80, $03, $00
 	byte $26, $50, $18, $10, $80, $00, $07, $00
 	byte $fc, $00, $20, $20, $00, $80, $06, $00
 	byte $f0, $f0, $40, $30, $80, $00, $05, $00
 	byte $00, $00, $40, $3c, $00, $80, $04, $00
 	byte $f0, $3c, $60, $34, $00, $c0, $00, $03
-	; sequence 1 : Circle LeftDownReverse
+	; sequence 2 : Circle LeftDownReverse
 	byte $08, $f8, $60, $60, $00, $f9, $06, $00
-	; sequence 2 : Tunnel Going Right
+	; sequence 3 : Tunnel Going Right
 	byte $08, $00, $29, $50, $80, $87, $00, $07
-	; sequence 3 : Horse Shoe Loop
-	byte $30, $00, $40, $f2, $00, $80, $00, $02
-	byte $d4, $a0, $a0, $50, $80, $02, $00, $02
 	; sequence 4 : wide S short
 	byte $00, $d8, $64, $28, $80, $40, $00, $02
 	byte $64, $00, $64, $28, $c0, $00, $02, $00
