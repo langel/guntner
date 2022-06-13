@@ -16,7 +16,7 @@ bullet2		= $0214
 bullet3		= $0218
 bullet4		= $021c
 
-player_bullet_sprite	.byte #$79
+player_bullet_sprite	= $79
 
 
         

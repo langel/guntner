@@ -9,11 +9,11 @@ lives_addr		= $271d
 phase_addr		= $2748
 score_addr		= $274c
 timer_addr		= $2756
-tile_empty .byte $05
 
-dash_cache EQU $0100
+dash_cache		= $0100
 
-dash_top_bar_tile .byte $0e
+tile_empty 		= $05
+dash_top_bar_tile 	= $0e
 
 
 dashboard_init: subroutine
@@ -41,7 +41,7 @@ dashboard_init: subroutine
         
         ; fill page 2 dashboard top row
 	PPU_SETADDR dash_page2_top_bar
-        lda dash_top_bar_tile
+        lda #dash_top_bar_tile
         ldy #$20
 .set_top_bar
 	sta PPU_DATA

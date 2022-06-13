@@ -1,7 +1,7 @@
 
-oam_ram_rudy      = $0204
+oam_ram_rudy		= $0204
+player_dead_tile	= $0a
 
-player_dead_tile .byte #$0a
 
 player_game_reset: subroutine
 	lda #$00
@@ -109,7 +109,7 @@ set_player_sprite: subroutine
         lda player_health
         bne .not_dead
 .is_dead
-	lda player_dead_tile
+	lda #player_dead_tile
         sta oam_ram_rudy+5
         sta oam_ram_rudy+1
         rts

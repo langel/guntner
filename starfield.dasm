@@ -1,19 +1,19 @@
 ;;;; Constants
 
 ; XXX these constants don't need to be in the ROM
-STARFIELD_MASK		.byte #%00111111 ; star probability
-STARFIELD_COL0_START	.byte #$00
-STARFIELD_COL1_START	.byte #$07
+STARFIELD_MASK		= %00111111 ; star probability
+STARFIELD_COL0_START	= $00
+STARFIELD_COL1_START	= $07
 
-starfield_tile	.byte #$0f
-starempty_tile	.byte #$20
-starfield_sprite	.byte	#$6b
+starfield_tile		= $0f
+starempty_tile		= $20
+starfield_sprite	= $6b
 
-starfield_msg_cache	=	$03e0	; 32 bytes for string data
+starfield_msg_cache	= $03e0	; 32 bytes for string data
 
-star_cache		EQU 	208
-star_oam_start		EQU	$40
-star_oam_end		EQU	<(star_oam_start+$80)
+star_cache		= 208
+star_oam_start		= $40
+star_oam_end		= <(star_oam_start+$80)
 
 
 ;	POSSIBLE STARFIELD STATES
@@ -64,7 +64,7 @@ death_scroll_speed: subroutine
 starfield_draw_dash_top_bar_nametable0: subroutine
         ; fill page 1 bar for sprite 0 collisions
 	PPU_SETADDR dash_page1_top_bar
-        lda dash_top_bar_tile
+        lda #dash_top_bar_tile
         ldy #$20
 .tile_dash_set_page1
         sta PPU_DATA
@@ -264,17 +264,17 @@ starfield_cache_next_col:
         ; setup rng for star probability
         lda rng0
         lsr
-        and STARFIELD_MASK
+        and #STARFIELD_MASK
         sta temp00
       	ldy #$00
 .col_assign_tile_loop
 	cpy temp00
         bne .empty_tile
 .star_tile
-	lda starfield_tile
+	lda #starfield_tile
         jmp .cache_tile
 .empty_tile
-	lda starempty_tile 
+	lda #starempty_tile 
 .cache_tile
 	sta star_cache,y
         iny
@@ -464,7 +464,7 @@ starfield_spr_set_next: subroutine
         clc
         adc #$08
         sta oam_ram_y,x
-        lda starfield_sprite
+        lda #starfield_sprite
         sta oam_ram_spr,x
         ; set spr pal based on x position
 	txa
@@ -722,7 +722,7 @@ starfield_msgscroll_cleanup_reinstate_dash: subroutine
         sta state_v1 ; nametable hi
         lda 1+#<dash_page1_top_bar
         sta state_v0 ; nametable lo
-        lda dash_top_bar_tile
+        lda #dash_top_bar_tile
         ldy #$20
 .loop
 	sta starfield_msg_cache,y
@@ -814,9 +814,9 @@ starfield_tile_left_border: subroutine
         
         
 starfield_twinkle_reset: subroutine
-	lda STARFIELD_COL0_START
+	lda #STARFIELD_COL0_START
         sta starfield_col0
-        lda STARFIELD_COL1_START
+        lda #STARFIELD_COL1_START
         sta starfield_col1
 	rts
         

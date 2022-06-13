@@ -1,5 +1,5 @@
 
-PHASE_MAX	.byte #$01
+PHASE_MAX	= #$01
 
 ; phase_state 0 = need init, 1 = running, 2 = done and next?
 
@@ -55,7 +55,7 @@ phase_handler: subroutine
         
 phase_next: subroutine
 	inc phase_current
-        cmp PHASE_MAX
+        cmp #PHASE_MAX
         bne .not_end_of_game
         
 .not_end_of_game

@@ -31,17 +31,17 @@ APU_TRI_TIMER_HI	= $400b
 ;$400E	L--- PPPP	Loop noise (L), noise period (P)
 ;$400F	LLLL L---	Length counter load (L)
         
-APU_NOISE_VOL   = $400C
-APU_NOISE_FREQ  = $400E
-APU_NOISE_TIMER = $400F
+APU_NOISE_VOL   	= $400C
+APU_NOISE_FREQ 		= $400E
+APU_NOISE_TIMER		= $400F
 
-DMC_FREQ	= $4010
-APU_STATUS	= $4015
-APU_DMC_CTRL    = $4010
-APU_CHAN_CTRL   = $4015
-APU_FRAME       = $4017
+DMC_FREQ		= $4010
+APU_STATUS		= $4015
+APU_DMC_CTRL    	= $4010
+APU_CHAN_CTRL   	= $4015
+APU_FRAME       	= $4017
 
-apu_cache	=	$0140
+apu_cache		= $0140
   
   
 apu_init: subroutine

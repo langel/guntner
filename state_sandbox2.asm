@@ -26,7 +26,8 @@ sandbox2_init: subroutine
         tax
         ldx #$d8
         jsr ant_spawn
-        ;ldx #$c8
+        ldx #$c8
+        jsr uzi_spawn
         ;jsr skully_spawn
         
 	jsr get_enemy_slot_4_sprite
