@@ -48,11 +48,6 @@ uzi_cycle: subroutine
         and #$0f
         bne .dont_shoot
         jsr bullet_spawn  
-        ldx enemy_ram_offset
-        lda enemy_ram_ac,x
-        clc
-        adc #$05 ; kickback in pixels
-        sta enemy_ram_ac,x
         ; XXX makes for less repetitive patterns
         jsr get_next_random
         jsr get_next_random
@@ -86,6 +81,12 @@ bullet_spawn: subroutine
         sta enemy_ram_y,x
         ; XXX trigger sfx?
         jsr sfx_shoot_bullet
+        ; animate uzi kickback
+        ldx enemy_ram_offset
+        lda enemy_ram_ac,x
+        clc
+        adc #$05 ; kickback in pixels
+        sta enemy_ram_ac,x
 .done
 	rts
         

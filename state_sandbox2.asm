@@ -26,8 +26,10 @@ sandbox2_init: subroutine
         tax
         ldx #$d8
         jsr ant_spawn
+        ldx #$d0
+        jsr ant_spawn
         ldx #$c8
-        jsr uzi_spawn
+        ;jsr uzi_spawn
         ;jsr skully_spawn
         
 	jsr get_enemy_slot_4_sprite
@@ -109,7 +111,7 @@ sandbox2_update: subroutine
         bne .dont_next_state
         lda phase_state
         bne .dont_next_state
-        inc phase_current
+        ;inc phase_current
         inc phase_state
         ; setup msg
         ldx state_v6

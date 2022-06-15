@@ -35,20 +35,22 @@ arc_leg_speed_dec	EQU	$407
 
 ; height of playfield = 182px
 
-	; 9 sequences with 22 steps total
+	; 16 sequences with 46 steps total
 arc_sequence_begin:
-	byte $00, $03, $09, $0a, $0b, $0d, $0f, $11, $13
+	byte $00, $05, $0b, $0f, $11, $13, $15, $1a, $1e, $21, $22, $23, $25, $27, $29, $2b
 arc_sequence_end:
-	byte $02, $08, $09, $0a, $0c, $0e, $10, $12, $15
+	byte $04, $0a, $0e, $10, $12, $14, $19, $1d, $20, $21, $22, $24, $26, $28, $2a, $2d
 arc_sequence_x_origin:
-	byte $22, $a0, $f8, $e8, $c8, $ba, $dc, $c0, $80
+	byte $00, $a0, $78, $cd, $98, $35, $be, $d2, $22, $f8, $e8, $c8, $ba, $dc, $c0, $80
 arc_sequence_y_origin:
-	byte $a8, $ec, $5e, $32, $84, $78, $70, $8c, $34
+	byte $96, $ec, $2a, $10, $ac, $76, $9e, $a0, $a8, $5e, $32, $84, $78, $70, $8c, $34
 arc_sequences:
-	; sequence 0 : Horse Shoe Loop
-	byte $00, $00, $40, $f2, $ca, $80, $00, $02
-	byte $d4, $a0, $a0, $50, $80, $02, $00, $02
-	byte $30, $00, $40, $f2, $00, $c8, $00, $02
+	; sequence 0 : Spiral Young Buck
+	byte $d2, $a0, $60, $60, $80, $40, $00, $02
+	byte $60, $10, $40, $40, $c0, $78, $04, $00
+	byte $10, $10, $30, $30, $80, $f8, $05, $00
+	byte $00, $00, $20, $20, $00, $78, $07, $00
+	byte $10, $10, $08, $08, $80, $f0, $10, $00
 	; sequence 1 : Spiral O.G.
 	byte $a0, $ec, $60, $60, $40, $80, $03, $00
 	byte $26, $50, $18, $10, $80, $00, $07, $00
@@ -56,23 +58,52 @@ arc_sequences:
 	byte $f0, $f0, $40, $30, $80, $00, $05, $00
 	byte $00, $00, $40, $3c, $00, $80, $04, $00
 	byte $f0, $3c, $60, $34, $00, $c0, $00, $03
-	; sequence 2 : Circle LeftDownReverse
+	; sequence 2 : Big S
+	byte $80, $60, $70, $14, $bc, $80, $00, $04
+	byte $1c, $d2, $3c, $40, $7d, $03, $00, $04
+	byte $00, $c0, $3c, $40, $80, $fa, $04, $00
+	byte $dc, $00, $80, $c8, $00, $40, $02, $00
+	; sequence 3 : Arc and Loop from Behind
+	byte $a8, $00, $ff, $eb, $00, $c0, $00, $01
+	byte $00, $5a, $40, $40, $c0, $06, $00, $04
+	; sequence 4 : Butt Planet
+	byte $28, $b6, $de, $a4, $40, $05, $00, $01
+	byte $60, $f0, $20, $12, $80, $c0, $05, $00
+	; sequence 5 : Loop Up from Below
+	byte $00, $c0, $40, $80, $80, $fa, $02, $00
+	byte $00, $00, $40, $40, $00, $7d, $03, $00
+	; sequence 6 : Loop de Loop
+	byte $00, $00, $80, $10, $80, $c0, $03, $00
+	byte $80, $fc, $80, $10, $40, $02, $00, $03
+	byte $00, $81, $80, $80, $80, $7e, $02, $00
+	byte $00, $81, $80, $10, $00, $c0, $00, $03
+	byte $80, $00, $80, $10, $40, $80, $03, $00
+	; sequence 7 : Wide Ying Yang
+	byte $c8, $c0, $c0, $40, $80, $40, $00, $02
+	byte $c0, $00, $40, $40, $c3, $80, $04, $00
+	byte $bc, $00, $c0, $40, $80, $c0, $02, $00
+	byte $00, $00, $40, $40, $c3, $00, $04, $00
+	; sequence 8 : Horse Shoe Loop
+	byte $00, $00, $40, $f2, $ca, $80, $00, $02
+	byte $d4, $a0, $a0, $50, $80, $02, $00, $02
+	byte $30, $00, $40, $f2, $00, $c8, $00, $02
+	; sequence 9 : Circle LeftDownReverse
 	byte $08, $f8, $60, $60, $00, $f9, $06, $00
-	; sequence 3 : Tunnel Going Right
+	; sequence 10 : Tunnel Going Right
 	byte $08, $00, $29, $50, $80, $87, $00, $07
-	; sequence 4 : wide S short
+	; sequence 11 : Wide S Short
 	byte $00, $d8, $64, $28, $80, $40, $00, $02
 	byte $64, $00, $64, $28, $c0, $00, $02, $00
-	; sequence 5 : wide S medium
+	; sequence 12 : Wide S Medium
 	byte $00, $b4, $a0, $50, $80, $40, $00, $02
 	byte $a4, $00, $a0, $50, $c0, $00, $02, $00
-	; sequence 6 : stair step small
+	; sequence 13 : Stair Step Small
 	byte $00, $c8, $3c, $3c, $80, $40, $00, $04
 	byte $3c, $f8, $3c, $3c, $c0, $00, $04, $00
-	; sequence 7 : stair step big
+	; sequence 14 : Stair Step Big
 	byte $00, $8c, $78, $78, $80, $40, $00, $03
 	byte $78, $f2, $78, $78, $c0, $00, $03, $00
-	; sequence 8 : W
+	; sequence 15 : W
 	byte $80, $d8, $40, $78, $c0, $40, $00, $03
 	byte $40, $00, $40, $78, $ba, $40, $00, $03
 	byte $40, $28, $80, $28, $c3, $3d, $03, $00
