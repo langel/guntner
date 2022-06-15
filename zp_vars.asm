@@ -143,6 +143,11 @@ boss_dmg_handle_true	byte
 boss_x		byte
 boss_y		byte
 
+arc_sequence_id		byte
+arc_sequence_lo		byte
+arc_sequence_hi		byte
+arc_sequence_length	byte
+
 arctang_velocity_lo	byte
 arctang_velocity_hi	byte
 

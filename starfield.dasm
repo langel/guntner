@@ -26,17 +26,17 @@ star_oam_end		= <(star_oam_start+$80)
 
 ; XXX might could remove hi byte table if all on same page
 starfield_update_state_function_lo:
-	.byte <starfield_bg_update
-	.byte <starfield_spr_update
-        .byte <starfield_bg2spr_update
-        .byte <starfield_sprmsg_update
-        .byte <starfield_spr2bg_update
+	byte <starfield_bg_update
+	byte <starfield_spr_update
+        byte <starfield_bg2spr_update
+        byte <starfield_sprmsg_update
+        byte <starfield_spr2bg_update
 starfield_update_state_function_hi:
-	.byte >starfield_bg_update
-	.byte >starfield_spr_update
-        .byte >starfield_bg2spr_update
-        .byte >starfield_sprmsg_update
-        .byte >starfield_spr2bg_update
+	byte >starfield_bg_update
+	byte >starfield_spr_update
+        byte >starfield_bg2spr_update
+        byte >starfield_sprmsg_update
+        byte >starfield_spr2bg_update
 	        
 starfield_update: subroutine
 	lda starfield_state

@@ -40,6 +40,8 @@ arc_sequence_begin:
 	byte $00, $05, $0b, $0f, $11, $13, $15, $1a, $1e, $21, $22, $23, $25, $27, $29, $2b
 arc_sequence_end:
 	byte $04, $0a, $0e, $10, $12, $14, $19, $1d, $20, $21, $22, $24, $26, $28, $2a, $2d
+arc_sequence_lengths:
+	byte $05, $06, $04, $02, $02, $02, $05, $04, $03, $01, $01, $02, $02, $02, $02, $03
 arc_sequence_x_origin:
 	byte $00, $a0, $78, $cd, $98, $35, $be, $d2, $22, $f8, $e8, $c8, $ba, $dc, $c0, $80
 arc_sequence_y_origin:
@@ -109,6 +111,27 @@ arc_sequences:
 	byte $40, $28, $80, $28, $c3, $3d, $03, $00
         
         
+arc_sequence_set: subroutine
+	; x holds which sequence
+        stx arc_sequence_id
+        lda #>arc_sequences
+	sta arc_sequence_hi
+        lda arc_sequence_begin,x
+        asl
+        asl
+        asl
+        bcc .hi_byte_perfect
+.hi_byte_increase
+	inc arc_sequence_hi
+.hi_byte_perfect
+	clc
+        adc #<arc_sequences
+	sta arc_sequence_lo
+        lda arc_sequence_lengths,x
+        sta arc_sequence_length
+	rts
+        
+        
 galger_spawn: subroutine
 	; x is set by enemy spawner
 	lda #$0f
@@ -117,9 +140,9 @@ galger_spawn: subroutine
         lda ENEMY_HITPOINTS_TABLE,y
         sta enemy_ram_hp,x 
         ; arc system setup
-        ldy state_v6
-        lda arc_sequence_begin,y
+        lda 0
         sta enemy_ram_ex,x
+        ldy arc_sequence_id
         lda arc_sequence_x_origin,y
         sta enemy_ram_x,x
         lda arc_sequence_y_origin,y
@@ -274,13 +297,11 @@ arc_leg: subroutine
         rts
         
 .next_leg
-	lda state_v6 ; arc sequence id
-        tay
 	inc enemy_ram_ex,x
-        lda arc_sequence_end,y
+        lda arc_sequence_length
         cmp enemy_ram_ex,x
-        bcs .dont_wrap_sequence
-        lda arc_sequence_begin,y
+        bne .dont_wrap_sequence
+        lda #0
         sta enemy_ram_ex,x
 .dont_wrap_sequence
 arc_leg_init:
@@ -290,22 +311,29 @@ arc_leg_init:
         asl
         asl
         tay
-        lda arc_sequences,y
+        lda (arc_sequence_lo),y
         sta arc_leg_x_offset,x
-        lda arc_sequences+1,y
+        iny
+        lda (arc_sequence_lo),y
         sta arc_leg_y_offset,x
-        lda arc_sequences+2,y
+        iny
+        lda (arc_sequence_lo),y
         sta arc_leg_x_scale,x
-        lda arc_sequences+3,y
+        iny
+        lda (arc_sequence_lo),y
         sta arc_leg_y_scale,x
-        lda arc_sequences+4,y
+        iny
+        lda (arc_sequence_lo),y
         sta arc_leg_arc_start,x
         sta enemy_ram_pc,x
-        lda arc_sequences+5,y
+        iny
+        lda (arc_sequence_lo),y
         sta arc_leg_arc_target,x
-        lda arc_sequences+6,y
+        iny
+        lda (arc_sequence_lo),y
         sta arc_leg_speed_inc,x
-        lda arc_sequences+7,y
+        iny
+        lda (arc_sequence_lo),y
         sta arc_leg_speed_dec,x
         ldy enemy_oam_offset
 	; update x origin
