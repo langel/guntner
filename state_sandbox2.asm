@@ -44,7 +44,7 @@ sandbox2_init: subroutine
         lda #>sandbox2_phase_next
         sta starfield_msg_return_hi
         
-        ldx #$1
+        ldx #$0
         jsr arc_sequence_set
         
 	rts

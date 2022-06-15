@@ -18,6 +18,10 @@
 ; state6 ;  88, 76    ; 3 in reverse ; 96, 52       ; -16, +60
 ; state7 resets the pattern...   -8, 56             ; -96, -20
 
+; enemy_ram_pc	= current arc position
+; enemy_ram_ac	= arc position high byte
+; enemy_ram_ex	= current arc sequence leg
+
 ; before 1st leg translation === saves stuff in enemy ram
 ; x, y origin: 184, 228		<-- saved in x, y
 ; how many legs : 6		<-- saved in ex
@@ -127,6 +131,9 @@ arc_sequence_set: subroutine
 	clc
         adc #<arc_sequences
 	sta arc_sequence_lo
+        bcc .hi_byte_still_perfect
+        inc arc_sequence_hi
+.hi_byte_still_perfect
         lda arc_sequence_lengths,x
         sta arc_sequence_length
 	rts
@@ -140,7 +147,8 @@ galger_spawn: subroutine
         lda ENEMY_HITPOINTS_TABLE,y
         sta enemy_ram_hp,x 
         ; arc system setup
-        lda 0
+        lda #0
+        sta enemy_ram_ac,x
         sta enemy_ram_ex,x
         ldy arc_sequence_id
         lda arc_sequence_x_origin,y
@@ -148,8 +156,6 @@ galger_spawn: subroutine
         lda arc_sequence_y_origin,y
         sta enemy_ram_y,x
         ; angle / pc set in leg init
-        lda #$00
-        sta enemy_ram_ac,x
         jsr arc_leg_init
 	rts
         
@@ -297,13 +303,6 @@ arc_leg: subroutine
         rts
         
 .next_leg
-	inc enemy_ram_ex,x
-        lda arc_sequence_length
-        cmp enemy_ram_ex,x
-        bne .dont_wrap_sequence
-        lda #0
-        sta enemy_ram_ex,x
-.dont_wrap_sequence
 arc_leg_init:
 	lda enemy_ram_ex,x
 	; update arc data in enemy slot
@@ -364,5 +363,12 @@ arc_leg_init:
         bcs .arc_leg_done
         inc enemy_ram_ac,x
 .arc_leg_done
+	inc enemy_ram_ex,x
+        lda arc_sequence_length
+        cmp enemy_ram_ex,x
+        bne .dont_wrap_sequence
+        lda #0
+        sta enemy_ram_ex,x
+.dont_wrap_sequence
         rts
         
