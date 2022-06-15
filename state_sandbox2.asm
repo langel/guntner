@@ -57,9 +57,11 @@ sandbox2_phase_next: subroutine
         sta state_v5
         ; sequence id
         lda phase_current
-        and #$07
+        and #$0f
         ;and #$00
         sta state_v6
+        tax
+        jsr arc_sequence_set
         ; reset kills
         lda #$00
         sta phase_kill_count
@@ -103,6 +105,9 @@ sandbox2_update: subroutine
 	jsr player_move_position
         jsr player_bullets_check_controls
         
+        ;lda wtf
+        ;beq .do_next_state
+        
 	lda phase_kill_count
         cmp #16
         lda phase_enemy_downcount
@@ -114,7 +119,8 @@ sandbox2_update: subroutine
         bne .dont_next_state
         lda phase_state
         bne .dont_next_state
-        ;inc phase_current
+.do_next_state
+        inc phase_current
         inc phase_state
         ; setup msg
         ldx state_v6
