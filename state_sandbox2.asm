@@ -110,7 +110,7 @@ sandbox2_update: subroutine
         ;beq .do_next_state
         
         lda wtf
-        cmp #$80
+        cmp #$25
         bne .dont_count
         inc state_v1
         lda #$02
@@ -118,6 +118,7 @@ sandbox2_update: subroutine
         bne .dont_count
 .next_arc_seq
 	lda #$0
+        sta wtf
         sta state_v1
         sta enemy_ram_offset
         lda #$20
