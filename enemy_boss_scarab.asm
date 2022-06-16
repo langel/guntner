@@ -13,17 +13,17 @@
 ; $0c, $27, $38
 
 boss_scarab_spawn: subroutine
-	; claim highest 4 srpite slot for beetle body
-	ldx #$16
+	; claim highest 4 sprite slot for beetle body
+	ldx #boss_scarab_id
         stx $03b8
         ; claim 4 more slots for the wings
-        lda #$17
+        lda #do_nothing_id
         sta $03c0
         sta $03c8
         sta $03d0
         sta $03d8
         ; setup initial state
-        lda ENEMY_HITPOINTS_TABLE,x
+        lda enemy_hitpoints_table,x
         sta $03b9
         lda #$14
         sta boss_x

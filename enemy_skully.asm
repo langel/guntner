@@ -2,10 +2,10 @@
                     
 skully_spawn: subroutine
 	; x is set by enemy spawner
-	lda #$05
+	lda #skully_id
         sta enemy_ram_type,x ; enemy type
         tay
-        lda ENEMY_HITPOINTS_TABLE,y
+        lda enemy_hitpoints_table,y
         sta enemy_ram_hp,x 
         lda rng0
         sta enemy_ram_ac,x ; animation counter

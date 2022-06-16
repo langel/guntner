@@ -4,10 +4,10 @@
         
 maggs_spawn: subroutine
 	; x is set by enemy spawner
-	lda #$03
+	lda #maggs_id
         sta enemy_ram_type,x ; enemy type
         tay
-        lda ENEMY_HITPOINTS_TABLE,y
+        lda enemy_hitpoints_table,y
         sta enemy_ram_hp,x 
         lda #$00
         sta enemy_ram_x,x ; x pos

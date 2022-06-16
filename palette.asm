@@ -1,5 +1,5 @@
 
-palette_cache	EQU 231
+palette_cache	EQU $e7
 
 
 Palette00:		; 25 bytes

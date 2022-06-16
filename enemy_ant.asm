@@ -1,10 +1,10 @@
 
 ant_spawn: subroutine
 	; x is set by enemy spawner
-	lda #$11
+	lda #ant_id
         sta enemy_ram_type,x 
         tay
-        lda ENEMY_HITPOINTS_TABLE,y
+        lda enemy_hitpoints_table,y
         sta enemy_ram_hp,x 
         lda #$f7
         sta enemy_ram_x,x ; x pos

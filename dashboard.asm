@@ -12,8 +12,8 @@ timer_addr		= $2756
 
 dash_cache		= $0100
 
-tile_empty 		= $05
-dash_top_bar_tile 	= $0e
+tile_empty 		EQM $05
+dash_top_bar_tile 	EQM $0e
 
 
 dashboard_init: subroutine

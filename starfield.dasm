@@ -1,19 +1,19 @@
 ;;;; Constants
 
 ; XXX these constants don't need to be in the ROM
-STARFIELD_MASK		= %00111111 ; star probability
-STARFIELD_COL0_START	= $00
-STARFIELD_COL1_START	= $07
+STARFIELD_MASK		EQM %00111111 ; star probability
+STARFIELD_COL0_START	EQM $00
+STARFIELD_COL1_START	EQM $07
 
-starfield_tile		= $0f
-starempty_tile		= $20
-starfield_sprite	= $6b
+starfield_tile		EQM $0f
+starempty_tile		EQM $20
+starfield_sprite	EQM $6b
 
 starfield_msg_cache	= $03e0	; 32 bytes for string data
 
-star_cache		= 208
-star_oam_start		= $40
-star_oam_end		= <(star_oam_start+$80)
+star_cache		= $d0
+star_oam_start		EQM $40
+star_oam_end		EQM <(star_oam_start+$80)
 
 
 ;	POSSIBLE STARFIELD STATES

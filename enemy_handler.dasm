@@ -1,6 +1,6 @@
 ;;;; Constants
 
-ENEMY_HIT_PALETTE_FRAMES	= #$04
+ENEMY_HIT_PALETTE_FRAMES	EQM $04
 
 enemy_ram_type = $0300
 enemy_ram_hp   = $0301
@@ -314,31 +314,6 @@ crossbones_cycle: subroutine
 .crossbones_done
 	jmp update_enemies_handler_next
         
-        
-  
-
-; XXX this seems to be included below    
-enemy_give_points: subroutine
-        ; a = enemy type
-        stx temp00
-        sty temp01
-        asl
-        asl
-        clc
-        adc #$03
-        tay ; enemy points counter
-        ldx #$03 ; score bytes counter
-        clc
-.score_loop
-        lda ENEMY_PLAYER_POINTS_TABLE,y
-        adc score_000000xx,x
-        sta score_000000xx,x
-        dey
-	dex
-	bne .score_loop
-        ldx temp00
-        ldy temp01
-        rts
 
         
         
@@ -354,7 +329,7 @@ enemy_handle_damage_and_death: subroutine
 ; handle player collision
 	; player damage
         ldy enemy_ram_type,x
-        lda ENEMY_PLAYER_COLLISION_TABLE,y
+        lda enemy_player_collision_table,y
         ldy enemy_ram_ex,x
         sta player_damage
         jsr player_take_damage
@@ -396,7 +371,7 @@ enemy_handle_damage_and_death: subroutine
         lda #$00
 .boss_dead_kill_all
 	tax
-        lda #$01
+        lda #crossbones_id
         sta enemy_ram_type,x
         txa
 	cmp #$a0
@@ -430,7 +405,7 @@ enemy_handle_damage_and_death: subroutine
         ldx #$03 ; score bytes counter
         clc
 .score_loop
-        lda ENEMY_PLAYER_POINTS_TABLE,y
+        lda enemy_player_points_table,y
         adc score_000000xx,x
         sta score_000000xx,x
         dey
@@ -445,7 +420,7 @@ enemy_handle_damage_and_death: subroutine
 .not_4_sprite
 ; starglasses 
         lda enemy_ram_type,x
-        cmp #$04
+        cmp #starglasses_id
         bne .not_starglasses
         ;lda bomb_counter
         ;bne .not_starglasses
@@ -463,7 +438,7 @@ enemy_handle_damage_and_death: subroutine
 .not_smaller_enemy
         jsr sfx_enemy_death
         ; change it into crossbones!
-        lda #$01
+        lda #crossbones_id
         sta enemy_ram_type,x
         sta enemy_ram_hp,x
         ; return to enemy handler not cycle

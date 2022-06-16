@@ -19,7 +19,7 @@
 powerup_from_starglasses:
 	ldx enemy_ram_offset
         ldy enemy_oam_offset
-	lda #$06
+	lda #powerups_id
         sta enemy_ram_type,x
         lda oam_ram_x,y
         clc

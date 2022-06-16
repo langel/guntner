@@ -1,9 +1,9 @@
 
 uzi_spawn: subroutine
-	lda #$13
+	lda #uzi_id
         sta enemy_ram_type,x
         tay
-        lda ENEMY_HITPOINTS_TABLE,y
+        lda enemy_hitpoints_table,y
         lda #$20
         sta enemy_ram_x,x
         lda #$30
@@ -65,10 +65,10 @@ bullet_spawn: subroutine
         cmp #$ff
         beq .done
         ; sprite
-	lda #$14
+	lda #bullet_id
         sta enemy_ram_type,x
         tay
-        lda ENEMY_HITPOINTS_TABLE,y
+        lda enemy_hitpoints_table,y
         ; x pos
         lda temp02
         clc

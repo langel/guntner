@@ -124,7 +124,7 @@ demo_enemy_spawn: subroutine
         jsr starglasses_spawn
         jmp .no_bigs_spawn
 .spawn_throber
-	jsr throber_spawn
+	;jsr throber_spawn
 .no_bigs_spawn
 	rts
         

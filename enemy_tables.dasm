@@ -1,162 +1,157 @@
-; 00 (not populated)
-; 01 crossbones (enemy death)
-; 02 birb
-; 03 maggs
-; 04 starglasses
-; 05 skully
-; 06 powerups
-; 07 bat
-; 08 space vampire
-; 09 vampire's bat
-; 0a skeet
-; 0b zigzag
-; 0c chomps
-; 0d spark
-; 0e dumbface
-; 0f galger
-; 10 dart
-; 11 ant
-; 12 throber
-; 13 uzi
-; 14 bullet
-; 15 larsso
-; 16 scarab
-; 17 do-nothing
+	; 24 enemy entities defined
 
-ENEMY_HITPOINTS_TABLE:
-	byte #$00
-        byte #$00
-        byte #$02 ; birb
-        byte #$09 ; mags
-        byte #$05 ; starglasses
-        byte #$20 ; skully
-        byte #$00 ; powerups
-        byte #$06 ; bat
-        ;byte #$40 ; vampire
-        byte #$20 ; vampire
-        byte #$0a ; vamp bat
-        byte #$04 ; skeet
-        byte #$10 ; zigzag
-        byte #$07 ; chomps
-        byte #$0f ; spark
-        byte #$10 ; dumface
-        byte #$02 ; galger
-        byte #$01 ; dart
-        byte #$01 ; ant
-        byte #$80 ; throber
-        byte #$20 ; uzi
-        byte #$07 ; bullet
-        byte #$20 ; larsso
-        byte #$40 ; scarab
-        byte #$00 ; do-nothing
-        
-        
-ENEMY_PLAYER_POINTS_TABLE:
-	; msb to lsb
-	byte #$00,#$00,#$00,#$00
-	byte #$00,#$00,#$00,#$00
-        byte #$00,#$00,#$00,#$05 ; birb
-        byte #$00,#$00,#$00,#$56 ; maggs
-        byte #$00,#$00,#$25,#$00 ; starglass
-        byte #$00,#$00,#$00,#$ff ; skully
-        byte #$00,#$00,#$00,#$00 ; powerups
-        byte #$00,#$00,#$00,#$05 ; bat
-        byte #$00,#$06,#$06,#$06 ; vampire head
-        byte #$00,#$01,#$22,#$55 ; vamp bat
-        byte #$00,#$00,#$00,#$27 ; skeet
-        byte #$00,#$00,#$02,#$79 ; zigzag
-        byte #$00,#$00,#$02,#$79 ; chomps
-        byte #$00,#$40,#$ff,#$ff ; spark
-        byte #$00,#$00,#$00,#$72 ; dumbface
-        byte #$00,#$00,#$00,#$11 ; galger
-        byte #$00,#$00,#$00,#$00 ; dart
-        byte #$00,#$00,#$00,#$00 ; ant
-        byte #$00,#$00,#$00,#$00 ; throber
-        byte #$00,#$00,#$00,#$00 ; uzi
-        byte #$00,#$00,#$00,#$00 ; bullet
-        byte #$00,#$00,#$00,#$00 ; larsso
-        byte #$00,#$00,#$00,#$00 ; scarab
-        byte #$00,#$00,#$00,#$00 ; do-nothing
-        
+; enemy id list: 
+null_id              EQM $00
+do_nothing_id        EQM $01
+crossbones_id        EQM $02
+powerups_id          EQM $03
+birb_id              EQM $04
+bat_id               EQM $05
+skeet_id             EQM $06
+zigzag_id            EQM $07
+galger_id            EQM $08
+dart_id              EQM $09
+spark_id             EQM $0a
+bullet_id            EQM $0b
+boss_vamp_bat_id     EQM $0c
+maggs_id             EQM $0d
+chomps_id            EQM $0e
+starglasses_id       EQM $0f
+skully_id            EQM $10
+dumbface_id          EQM $11
+ant_id               EQM $12
+throber_id           EQM $13
+uzi_id               EQM $14
+lasso_id             EQM $15
+boss_vamp_id         EQM $16
+boss_scarab_id       EQM $17
 
-ENEMY_PLAYER_COLLISION_TABLE:
-	byte #$00
-        byte #$00
-        byte #$04 ; birb
-        byte #$06 ; maggs
-        byte #$40 ; starglasses
-        byte #$07 ; skully
-        byte #$00 ; powerups
-        byte #$03 ; bat
-        byte #$40 ; vampire head
-        byte #$04 ; vamp bat
-        byte #$07 ; skeet
-        byte #$03 ; zigzag
-        byte #$03 ; chomps
-        byte #$00 ; spark
-        byte #$05 ; dumbface
-        byte #$00 ; galger
-        byte #$20 ; dart
-        byte #$20 ; ant
-        byte #$01 ; throber
-        byte #$20 ; uzi
-        byte #$01 ; bullet
-        byte #$01 ; larsso
-        byte #$20 ; scarab
-        byte #$00 ; do-nothing
-        
-        
-        
+enemy_hitpoints_table:
+	byte $00 ; null
+	byte $00 ; do_nothing
+	byte $00 ; crossbones
+	byte $00 ; powerups
+	byte $02 ; birb
+	byte $06 ; bat
+	byte $04 ; skeet
+	byte $10 ; zigzag
+	byte $02 ; galger
+	byte $01 ; dart
+	byte $0f ; spark
+	byte $07 ; bullet
+	byte $0a ; boss_vamp_bat
+	byte $09 ; maggs
+	byte $07 ; chomps
+	byte $05 ; starglasses
+	byte $20 ; skully
+	byte $0a ; dumbface
+	byte $01 ; ant
+	byte $14 ; throber
+	byte $20 ; uzi
+	byte $20 ; lasso
+	byte $20 ; boss_vamp
+	byte $40 ; boss_scarab
+
+enemy_player_points_table:
+	byte $00, $00, $00, $00 ; null
+	byte $00, $00, $00, $00 ; do_nothing
+	byte $00, $00, $00, $00 ; crossbones
+	byte $00, $00, $00, $00 ; powerups
+	byte $00, $00, $00, $05 ; birb
+	byte $00, $00, $00, $05 ; bat
+	byte $00, $00, $00, $27 ; skeet
+	byte $00, $00, $02, $79 ; zigzag
+	byte $00, $00, $00, $11 ; galger
+	byte $00, $00, $00, $00 ; dart
+	byte $00, $40, $ff, $ff ; spark
+	byte $00, $00, $00, $00 ; bullet
+	byte $00, $01, $22, $55 ; boss_vamp_bat
+	byte $00, $00, $00, $56 ; maggs
+	byte $00, $00, $02, $79 ; chomps
+	byte $00, $00, $25, $00 ; starglasses
+	byte $00, $00, $00, $56 ; skully
+	byte $00, $00, $00, $72 ; dumbface
+	byte $00, $00, $00, $00 ; ant
+	byte $00, $00, $00, $00 ; throber
+	byte $00, $00, $00, $00 ; uzi
+	byte $00, $00, $00, $00 ; lasso
+	byte $00, $06, $06, $06 ; boss_vamp
+	byte $00, $00, $00, $00 ; boss_scarab
+
+enemy_player_collision_table:
+	byte $00 ; null
+	byte $00 ; do_nothing
+	byte $00 ; crossbones
+	byte $00 ; powerups
+	byte $02 ; birb
+	byte $06 ; bat
+	byte $04 ; skeet
+	byte $10 ; zigzag
+	byte $02 ; galger
+	byte $01 ; dart
+	byte $0f ; spark
+	byte $07 ; bullet
+	byte $0a ; boss_vamp_bat
+	byte $09 ; maggs
+	byte $07 ; chomps
+	byte $05 ; starglasses
+	byte $20 ; skully
+	byte $0a ; dumbface
+	byte $01 ; ant
+	byte $14 ; throber
+	byte $20 ; uzi
+	byte $20 ; lasso
+	byte $20 ; boss_vamp
+	byte $40 ; boss_scarab
+
 enemy_update_table_lo:
-        byte 00 ; null enemy type
-        byte <crossbones_cycle    
-        byte <birb_cycle
-        byte <maggs_cycle
-        byte <starglasses_cycle
-        byte <skully_cycle
-        byte <powerups_cycle
-        byte <bat_cycle
-        byte <boss_vamp_cycle
-        byte <boss_vamp_bat_cycle
-        byte <skeet_cycle
-        byte <zigzag_cycle
-        byte <chomps_cycle
-        byte <spark_cycle
-        byte <dumbface_cycle
-        byte <galger_cycle
-        byte <dart_cycle
-        byte <ant_cycle
-        byte <throber_cycle
-        byte <uzi_cycle
-        byte <bullet_cycle
-        byte <lasso_cycle
-        byte <boss_scarab_cycle
-        byte <do_nothing
+	byte <null_cycle
+	byte <do_nothing
+	byte <crossbones_cycle
+	byte <powerups_cycle
+	byte <birb_cycle
+	byte <bat_cycle
+	byte <skeet_cycle
+	byte <zigzag_cycle
+	byte <galger_cycle
+	byte <dart_cycle
+	byte <spark_cycle
+	byte <bullet_cycle
+	byte <boss_vamp_bat_cycle
+	byte <maggs_cycle
+	byte <chomps_cycle
+	byte <starglasses_cycle
+	byte <skully_cycle
+	byte <dumbface_cycle
+	byte <ant_cycle
+	byte <throber_cycle
+	byte <uzi_cycle
+	byte <lasso_cycle
+	byte <boss_vamp_cycle
+	byte <boss_scarab_cycle
 
 enemy_update_table_hi:
-        byte 00 ; null enemy type
-        byte >crossbones_cycle    
-        byte >birb_cycle
-        byte >maggs_cycle
-        byte >starglasses_cycle
-        byte >skully_cycle
-        byte >powerups_cycle
-        byte >bat_cycle
-        byte >boss_vamp_cycle
-        byte >boss_vamp_bat_cycle
-        byte >skeet_cycle
-        byte >zigzag_cycle
-        byte >chomps_cycle
-        byte >spark_cycle
-        byte >dumbface_cycle
-        byte >galger_cycle
-        byte >dart_cycle
-        byte >ant_cycle
-        byte >throber_cycle
-        byte >uzi_cycle
-        byte >bullet_cycle
-        byte >lasso_cycle
-        byte >boss_scarab_cycle
-        byte >do_nothing
-        
-        
+	byte >null_cycle
+	byte >do_nothing
+	byte >crossbones_cycle
+	byte >powerups_cycle
+	byte >birb_cycle
+	byte >bat_cycle
+	byte >skeet_cycle
+	byte >zigzag_cycle
+	byte >galger_cycle
+	byte >dart_cycle
+	byte >spark_cycle
+	byte >bullet_cycle
+	byte >boss_vamp_bat_cycle
+	byte >maggs_cycle
+	byte >chomps_cycle
+	byte >starglasses_cycle
+	byte >skully_cycle
+	byte >dumbface_cycle
+	byte >ant_cycle
+	byte >throber_cycle
+	byte >uzi_cycle
+	byte >lasso_cycle
+	byte >boss_vamp_cycle
+	byte >boss_scarab_cycle

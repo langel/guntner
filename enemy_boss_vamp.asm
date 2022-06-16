@@ -20,10 +20,10 @@
 boss_vamp_bat_spawn: subroutine
 	; a = animation counter for ex
 	; x = bat slot in enemy ram
-	lda #$09
+	lda #boss_vamp_bat_id
         sta enemy_ram_type,x
         tay
-        lda ENEMY_HITPOINTS_TABLE,y
+        lda enemy_hitpoints_table,y
         sta enemy_ram_hp,x 
         lda #$20
         sta state_v7
@@ -383,10 +383,10 @@ boss_vamp_state_blow_bats: subroutine
 
         
 boss_vamp_spawn: subroutine
-	lda #$08
+	lda #boss_vamp_id
         sta enemy_ram_type,x
         tay
-        lda ENEMY_HITPOINTS_TABLE,y
+        lda enemy_hitpoints_table,y
         sta enemy_ram_hp,x 
         ; set spawn x
         lda #$00

@@ -141,10 +141,10 @@ arc_sequence_set: subroutine
         
 galger_spawn: subroutine
 	; x is set by enemy spawner
-	lda #$0f
+	lda #galger_id
         sta enemy_ram_type,x 
         tay
-        lda ENEMY_HITPOINTS_TABLE,y
+        lda enemy_hitpoints_table,y
         sta enemy_ram_hp,x 
         ; arc system setup
         lda #0

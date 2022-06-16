@@ -1,10 +1,10 @@
 
 throber_spawn: subroutine
 	; x is set by enemy spawner
-	lda #$12
+	lda #throber_id
         sta enemy_ram_type,x 
         tay
-        lda ENEMY_HITPOINTS_TABLE,y
+        lda enemy_hitpoints_table,y
         sta enemy_ram_hp,x 
         jsr get_oam_offset_from_slot_offset
         lda #$42

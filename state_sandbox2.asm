@@ -45,6 +45,7 @@ sandbox2_init: subroutine
         sta starfield_msg_return_hi
         
         ldx #$0
+        stx state_v1
         jsr arc_sequence_set
         
 	rts
@@ -97,7 +98,7 @@ sandbox2_update: subroutine
         lda wtf
         bne .starglasses_done
         jsr get_enemy_slot_4_sprite
-        jsr starglasses_spawn
+        ;jsr starglasses_spawn
         inc starglasses_count
 .starglasses_done
         
@@ -107,6 +108,40 @@ sandbox2_update: subroutine
         
         ;lda wtf
         ;beq .do_next_state
+        
+        lda wtf
+        cmp #$80
+        bne .dont_count
+        inc state_v1
+        lda #$02
+        cmp state_v1
+        bne .dont_count
+.next_arc_seq
+	lda #$0
+        sta state_v1
+        sta enemy_ram_offset
+        lda #$20
+        sta enemy_oam_offset
+.enemy_clear_loop
+        jsr enemy_death
+        clc
+        lda #$08
+        adc enemy_ram_offset
+        cmp #$80
+        beq .enemy_clear_done
+        sta enemy_ram_offset
+        lda #$04
+        clc
+        adc enemy_oam_offset
+        sta enemy_oam_offset
+        bne .enemy_clear_loop
+.enemy_clear_done
+	lda #0
+        sta state_v1
+	inc phase_current
+        inc phase_state
+        jsr sandbox2_phase_next
+.dont_count
         
 	lda phase_kill_count
         cmp #16

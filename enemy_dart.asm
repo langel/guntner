@@ -17,7 +17,7 @@ dart_spawn: subroutine
         cpx #$ff
         beq .done
 .spawn
-	lda #$10
+	lda #dart_id
         sta enemy_ram_type,x
         lda #0
         sta enemy_ram_x,x ; sub pixel pos
