@@ -5,7 +5,6 @@ player_dead_tile	= $0a
 
 player_game_reset: subroutine
 	lda #$00
-        sta phase_current
         sta phase_state
         sta phase_kill_count
         sta phase_end_game
@@ -20,6 +19,8 @@ player_game_reset: subroutine
         sta score_0000xx00
         sta score_000000xx
         jsr timer_reset
+        lda #$01
+        sta phase_current
 	lda #$d0
         sta player_x_hi
         sta player_demo_x

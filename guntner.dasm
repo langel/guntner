@@ -74,7 +74,7 @@ cart_start:	subroutine
         
         
 ;============================== M O D E   I N I T   H E R E
-	;jsr game_init
+	jsr game_init
 	;jsr menu_screens_init
         ;jsr demo_init
         ;jsr cut_scene_00_init
@@ -83,7 +83,7 @@ cart_start:	subroutine
         
         ;jsr options_screen_init
         ;jsr sandbox_init
-   	jsr sandbox2_init
+   	;jsr sandbox2_init
         
         ; XXX why does this need to exist here?
         ;     shouldn't render_enable handle this?
@@ -320,8 +320,6 @@ sprite0_done:
 
 
 	include "phases_and_levels.dasm"
-        nop	; how much prg space we using?
-	include "phase_table.dasm"
         nop	; how much prg space we using?
         
 	include "player_main.dasm"

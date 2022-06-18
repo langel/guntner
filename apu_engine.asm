@@ -272,25 +272,7 @@ apu_update: subroutine
 .skip_sfx_noi_dec
 	rts
         
-        
-; XXX this is awful
-; only used during ConGraTioN
-apu_make_it_hum: subroutine
-        lda #%10110111
-        sta $4000
-	ldx wtf
-        lda sine_table,x
-        sta $4003
-        lda #%10110111
-        sta $4004
-	ldx wtf
-        lda sine_table,x
-        sta $4006
-        lda #$15
-        sta $4007
-	rts
-        
-
+    
 
 
 

@@ -68,7 +68,7 @@ sandbox2_phase_next: subroutine
         sta phase_kill_count
         sta phase_state
         lda #$0f
-        sta phase_enemy_downcount
+        sta state_v4
 	rts
         
         
@@ -146,7 +146,7 @@ sandbox2_update: subroutine
         
 	lda phase_kill_count
         cmp #16
-        lda phase_enemy_downcount
+        lda state_v4
         cmp #$f7
         bcc .dont_next_state
         ; XXX test line here

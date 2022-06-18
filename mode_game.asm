@@ -154,6 +154,7 @@ player_change_speed:
 	rts
         
         
+        
 game_update:
 	jsr player_pause
         ; test for paused

@@ -14,6 +14,7 @@ birb_spawn: subroutine
         sta enemy_ram_pc,x ; pattern counter
         lda rng2
         sta enemy_ram_ac,x ; animation counter
+	jsr get_next_random
         lsr
         clc
         adc #$0c
@@ -80,7 +81,7 @@ birb_cycle: subroutine
         adc #$2c
         sta oam_ram_spr,y
 .frame_done
-        lda #$03
+        lda #$01
         jsr enemy_set_palette
 .done
 	jmp update_enemies_handler_next

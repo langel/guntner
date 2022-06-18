@@ -10,9 +10,9 @@ Palette00:		; 25 bytes
         hex 02113c	;background 2
         hex 0b1a3b	;background 3
         hex 192939	;sprite 0 ; rudy
-        ;hex 132130	;sprite 1; old birb palete
+        hex 132130	;sprite 1; old birb palete
         ;hex 051637	; chomps
-        hex 122130	; vamp eyes & bats
+        ;hex 122130	; vamp eyes & bats
         ;hex 071727	;sprite 2
         hex 150037	; vamp head/face
         hex 013530	;sprite 3 ; starglasses ; crossbones

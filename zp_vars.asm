@@ -122,11 +122,8 @@ nametable_tile_planter_addr_lo	byte
 nametable_tile_planter_addr_hi	byte
 
 phase_kill_count	byte
-phase_enemy_downcount	byte
 phase_current		byte
 phase_state		byte
-phase_temp_addr_lo	byte
-phase_temp_addr_hi	byte
 phase_end_game		byte
 
 dart_frame_max		byte
