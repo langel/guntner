@@ -1,5 +1,7 @@
 ;;;; Constants
 
+; takes up almost 1500 bytes !!!!
+
 ; XXX these constants don't need to be in the ROM
 STARFIELD_MASK		EQM %00111111 ; star probability
 STARFIELD_COL0_START	EQM $00

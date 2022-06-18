@@ -321,6 +321,8 @@ sprite0_done:
 
 	include "phases_and_levels.dasm"
         nop	; how much prg space we using?
+	include "phase_table.dasm"
+        nop	; how much prg space we using?
         
 	include "player_main.dasm"
         nop	; how much prg space we using?

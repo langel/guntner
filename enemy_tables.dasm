@@ -104,8 +104,34 @@ enemy_player_collision_table:
 	byte $20 ; boss_vamp
 	byte $40 ; boss_scarab
 
+enemy_size_table:
+	byte $00 ; null
+	byte $00 ; do_nothing
+	byte $00 ; crossbones
+	byte $00 ; powerups
+	byte $01 ; birb
+	byte $01 ; bat
+	byte $01 ; skeet
+	byte $01 ; zigzag
+	byte $01 ; galger
+	byte $01 ; dart
+	byte $01 ; spark
+	byte $01 ; bullet
+	byte $01 ; boss_vamp_bat
+	byte $02 ; maggs
+	byte $02 ; chomps
+	byte $04 ; starglasses
+	byte $04 ; skully
+	byte $04 ; dumbface
+	byte $04 ; ant
+	byte $04 ; throber
+	byte $04 ; uzi
+	byte $04 ; lasso
+	byte $04 ; boss_vamp
+	byte $04 ; boss_scarab
+
 enemy_update_table_lo:
-	byte <null_cycle
+	byte <do_nothing
 	byte <do_nothing
 	byte <crossbones_cycle
 	byte <powerups_cycle
@@ -131,7 +157,7 @@ enemy_update_table_lo:
 	byte <boss_scarab_cycle
 
 enemy_update_table_hi:
-	byte >null_cycle
+	byte >do_nothing
 	byte >do_nothing
 	byte >crossbones_cycle
 	byte >powerups_cycle
@@ -155,3 +181,55 @@ enemy_update_table_hi:
 	byte >lasso_cycle
 	byte >boss_vamp_cycle
 	byte >boss_scarab_cycle
+
+enemy_spawn_table_lo:
+	byte <do_nothing
+	byte <do_nothing
+	byte <do_nothing
+	byte <do_nothing
+	byte <birb_spawn
+	byte <bat_spawn
+	byte <skeet_spawn
+	byte <zigzag_spawn
+	byte <galger_spawn
+	byte <dart_spawn
+	byte <spark_spawn
+	byte <bullet_spawn
+	byte <boss_vamp_bat_spawn
+	byte <maggs_spawn
+	byte <chomps_spawn
+	byte <starglasses_spawn
+	byte <skully_spawn
+	byte <dumbface_spawn
+	byte <ant_spawn
+	byte <throber_spawn
+	byte <uzi_spawn
+	byte <lasso_spawn
+	byte <boss_vamp_spawn
+	byte <boss_scarab_spawn
+
+enemy_spawn_table_hi:
+	byte >do_nothing
+	byte >do_nothing
+	byte >do_nothing
+	byte >do_nothing
+	byte >birb_spawn
+	byte >bat_spawn
+	byte >skeet_spawn
+	byte >zigzag_spawn
+	byte >galger_spawn
+	byte >dart_spawn
+	byte >spark_spawn
+	byte >bullet_spawn
+	byte >boss_vamp_bat_spawn
+	byte >maggs_spawn
+	byte >chomps_spawn
+	byte >starglasses_spawn
+	byte >skully_spawn
+	byte >dumbface_spawn
+	byte >ant_spawn
+	byte >throber_spawn
+	byte >uzi_spawn
+	byte >lasso_spawn
+	byte >boss_vamp_spawn
+	byte >boss_scarab_spawn

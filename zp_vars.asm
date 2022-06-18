@@ -124,6 +124,9 @@ nametable_tile_planter_addr_hi	byte
 phase_kill_count	byte
 phase_current		byte
 phase_state		byte
+phase_table_ptr		byte
+phase_spawn_type	byte
+phase_spawn_counter	byte
 phase_end_game		byte
 
 dart_frame_max		byte

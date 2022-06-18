@@ -21,7 +21,6 @@ ClearRAM: subroutine
         rts
 
 
-null_cycle:
 do_nothing: subroutine
 	rts
 

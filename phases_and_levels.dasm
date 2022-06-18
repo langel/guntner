@@ -3,6 +3,9 @@
 ;phase_kill_count	byte
 ;phase_current		byte
 ;phase_state		byte
+;phase_table_ptr	byte
+;phase_spawn_type	byte
+;phase_spawn_counter	byte
 ;phase_end_game		byte
 
 ; phase_state : 0 = still spawning
@@ -50,7 +53,7 @@
 ;	enemy id, enemy count, (repeat); null terminated
 ;	enemies spawn every 8th frame
 
-; every level has a table for perdiodic enemy spawns
+; every level has a table for periodic enemy spawns
 ;	enemy id, (repeat); null terminated
 ;	enemies spawn every nth frame
 ;	rate could be set by level (and/or difficulty)
@@ -106,77 +109,99 @@ phase_handler: subroutine
 .dont_count
 
 
-	; starglasses spawn?
+	; large enemy spawn?
         lda timer_frames_1s
         cmp #$30
-        bne .no_starglasses
+        bne .no_large_enemy
         lda timer_frames_10s
         cmp #$30
-        bne .no_starglasses
+        bne .no_large_enemy
         lda timer_seconds_1s
         cmp #$30
-        bne .no_starglasses
+        bne .no_large_enemy
+        ; look for 20 sec increments
+        lda timer_seconds_10s
+        cmp #$31
+        beq .spawn_large_enemy
+        cmp #$33
+        beq .spawn_large_enemy
+        cmp #$35
+        beq .spawn_large_enemy
+        bne .no_large_enemy
+.spawn_large_enemy
         jsr get_enemy_slot_4_sprite
         cmp #$ff
-        beq .no_starglasses
+        beq .no_large_enemy
         tax
+        ; XXX get enemy_id from level table
         jsr starglasses_spawn
-.no_starglasses
+.no_large_enemy
 
-        lda phase_current
-        and #$01
-        bne .phase_current_not_even
-        jmp phase_even_update
-.phase_current_not_even
-	jmp phase_odd_update
 
-phase_even_update: subroutine
+	; check for spawning state
+        ; state_v4 : spawn type
 	; state_v5 : spawn downcounter
-        ; state_v6 : arc sequence id
-	lda phase_state
-        bne .dont_spawn
 	lda wtf
+        ; only spawn every 8th frame
         and #$07
         bne .dont_spawn
-        lda state_v5
-        beq .dont_spawn
-        ; setup arc sequence
+        ; phase state > 0 == done spawning
+	lda phase_state
+        bne .dont_spawn
+        ; if downcounter > 0 then spawn
+        lda phase_spawn_counter
+        bne .do_spawn
+        ; check for next spawn type
+        ldy phase_table_ptr
+        inc phase_table_ptr
+        lda phase_enemy_table,y
+        ; if type == 0 then stop spawning
+        bne .next_spawn_type
+        inc phase_state
+        jmp .dont_spawn
+.next_spawn_type
+	sta phase_spawn_type
+        ; set arc sequence regardless of type
         lda phase_current
-        
         lsr
         sec
         sbc #1
         tax
         jsr arc_sequence_set
-        sta state_v6
-        ; actually spawn
-        jsr get_enemy_slot_1_sprite
+        ; load number to spawn
+        ldy phase_table_ptr
+        inc phase_table_ptr
+        lda phase_enemy_table,y
+        sta phase_spawn_counter
+.do_spawn
+	dec phase_spawn_counter
+        ldy phase_spawn_type
+        lda enemy_spawn_table_lo,y
+        sta temp02
+        lda enemy_spawn_table_hi,y
+        sta temp03
+        ldx enemy_size_table,y
+        cpx #1
+        bne .not_size_1
+	jsr get_enemy_slot_1_sprite
+        jmp .slot_found_check
+.not_size_1
+	cpx #2
+        bne .not_size_2
+	jsr get_enemy_slot_2_sprite
+        jmp .slot_found_check
+.not_size_2
+	jsr get_enemy_slot_4_sprite
+.slot_found_check
         cmp #$ff
-        beq .dont_spawn
-        jsr galger_spawn
-        lda #$00
-        sta enemy_ram_ac,x
-        dec state_v5
-        bne .dont_spawn
-        inc phase_state
+        beq .skip_spawn
+        tax
+        jmp (temp02)
+.skip_spawn
 .dont_spawn
 	rts
         
-phase_odd_update: subroutine
-	lda phase_state
-        bne .dont_spawn
-        lda phase_current
-        asl
-        sta state_v5
-.phase_spawn_loop
-	jsr get_enemy_slot_1_sprite
-        tax
-	jsr birb_spawn
-        dec state_v5
-        bne .phase_spawn_loop
-        inc phase_state
-.dont_spawn
-	rts
+
         
         
  	; XXX not in use yet
