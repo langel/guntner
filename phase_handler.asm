@@ -6,6 +6,7 @@
 ;phase_table_ptr	byte
 ;phase_spawn_type	byte
 ;phase_spawn_counter	byte
+;phase_large_counter	byte
 ;phase_end_game		byte
 
 ; phase_state : 0 = still spawning
@@ -64,6 +65,7 @@ phase_handler: subroutine
         cmp #$00
         beq .speed_skip
 	; update starfield speed
+        ; XXX star speed should be smarter than this
         lda phase_current
         clc
         adc #$03
@@ -71,44 +73,20 @@ phase_handler: subroutine
 .speed_skip
 
 
-        
-.demo_phase_skip_after_time
-        lda wtf
-        cmp #$f0
-        bne .dont_count
-        inc state_v1
-        lda #$01
-        cmp state_v1
-        bne .dont_count
-        ; clear all enemies
-	lda #$0
-        sta wtf
-        sta state_v1
-        sta enemy_ram_offset
-        lda #$20
-        sta enemy_oam_offset
-.enemy_clear_loop
-        jsr enemy_death
-        clc
-        lda #$08
-        adc enemy_ram_offset
-        cmp #$80
-        beq .enemy_clear_done
-        sta enemy_ram_offset
-        lda #$04
-        clc
-        adc enemy_oam_offset
-        sta enemy_oam_offset
-        bne .enemy_clear_loop
-.enemy_clear_done
-	lda #0
-        sta state_v1
+	;jsr demo_phase_skip_after_time        
+	lda phase_state
+        beq .not_next_phase
+        lda phase_kill_counter
+        bne .not_next_phase
+.next_phase
+        lda #$00
+        sta phase_kill_counter
+        sta phase_state
 	inc phase_current
-        inc phase_state
-        jsr sandbox2_phase_next
-.dont_count
+.not_next_phase
 
 
+; LEVEL LARGE ENEMY SPAWN INTERVAL
 	; large enemy spawn?
         lda timer_frames_1s
         cmp #$30
@@ -116,10 +94,15 @@ phase_handler: subroutine
         lda timer_frames_10s
         cmp #$30
         bne .no_large_enemy
+        ; look for 10 second increments
+        lda timer_seconds_1s
+        cmp #$37
+        beq .spawn_large_enemy
+        bne .no_large_enemy
         lda timer_seconds_1s
         cmp #$30
         bne .no_large_enemy
-        ; look for 20 sec increments
+        ; XXX look for 20 sec increments
         lda timer_seconds_10s
         cmp #$31
         beq .spawn_large_enemy
@@ -133,8 +116,22 @@ phase_handler: subroutine
         cmp #$ff
         beq .no_large_enemy
         tax
+        ldy phase_large_counter
+        lda level_enemy_table,y
+        bne .dont_reset_large_counter
+        ldy #0
+        sty phase_large_counter
+        lda level_enemy_table,y
+.dont_reset_large_counter	
+	inc phase_large_counter
+        tay
+        lda enemy_spawn_table_lo,y
+        sta temp02
+        lda enemy_spawn_table_hi,y
+        sta temp03
+        jmp (temp02)
         ; XXX get enemy_id from level table
-        jsr starglasses_spawn
+        ;jsr starglasses_spawn
 .no_large_enemy
 
 
@@ -174,7 +171,6 @@ phase_handler: subroutine
         lda phase_enemy_table,y
         sta phase_spawn_counter
 .do_spawn
-	dec phase_spawn_counter
         ldy phase_spawn_type
         lda enemy_spawn_table_lo,y
         sta temp02
@@ -196,17 +192,56 @@ phase_handler: subroutine
         cmp #$ff
         beq .skip_spawn
         tax
+	dec phase_spawn_counter
+        inc phase_kill_counter
         jmp (temp02)
 .skip_spawn
 .dont_spawn
 	rts
         
-
+        
+        
+demo_phase_skip_after_time: subroutine
+        lda wtf
+        cmp #$f0
+        bne .dont_count
+        inc state_v1
+        lda #$01
+        cmp state_v1
+        bne .dont_count
+        ; clear all enemies
+	lda #$0
+        sta wtf
+        sta state_v1
+        sta enemy_ram_offset
+        lda #$20
+        sta enemy_oam_offset
+.enemy_clear_loop
+        jsr enemy_death
+        clc
+        lda #$08
+        adc enemy_ram_offset
+        cmp #$80
+        beq .enemy_clear_done
+        sta enemy_ram_offset
+        lda #$04
+        clc
+        adc enemy_oam_offset
+        sta enemy_oam_offset
+        bne .enemy_clear_loop
+.enemy_clear_done
+	lda #0
+        sta state_v1
+	inc phase_current
+        inc phase_state
+        jsr sandbox2_phase_next
+.dont_count
+	rts
         
         
  	; XXX not in use yet
 phase_check_end: subroutine
-	lda phase_kill_count
+	lda phase_kill_counter
         ; cmp to target kill count
         bne .phase_not_done
 .phase_next
@@ -214,7 +249,7 @@ phase_check_end: subroutine
 	inc phase_current
         ; XXX check if end of game
         lda #$0
-        sta phase_kill_count
+        sta phase_kill_counter
         sta phase_state
 	
 .phase_not_done

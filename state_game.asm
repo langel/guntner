@@ -30,7 +30,7 @@ game_init:
         lda #6
         jsr state_update_set_addr
         lda #$00
-        sta demo_true
+        sta attract_true
         jsr starfield_bg_init
         jsr render_enable
         jsr palette_fade_in_init
@@ -55,8 +55,8 @@ game_update_generic: subroutine
         lda player_lives
         cmp #$00
         bne .youdead
-        ; demo mode has different behaviour
-        lda demo_true
+        ; attract mode has different behaviour
+        lda attract_true
         cmp #$ff
         beq .youdead
         ; "GAME OVER"
@@ -85,7 +85,7 @@ game_update_generic: subroutine
         jmp .done
 .trigger_fadeout
         ; demo mode has different behaviour
-        lda demo_true
+        lda attract_true
         cmp #$ff
         beq .return_to_title_screen
      	; do not return to title if game is not over

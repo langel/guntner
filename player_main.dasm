@@ -1,12 +1,12 @@
 
-oam_ram_rudy		= $0204
-player_dead_tile	= $0a
+oam_ram_rudy		EQU $0204
+player_dead_tile	EQM $0a
 
 
 player_game_reset: subroutine
 	lda #$00
         sta phase_state
-        sta phase_kill_count
+        sta phase_kill_counter
         sta phase_end_game
         sta player_death_flag
         sta bomb_counter

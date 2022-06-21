@@ -44,7 +44,7 @@
 
 STATE_INIT_FUNCTION_TABLE:
 	.word	menu_screens_init		; 0
-        .word	demo_init			; 1
+        .word	attract_init			; 1
         .word	game_init			; 2
         .word	cut_scene_00_init		; 3
         
@@ -75,7 +75,7 @@ STATE_UPDATE_FUNCTION_TABLE:
         .word	scrollto_options_update		; 2
         .word	options_screen_update		; 3
         .word	scrollto_titles_update		; 4
-        .word	demo_update			; 5
+        .word	attract_update			; 5
         .word	game_update			; 6
         .word	sandbox_update			; 7
         .word	cut_scene_update_generic	; 8

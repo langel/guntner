@@ -65,7 +65,7 @@ sandbox2_phase_next: subroutine
         jsr arc_sequence_set
         ; reset kills
         lda #$00
-        sta phase_kill_count
+        sta phase_kill_counter
         sta phase_state
         lda #$0f
         sta state_v4
@@ -144,7 +144,7 @@ sandbox2_update: subroutine
         jsr sandbox2_phase_next
 .dont_count
         
-	lda phase_kill_count
+	lda phase_kill_counter
         cmp #16
         lda state_v4
         cmp #$f7

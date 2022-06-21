@@ -19,7 +19,7 @@ bg_tile_default	byte
 player_health	byte
 player_lives	byte
 player_heal_c	byte
-demo_true	byte ; if set game in demo mode
+attract_true	byte ; if set game in demo mode
 player_demo_x	byte ; dest x for demo cornputer controlls
 player_demo_y	byte ; dest y for same
 player_demo_lr	byte
@@ -121,12 +121,13 @@ state_update_addr_hi	byte
 nametable_tile_planter_addr_lo	byte
 nametable_tile_planter_addr_hi	byte
 
-phase_kill_count	byte
+phase_kill_counter	byte
 phase_current		byte
 phase_state		byte
 phase_table_ptr		byte
 phase_spawn_type	byte
 phase_spawn_counter	byte
+phase_large_counter	byte
 phase_end_game		byte
 
 dart_frame_max		byte

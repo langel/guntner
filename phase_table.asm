@@ -1,7 +1,7 @@
 
 level_enemy_table:
 	; level 1
-        byte starglasses_id
+        byte starglasses_id, starglasses_id, dumbface_id
         byte 0
         ; level 2
         byte 0
@@ -27,6 +27,7 @@ phase_enemy_table:
         byte birb_id, 4
         byte maggs_id, 4
         byte birb_id, 4
+        byte 0
         ; phase 6
         byte galger_id, 12
         byte 0
@@ -43,5 +44,7 @@ phase_enemy_table:
         ; phase 9
         byte boss_scarab_id, 1
         byte 0
+        
+
         
         

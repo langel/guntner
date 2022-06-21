@@ -25,6 +25,23 @@ star_oam_end		EQM <(star_oam_start+$80)
 ;		- bg to sprite
 ;		- sprite to bg
 
+; init:
+;        jsr sandbox2_phase_next       
+;        lda #<sandbox2_phase_next
+;        sta starfield_msg_return_lo
+;        lda #>sandbox2_phase_next
+;        sta starfield_msg_return_hi
+
+; usage :
+;        ldx state_v6
+;        lda starfield_msg_table_lo,x
+;        sta starfield_msg_pos_lo
+;        lda starfield_msg_table_hi,x
+;        sta starfield_msg_pos_hi
+;        jsr starfield_bg2spr_init
+
+; returns to sandbox2_phase_next using hardcoded jsr
+
 
 ; XXX might could remove hi byte table if all on same page
 starfield_update_state_function_lo:

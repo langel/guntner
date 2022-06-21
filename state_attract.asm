@@ -1,7 +1,7 @@
 
 
 
-demo_init:
+attract_init:
   ; SCROLL SPEED
   	lda #$07
         sta scroll_speed_cache
@@ -9,17 +9,17 @@ demo_init:
         lda #5
         jsr state_update_set_addr
         lda #$ff
-        sta demo_true
+        sta attract_true
         jsr starfield_bg_init
         jsr render_enable
         jsr palette_fade_in_init
         ; XXX testing
-        jsr audio_init_song
+        ;jsr audio_init_song
         rts
         
         
 
-demo_update: subroutine
+attract_update: subroutine
         ; some buttons return to menu
         lda player_start
         ora player_a
@@ -30,7 +30,7 @@ demo_update: subroutine
 	jsr palette_fade_out_init
 	jmp state_update_done
 .menu_return_buttons_not_pressed
-	jsr demo_enemy_spawn
+	jsr attract_enemy_spawn
 	jsr get_enemy_slot_4_sprite
         cmp #$ff
         beq .no_enemy_spawn
@@ -49,7 +49,7 @@ demo_update: subroutine
         
         
         
-demo_enemy_spawn: subroutine
+attract_enemy_spawn: subroutine
 	; 1 sprite enemy slots
         lda enemy_slot_1_next
         cmp #$ff
@@ -58,8 +58,6 @@ demo_enemy_spawn: subroutine
         lda rng0
         lsr
         and #$07
-        cmp #$00
-        ;beq .spawn_bat
         cmp #$01
         beq .spawn_zigzag
         cmp #$02
@@ -76,9 +74,6 @@ demo_enemy_spawn: subroutine
         rts
 .spawn_skeet
 	jsr skeet_spawn
-        rts
-.spawn_chomps
-	jsr chomps_spawn
         rts
 .spawn_spark
 	jsr spark_spawn

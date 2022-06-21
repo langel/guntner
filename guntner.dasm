@@ -76,7 +76,7 @@ cart_start:	subroutine
 ;============================== M O D E   I N I T   H E R E
 	jsr game_init
 	;jsr menu_screens_init
-        ;jsr demo_init
+        ;jsr attract_init
         ;jsr cut_scene_00_init
         ;lda #$0a
         ;sta game_mode
@@ -272,15 +272,15 @@ sprite0_done:
 	include "starfield.dasm"
         nop	; how much prg space we using?
         
+        
 	include "timer_global.dasm"
         nop	; how much prg space we using?
         
         
-	include "enemy_tables.dasm"
-        nop	; how much prg space we using?
 	include "enemy_handler.dasm"
         nop	; how much prg space we using?
-
+	include "enemy_tables.dasm"
+        nop	; how much prg space we using?
 	
 	include "enemy_boss_scarab.asm"
         nop	; how much prg space we using?
