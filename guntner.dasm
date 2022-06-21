@@ -246,9 +246,9 @@ sprite0_done:
         nop	; how much prg space we using?
 	include "state_game.asm"
         nop	; how much prg space we using?
-	include "phases_and_levels.dasm"
+	include "phase_handler.asm"
         nop	; how much prg space we using?
-	include "phase_table.dasm"
+	include "phase_table.asm"
         nop	; how much prg space we using?
 
 	include "state_sandbox.asm"
