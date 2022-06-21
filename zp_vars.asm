@@ -225,14 +225,4 @@ sfx_noi_update_type	byte
 ; XXX the temp?
 apu_temp		byte
 
-title_screen_color	byte
-title_rudy_pos		byte
 
-options_rudy_pos	byte
-options_music_on	byte
-options_song_id		byte
-options_sound_id	byte
-options_rudy_color1	byte	
-options_rudy_color2	byte
-
-scroll_to_counter	byte

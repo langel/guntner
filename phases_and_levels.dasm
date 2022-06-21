@@ -139,8 +139,8 @@ phase_handler: subroutine
 
 
 	; check for spawning state
-        ; state_v4 : spawn type
-	; state_v5 : spawn downcounter
+        ; phase_spawn_type
+	; phase_spawn_counter
 	lda wtf
         ; only spawn every 8th frame
         and #$07

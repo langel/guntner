@@ -59,7 +59,7 @@ demo_enemy_spawn: subroutine
         lsr
         and #$07
         cmp #$00
-        beq .spawn_bat
+        ;beq .spawn_bat
         cmp #$01
         beq .spawn_zigzag
         cmp #$02

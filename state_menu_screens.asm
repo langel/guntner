@@ -1,4 +1,18 @@
 
+
+title_screen_color	EQU $180
+title_rudy_pos		EQU $181
+
+options_rudy_pos	EQU $182
+options_music_on	EQU $183
+options_song_id		EQU $184
+options_sound_id	EQU $185
+options_rudy_color1	EQU $186
+options_rudy_color2	EQU $187
+
+scroll_to_counter	EQU $188
+
+
 menu_screens_init: subroutine
 
         jsr render_disable
@@ -249,7 +263,7 @@ menu_screen_tile_data:
         .byte #$ff
         
                 
-guntner_title_name_table:
+guntner_title_name_table:  ; 256 bytes
 	.byte $c0,$c0,$c0,$c1,$c2,$c3,$c4,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2
 	.byte $c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c5,$c0,$c0,$c0
 	.byte $c0,$c0,$c0,$c6,$c7,$c8,$c9,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$cb
