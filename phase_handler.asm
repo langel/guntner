@@ -234,27 +234,12 @@ demo_phase_skip_after_time: subroutine
         sta state_v1
 	inc phase_current
         inc phase_state
-        jsr sandbox2_phase_next
+        ; XXX need next phase subroutine
+        ;jsr sandbox2_phase_next
 .dont_count
 	rts
         
-        
- 	; XXX not in use yet
-phase_check_end: subroutine
-	lda phase_kill_counter
-        ; cmp to target kill count
-        bne .phase_not_done
-.phase_next
-	; XXX end of phase SFX
-	inc phase_current
-        ; XXX check if end of game
-        lda #$0
-        sta phase_kill_counter
-        sta phase_state
-	
-.phase_not_done
-	rts
-        
+
         
 
         

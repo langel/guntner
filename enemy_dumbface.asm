@@ -40,7 +40,7 @@ dumbface_cycle: subroutine
 .going_down
 	inc enemy_ram_y,x
         lda enemy_ram_y,x
-        cmp #$a8
+        cmp #$ad
         bne .updown_done
         lda #$00
         sta enemy_ram_ex,x

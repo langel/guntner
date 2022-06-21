@@ -16,6 +16,7 @@ game_init_generic: subroutine
         
         jsr timer_reset
 	jsr player_game_reset
+        jsr starfield_init
         jsr dashboard_init
         jsr dashboard_update
         jsr dashboard_render
@@ -31,7 +32,6 @@ game_init:
         jsr state_update_set_addr
         lda #$00
         sta attract_true
-        jsr starfield_bg_init
         jsr render_enable
         jsr palette_fade_in_init
         rts

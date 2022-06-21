@@ -64,9 +64,10 @@ state_init_call:
 STATE_RENDER_FUNCTION_TABLE:
 	.word	state_render_do_nothing		; 0
         .word	menu_screens_render		; 1
-        .word	starfield_bg_render		; 2
+        ;.word	starfield_bg_render		; 2
+        .word	starfield_render		; 3
         .word 	state_render_do_nothing ; placeholder
-        .word	starfield_sprmsg_render		; 4
+        ;.word	starfield_sprmsg_render		; 4
         .word	dashboard_render		; 5
 
 STATE_UPDATE_FUNCTION_TABLE:
@@ -79,8 +80,8 @@ STATE_UPDATE_FUNCTION_TABLE:
         .word	game_update			; 6
         .word	sandbox_update			; 7
         .word	cut_scene_update_generic	; 8
-        .word	sandbox2_update			; 9
-        .word	starfield_sprmsg_update		; a
+        ;.word	sandbox2_update			; 9
+        ;.word	starfield_sprmsg_update		; a
 
 
 

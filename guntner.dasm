@@ -253,8 +253,8 @@ sprite0_done:
 
 	include "state_sandbox.asm"
         nop	; how much prg space we using?
-	include "state_sandbox2.asm"
-        nop	; how much prg space we using?
+	;include "state_sandbox2.asm"
+        ;nop	; how much prg space we using?
 
 	include "arctang.asm"
         nop	; how much prg space we using?
@@ -269,9 +269,11 @@ sprite0_done:
         nop	; how much prg space we using?
 	include "sine.dasm"
         nop	; how much prg space we using?
-	include "starfield.dasm"
+	;include "starfield.dasm"
+        ;nop	; how much prg space we using?
+	include "starfield_simple.asm"
         nop	; how much prg space we using?
-        
+
         
 	include "timer_global.dasm"
         nop	; how much prg space we using?
@@ -336,6 +338,8 @@ sprite0_done:
 	include "apu_sfx.asm"
         nop	; how much prg space we using?
 
+;f4d9 - gutted fancy starfield/msg feature
+;fa82 - 1st level playable
 ;f7e3 - scarab boss
 ;f6e3 - ant/lasso/throber/uzi
 ;f37d - new audio engine and powerup sfx

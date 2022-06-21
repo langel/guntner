@@ -10,7 +10,6 @@ attract_init:
         jsr state_update_set_addr
         lda #$ff
         sta attract_true
-        jsr starfield_bg_init
         jsr render_enable
         jsr palette_fade_in_init
         ; XXX testing
