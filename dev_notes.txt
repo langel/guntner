@@ -11,6 +11,8 @@ tools? #nesdev #GunTneR [ !ks for info ]\
 
 
 
+
+
 	
 	so many bits #nesdev #GunTneR [ !ks for info ]
 	

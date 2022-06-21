@@ -236,19 +236,23 @@ sprite0_done:
 	include "ppu_lib.dasm"
         nop	; how much prg space we using?  
         
-	include "state_machine.asm"
+	include "state__handler.asm"
         nop	; how much prg space we using?
 	include "state_menu_screens.asm"
         nop	; how much prg space we using?
 	include "state_cutscenes.asm"
         nop	; how much prg space we using?
-	include "mode_demo.asm"
+	include "state_attract.asm"
         nop	; how much prg space we using?
-	include "mode_game.asm"
+	include "state_game.asm"
         nop	; how much prg space we using?
-	include "mode_sandbox.asm"
+	include "phases_and_levels.dasm"
         nop	; how much prg space we using?
-        
+	include "phase_table.dasm"
+        nop	; how much prg space we using?
+
+	include "state_sandbox.asm"
+        nop	; how much prg space we using?
 	include "state_sandbox2.asm"
         nop	; how much prg space we using?
 
@@ -314,14 +318,6 @@ sprite0_done:
 	include "enemy_uzi.asm"
         nop	; how much prg space we using?
 	include "enemy_zigzag.asm"
-        nop	; how much prg space we using?
-        
-	include "enemy_test.asm"
-
-
-	include "phases_and_levels.dasm"
-        nop	; how much prg space we using?
-	include "phase_table.dasm"
         nop	; how much prg space we using?
         
 	include "player_main.dasm"
