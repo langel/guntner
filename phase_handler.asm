@@ -191,9 +191,15 @@ phase_handler: subroutine
 .slot_found_check
         cmp #$ff
         beq .skip_spawn
+        sta temp00
+        lsr
+        lsr
+        lsr
         tax
+        inc phase_spawn_table,x
 	dec phase_spawn_counter
         inc phase_kill_counter
+        ldx temp00
         jmp (temp02)
 .skip_spawn
 .dont_spawn

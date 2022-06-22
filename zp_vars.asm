@@ -136,9 +136,6 @@ starglasses_count	byte
 enemy_ram_offset	byte
 enemy_oam_offset	byte
 enemy_slot_id		byte
-enemy_slot_1_next	byte
-enemy_slot_2_next	byte
-enemy_slot_4_next	byte
 enemy_dmg_accumulator	byte
 boss_dmg_handle_true	byte
 boss_x		byte

@@ -55,8 +55,9 @@ powerups_cycle: subroutine
         lda oam_ram_x,y
         sta collision_0_x
         lda oam_ram_y,y
+        sbc #3
         sta collision_0_y
-        lda #$08
+        lda #$0d
         sta collision_0_w
         sta collision_0_h
         lda #$00

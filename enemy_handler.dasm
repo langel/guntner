@@ -2,14 +2,7 @@
 
 ENEMY_HIT_PALETTE_FRAMES	EQM $04
 
-enemy_ram_type = $0300
-enemy_ram_hp   = $0301
-enemy_ram_x    = $0302
-enemy_ram_y    = $0303
-enemy_ram_pc   = $0304
-enemy_ram_ac   = $0305
-enemy_ram_hc   = $0306
-enemy_ram_ex   = $0307
+phase_spawn_table	= $0160
 
 oam_ram_x      = $0203
 oam_ram_y      = $0200
@@ -19,6 +12,14 @@ oam_ram_att    = $0202
 oam_enemy_sprites = $0220
 
 
+enemy_ram_type = $0300
+enemy_ram_hp   = $0301
+enemy_ram_x    = $0302
+enemy_ram_y    = $0303
+enemy_ram_pc   = $0304
+enemy_ram_ac   = $0305
+enemy_ram_hc   = $0306
+enemy_ram_ex   = $0307
 
 ;;;; enemy types
 ;	0 = [nothing]
@@ -184,14 +185,18 @@ enemy_death: subroutine
 enemy_slot_offset_to_oam_offset:
 	; slots leftshift 3 times to get enemy_ram_offset
         ; 1 sprite slots : start at $300
+	; 16 slots using 1 sprite
         byte $20,$24,$28,$2c,$30,$34,$38,$3c
         byte $40,$44,$48,$4c,$50,$54,$58,$5c
         ; 2 sprite slots : start at $380
+        ; 4 slots using 2 sprites
         byte $60,$68,$70,$78
         ; 4 sprite slots : start at $3a0
+        ; 8 slots using 4 sprites
         byte $80,$90,$a0,$b0,$c0,$d0,$e0,$f0
         ; null terminater
         byte $00
+        
         
         
 enemies_update_all: subroutine
@@ -436,13 +441,20 @@ enemy_handle_damage_and_death: subroutine
         ; #$a0 to include 2 sprite enemies
         ;cpx #$a0
         ;bcs .not_smaller_enemy
+        ldy enemy_slot_id
+        lda phase_spawn_table,y
+        beq .not_phase_spawn
+        lda #$00
+        sta phase_spawn_table,y
 	dec phase_kill_counter
 .not_smaller_enemy
+.not_phase_spawn
         jsr sfx_enemy_death
         ; change it into crossbones!
         lda #crossbones_id
         sta enemy_ram_type,x
         sta enemy_ram_hp,x
+        ldy enemy_oam_offset
         ; return to enemy handler not cycle
         pla
         pla
@@ -484,14 +496,6 @@ enemy_set_palette: subroutine
 ; 2 sprite can occupy 12 slots
 ; 4 sprite restricted to their 8 slots
 
-slot_offset_to_oam_offset_table:
-	; 16 slots using 1 sprite
-	.byte $20, $24, $28, $2c, $30, $34, $38, $3c
-        .byte $40, $44, $48, $4c, $50, $54, $58, $5c
-        ; 4 slots using 2 sprites
-        .byte $60, $68, $70, $78
-        ; 8 slots using 4 sprites
-        .byte $80, $90, $a0, $b0, $c0, $d0, $e0, $f0
 
 get_oam_offset_from_slot_offset: subroutine
 	; x = slot offset
@@ -502,96 +506,16 @@ get_oam_offset_from_slot_offset: subroutine
         lsr
         lsr
         tax
-        ldy slot_offset_to_oam_offset_table,x
+        ldy enemy_slot_offset_to_oam_offset,x
         ldx temp00
         rts
         
-get_enemy_slot_cache_next:
-        ; XXX should be refactored to use subroutines below
-        ;     also do we even need this?
-        ; XXX should either remove this or use it more!
-;get_enemy_slot_1_sprite: subroutine
-	; returns enemy_ram offset
-        lda #$00
-.slot_1_loop
-	tax
-        stx temp00
-        lda $0300,x
-        cmp #$00
-        beq .slot_1_found
-        lda #$08
-        clc
-        adc temp00
-        cmp #$80
-        bne .slot_1_loop
-.no_available_slot_1
-        ldx #$ff 
-.slot_1_found
-	stx enemy_slot_1_next
         
-;get_enemy_slot_2_sprite: subroutine
-	; returns enemy_ram offset
-        lda #$80
-.slot_2_loop
-	tax
-        stx temp00
-        lda $0300,x
-        cmp #$00
-        beq .slot_2_found
-        lda #$08
-        clc
-        adc temp00
-        cmp #$a0
-        bne .slot_2_loop
-.no_available_slot_2
-        ldx #$ff 
-.slot_2_found
-	stx enemy_slot_2_next
-        
-;get_enemy_slot_4_sprite: subroutine
-	; returns enemy_ram offset
-        lda #$a0
-.slot_4_loop
-	tax
-        stx temp00
-        lda $0300,x
-        cmp #$00
-        beq .slot_4_found
-        lda #$08
-        clc
-        adc temp00
-        cmp #$e0
-        bne .slot_4_loop
-.no_available_slot_4
-        ldx #$ff 
-.slot_4_found
-	stx enemy_slot_4_next
-	rts
-        
-        
-get_enemy_slot_1_count: subroutine
-	; returns number of enemies of slot_1 type in a
-        lda #$00
-        sta temp01 ; occupied count
-.loop
-        sta temp00 ; slot offset
-        lda temp00
-        tax
-        lda $0300,x
-        beq .slot_empty
-        inc temp01
-.slot_empty
-	lda #$08
-        clc
-        adc temp00
-        cmp #$80
-        bne .loop
-        lda temp01
-        rts
         
 
 get_enemy_slot_next: subroutine
 	; returns enemy_ram_offset in x
+        ; works from the top down
         lda #$d8
 .slot_loop
 	tax

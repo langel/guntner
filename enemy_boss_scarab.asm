@@ -2,12 +2,12 @@
 ; things the bat entities need to know
 ; boss_x  : topleft offset
 ; boss_y  : topleft offset
-; state_v0 : state
-; state_v1 : shoot frequency
 ; state_v2 : x sine position
 ; state_v3 : y sine position
 ; state_v4 : x body position
 ; state_v5 : y body position
+; state_v6 : x wing position
+; state_v7 : y wing position
 
 ; scarab palette
 ; $0c, $27, $38
@@ -25,14 +25,15 @@ boss_scarab_spawn: subroutine
         ; setup initial state
         lda enemy_hitpoints_table,x
         sta $03b9
-        lda #$14
+        lda #$0
         sta boss_x
+        lda #$1c
         sta boss_y
         lda #$00
-        sta state_v0
-        sta state_v1
         sta state_v3
-        lda #$40
+        sta state_v6
+        sta state_v7
+        lda #$c0
         sta state_v2
         
         ; palette
@@ -115,6 +116,17 @@ boss_scarab_cycle: subroutine
         ora temp01
         sta temp02 ; y offset
         
+        inc state_v7
+        lda state_v7
+        cmp #3
+        bne .state_v7_dont_reset
+        lda #0
+        sta state_v7
+.state_v7_dont_reset
+	lda wtf
+        and #1
+        sta state_v6
+        
 	; top middle
 	lda #$10
         clc
@@ -124,13 +136,13 @@ boss_scarab_cycle: subroutine
         sec
         sbc #$6
         clc
-        adc temp01
+        adc state_v6
         sta temp00
         jsr sprite_4_set_x
         lda state_v5
         sec
         sbc #$c
-        sbc temp02
+        sbc state_v7
         jsr sprite_4_set_y
         lda #$80
         jsr sprite_4_set_sprite
@@ -145,7 +157,7 @@ boss_scarab_cycle: subroutine
         lda state_v5
         sec
         sbc #$1c
-        sbc temp02
+        sbc state_v7
         jsr sprite_4_set_y
         lda #$60
         jsr sprite_4_set_sprite
@@ -160,7 +172,7 @@ boss_scarab_cycle: subroutine
         lda state_v5
         clc
         adc #$c
-        adc temp02
+        adc state_v7
         jsr sprite_4_set_y
         lda #$80
         jsr sprite_4_set_sprite_flip
@@ -175,7 +187,7 @@ boss_scarab_cycle: subroutine
         lda state_v5
         clc
         adc #$1c
-        adc temp02
+        adc state_v7
         jsr sprite_4_set_y
         lda #$60
         jsr sprite_4_set_sprite_flip
@@ -209,15 +221,10 @@ boss_scarab_cycle: subroutine
         
 ; SHOOT
 	lda wtf
-        and #$1f
-        bne .dont_change_freq
-        inc state_v1
-        lda state_v1
         and #$03
-        sta state_v1
-.dont_change_freq
-	lda wtf
-        and state_v1
+        bne .done
+        lda wtf
+        and #$20
         bne .done
         
 .dart_fire
@@ -232,7 +239,7 @@ boss_scarab_cycle: subroutine
         jsr dart_spawn
         cpx #$ff
         beq .done
-        lda #<arctang_velocity_1.75
+        lda #<arctang_velocity_2.5
         sta enemy_ram_pc,x
         lda #$02
         sta oam_ram_att,y
@@ -243,4 +250,12 @@ boss_scarab_cycle: subroutine
         
 
 .done
+	lda wtf
+        and #$0f
+        bne .done_x_entrance
+	lda boss_x
+        cmp #$40
+        beq .done_x_entrance
+        inc boss_x
+.done_x_entrance
 	jmp update_enemies_handler_next

@@ -72,6 +72,29 @@ sandbox2_phase_next: subroutine
 	rts
         
         
+
+        ; XXX do we need this?
+get_enemy_slot_1_count: subroutine
+	; returns number of enemies of slot_1 type in a
+        lda #$00
+        sta temp01 ; occupied count
+.loop
+        sta temp00 ; slot offset
+        lda temp00
+        tax
+        lda $0300,x
+        beq .slot_empty
+        inc temp01
+.slot_empty
+	lda #$08
+        clc
+        adc temp00
+        cmp #$80
+        bne .loop
+        lda temp01
+        rts
+        
+        
 sandbox2_update: subroutine
 	lda phase_state
         bne .dont_spawn

@@ -41,7 +41,7 @@ phase_enemy_table:
         byte galger_id, 12
         byte skully_id, 2
         byte 0
-        ; phase 9
+        ; phase f
         byte boss_scarab_id, 1
         byte 0
         

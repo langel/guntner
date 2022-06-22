@@ -82,7 +82,7 @@ cart_start:	subroutine
         ;sta game_mode
         
         ;jsr options_screen_init
-        ;jsr sandbox_init
+        jsr sandbox_init
    	;jsr sandbox2_init
         
         ; XXX why does this need to exist here?
@@ -163,20 +163,20 @@ sprite0_wait:
 .wait1	bit PPU_STATUS
         beq .wait1
         
-        ; XXX vertical scroll solution
-        lda #$26
-        sta PPU_ADDR
-        lda #$c0
-        sta PPU_ADDR
-        lda #$00
-        sta PPU_SCROLL
-        sta PPU_SCROLL
 	; HUD POSITIONING
-        ; XXX horizontal scroll solution
-        ;bit PPU_STATUS
+        ; XXX vertical scroll solution
+        ;lda #$26
+        ;sta PPU_ADDR
+        ;lda #$c0
+        ;sta PPU_ADDR
         ;lda #$00
         ;sta PPU_SCROLL
         ;sta PPU_SCROLL
+        ; XXX horizontal scroll solution
+        bit PPU_STATUS
+        lda #$00
+        sta PPU_SCROLL
+        sta PPU_SCROLL
         
 	; set bg pos to page 2 for dashboard
 	lda #$01|#CTRL_NMI|CTRL_BG_1000
@@ -196,7 +196,6 @@ sprite0_wait:
         cmp #$00
         bne sprite0_done
 	jsr dashboard_update
-        jsr get_enemy_slot_cache_next
 sprite0_done:
 
 	; XXX starfield debugger
@@ -291,8 +290,8 @@ sprite0_done:
         
 	include "enemy_ant.asm"
         nop	; how much prg space we using?
-	include "enemy_bat.asm"
-        nop	; how much prg space we using?
+	;include "enemy_bat.asm"
+        ;nop	; how much prg space we using?
 	include "enemy_birb.asm"
         nop	; how much prg space we using?
 	include "enemy_chomps.asm"
@@ -338,6 +337,7 @@ sprite0_done:
 	include "apu_sfx.asm"
         nop	; how much prg space we using?
 
+;f3c0 - gutted superfluous enemy handling code
 ;f4d9 - gutted fancy starfield/msg feature
 ;fa82 - 1st level playable
 ;f7e3 - scarab boss

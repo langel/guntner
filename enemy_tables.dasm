@@ -1,4 +1,4 @@
-	; 24 enemy entities defined
+	; 23 enemy entities defined
 
 ; enemy id list: 
 null_id              EQM $00
@@ -6,25 +6,24 @@ do_nothing_id        EQM $01
 crossbones_id        EQM $02
 powerups_id          EQM $03
 birb_id              EQM $04
-bat_id               EQM $05
-skeet_id             EQM $06
-zigzag_id            EQM $07
-galger_id            EQM $08
-dart_id              EQM $09
-spark_id             EQM $0a
-bullet_id            EQM $0b
-boss_vamp_bat_id     EQM $0c
-maggs_id             EQM $0d
-chomps_id            EQM $0e
-starglasses_id       EQM $0f
-skully_id            EQM $10
-dumbface_id          EQM $11
-ant_id               EQM $12
-throber_id           EQM $13
-uzi_id               EQM $14
-lasso_id             EQM $15
-boss_vamp_id         EQM $16
-boss_scarab_id       EQM $17
+skeet_id             EQM $05
+zigzag_id            EQM $06
+galger_id            EQM $07
+dart_id              EQM $08
+spark_id             EQM $09
+bullet_id            EQM $0a
+boss_vamp_bat_id     EQM $0b
+maggs_id             EQM $0c
+chomps_id            EQM $0d
+starglasses_id       EQM $0e
+skully_id            EQM $0f
+dumbface_id          EQM $10
+ant_id               EQM $11
+throber_id           EQM $12
+uzi_id               EQM $13
+lasso_id             EQM $14
+boss_vamp_id         EQM $15
+boss_scarab_id       EQM $16
 
 enemy_hitpoints_table:
 	byte $00 ; null
@@ -32,7 +31,6 @@ enemy_hitpoints_table:
 	byte $00 ; crossbones
 	byte $00 ; powerups
 	byte $02 ; birb
-	byte $06 ; bat
 	byte $04 ; skeet
 	byte $10 ; zigzag
 	byte $02 ; galger
@@ -58,7 +56,6 @@ enemy_player_points_table:
 	byte $00, $00, $00, $00 ; crossbones
 	byte $00, $00, $00, $00 ; powerups
 	byte $00, $00, $00, $05 ; birb
-	byte $00, $00, $00, $05 ; bat
 	byte $00, $00, $00, $27 ; skeet
 	byte $00, $00, $02, $79 ; zigzag
 	byte $00, $00, $00, $11 ; galger
@@ -84,7 +81,6 @@ enemy_player_collision_table:
 	byte $00 ; crossbones
 	byte $00 ; powerups
 	byte $02 ; birb
-	byte $06 ; bat
 	byte $04 ; skeet
 	byte $10 ; zigzag
 	byte $02 ; galger
@@ -110,7 +106,6 @@ enemy_size_table:
 	byte $00 ; crossbones
 	byte $00 ; powerups
 	byte $01 ; birb
-	byte $01 ; bat
 	byte $01 ; skeet
 	byte $01 ; zigzag
 	byte $01 ; galger
@@ -136,7 +131,6 @@ enemy_update_table_lo:
 	byte <crossbones_cycle
 	byte <powerups_cycle
 	byte <birb_cycle
-	byte <bat_cycle
 	byte <skeet_cycle
 	byte <zigzag_cycle
 	byte <galger_cycle
@@ -162,7 +156,6 @@ enemy_update_table_hi:
 	byte >crossbones_cycle
 	byte >powerups_cycle
 	byte >birb_cycle
-	byte >bat_cycle
 	byte >skeet_cycle
 	byte >zigzag_cycle
 	byte >galger_cycle
@@ -188,7 +181,6 @@ enemy_spawn_table_lo:
 	byte <do_nothing
 	byte <do_nothing
 	byte <birb_spawn
-	byte <bat_spawn
 	byte <skeet_spawn
 	byte <zigzag_spawn
 	byte <galger_spawn
@@ -214,7 +206,6 @@ enemy_spawn_table_hi:
 	byte >do_nothing
 	byte >do_nothing
 	byte >birb_spawn
-	byte >bat_spawn
 	byte >skeet_spawn
 	byte >zigzag_spawn
 	byte >galger_spawn

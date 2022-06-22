@@ -47,11 +47,11 @@ sandbox_init: subroutine
         
 	jsr get_enemy_slot_4_sprite
         tax
-        ;jsr ant_spawn
+        jsr ant_spawn
         
 	jsr get_enemy_slot_4_sprite
         tax
-        ;jsr ant_spawn
+        jsr ant_spawn
         
 	jsr get_enemy_slot_4_sprite
         tax

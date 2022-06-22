@@ -29,10 +29,10 @@ attract_update: subroutine
 	jsr palette_fade_out_init
 	jmp state_update_done
 .menu_return_buttons_not_pressed
-	jsr attract_enemy_spawn
-	jsr get_enemy_slot_4_sprite
-        cmp #$ff
-        beq .no_enemy_spawn
+	lda wtf
+        and #$03
+        bne .no_enemy_spawn
+	jsr attract_spawn_enemy
 .no_enemy_spawn
 	lda player_health
         cmp #$00
@@ -48,15 +48,28 @@ attract_update: subroutine
         
         
         
-attract_enemy_spawn: subroutine
+attract_spawn_enemy: subroutine
+	lda wtf
+        lsr
+        lsr
+        lsr
+        cmp #0
+        beq .1_sprite_slots
+        cmp #2 
+        beq .2_sprite_slots
+        cmp #4
+        beq .4_sprite_slots
+        rts
+        
 	; 1 sprite enemy slots
-        lda enemy_slot_1_next
+.1_sprite_slots
+        jsr get_enemy_slot_1_sprite
         cmp #$ff
         beq .no_1_sprite_spawn
         tax
         lda rng0
         lsr
-        and #$07
+        and #$03
         cmp #$01
         beq .spawn_zigzag
         cmp #$02
@@ -64,9 +77,6 @@ attract_enemy_spawn: subroutine
         cmp #$03
         beq .spawn_spark
         jsr birb_spawn
-        rts
-.spawn_bat
-	jsr bat_spawn
         rts
 .spawn_zigzag
 	jsr zigzag_spawn
@@ -80,11 +90,13 @@ attract_enemy_spawn: subroutine
 .no_1_sprite_spawn
 
 	; 2 sprite enemy slots
-        lda enemy_slot_2_next
+.2_sprite_slots
+        jsr get_enemy_slot_2_sprite
         cmp #$ff
         beq .4_sprite_slots
         tax
-        lda wtf
+        lda rng0
+        lsr
         and #$01
         beq .no_maggs_spawn
         jsr maggs_spawn
@@ -95,13 +107,13 @@ attract_enemy_spawn: subroutine
 
 	; 4 sprite enemy slots
 .4_sprite_slots
-        lda enemy_slot_4_next
+        jsr get_enemy_slot_4_sprite
         cmp #$ff
         beq .no_bigs_spawn
         tax
         lda rng0
-        jsr NextRandom
-        sta rng0
+        lsr
+        lsr
         and #$03
         cmp #$00
         beq .spawn_starglasses

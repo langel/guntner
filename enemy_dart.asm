@@ -85,6 +85,11 @@ dart_cycle: subroutine
         jmp .despawn
 .no_collision
 
+	; handle direction movement
+        lda enemy_ram_pc,x
+        sta arctang_velocity_lo
+	jsr enemy_update_arctang_path
+
 	; check for despawn
         lda oam_ram_x,y
         cmp #$09
@@ -93,10 +98,6 @@ dart_cycle: subroutine
         cmp sprite_0_y
         bcs .despawn
         
-	; handle direction movement
-        lda enemy_ram_pc,x
-        sta arctang_velocity_lo
-	jsr enemy_update_arctang_path
         
 .done	
 	jmp update_enemies_handler_next
