@@ -43,7 +43,7 @@ enemy_hitpoints_table:
 	byte $05 ; starglasses
 	byte $20 ; skully
 	byte $0a ; dumbface
-	byte $01 ; ant
+	byte $17 ; ant
 	byte $14 ; throber
 	byte $20 ; uzi
 	byte $20 ; lasso
@@ -62,18 +62,18 @@ enemy_player_points_table:
 	byte $00, $00, $00, $00 ; dart
 	byte $00, $40, $ff, $ff ; spark
 	byte $00, $00, $00, $00 ; bullet
-	byte $00, $01, $22, $55 ; boss_vamp_bat
+	byte $00, $00, $00, $19 ; boss_vamp_bat
 	byte $00, $00, $00, $56 ; maggs
 	byte $00, $00, $02, $79 ; chomps
 	byte $00, $00, $25, $00 ; starglasses
 	byte $00, $00, $00, $56 ; skully
 	byte $00, $00, $00, $72 ; dumbface
-	byte $00, $00, $00, $00 ; ant
-	byte $00, $00, $00, $00 ; throber
-	byte $00, $00, $00, $00 ; uzi
-	byte $00, $00, $00, $00 ; lasso
-	byte $00, $06, $06, $06 ; boss_vamp
-	byte $00, $00, $00, $00 ; boss_scarab
+	byte $00, $00, $00, $25 ; ant
+	byte $00, $00, $00, $1b ; throber
+	byte $00, $00, $00, $7b ; uzi
+	byte $00, $00, $09, $29 ; lasso
+	byte $06, $06, $06, $06 ; boss_vamp
+	byte $06, $09, $da, $95 ; boss_scarab
 
 enemy_player_collision_table:
 	byte $00 ; null
@@ -93,7 +93,7 @@ enemy_player_collision_table:
 	byte $05 ; starglasses
 	byte $20 ; skully
 	byte $0a ; dumbface
-	byte $01 ; ant
+	byte $17 ; ant
 	byte $14 ; throber
 	byte $20 ; uzi
 	byte $20 ; lasso

@@ -32,6 +32,12 @@ ant_spawn: subroutine
         
         
 ant_cycle: subroutine
+        lda #$10
+        sta collision_0_w
+        lda #$10
+        sta collision_0_h
+        jsr enemy_handle_damage_and_death
+        
 	lda wtf
         lsr
         lsr

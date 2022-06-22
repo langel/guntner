@@ -22,6 +22,7 @@ boss_vamp_bat_spawn: subroutine
 	; x = bat slot in enemy ram
 	lda #boss_vamp_bat_id
         sta enemy_ram_type,x
+        rts
         tay
         lda enemy_hitpoints_table,y
         sta enemy_ram_hp,x 
@@ -34,7 +35,6 @@ boss_vamp_bat_cycle: subroutine
         lda #$08
         sta collision_0_w
         sta collision_0_h
-        
         jsr enemy_handle_damage_and_death
         
 	lda state_v5
@@ -391,7 +391,11 @@ boss_vamp_spawn: subroutine
         ; set spawn x
         lda #$00
         sta state_v1
-        sta state_v7 ; mouth closed
+        lda #$a0
+        sta state_v2
+        ; set mouth closed
+        lda #$00
+        sta state_v7
         sta enemy_ram_x,x
         ; set spawn y
         lda #$15
@@ -464,6 +468,7 @@ boss_vamp_cycle: subroutine
 
 ; STATE behavior     
         jsr boss_vamp_update_state_delegator
+        ldy enemy_oam_offset
         
 	; SPRITE tiles
         lda state_v7

@@ -307,7 +307,8 @@ crossbones_cycle: subroutine
         lda oam_ram_y,y
         sec
         sbc enemy_ram_y,x
-        bmi .crossbones_death
+        cmp sprite_0_y
+        bcs .crossbones_death
         sta oam_ram_y,y
         lda #$0b
         sta oam_ram_spr,y
@@ -373,11 +374,15 @@ enemy_handle_damage_and_death: subroutine
         ; boss death check
         lda boss_dmg_handle_true
         beq .not_boss_death
+        ; cache enemy type
+        lda enemy_ram_type,x
+        sta temp01
         lda #$00
 .boss_dead_kill_all
 	tax
         lda #crossbones_id
         sta enemy_ram_type,x
+        ldy temp00
         txa
 	cmp #$a0
         bcc .not_4_sprites
@@ -399,9 +404,12 @@ enemy_handle_damage_and_death: subroutine
         ; XXX boss death state (explosion)?
         lda #$00
         sta boss_dmg_handle_true
+        lda temp01
+        bne .enemy_type_already_set
 .not_boss_death
 	; handle point bonus
 	lda enemy_ram_type,x
+.enemy_type_already_set
         asl
         asl
         clc
@@ -415,7 +423,7 @@ enemy_handle_damage_and_death: subroutine
         sta score_000000xx,x
         dey
 	dex
-	bne .score_loop
+	bpl .score_loop
         ldx enemy_ram_offset
         ldy enemy_oam_offset
 ; 4 sprite cleanup
@@ -441,6 +449,7 @@ enemy_handle_damage_and_death: subroutine
         ; #$a0 to include 2 sprite enemies
         ;cpx #$a0
         ;bcs .not_smaller_enemy
+        ; XXX ^ using slot tracking instead now
         ldy enemy_slot_id
         lda phase_spawn_table,y
         beq .not_phase_spawn

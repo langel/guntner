@@ -107,15 +107,6 @@ boss_scarab_cycle: subroutine
         
 ; WINGS
 	; twitch offset
-        lda rng0
-        lsr
-        and #$03
-        sta temp01 ; x offset
-        lda rng1
-        and #$03
-        ora temp01
-        sta temp02 ; y offset
-        
         inc state_v7
         lda state_v7
         cmp #3

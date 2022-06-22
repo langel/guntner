@@ -4,15 +4,21 @@ uzi_spawn: subroutine
         sta enemy_ram_type,x
         tay
         lda enemy_hitpoints_table,y
+        sta enemy_ram_hp,x
         lda #$20
         sta enemy_ram_x,x
-        lda #$30
+        lda #$28
         sta enemy_ram_ac,x
 	rts
         
         
         
 uzi_cycle: subroutine
+        lda #$10
+        sta collision_0_w
+        lda #$10
+        sta collision_0_h
+        jsr enemy_handle_damage_and_death
 ; x pos
         lda enemy_ram_x,x
         sec
@@ -79,7 +85,7 @@ bullet_spawn: subroutine
         clc
         adc #$03
         sta enemy_ram_y,x
-        ; XXX trigger sfx?
+        ; trigger sfx
         jsr sfx_shoot_bullet
         ; animate uzi kickback
         ldx enemy_ram_offset
