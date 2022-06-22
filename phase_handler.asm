@@ -73,7 +73,7 @@ phase_handler: subroutine
 .speed_skip
 
 
-	;jsr demo_phase_skip_after_time        
+	jsr demo_phase_skip_after_time        
 	lda phase_state
         beq .not_next_phase
         lda phase_kill_counter
@@ -207,42 +207,51 @@ phase_handler: subroutine
         
         
         
+; debugger that quickly shows all phase spawns
 demo_phase_skip_after_time: subroutine
+	lda ftw
+        cmp #0
+        bne .done
         lda wtf
-        cmp #$f0
-        bne .dont_count
-        inc state_v1
-        lda #$01
-        cmp state_v1
-        bne .dont_count
+        cmp #150
+        bne .done
+        ; reset wtf/ftw
+        lda #0
+        sta wtf
+        sta ftw
         ; clear all enemies
 	lda #$0
-        sta wtf
-        sta state_v1
+        sta temp00
         sta enemy_ram_offset
         lda #$20
         sta enemy_oam_offset
 .enemy_clear_loop
+	ldx temp00
+        lda phase_spawn_table,x
+        beq .enemy_clear_skip
         jsr enemy_death
+        lda #0
+        ldx temp00
+        sta phase_spawn_table,x
+.enemy_clear_skip
         clc
         lda #$08
         adc enemy_ram_offset
-        cmp #$80
+        cmp #$e0
         beq .enemy_clear_done
         sta enemy_ram_offset
         lda #$04
         clc
         adc enemy_oam_offset
         sta enemy_oam_offset
+        inc temp00
         bne .enemy_clear_loop
 .enemy_clear_done
 	lda #0
-        sta state_v1
+        sta phase_kill_counter
+        sta phase_state
 	inc phase_current
-        inc phase_state
-        ; XXX need next phase subroutine
-        ;jsr sandbox2_phase_next
-.dont_count
+.done
 	rts
         
 

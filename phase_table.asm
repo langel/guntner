@@ -10,6 +10,13 @@ level_enemy_table:
         ; level 4
         byte 0
 
+
+	; phase 0 	: introduce level
+        ; even phases	: galger spawns
+        ; phases 7+d	: spawn until kill count done
+        ; phase e	: boss fight
+        ; phase f	: level outro
+        
 phase_enemy_table:
 	; phase 1
 	byte birb_id, 4

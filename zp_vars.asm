@@ -61,7 +61,8 @@ shroom_counter	byte ; counts down animation frames
 shroom_mod	byte ; apu pitch offset
 mask_shield	byte ; 0 = no skull shield
 
-wtf		byte
+wtf		byte ; frame counter lo
+ftw		byte ; frame counter hi
 rng0		byte
 rng1		byte
 rng2		byte

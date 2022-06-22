@@ -82,7 +82,7 @@ cart_start:	subroutine
         ;sta game_mode
         
         ;jsr options_screen_init
-        jsr sandbox_init
+        ;jsr sandbox_init
    	;jsr sandbox2_init
         
         ; XXX why does this need to exist here?
@@ -209,7 +209,10 @@ sprite0_done:
         jsr powerup_bomb_update
         jsr powerup_mushroom_update
         jsr palette_update
-	inc wtf	; frame counter  
+	inc wtf	; frame counter lo 
+        bne .skip_ftw
+        inc ftw ; frame counter hi
+.skip_ftw
 	jsr timer_update ; update global time
 	lda rng0 ; rng updates
         jsr NextRandom
@@ -245,10 +248,6 @@ sprite0_done:
         nop	; how much prg space we using?
 	include "state_game.asm"
         nop	; how much prg space we using?
-	include "phase_handler.asm"
-        nop	; how much prg space we using?
-	include "phase_table.asm"
-        nop	; how much prg space we using?
 
 	include "state_sandbox.asm"
         nop	; how much prg space we using?
@@ -278,11 +277,16 @@ sprite0_done:
         nop	; how much prg space we using?
         
         
+	include "phase_handler.asm"
+        nop	; how much prg space we using?
+	include "phase_table.asm"
+        nop	; how much prg space we using?
 	include "enemy_handler.dasm"
         nop	; how much prg space we using?
 	include "enemy_tables.dasm"
         nop	; how much prg space we using?
 	
+        
 	include "enemy_boss_scarab.asm"
         nop	; how much prg space we using?
 	include "enemy_boss_vamp.asm"

@@ -234,7 +234,7 @@ boss_scarab_cycle: subroutine
         sta enemy_ram_pc,x
         lda #$02
         sta oam_ram_att,y
-        lda #$a2
+        lda #$fe
         sta oam_ram_spr,y
         ldx enemy_ram_offset
         ldy enemy_oam_offset

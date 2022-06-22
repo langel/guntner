@@ -15,17 +15,17 @@ ant_spawn: subroutine
         lsr
         lsr
         and #1
-        beq .ceiling_ant
-.dash_ant
+        beq .dash_ant
+.ceiling_ant
 	sta enemy_ram_ex,x
-	lda #$06
+	lda #$03
         sta enemy_ram_y,x ; y ant pos
         lda #$0c
         sta enemy_ram_pc,x ; y dart origin
    	rts
-.ceiling_ant
+.dash_ant
 	sta enemy_ram_ex,x
-        lda #$a7
+        lda #$ad
         sta enemy_ram_y,x ; y ant pos
         sta enemy_ram_pc,x ; y dart origin
    	rts
