@@ -13,7 +13,7 @@ level_enemy_table:
 
 	; phase 0 	: introduce level
         ; even phases	: galger spawns
-        ; phases 7+d	: spawn until kill count done
+        ; phases 7 & d	: spawn until kill count done
         ; phase e	: boss fight
         ; phase f	: level outro
         

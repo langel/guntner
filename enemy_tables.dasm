@@ -6,24 +6,24 @@ do_nothing_id        EQM $01
 crossbones_id        EQM $02
 powerups_id          EQM $03
 birb_id              EQM $04
-skeet_id             EQM $05
-zigzag_id            EQM $06
-galger_id            EQM $07
-dart_id              EQM $08
-spark_id             EQM $09
-bullet_id            EQM $0a
+galger_id            EQM $05
+spark_id             EQM $06
+zigzag_id            EQM $07
+skeet_id             EQM $08
+bullet_id            EQM $09
+dart_id              EQM $0a
 boss_vamp_bat_id     EQM $0b
-maggs_id             EQM $0c
-chomps_id            EQM $0d
+chomps_id            EQM $0c
+maggs_id             EQM $0d
 starglasses_id       EQM $0e
-skully_id            EQM $0f
-dumbface_id          EQM $10
+dumbface_id          EQM $0f
+throber_id           EQM $10
 ant_id               EQM $11
-throber_id           EQM $12
-uzi_id               EQM $13
-lasso_id             EQM $14
-boss_vamp_id         EQM $15
-boss_scarab_id       EQM $16
+lasso_id             EQM $12
+skully_id            EQM $13
+uzi_id               EQM $14
+boss_scarab_id       EQM $15
+boss_vamp_id         EQM $16
 
 enemy_hitpoints_table:
 	byte $00 ; null
@@ -31,49 +31,49 @@ enemy_hitpoints_table:
 	byte $00 ; crossbones
 	byte $00 ; powerups
 	byte $02 ; birb
-	byte $04 ; skeet
-	byte $10 ; zigzag
 	byte $02 ; galger
+	byte $03 ; spark
+	byte $03 ; zigzag
+	byte $03 ; skeet
+	byte $01 ; bullet
 	byte $01 ; dart
-	byte $0f ; spark
-	byte $07 ; bullet
 	byte $0a ; boss_vamp_bat
-	byte $09 ; maggs
 	byte $07 ; chomps
+	byte $09 ; maggs
 	byte $05 ; starglasses
-	byte $20 ; skully
-	byte $0a ; dumbface
-	byte $17 ; ant
-	byte $14 ; throber
-	byte $20 ; uzi
-	byte $20 ; lasso
-	byte $20 ; boss_vamp
-	byte $40 ; boss_scarab
+	byte $0b ; dumbface
+	byte $0d ; throber
+	byte $11 ; ant
+	byte $17 ; lasso
+	byte $1d ; skully
+	byte $25 ; uzi
+	byte $2b ; boss_scarab
+	byte $2b ; boss_vamp
 
 enemy_player_points_table:
 	byte $00, $00, $00, $00 ; null
 	byte $00, $00, $00, $00 ; do_nothing
 	byte $00, $00, $00, $00 ; crossbones
 	byte $00, $00, $00, $00 ; powerups
-	byte $00, $00, $00, $05 ; birb
-	byte $00, $00, $00, $27 ; skeet
-	byte $00, $00, $02, $79 ; zigzag
-	byte $00, $00, $00, $11 ; galger
-	byte $00, $00, $00, $00 ; dart
-	byte $00, $40, $ff, $ff ; spark
+	byte $00, $00, $38, $65 ; birb
+	byte $00, $00, $39, $2f ; galger
+	byte $00, $00, $80, $0b ; spark
+	byte $00, $00, $cd, $93 ; zigzag
+	byte $00, $01, $29, $7d ; skeet
 	byte $00, $00, $00, $00 ; bullet
-	byte $00, $00, $00, $19 ; boss_vamp_bat
-	byte $00, $00, $00, $56 ; maggs
-	byte $00, $00, $02, $79 ; chomps
-	byte $00, $00, $25, $00 ; starglasses
-	byte $00, $00, $00, $56 ; skully
-	byte $00, $00, $00, $72 ; dumbface
-	byte $00, $00, $00, $25 ; ant
-	byte $00, $00, $00, $1b ; throber
+	byte $00, $00, $00, $00 ; dart
+	byte $00, $01, $5a, $d5 ; boss_vamp_bat
+	byte $00, $03, $9b, $ad ; chomps
+	byte $00, $0b, $dc, $65 ; maggs
+	byte $00, $0f, $4d, $f9 ; starglasses
+	byte $00, $1d, $cb, $4f ; dumbface
+	byte $00, $30, $c7, $f1 ; throber
+	byte $00, $3b, $ec, $fd ; ant
+	byte $00, $6b, $ef, $ab ; lasso
+	byte $00, $78, $be, $ed ; skully
 	byte $00, $00, $00, $7b ; uzi
-	byte $00, $00, $09, $29 ; lasso
-	byte $06, $06, $06, $06 ; boss_vamp
-	byte $06, $09, $da, $95 ; boss_scarab
+	byte $0b, $c6, $01, $1f ; boss_scarab
+	byte $15, $cc, $8f, $4b ; boss_vamp
 
 enemy_player_collision_table:
 	byte $00 ; null
@@ -81,24 +81,24 @@ enemy_player_collision_table:
 	byte $00 ; crossbones
 	byte $00 ; powerups
 	byte $02 ; birb
-	byte $04 ; skeet
-	byte $10 ; zigzag
 	byte $02 ; galger
+	byte $03 ; spark
+	byte $03 ; zigzag
+	byte $03 ; skeet
+	byte $01 ; bullet
 	byte $01 ; dart
-	byte $0f ; spark
-	byte $07 ; bullet
 	byte $0a ; boss_vamp_bat
-	byte $09 ; maggs
 	byte $07 ; chomps
+	byte $09 ; maggs
 	byte $05 ; starglasses
-	byte $20 ; skully
-	byte $0a ; dumbface
-	byte $17 ; ant
-	byte $14 ; throber
-	byte $20 ; uzi
-	byte $20 ; lasso
-	byte $20 ; boss_vamp
-	byte $40 ; boss_scarab
+	byte $0b ; dumbface
+	byte $0d ; throber
+	byte $11 ; ant
+	byte $17 ; lasso
+	byte $1d ; skully
+	byte $25 ; uzi
+	byte $2b ; boss_scarab
+	byte $2b ; boss_vamp
 
 enemy_size_table:
 	byte $00 ; null
@@ -106,24 +106,24 @@ enemy_size_table:
 	byte $00 ; crossbones
 	byte $00 ; powerups
 	byte $01 ; birb
-	byte $01 ; skeet
-	byte $01 ; zigzag
 	byte $01 ; galger
-	byte $01 ; dart
 	byte $01 ; spark
+	byte $01 ; zigzag
+	byte $01 ; skeet
 	byte $01 ; bullet
+	byte $01 ; dart
 	byte $01 ; boss_vamp_bat
-	byte $02 ; maggs
 	byte $02 ; chomps
+	byte $02 ; maggs
 	byte $04 ; starglasses
-	byte $04 ; skully
 	byte $04 ; dumbface
-	byte $04 ; ant
 	byte $04 ; throber
-	byte $04 ; uzi
+	byte $04 ; ant
 	byte $04 ; lasso
-	byte $04 ; boss_vamp
+	byte $04 ; skully
+	byte $04 ; uzi
 	byte $04 ; boss_scarab
+	byte $04 ; boss_vamp
 
 enemy_update_table_lo:
 	byte <do_nothing
@@ -131,24 +131,24 @@ enemy_update_table_lo:
 	byte <crossbones_cycle
 	byte <powerups_cycle
 	byte <birb_cycle
-	byte <skeet_cycle
-	byte <zigzag_cycle
 	byte <galger_cycle
-	byte <dart_cycle
 	byte <spark_cycle
+	byte <zigzag_cycle
+	byte <skeet_cycle
 	byte <bullet_cycle
+	byte <dart_cycle
 	byte <boss_vamp_bat_cycle
-	byte <maggs_cycle
 	byte <chomps_cycle
+	byte <maggs_cycle
 	byte <starglasses_cycle
-	byte <skully_cycle
 	byte <dumbface_cycle
-	byte <ant_cycle
 	byte <throber_cycle
-	byte <uzi_cycle
+	byte <ant_cycle
 	byte <lasso_cycle
-	byte <boss_vamp_cycle
+	byte <skully_cycle
+	byte <uzi_cycle
 	byte <boss_scarab_cycle
+	byte <boss_vamp_cycle
 
 enemy_update_table_hi:
 	byte >do_nothing
@@ -156,24 +156,24 @@ enemy_update_table_hi:
 	byte >crossbones_cycle
 	byte >powerups_cycle
 	byte >birb_cycle
-	byte >skeet_cycle
-	byte >zigzag_cycle
 	byte >galger_cycle
-	byte >dart_cycle
 	byte >spark_cycle
+	byte >zigzag_cycle
+	byte >skeet_cycle
 	byte >bullet_cycle
+	byte >dart_cycle
 	byte >boss_vamp_bat_cycle
-	byte >maggs_cycle
 	byte >chomps_cycle
+	byte >maggs_cycle
 	byte >starglasses_cycle
-	byte >skully_cycle
 	byte >dumbface_cycle
-	byte >ant_cycle
 	byte >throber_cycle
-	byte >uzi_cycle
+	byte >ant_cycle
 	byte >lasso_cycle
-	byte >boss_vamp_cycle
+	byte >skully_cycle
+	byte >uzi_cycle
 	byte >boss_scarab_cycle
+	byte >boss_vamp_cycle
 
 enemy_spawn_table_lo:
 	byte <do_nothing
@@ -181,24 +181,24 @@ enemy_spawn_table_lo:
 	byte <do_nothing
 	byte <do_nothing
 	byte <birb_spawn
-	byte <skeet_spawn
-	byte <zigzag_spawn
 	byte <galger_spawn
-	byte <dart_spawn
 	byte <spark_spawn
+	byte <zigzag_spawn
+	byte <skeet_spawn
 	byte <bullet_spawn
+	byte <dart_spawn
 	byte <boss_vamp_bat_spawn
-	byte <maggs_spawn
 	byte <chomps_spawn
+	byte <maggs_spawn
 	byte <starglasses_spawn
-	byte <skully_spawn
 	byte <dumbface_spawn
-	byte <ant_spawn
 	byte <throber_spawn
-	byte <uzi_spawn
+	byte <ant_spawn
 	byte <lasso_spawn
-	byte <boss_vamp_spawn
+	byte <skully_spawn
+	byte <uzi_spawn
 	byte <boss_scarab_spawn
+	byte <boss_vamp_spawn
 
 enemy_spawn_table_hi:
 	byte >do_nothing
@@ -206,21 +206,21 @@ enemy_spawn_table_hi:
 	byte >do_nothing
 	byte >do_nothing
 	byte >birb_spawn
-	byte >skeet_spawn
-	byte >zigzag_spawn
 	byte >galger_spawn
-	byte >dart_spawn
 	byte >spark_spawn
+	byte >zigzag_spawn
+	byte >skeet_spawn
 	byte >bullet_spawn
+	byte >dart_spawn
 	byte >boss_vamp_bat_spawn
-	byte >maggs_spawn
 	byte >chomps_spawn
+	byte >maggs_spawn
 	byte >starglasses_spawn
-	byte >skully_spawn
 	byte >dumbface_spawn
-	byte >ant_spawn
 	byte >throber_spawn
-	byte >uzi_spawn
+	byte >ant_spawn
 	byte >lasso_spawn
-	byte >boss_vamp_spawn
+	byte >skully_spawn
+	byte >uzi_spawn
 	byte >boss_scarab_spawn
+	byte >boss_vamp_spawn
