@@ -5,10 +5,6 @@ sandbox_init: subroutine
 
         ;jsr game_init
         jsr game_init_generic
-  ; SCROLL SPEED
-  	;lda #$27
-        lda #$07
-        sta scroll_speed
         
         jsr nametables_clear
         jsr dashboard_init

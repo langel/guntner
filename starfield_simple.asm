@@ -145,13 +145,18 @@ starfield_cache_next_col:
 
 
 death_scroll_speed: subroutine
-        lda scroll_speed
+        lda scroll_speed_hi
         beq .scroll_slow_done
-        lda wtf
-        and #$07
+        lda scroll_speed_lo
+        sec
+        sbc #13
+        sta scroll_speed_lo
+        bcs .scroll_slow_done
+        dec scroll_speed_hi
+        lda scroll_speed_hi
         bne .scroll_slow_done
-        ; slow down stars
-	dec scroll_speed
+        lda #0
+        sta scroll_speed_lo
 .scroll_slow_done
 	rts
         
@@ -171,13 +176,16 @@ starfield_draw_dash_top_bar_nametable0: subroutine
         
 starfield_scroll: subroutine        
 	; update scroll pos
-	lda scroll_x
+        lda scroll_x_lo
         sec
-        sbc scroll_speed
+        sbc scroll_speed_lo
+        sta scroll_x_lo
+        lda scroll_x_hi
+        sbc scroll_speed_hi
+        sta scroll_x_hi
         bcs .samepage
         inc scroll_page
 .samepage
-	sta scroll_x
  	; find starfield column for updating       
         lsr
         lsr
@@ -224,3 +232,4 @@ starfield_twinkle_bg: subroutine
         adc #$0d
         sta pal_bg_1_3
 	rts
+

@@ -4,19 +4,18 @@ game_init_generic: subroutine
 
 	jsr render_disable
         
+        lda #179
+        sta scroll_speed_lo
+        lda #2
+        sta scroll_speed_hi
+        
         lda #2
         jsr state_render_set_addr
-        
-        ;jsr starfield_bg_init
-        
- 	jsr starfield_draw_dash_top_bar_nametable0
-        
-        lda scroll_speed_cache
-        sta scroll_speed
         
         jsr timer_reset
 	jsr player_game_reset
         jsr starfield_init
+ 	jsr starfield_draw_dash_top_bar_nametable0
         jsr dashboard_init
         jsr dashboard_update
         jsr dashboard_render
@@ -48,8 +47,10 @@ game_update_generic: subroutine
         bne .death_already_set
         inc player_death_flag
         jsr sfx_player_death
-        lda scroll_speed
-        sta scroll_speed_cache
+        lda scroll_speed_hi
+        sta scroll_cache_hi
+        lda scroll_speed_lo
+        sta scroll_cache_lo
         ;jsr death_scroll_set_speed_m
         dec player_lives
         lda player_lives
@@ -110,8 +111,10 @@ game_update_generic: subroutine
         sta player_death_flag
         sta you_dead_counter
         ; revert scroll speed
-        lda scroll_speed_cache
-        sta scroll_speed
+        lda scroll_cache_hi
+        sta scroll_speed_hi
+        lda scroll_cache_lo
+        sta scroll_speed_lo
 
 .player_not_dead
 

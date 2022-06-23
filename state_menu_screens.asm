@@ -24,7 +24,7 @@ menu_screens_init: subroutine
 	lda #$01
         jsr state_update_set_addr
         lda #$00
-        sta scroll_x
+        sta scroll_x_hi
         sta scroll_page
         jsr timer_reset
         jsr title_screen_set_rudy_y
@@ -131,7 +131,7 @@ scrollto_options_update: subroutine
         sta scroll_to_counter
         tax
         lda sine_table,x
-        sta scroll_x
+        sta scroll_x_hi
         cpx #$40
         bne .done
         ; setup options
@@ -140,7 +140,7 @@ scrollto_options_update: subroutine
         lda #1
         sta scroll_page
         lda #$00
-        sta scroll_x
+        sta scroll_x_hi
         ;jmp options_screen_init
 .done
 	jsr menus_position_rudy
@@ -157,7 +157,7 @@ scrollto_titles_update: subroutine
         sta scroll_to_counter
         tax
         lda sine_table,x
-        sta scroll_x
+        sta scroll_x_hi
         cpx #$c0
         bne .done
         ; setup options
@@ -173,7 +173,7 @@ scrollto_titles_update: subroutine
 
 
 menus_position_rudy: subroutine
-	lda scroll_x
+	lda scroll_x_hi
         cmp #$00
         bne .do_eeet
         rts
@@ -184,13 +184,13 @@ menus_position_rudy: subroutine
 	jsr title_screen_set_rudy_y
 	lda #$3a
 	sec
-        sbc scroll_x
+        sbc scroll_x_hi
 	jmp .plot_tiles
 .coming_from_right
 	jsr options_screen_set_rudy_y
 	lda #$38
         sec
-        sbc scroll_x
+        sbc scroll_x_hi
 .plot_tiles
         sta oam_ram_rudy+3
         clc

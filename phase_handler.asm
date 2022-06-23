@@ -59,19 +59,24 @@
 ;	enemies spawn every nth frame
 ;	rate could be set by level (and/or difficulty)
 
+
+phase_next: subroutine
+        lda #$00
+        sta phase_kill_counter
+        sta phase_state
+	inc phase_current
+        lda #53
+        clc
+        adc scroll_speed_lo
+        sta scroll_speed_lo
+        bcc .scroll_hi_done
+        inc scroll_speed_hi
+.scroll_hi_done
+	rts
+        
+        
         
 phase_handler: subroutine
-	lda player_health
-        cmp #$00
-        beq .speed_skip
-	; update starfield speed
-        ; XXX star speed should be smarter than this
-        lda phase_current
-        clc
-        adc #$03
-        sta scroll_speed
-.speed_skip
-
 
 	jsr demo_phase_skip_after_time        
 	lda phase_state
@@ -79,12 +84,8 @@ phase_handler: subroutine
         lda phase_kill_counter
         bne .not_next_phase
 .next_phase
-        lda #$00
-        sta phase_kill_counter
-        sta phase_state
-	inc phase_current
+	jsr phase_next
 .not_next_phase
-
 
 ; LEVEL LARGE ENEMY SPAWN INTERVAL
 	; large enemy spawn?
@@ -130,8 +131,6 @@ phase_handler: subroutine
         lda enemy_spawn_table_hi,y
         sta temp03
         jmp (temp02)
-        ; XXX get enemy_id from level table
-        ;jsr starglasses_spawn
 .no_large_enemy
 
 
@@ -247,10 +246,7 @@ demo_phase_skip_after_time: subroutine
         inc temp00
         bne .enemy_clear_loop
 .enemy_clear_done
-	lda #0
-        sta phase_kill_counter
-        sta phase_state
-	inc phase_current
+	jsr phase_next
 .done
 	rts
         

@@ -76,13 +76,11 @@ cart_start:	subroutine
 ;============================== M O D E   I N I T   H E R E
 	;jsr game_init
 	;jsr menu_screens_init
-        ;jsr attract_init
+        jsr attract_init
         ;jsr cut_scene_00_init
-        ;lda #$0a
-        ;sta game_mode
         
         ;jsr options_screen_init
-        jsr sandbox_init
+        ;jsr sandbox_init
    	;jsr sandbox2_init
         
         ; XXX why does this need to exist here?
@@ -133,7 +131,7 @@ state_render_done:
         jsr palette_render
 	; SCROLL POS	17 cycles
 	bit PPU_STATUS
-        lda scroll_x
+        lda scroll_x_hi
         sta PPU_SCROLL
         lda scroll_y
         sta PPU_SCROLL

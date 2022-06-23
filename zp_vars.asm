@@ -9,13 +9,16 @@ nmi_lockout	byte
 
 sprite_0_y	byte
 sprite_0_y_diff	byte
-scroll_x	byte
+scroll_x_hi	byte
+scroll_x_lo	byte
 scroll_y	byte
 scroll_page	byte
-ppu_mask_cache	byte ; used to enable various rendering scenarios
-scroll_speed	byte
-scroll_speed_cache	byte
+scroll_speed_lo	byte
+scroll_speed_hi	byte
+scroll_cache_lo	byte
+scroll_cache_hi	byte
 bg_tile_default	byte
+ppu_mask_cache	byte ; used to enable various rendering scenarios
 player_health	byte
 player_lives	byte
 player_heal_c	byte

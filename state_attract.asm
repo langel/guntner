@@ -3,9 +3,11 @@
 
 attract_init:
   ; SCROLL SPEED
-  	lda #$07
-        sta scroll_speed_cache
 	jsr game_init_generic
+  	lda #03
+        sta scroll_speed_hi
+        lda #173
+        sta scroll_speed_lo
         lda #5
         jsr state_update_set_addr
         lda #$ff
