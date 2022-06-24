@@ -78,15 +78,21 @@ octoscale:
 	.byte $00,$02,$03,$05,$06,$08,$09,$0b
 	.byte $0c,$0e,$0f,$11,$12,$14,$15,$17
         .byte $18,$1a,$1b,$1d,$1e,$20,$21,$23
+        
+minorscale:
+	byte  #0, #2, #3, #5, #7, #8,#10
+        byte #12,#14,#15,#17,#19,#20,#22
+        byte #24,#26,#27,#29,#31,#32,#34
+        byte #36,#38,#39,#41,#43,#44,#46
    
 periodTableLo:
   ;      A   A#  B   C   C#  D   D#  E   F   F#  G   G#
-  .byte $f1,$7f,$13,$ad,$4d,$f3,$9d,$4c,$00,$b8,$74,$34
-  .byte $f8,$bf,$89,$56,$26,$f9,$ce,$a6,$80,$5c,$3a,$1a
-  .byte $fb,$df,$c4,$ab,$93,$7c,$67,$52,$3f,$2d,$1c,$0c
-  .byte $fd,$ef,$e1,$d5,$c9,$bd,$b3,$a9,$9f,$96,$8e,$86
-  .byte $7e,$77,$70,$6a,$64,$5e,$59,$54,$4f,$4b,$46,$42
-  .byte $3f,$3b,$38,$34,$31,$2f,$2c,$29,$27,$25,$23,$21
+  .byte $f1,$7f,$13,$ad,$4d,$f3,$9d,$4c,$00,$b8,$74,$34 ; 12
+  .byte $f8,$bf,$89,$56,$26,$f9,$ce,$a6,$80,$5c,$3a,$1a ; 24
+  .byte $fb,$df,$c4,$ab,$93,$7c,$67,$52,$3f,$2d,$1c,$0c ; 36
+  .byte $fd,$ef,$e1,$d5,$c9,$bd,$b3,$a9,$9f,$96,$8e,$86 ; 48
+  .byte $7e,$77,$70,$6a,$64,$5e,$59,$54,$4f,$4b,$46,$42 ; 60
+  .byte $3f,$3b,$38,$34,$31,$2f,$2c,$29,$27,$25,$23,$21 ; 72
   .byte $1f,$1d,$1b,$1a,$18,$17,$15,$14
 periodTableHi:
   .byte $07,$07,$07,$06,$06,$05,$05,$05,$05,$04,$04,$04
@@ -122,12 +128,13 @@ apu_env_run: subroutine
         sta temp01
         jmp (temp00)
 apu_env_table_lo:
-	.byte #<apu_env_lin_long
-	.byte #<apu_env_lin_short
-	.byte #<apu_env_lin_tiny
-        .byte #<apu_env_exp_long
-        .byte #<apu_env_exp_short
-        .byte #<apu_env_exp_tiny
+	.byte #<apu_env_lin_long	; 0
+	.byte #<apu_env_lin_short	; 1
+	.byte #<apu_env_lin_tiny	; 2
+        .byte #<apu_env_exp_long	; 3
+        .byte #<apu_env_exp_short	; 4
+        .byte #<apu_env_exp_tiny	; 5
+        .byte #<apu_env_exp_pico	; 6
 apu_env_table_hi:
 	.byte #>apu_env_lin_long
 	.byte #>apu_env_lin_short
@@ -135,6 +142,7 @@ apu_env_table_hi:
         .byte #>apu_env_exp_long
         .byte #>apu_env_exp_short
         .byte #>apu_env_exp_tiny
+        .byte #>apu_env_exp_pico	; 6
 apu_env_lin_long: subroutine
 	; #$40 counter = 63 frames / 1 second
         lda apu_pu1_counter,x
@@ -176,6 +184,13 @@ apu_env_exp_tiny: subroutine
 apu_env_exp_tiny_table:
 	.byte $00,$01,$01,$01,$01,$01,$01,$01,
         .byte $01,$01,$02,$03,$08,$0b,$0f
+apu_env_exp_pico: subroutine
+	; #$06 counter =~ 15 frames / 0.25 second
+        ldy apu_pu1_counter,x
+        lda apu_env_exp_pico_table,y
+	rts
+apu_env_exp_pico_table:
+        .byte $00,$01,$03,$05,$0a,$0f
         
         
 apu_update: subroutine
@@ -328,11 +343,6 @@ apu_debugger: subroutine
         rts
         
         
-
-        
-        
-  
-
         
   
   
