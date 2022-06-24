@@ -58,6 +58,11 @@ apu_init: subroutine
         sta $4015
         lda #$40
         sta $4017
+        ; seed rng
+        lda #$11
+        sta apu_rng0
+        lda #$7f
+	sta apu_rng1
         rts
         
         
@@ -256,10 +261,10 @@ apu_update: subroutine
         bpl .cache_to_apu_loop
 ; RNG updates
 	lda apu_rng0
-        jsr PrevRandom
+        jsr NextRandom
         sta apu_rng0
 	lda apu_rng1
-        jsr NextRandom
+        jsr PrevRandom
         sta apu_rng1
 ; SFX counter updates
 	lda sfx_pu2_counter
@@ -375,9 +380,9 @@ audio_init_song: subroutine
         lda #$04
         sta audio_pattern_pos
         lda #$30
-        sta rng1
+        sta apu_rng1
         lda #$44
-        sta rng2
+        sta apu_rng0
         rts
         
 apu_game_music_frame: subroutine
@@ -395,7 +400,7 @@ apu_game_music_frame: subroutine
         lda #$08
         sta audio_pattern_pos
 .update_root_note
-        lda rng1
+        lda apu_rng1
         and #%00000111
         tax
         lda octoscale,x
@@ -403,7 +408,7 @@ apu_game_music_frame: subroutine
         ;inc phase_current
 .trigger_note
         ; pulse 1
-        lda rng1
+        lda apu_rng1
         and #%0000001
         cmp #$00
         bne .no_pulse_lead
@@ -411,7 +416,7 @@ apu_game_music_frame: subroutine
         sta apu_pu1_counter
         lda #$00
         sta apu_pu1_envelope
-        lda rng2
+        lda apu_rng0
         and #%00000111
         clc
         adc audio_root_tone
@@ -427,7 +432,7 @@ apu_game_music_frame: subroutine
         lda sfx_pu2_counter
         bne .no_pulse_rhythm
         lda #$04
-        and rng1
+        and apu_rng1
         bit audio_pattern_pos
         beq .no_pulse_rhythm
         lda #$10

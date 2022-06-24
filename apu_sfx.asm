@@ -1,4 +1,4 @@
-	; these should only use Pulse 2 and Noise channels
+; these should only use Pulse 2 and Noise channels
 ; unless its a non-music moment (like player death)
 
 
@@ -17,8 +17,6 @@ sfx_update_table_lo:
         .byte #<sfx_powerup_bomb_update
         .byte #<sfx_powerup_1up_update
 sfx_update_table_hi:
-	; XXX can probably remove this table
-        ;     get all subroutines on same page
 	.byte #>do_nothing
 	.byte #>sfx_player_death_update
         .byte #>sfx_enemy_death_update
@@ -52,8 +50,6 @@ sfx_test_table_lo:
         .byte #<sfx_shoot_dart
         .byte #<sfx_shoot_bullet
 sfx_test_table_hi:
-	; XXX can probably remove this table
-        ;     get all subroutines on same page
 	.byte #>sfx_pewpew
         .byte #>sfx_player_damage
         .byte #>sfx_player_death

@@ -75,8 +75,8 @@ cart_start:	subroutine
         
 ;============================== M O D E   I N I T   H E R E
 	;jsr game_init
-	;jsr menu_screens_init
-        jsr attract_init
+	jsr menu_screens_init
+        ;jsr attract_init
         ;jsr cut_scene_00_init
         
         ;jsr options_screen_init
@@ -196,14 +196,8 @@ sprite0_wait:
 	jsr dashboard_update
 sprite0_done:
 
-	; XXX starfield debugger
-        ;jsr starfield_debugger
         jsr apu_update
-        ; XXX apu debugger
-        ;jsr apu_debugger
-
         jsr player_controls_read
-        ;jsr apu_manage
         jsr powerup_bomb_update
         jsr powerup_mushroom_update
         jsr palette_update

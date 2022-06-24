@@ -406,13 +406,6 @@ options_screen_update: subroutine
         lda #$00
 .dont_wrap_down
 	sta options_rudy_pos
-; show song id
-	lda options_song_id
-        cmp #100
-        bne .song_id_no_reset
-        lda #$00
-        sta options_song_id
-.song_id_no_reset
 ; show sound id
 ; play music if on
 ; XXX NMI game loop should auto-handle this?
@@ -422,27 +415,25 @@ options_screen_update: subroutine
 .no_music
 ; which option handler?
 .options_case
-        lda options_rudy_pos
-        cmp #$00
-        beq options_screen_song_handler
-        cmp #$01
-	beq options_screen_sfx_handler
-        cmp #$02
-        bne .not_color1
-        jmp options_screen_color1_handler
-.not_color1
-        cmp #$03
-        bne .not_color2
-        jmp options_screen_color2_handler
-.not_color2
-	cmp #$04
-       	bne .not_menu_return
-        jmp options_menu_return
-.not_menu_return
-	jmp state_update_done
-        rts
-        
-        
+        ; x = update offset
+        ldx options_rudy_pos
+        lda options_table_lo,x
+        sta temp00
+        lda options_table_hi,x
+        sta temp01
+        jmp (temp00)
+options_table_lo:
+	.byte #<options_screen_song_handler
+	.byte #<options_screen_sfx_handler
+        .byte #<options_screen_color1_handler
+        .byte #<options_screen_color2_handler
+        .byte #<options_menu_return
+options_table_hi:
+	.byte #>options_screen_song_handler
+	.byte #>options_screen_sfx_handler
+        .byte #>options_screen_color1_handler
+        .byte #>options_screen_color2_handler
+        .byte #>options_menu_return
 
         
 options_screen_song_handler: subroutine
@@ -455,6 +446,8 @@ options_screen_song_handler: subroutine
         beq .no_a
         lda #$01
         sta options_music_on
+        jsr audio_init_song
+        jsr apu_game_music_frame
 .no_a
 	jmp state_update_done
         
@@ -514,6 +507,7 @@ options_screen_color1_handler: subroutine
         sta player_color0
 .dont_decrease
 	jmp state_update_done
+
 
 options_screen_color2_handler: subroutine
 	; starts at 21

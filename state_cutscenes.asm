@@ -9,6 +9,7 @@ cut_scene_update_generic: subroutine
         lda #2
         jsr palette_fade_out_init
 .do_nothing
+	jsr apu_game_music_frame
 	jmp state_update_done
         
         
@@ -27,6 +28,7 @@ cut_scene_00_init: subroutine
         jsr state_update_set_addr
         jsr render_enable
         jsr palette_fade_in_init
+        jsr audio_init_song
 	rts
         
 
