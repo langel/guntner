@@ -332,6 +332,9 @@ sprite0_done:
         nop	; how much prg space we using?    
 	include "apu_sfx.asm"
         nop	; how much prg space we using?
+	include "apu_song.asm"
+        nop	; how much prg space we using?
+
 
 ;f3c0 - gutted superfluous enemy handling code
 ;f4d9 - gutted fancy starfield/msg feature

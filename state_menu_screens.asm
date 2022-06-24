@@ -87,7 +87,7 @@ big_title_loop:
         jsr set_player_sprite
         
         jsr palette_fade_in_init
-        jsr apu_trigger_title_screen_chord
+        jsr sfx_chord_rng
         
 ; turn ppu back on
         jsr WaitSync	; wait for VSYNC
@@ -411,7 +411,7 @@ options_screen_update: subroutine
 ; XXX NMI game loop should auto-handle this?
 	lda options_music_on
         beq .no_music
-        jsr apu_game_music_frame
+        jsr apu_song_update
 .no_music
 ; which option handler?
 .options_case
@@ -446,8 +446,10 @@ options_screen_song_handler: subroutine
         beq .no_a
         lda #$01
         sta options_music_on
-        jsr audio_init_song
-        jsr apu_game_music_frame
+        lda options_song_id
+        sta audio_song_id
+        jsr apu_song_init
+        jsr apu_song_update
 .no_a
 	jmp state_update_done
         
@@ -466,10 +468,10 @@ options_screen_sfx_handler: subroutine
 	lda options_sound_id
         cmp #$ff
         bne .sound_id_no_reset
-        lda #$0c
+        lda #$0f
         sta options_sound_id
 .sound_id_no_reset
-	cmp #$0d
+	cmp #$10
         bne .sound_id_not_maxed
         lda #$00
         sta options_sound_id

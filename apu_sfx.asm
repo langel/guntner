@@ -34,21 +34,22 @@ sfx_test_delegator: subroutine
         sta temp01
         jmp (temp00)
 sfx_test_table_lo:
-	.byte #<sfx_pewpew
-        .byte #<sfx_player_damage
-        .byte #<sfx_player_death
-        .byte #<sfx_enemy_damage
-        .byte #<sfx_enemy_death
-        .byte #<sfx_powerup_hit
-        .byte #<sfx_powerup_bomb
-        .byte #<sfx_powerup_mushroom
-        .byte #<sfx_powerup_mask
-        .byte #<sfx_powerup_1up
-        .byte #<sfx_powerup_battery_25
-        .byte #<sfx_powerup_battery_50
-        .byte #<sfx_powerup_battery_100
-        .byte #<sfx_shoot_dart
-        .byte #<sfx_shoot_bullet
+	.byte #<sfx_pewpew			; 0
+        .byte #<sfx_player_damage		; 1
+        .byte #<sfx_player_death		; 2
+        .byte #<sfx_enemy_damage		; 3
+        .byte #<sfx_enemy_death			; 4
+        .byte #<sfx_powerup_hit			; 5
+        .byte #<sfx_powerup_bomb		; 6
+        .byte #<sfx_powerup_mushroom		; 7
+        .byte #<sfx_powerup_mask		; 8
+        .byte #<sfx_powerup_1up			; 9
+        .byte #<sfx_powerup_battery_25		; a
+        .byte #<sfx_powerup_battery_50		; b
+        .byte #<sfx_powerup_battery_100		; c
+        .byte #<sfx_shoot_dart			; d
+        .byte #<sfx_shoot_bullet		; e
+        .byte #<sfx_chord_rng			; f
 sfx_test_table_hi:
 	.byte #>sfx_pewpew
         .byte #>sfx_player_damage
@@ -65,6 +66,8 @@ sfx_test_table_hi:
         .byte #>sfx_powerup_battery_100
         .byte #>sfx_shoot_dart
         .byte #>sfx_shoot_bullet
+        .byte #>sfx_chord_rng
+
 
 ; sound test 00
 sfx_pewpew: subroutine
@@ -224,10 +227,11 @@ sfx_powerup_bomb: subroutine
 sfx_powerup_bomb_update: subroutine
 	lda bomb_counter
         and #%00001111
-        ora #%00010000
+        ora #%00011100
         sta apu_cache+$c
         lda bomb_counter
-        ora #$0d
+        and #%00001111
+        ora #%00000011
         sta apu_cache+$e
         lda bomb_counter
         beq sfx_noi_update_clear
@@ -235,6 +239,8 @@ sfx_powerup_bomb_update: subroutine
 
 ; sound test 07
 sfx_powerup_mushroom: subroutine
+	lda #$7f
+        sta shroom_counter
 	; slow pu2 sweep up
 	lda #%10001111
         sta $4004
@@ -269,7 +275,7 @@ sfx_powerup_mask: subroutine
         sta sfx_pu2_counter
 	rts
         
-; sound test 08
+; sound test 09
 sfx_powerup_1up: subroutine
 	; imperial jingle
         ; root note -- x - x x X
@@ -317,17 +323,17 @@ sfx_powerup_1up_update: subroutine
 	rts
        
         
-; sound test 09
+; sound test 0a
 sfx_powerup_battery_25: subroutine
         lda #$08
         sta sfx_temp00 ; counter
         bne sfx_powerup_battery_set_update_type
-; sound test 0a
+; sound test 0b
 sfx_powerup_battery_50: subroutine
         lda #$04
         sta sfx_temp00 ; counter
         bne sfx_powerup_battery_set_update_type
-; sound test 0b
+; sound test 0c
 sfx_powerup_battery_100: subroutine
         lda #$00
         sta sfx_temp00 ; counter
@@ -335,7 +341,6 @@ sfx_powerup_battery_set_update_type:
 	lda #$03
         sta sfx_pu2_update_type
         rts
-        
         
 sfx_powerup_battery_arp:
  .byte	#$18, #$1c, #$1f, #$24
@@ -373,7 +378,7 @@ sfx_powerup_battery_update: subroutine
         sta sfx_pu2_update_type
         rts
 
-; sound test 0c
+; sound test 0d
 sfx_shoot_dart: subroutine
 	; pulse 2
 	lda #%00001111
@@ -390,7 +395,7 @@ sfx_shoot_dart: subroutine
         sta sfx_pu2_counter
 	rts
         
-; sound test 0d
+; sound test 0e
 sfx_shoot_bullet: subroutine
 	lda #%00011111
         sta apu_cache+$c
@@ -404,4 +409,44 @@ sfx_shoot_bullet: subroutine
         lda #$20
         sta apu_noi_counter
         rts
-        rts
+        
+        
+; sound test 0f
+sfx_chord_rng: subroutine
+	; used hardware enevelope was 1 second
+        ; ~ 64 frame fade
+        ; triangle cuts off at 32 frames
+        ; setup pulse 1 + 2
+        lda #$40
+        sta apu_pu1_counter
+        sta apu_pu2_counter
+        lda #$00
+        sta apu_pu1_envelope
+        sta apu_pu2_envelope
+        ; pulse 1 pitch
+        lda rng0
+        and #%00001111
+        clc
+        adc #$10
+        tax
+        ldy #$02
+        jsr apu_set_pitch
+        ; pulse 2 pitch
+        lda rng1
+        and #%00001111
+        clc
+        adc #$08
+        tax
+        ldy #$06
+        jsr apu_set_pitch
+        ; setup triangle
+        lda #$20
+        sta apu_tri_counter
+        lda rng2
+        and #%00001111
+        clc
+        adc #$08
+        tax
+        ldy #$0a
+        jsr apu_set_pitch
+	rts

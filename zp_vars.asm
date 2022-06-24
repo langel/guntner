@@ -214,6 +214,7 @@ sfx_temp00		byte
 sfx_temp01		byte
 ; XXX these are for music
 ; XXX could user better names?
+audio_song_id		byte
 audio_frame_counter     byte
 audio_root_tone         byte
 audio_pattern_pos	byte

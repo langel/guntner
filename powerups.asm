@@ -169,16 +169,14 @@ powerup_pickup_mask: subroutine
         
         
 powerup_pickup_mushroom: subroutine
-	; XXX still need to override player controls
-	lda #$7f
-        sta shroom_counter
+	jsr sfx_powerup_mushroom
 	rts
 powerup_mushroom_update: subroutine
+	lda shroom_counter
+        beq .shroom_done
 	lda wtf
         and #$03
         bne .shroom_done
-	lda shroom_counter
-        beq .shroom_done
         dec shroom_counter
         bne .audio_bend_up_or_down
 .end_of_shroom
