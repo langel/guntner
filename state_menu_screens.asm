@@ -24,6 +24,9 @@ menu_screens_init: subroutine
 	lda #$01
         jsr state_update_set_addr
         lda #$00
+        sta state_v0 ; super
+        sta state_v1 ; secret
+        sta state_v2 ; code
         sta scroll_x_hi
         sta scroll_page
         jsr timer_reset
@@ -282,7 +285,8 @@ guntner_title_name_table:  ; 256 bytes
 	.byte $fa,$fd,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$fe,$fa,$fd,$c0,$c0
   
   
-  
+title_screen_super_secret_code:
+	byte $08,$08,$04,$04,$02,$01,$02,$01,$40,$80
   
   
 ; TITLE SCREEN UPDATES
@@ -303,6 +307,30 @@ title_screen_update: subroutine
         lda #1
         jsr palette_fade_out_init
 .sit_and_wait
+	; check for super secret code
+	ldy state_v0
+        bmi .super_secret_code_done
+        lda player_controls
+        and #$cf
+        cmp state_v2
+        beq .super_secret_code_done
+        sta state_v2
+        cmp #0
+        beq .super_secret_code_done
+        cmp title_screen_super_secret_code,y
+        beq .super_secret_code_next
+        lda #$ff
+        sta state_v0
+        bmi .super_secret_code_done
+.super_secret_code_next
+	iny
+        sty state_v0
+        cpy #$0a
+        bcc .super_secret_code_done
+        lda #$01
+        sta state_v1
+.super_secret_code_done
+        
 	lda player_up_d
         ora player_down_d
         ora player_left_d
@@ -318,8 +346,12 @@ title_screen_update: subroutine
         bne .do_nothing
 .dont_change_pos
 	lda player_start_d
+        ldy state_v0
+        cpy #$ff
+        bne .button_check
         ora player_b_d
         ora player_a_d
+.button_check
         cmp #$00
         beq .do_nothing
         lda title_rudy_pos

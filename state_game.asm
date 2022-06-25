@@ -33,6 +33,11 @@ game_init:
         sta attract_true
         jsr render_enable
         jsr palette_fade_in_init
+        lda state_v1
+        beq .no_super_secret_code
+	lda #30
+        sta player_lives
+.no_super_secret_code
         rts
 
 
