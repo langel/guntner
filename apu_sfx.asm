@@ -10,19 +10,21 @@ sfx_update_delegator: subroutine
         sta temp01
         jmp (temp00)
 sfx_update_table_lo:
-	.byte #<do_nothing
-	.byte #<sfx_player_death_update
-        .byte #<sfx_enemy_death_update
-        .byte #<sfx_powerup_battery_update
-        .byte #<sfx_powerup_bomb_update
-        .byte #<sfx_powerup_1up_update
+	byte #<do_nothing			; 0
+	byte #<sfx_player_death_update		; 1
+        byte #<sfx_enemy_death_update		; 2
+        byte #<sfx_powerup_battery_update	; 3
+        byte #<sfx_powerup_bomb_update		; 4
+        byte #<sfx_powerup_1up_update		; 5
+        byte #<sfx_phase_next_update		; 6
 sfx_update_table_hi:
-	.byte #>do_nothing
-	.byte #>sfx_player_death_update
-        .byte #>sfx_enemy_death_update
-        .byte #>sfx_powerup_battery_update
-        .byte #>sfx_powerup_bomb_update
-        .byte #>sfx_powerup_1up_update
+	byte #>do_nothing
+	byte #>sfx_player_death_update
+        byte #>sfx_enemy_death_update
+        byte #>sfx_powerup_battery_update
+        byte #>sfx_powerup_bomb_update
+        byte #>sfx_powerup_1up_update
+        byte #>sfx_phase_next_update
         
         
         
@@ -34,39 +36,41 @@ sfx_test_delegator: subroutine
         sta temp01
         jmp (temp00)
 sfx_test_table_lo:
-	.byte #<sfx_pewpew			; 0
-        .byte #<sfx_player_damage		; 1
-        .byte #<sfx_player_death		; 2
-        .byte #<sfx_enemy_damage		; 3
-        .byte #<sfx_enemy_death			; 4
-        .byte #<sfx_powerup_hit			; 5
-        .byte #<sfx_powerup_bomb		; 6
-        .byte #<sfx_powerup_mushroom		; 7
-        .byte #<sfx_powerup_mask		; 8
-        .byte #<sfx_powerup_1up			; 9
-        .byte #<sfx_powerup_battery_25		; a
-        .byte #<sfx_powerup_battery_50		; b
-        .byte #<sfx_powerup_battery_100		; c
-        .byte #<sfx_shoot_dart			; d
-        .byte #<sfx_shoot_bullet		; e
-        .byte #<sfx_chord_rng			; f
+	byte #<sfx_pewpew			; 00
+        byte #<sfx_player_damage		; 01
+        byte #<sfx_player_death			; 02
+        byte #<sfx_enemy_damage			; 03
+        byte #<sfx_enemy_death			; 04
+        byte #<sfx_powerup_hit			; 05
+        byte #<sfx_powerup_bomb			; 06
+        byte #<sfx_powerup_mushroom		; 07
+        byte #<sfx_powerup_mask			; 08
+        byte #<sfx_powerup_1up			; 09
+        byte #<sfx_powerup_battery_25		; 0a
+        byte #<sfx_powerup_battery_50		; 0b
+        byte #<sfx_powerup_battery_100		; 0c
+        byte #<sfx_shoot_dart			; 0d
+        byte #<sfx_shoot_bullet			; 0e
+        byte #<sfx_chord_rng			; 0f
+        byte #<sfx_phase_next			; 10
 sfx_test_table_hi:
-	.byte #>sfx_pewpew
-        .byte #>sfx_player_damage
-        .byte #>sfx_player_death
-        .byte #>sfx_enemy_damage
-        .byte #>sfx_enemy_death
-        .byte #>sfx_powerup_hit
-        .byte #>sfx_powerup_bomb
-        .byte #>sfx_powerup_mushroom
-        .byte #>sfx_powerup_mask
-        .byte #>sfx_powerup_1up
-        .byte #>sfx_powerup_battery_25
-        .byte #>sfx_powerup_battery_50
-        .byte #>sfx_powerup_battery_100
-        .byte #>sfx_shoot_dart
-        .byte #>sfx_shoot_bullet
-        .byte #>sfx_chord_rng
+	byte #>sfx_pewpew
+        byte #>sfx_player_damage
+        byte #>sfx_player_death
+        byte #>sfx_enemy_damage
+        byte #>sfx_enemy_death
+        byte #>sfx_powerup_hit
+        byte #>sfx_powerup_bomb
+        byte #>sfx_powerup_mushroom
+        byte #>sfx_powerup_mask
+        byte #>sfx_powerup_1up
+        byte #>sfx_powerup_battery_25
+        byte #>sfx_powerup_battery_50
+        byte #>sfx_powerup_battery_100
+        byte #>sfx_shoot_dart
+        byte #>sfx_shoot_bullet
+        byte #>sfx_chord_rng
+        byte #>sfx_phase_next
 
 
 ; sound test 00
@@ -124,6 +128,8 @@ sfx_player_death: subroutine
         ; setup noise handler
 	lda #$01
         sta sfx_noi_update_type
+	lda #$00
+        sta sfx_pu2_update_type
         lda #$00
         sta sfx_temp00 ; volume
         lda #$80
@@ -225,9 +231,7 @@ sfx_powerup_bomb: subroutine
 	rts
         
 sfx_powerup_bomb_update: subroutine
-	lda bomb_counter
-        and #%00001111
-        ora #%00011100
+        lda #%00011111
         sta apu_cache+$c
         lda bomb_counter
         and #%00001111
@@ -450,3 +454,58 @@ sfx_chord_rng: subroutine
         ldy #$0a
         jsr apu_set_pitch
 	rts
+        
+        
+; sound test 10
+sfx_phase_next: subroutine
+        lda #$00
+        sta sfx_temp00
+        sta sfx_noi_update_type
+        lda #$06
+        sta sfx_pu2_update_type
+        rts
+        
+sfx_phase_next_update: subroutine
+	lda sfx_temp00
+        beq .trigger_first
+        cmp #$04
+        beq .trigger_last
+        bne .done
+.trigger_first
+	lda audio_root_tone
+        clc
+        adc #24 ; two octaves
+        tax
+        ldy #6
+        jsr apu_set_pitch
+        lda #$20
+        sta apu_pu2_counter
+        lda #4
+        sta apu_pu2_envelope
+        bne .done
+.trigger_last
+	lda audio_root_tone
+        clc
+        adc #31 ; two octaves + 5th
+        tax
+        ldy #2
+        jsr apu_set_pitch
+        ldy #6
+        jsr apu_set_pitch
+        inc apu_cache+6
+        inc apu_cache+6
+        inc apu_cache+6
+        lda #$40
+        sta apu_pu1_counter
+        sta apu_pu2_counter
+        sta sfx_pu2_counter
+        lda #3
+        sta apu_pu1_envelope
+        sta apu_pu2_envelope
+        ; trigger next phase and kill sfx
+        lda #$00
+        sta sfx_pu2_update_type
+.done
+	inc sfx_temp00
+	rts
+        

@@ -65,6 +65,7 @@ phase_next: subroutine
         sta phase_kill_counter
         sta phase_state
 	inc phase_current
+        ; XXX check for next level here
         lda #53
         clc
         adc scroll_speed_lo
@@ -78,12 +79,20 @@ phase_next: subroutine
         
 phase_handler: subroutine
 
-	jsr demo_phase_skip_after_time        
+	;jsr demo_phase_skip_after_time        
 	lda phase_state
         beq .not_next_phase
         lda phase_kill_counter
         bne .not_next_phase
+        lda phase_state
+        cmp #$40
+        bne .next_phase
+     	jsr sfx_phase_next
 .next_phase
+	inc phase_state
+        lda phase_state
+        cmp #$44
+        bne .not_next_phase
 	jsr phase_next
 .not_next_phase
 

@@ -444,19 +444,13 @@ enemy_handle_damage_and_death: subroutine
         pla
         jmp powerup_from_starglasses
 .not_starglasses
-	; only count smaller enemies for phase progress
-        ; #$80 for 1 sprite enemies only
-        ; #$a0 to include 2 sprite enemies
-        ;cpx #$a0
-        ;bcs .not_smaller_enemy
-        ; XXX ^ using slot tracking instead now
+	; track deaths of phase spawns
         ldy enemy_slot_id
         lda phase_spawn_table,y
         beq .not_phase_spawn
         lda #$00
         sta phase_spawn_table,y
 	dec phase_kill_counter
-.not_smaller_enemy
 .not_phase_spawn
         jsr sfx_enemy_death
         ; change it into crossbones!

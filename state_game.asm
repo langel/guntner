@@ -43,6 +43,10 @@ game_init:
 
 
 game_update_generic: subroutine
+	lda wtf
+        bne .dont_sfx
+        ;jsr sfx_phase_next
+.dont_sfx
 	lda player_health
         cmp #$00
         bne .player_not_dead

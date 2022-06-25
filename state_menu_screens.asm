@@ -500,18 +500,17 @@ options_screen_sfx_handler: subroutine
 	lda options_sound_id
         cmp #$ff
         bne .sound_id_no_reset
-        lda #$0f
+        lda #$10
         sta options_sound_id
 .sound_id_no_reset
-	cmp #$10
+	cmp #$11
         bne .sound_id_not_maxed
         lda #$00
         sta options_sound_id
 .sound_id_not_maxed
 ; trigger sound with button
-	lda player_a_d
-        ora player_b_d
-        cmp #$00
+	lda player_b_d
+        ora player_a_d
         bne .trigger_sound
 	jmp state_update_done
 .trigger_sound
