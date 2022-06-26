@@ -111,6 +111,10 @@ apu_set_pitch: subroutine
         lda periodTableHi,x
         ora #%11111000
         sta apu_cache+1,y
+        ; make sure counter resets in engine
+        lda #$ff
+        sta apu_pu1_last_hi
+        sta apu_pu2_last_hi
         rts
         
        
@@ -309,12 +313,46 @@ apu_debugger: subroutine
 .dont_reset_counter
 	;jsr sfx_powerup_mushroom
         ;jsr powerup_pickup_mushroom
-        jsr sfx_powerup_1up
+        ;jsr sfx_powerup_1up
+        jsr sfx_phase_next
 .dont_increase_counter
 	lda apu_temp
         jsr get_char_hi
         sta $109
         lda apu_temp
+        jsr get_char_lo
+        sta $10a
+        
+        lda $144
+        jsr get_char_hi
+        sta $10c
+        lda $144
+        jsr get_char_lo
+        sta $10d
+        
+        lda $145
+        jsr get_char_hi
+        sta $10f
+        lda $145
+        jsr get_char_lo
+        sta $110
+        
+        lda $146
+        jsr get_char_hi
+        sta $112
+        lda $146
+        jsr get_char_lo
+        sta $113
+        
+        lda $147
+        jsr get_char_hi
+        sta $115
+        lda $147
+        jsr get_char_lo
+        sta $116
+        
+        rts
+        
         and #$0f
         clc
         adc #$30

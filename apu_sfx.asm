@@ -75,6 +75,8 @@ sfx_test_table_hi:
 
 ; sound test 00
 sfx_pewpew: subroutine
+	lda sfx_pu2_counter
+        bne .no
 	; pulse 2
 	lda #%10001111
         sta $4004
@@ -86,8 +88,12 @@ sfx_pewpew: subroutine
         sta $4006
         lda #%00010000
         sta $4007
-        lda #$10
-        sta sfx_pu2_counter
+        lda #0
+        sta apu_pu2_counter
+        sta sfx_pu2_update_type
+        ;lda #$10
+        ;sta sfx_pu2_counter
+.no
 	rts
 
 ; sound test 01
@@ -165,6 +171,8 @@ sfx_player_death_update: subroutine
         
 ; sound test 03
 sfx_enemy_damage: subroutine
+	lda sfx_pu2_counter
+        bne .no
 	; pulse 2
 	lda #%10001111
         sta $4004
@@ -174,8 +182,11 @@ sfx_enemy_damage: subroutine
         sta $4006
         lda #%00010001
         sta $4007
-        lda #$10
+        lda #$08
         sta sfx_pu2_counter
+        lda #0
+        sta sfx_pu2_update_type
+.no
 	rts
         
         
@@ -456,34 +467,43 @@ sfx_chord_rng: subroutine
 	rts
         
         
+sfx_phase_next_counter		= $150        
+        
 ; sound test 10
 sfx_phase_next: subroutine
         lda #$00
-        sta sfx_temp00
-        sta sfx_noi_update_type
+        sta sfx_phase_next_counter
         lda #$06
         sta sfx_pu2_update_type
         rts
         
 sfx_phase_next_update: subroutine
-	lda sfx_temp00
+	lda sfx_phase_next_counter
         beq .trigger_first
         cmp #$04
         beq .trigger_last
         bne .done
 .trigger_first
+        lda #$20
+        sta apu_pu2_counter
+        lda #4
+        sta apu_pu2_envelope
 	lda audio_root_tone
         clc
         adc #24 ; two octaves
         tax
         ldy #6
         jsr apu_set_pitch
-        lda #$20
-        sta apu_pu2_counter
-        lda #4
-        sta apu_pu2_envelope
         bne .done
 .trigger_last
+        lda #$40
+        sta apu_pu1_counter
+        sta apu_pu2_counter
+        lda #$10
+        sta sfx_pu2_counter
+        lda #3
+        sta apu_pu1_envelope
+        sta apu_pu2_envelope
 	lda audio_root_tone
         clc
         adc #31 ; two octaves + 5th
@@ -495,17 +515,10 @@ sfx_phase_next_update: subroutine
         inc apu_cache+6
         inc apu_cache+6
         inc apu_cache+6
-        lda #$40
-        sta apu_pu1_counter
-        sta apu_pu2_counter
-        sta sfx_pu2_counter
-        lda #3
-        sta apu_pu1_envelope
-        sta apu_pu2_envelope
         ; trigger next phase and kill sfx
         lda #$00
         sta sfx_pu2_update_type
 .done
-	inc sfx_temp00
+	inc sfx_phase_next_counter
 	rts
         

@@ -195,7 +195,7 @@ sprite0_wait:
         bne sprite0_done
 	jsr dashboard_update
 sprite0_done:
-
+	;jsr apu_debugger
         jsr apu_update
         jsr player_controls_read
         jsr powerup_bomb_update
