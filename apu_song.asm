@@ -1,12 +1,52 @@
 
+song_rng_chord		EQM $00
+song_sick_dingle	EQM $01
+song_boss_intro		EQM $02
+song_boss_fight		EQM $03
+
+do_nothing_id        EQM $01
+crossbones_id        EQM $02
+
+
+
+song_update: subroutine
+	lda options_music_on
+        bne .music_on
+        rts
+.music_on
+        lax audio_song_id
+        lda song_update_table_lo,x
+        sta temp00
+        lda song_update_table_hi,x
+        sta temp01
+        jmp (temp00)
+song_update_table_lo:
+	byte #<do_nothing		; rng chord
+        byte #<song_01			; sick dingle
+        byte #<song_02			; in game
+        byte #<song_03			; boss intro
+        byte #<song_04			; boss fight
+song_update_table_hi:
+	byte #>do_nothing		; rng chord
+        byte #>song_01			; sick dingle
+        byte #>song_02			; in game
+        byte #>song_03			; boss intro
+        byte #>song_04			; boss fight
 
         
-apu_song_init: subroutine
-	lda audio_song_id
+song_start: subroutine
+	; a = song id
+	sta audio_song_id
+        bne .not_rng_chords
+        jsr sfx_rng_chord
+        rts
+.not_rng_chords
+        lda #$01
+        sta options_music_on
+	cmp audio_song_id
         bne .normal
-        ; music init
+        ; sick dingle music init
         lda #$70
-        ;lda #$30
         sta audio_frame_counter
         lda #$02
         sta audio_root_tone
@@ -25,83 +65,19 @@ apu_song_init: subroutine
         jsr apu_rng_reset
         rts
         
-apu_song_update: subroutine
-	lda audio_song_id
-        bne .normal
-        jmp apu_o_g_song
-.normal
-	lda wtf
-        and #$07
-        bne .done
-	; triangle
-        lda audio_pattern_pos
-        eor apu_rng0
-        and #7
-        beq .no_triangle
-	lda #$03
-        sta apu_tri_counter
-        lda audio_root_tone
-        clc
-        adc #24
-        sta apu_temp
-        lda audio_pattern_pos
-        and #1
-        bne .no_octave
-        lda apu_temp
-        adc #12
-        sta apu_temp
-.no_octave
-        ldx apu_temp
-        lda minorscale,x
-        ldy #$0a
-        jsr apu_set_pitch
-.no_triangle
-        ; kick
-        lda audio_pattern_pos
-        bne .no_kick
-        jsr sfx_enemy_damage
-.no_kick
-	; hats
-        lda apu_rng0
-        and #6
-        beq .no_hat
-        lda apu_rng1
-        and #3
-        sta apu_cache+$e
-        lda #$f
-        sta apu_noi_counter
-        lda #$05
-        sta apu_noi_envelope
-.no_hat
-	; snare
-        lda apu_noi_counter
-        cmp #$f
-        bne .no_snare
-        lda audio_pattern_pos
-        cmp #6
-        bne .no_snare
-        lda #$a
-        sta apu_cache+$e
-        lda #$06
-        sta apu_noi_counter
-        lda #$06
-        sta apu_noi_envelope
-.no_snare
-        ; next tic
-        inc audio_pattern_pos
-        lda audio_pattern_pos
-        cmp #12
-        bne .done
-        lda apu_rng0
-        and #$07
-        sta audio_root_tone
-        lda #0
-        sta audio_pattern_pos
-.done
+song_stop: subroutine
+        lda #$00
+        sta options_music_on
+	rts
+        
+song_unstop: subroutine
+        lda #$01
+        sta options_music_on
 	rts
         
 
-apu_o_g_song: subroutine
+; sick dingle
+song_01: subroutine
         lda #$11
         clc
         adc audio_frame_counter
@@ -176,3 +152,164 @@ apu_o_g_song: subroutine
 .do_nothing
 	;dec audio_frame_counter
 	rts
+        
+        
+        
+; in game
+song_02: subroutine
+	lda wtf
+        and #$07
+        bne .done
+	; triangle
+        lda audio_pattern_pos
+        eor apu_rng0
+        and #7
+        beq .no_triangle
+	lda #$03
+        sta apu_tri_counter
+        lda audio_root_tone
+        clc
+        adc #24
+        sta apu_temp
+        lda audio_pattern_pos
+        and #1
+        bne .no_octave
+        lda apu_temp
+        adc #12
+        sta apu_temp
+.no_octave
+        ldx apu_temp
+        lda minorscale,x
+        ldy #$0a
+        jsr apu_set_pitch
+.no_triangle
+        ; kick
+        lda audio_pattern_pos
+        bne .no_kick
+        jsr sfx_kick
+.no_kick
+	; hats
+        lda apu_rng0
+        and #6
+        beq .no_hat
+        jsr sfx_hat
+.no_hat
+	; snare
+        lda apu_noi_counter
+        cmp #$f
+        bne .no_snare
+        lda audio_pattern_pos
+        cmp #6
+        bne .no_snare
+        jsr sfx_snare
+.no_snare
+        ; next tic
+        inc audio_pattern_pos
+        lda audio_pattern_pos
+        cmp #12
+        bne .done
+        lda apu_rng0
+        and #$07
+        sta audio_root_tone
+        lda #0
+        sta audio_pattern_pos
+.done
+	rts
+        
+
+
+; boss intro 
+song_03: subroutine
+	lda wtf
+        and #$07
+        bne .done
+        lda audio_pattern_pos
+        cmp #$08
+        bne .next_step
+        jsr song_stop
+        rts
+.next_step
+	inc audio_pattern_pos
+	lda #0
+        sta apu_pu1_envelope
+        sta apu_pu2_envelope
+	lda #$40
+        sta apu_pu1_counter
+        sta apu_pu2_counter
+        sta apu_tri_counter
+.set_pitch
+	inc audio_root_tone
+        lda audio_root_tone
+        clc
+        adc #12
+        sta apu_temp
+        tax
+        lda octoscale,x
+        tax
+        ldy #2
+        jsr apu_set_pitch
+        lda apu_temp
+        clc
+        adc #8
+        tax
+        ldy #6
+        jsr apu_set_pitch
+        ldy #10
+        jsr apu_set_pitch
+.done
+	rts
+        
+
+
+; boss fight
+song_04: subroutine
+	lda audio_frame_counter
+        cmp #5
+        bne .done
+        lda #0
+        sta audio_frame_counter
+        inc audio_pattern_pos
+        lda audio_pattern_pos
+        cmp #18
+        bne .dont_loop
+.do_loop
+	inc audio_pattern_num 
+	lda #0
+        sta audio_pattern_pos
+        jsr sfx_kick
+.dont_loop
+        lda audio_pattern_pos
+        cmp #10
+        beq .snare
+        lda rng0
+        and #2
+        beq .snare
+        bne .no_snare
+.snare
+        jsr sfx_snare
+.no_snare
+        ldx audio_pattern_pos
+        lda song_04_length,x
+        beq .done
+        sta apu_tri_counter
+        lda song_04_pitch,x
+        clc
+        adc #24
+        sta apu_temp
+        lda audio_pattern_num
+        and #4
+        lsr
+        lsr
+        asl
+        adc apu_temp
+        tax
+        ldy #10
+        jsr apu_set_pitch
+        jsr sfx_hat
+.done
+	inc audio_frame_counter
+	rts
+song_04_pitch:
+	byte 12,0,17,0,0,12,12,0,17,0,0,15,0,0,13,0,0,12
+song_04_length:
+	byte 18,0,10,0,0, 3,18,0,10,0,0, 8,0,0, 8,0,0, 3

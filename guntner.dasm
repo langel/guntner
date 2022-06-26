@@ -75,8 +75,8 @@ cart_start:	subroutine
         
 ;============================== M O D E   I N I T   H E R E
 	;jsr game_init
-	;jsr menu_screens_init
-        jsr attract_init
+	jsr menu_screens_init
+        ;jsr attract_init
         ;jsr cut_scene_00_init
         
         ;jsr options_screen_init
@@ -196,6 +196,7 @@ sprite0_wait:
 	jsr dashboard_update
 sprite0_done:
 	;jsr apu_debugger
+        jsr song_update
         jsr apu_update
         jsr player_controls_read
         jsr powerup_bomb_update

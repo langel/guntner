@@ -90,7 +90,7 @@ big_title_loop:
         jsr set_player_sprite
         
         jsr palette_fade_in_init
-        jsr sfx_chord_rng
+        jsr sfx_rng_chord
         
 ; turn ppu back on
         jsr WaitSync	; wait for VSYNC
@@ -441,9 +441,9 @@ options_screen_update: subroutine
 ; show sound id
 ; play music if on
 ; XXX NMI game loop should auto-handle this?
-	lda options_music_on
-        beq .no_music
-        jsr apu_song_update
+	;lda options_music_on
+        ;beq .no_music
+        ;jsr apu_song_update
 .no_music
 ; which option handler?
 .options_case
@@ -469,19 +469,35 @@ options_table_hi:
 
         
 options_screen_song_handler: subroutine
+        lda player_right_d
+        cmp #$00
+        beq .dont_up_song
+        inc options_song_id
+.dont_up_song
+	lda player_left_d
+        cmp #$00
+        beq .dont_down_song
+    	dec options_song_id
+.dont_down_song
+	lda options_song_id
+        cmp #$ff
+        bne .song_id_no_reset
+        lda #$04
+        sta options_song_id
+.song_id_no_reset
+	cmp #$05
+        bne .song_id_not_maxed
+        lda #$00
+        sta options_song_id
+.song_id_not_maxed
 	lda player_b_d
         beq .no_b
-        lda #$00
-        sta options_music_on
+        jsr song_stop
 .no_b
 	lda player_a_d
         beq .no_a
-        lda #$01
-        sta options_music_on
         lda options_song_id
-        sta audio_song_id
-        jsr apu_song_init
-        jsr apu_song_update
+        jsr song_start
 .no_a
 	jmp state_update_done
         
@@ -500,10 +516,10 @@ options_screen_sfx_handler: subroutine
 	lda options_sound_id
         cmp #$ff
         bne .sound_id_no_reset
-        lda #$10
+        lda #$12
         sta options_sound_id
 .sound_id_no_reset
-	cmp #$11
+	cmp #$13
         bne .sound_id_not_maxed
         lda #$00
         sta options_sound_id

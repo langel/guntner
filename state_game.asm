@@ -33,6 +33,8 @@ game_init:
         sta attract_true
         jsr render_enable
         jsr palette_fade_in_init
+        lda #2
+        jsr song_start
         lda state_v1
         beq .no_super_secret_code
 	lda #30
@@ -55,6 +57,7 @@ game_update_generic: subroutine
         lda player_death_flag
         bne .death_already_set
         inc player_death_flag
+        jsr song_stop
         jsr sfx_player_death
         lda scroll_speed_hi
         sta scroll_cache_hi
@@ -109,6 +112,7 @@ game_update_generic: subroutine
 	jsr palette_fade_out_init
         jmp .done
 .next_life
+	jsr song_unstop
         ; reset health
 	lda #$ff
         sta player_health
@@ -167,8 +171,28 @@ player_change_speed:
         
         
         
-game_update:
-	jsr player_pause
+game_update: subroutine
+	; check for (un)pausings
+	lda phase_end_game
+        cmp #$01
+        beq .read_start_done
+	lda player_start_d
+        cmp #$00
+        beq .read_start_done
+        lda player_paused
+        cmp #$00
+        beq .pause
+.unpause
+	lda #$00
+        sta player_paused
+        jsr song_unstop
+        jmp .read_start_done
+.pause
+	lda #$ff
+        sta player_paused
+        jsr song_stop
+        jsr sfx_rng_chord
+.read_start_done
         ; test for paused
         lda player_paused
         cmp #$ff

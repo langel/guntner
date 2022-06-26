@@ -8,8 +8,8 @@ cut_scene_update_generic: subroutine
         beq .do_nothing
         lda #2
         jsr palette_fade_out_init
+        jsr song_stop
 .do_nothing
-	jsr apu_song_update
 	jmp state_update_done
         
         
@@ -29,8 +29,7 @@ cut_scene_00_init: subroutine
         jsr render_enable
         jsr palette_fade_in_init
         lda #1
-        sta audio_song_id
-        jsr apu_song_init
+        jsr song_start
 	rts
         
 

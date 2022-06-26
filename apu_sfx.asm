@@ -51,8 +51,10 @@ sfx_test_table_lo:
         byte #<sfx_powerup_battery_100		; 0c
         byte #<sfx_shoot_dart			; 0d
         byte #<sfx_shoot_bullet			; 0e
-        byte #<sfx_chord_rng			; 0f
+        byte #<sfx_rng_chord			; 0f
         byte #<sfx_phase_next			; 10
+        byte #<sfx_snare			; 11
+        byte #<sfx_hat				; 12
 sfx_test_table_hi:
 	byte #>sfx_pewpew
         byte #>sfx_player_damage
@@ -69,8 +71,10 @@ sfx_test_table_hi:
         byte #>sfx_powerup_battery_100
         byte #>sfx_shoot_dart
         byte #>sfx_shoot_bullet
-        byte #>sfx_chord_rng
+        byte #>sfx_rng_chord
         byte #>sfx_phase_next
+        byte #>sfx_snare
+        byte #>sfx_hat
 
 
 ; sound test 00
@@ -170,6 +174,7 @@ sfx_player_death_update: subroutine
         
         
 ; sound test 03
+sfx_kick:
 sfx_enemy_damage: subroutine
 	lda sfx_pu2_counter
         bne .no
@@ -427,7 +432,7 @@ sfx_shoot_bullet: subroutine
         
         
 ; sound test 0f
-sfx_chord_rng: subroutine
+sfx_rng_chord: subroutine
 	; used hardware enevelope was 1 second
         ; ~ 64 frame fade
         ; triangle cuts off at 32 frames
@@ -522,3 +527,27 @@ sfx_phase_next_update: subroutine
 	inc sfx_phase_next_counter
 	rts
         
+        
+; sound test 11
+sfx_snare: subroutine
+        lda #$a
+        sta apu_cache+$e
+        lda #$06
+        sta apu_noi_counter
+        lda #$06
+        sta apu_noi_envelope
+        rts
+        
+; sound test 12
+sfx_hat: subroutine
+	lda sfx_pu2_counter
+        bne .no
+        lda apu_rng1
+        and #3
+        sta apu_cache+$e
+        lda #$f
+        sta apu_noi_counter
+        lda #$05
+        sta apu_noi_envelope
+.no
+        rts

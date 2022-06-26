@@ -353,33 +353,6 @@ apu_debugger: subroutine
         
         rts
         
-        and #$0f
-        clc
-        adc #$30
-        sta $10a
-        ; pulse1 vol
-        lda $400c
-        jsr get_char_lo
-        sta $10c
-        ; noise envelope volume
-	lda $14c
-        jsr get_char_hi
-        sta $10e
-	lda $14c
-        jsr get_char_lo ; XXX does this save enough?
-        sta $10f
-        ; sfx update type
-        lda sfx_pu2_update_type
-        clc
-        adc #$30
-        sta $111
-        ; sfx update type
-        lda sfx_noi_update_type
-        clc
-        adc #$30
-        sta $113
-        rts
-        
         
         
   

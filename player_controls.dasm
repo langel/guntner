@@ -17,25 +17,6 @@
 ; select, start, a
 
 
-player_pause: subroutine
-	lda phase_end_game
-        cmp #$01
-        beq .read_start_done
-	lda player_start_d
-        cmp #$00
-        beq .read_start_done
-        lda player_paused
-        cmp #$00
-        beq .pause
-.unpause
-	lda #$00
-        sta player_paused
-        jmp .read_start_done
-.pause
-	lda #$ff
-        sta player_paused
-.read_start_done
-	rts
 
 
 
