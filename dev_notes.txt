@@ -10,6 +10,50 @@ tools? #nesdev #GunTneR [ !ks for info ]\
 
 
 
+enemies
+	muya
+	finger
+	ikes mom
+bosses
+	lazerface
+	swordtner
+boss cinematics
+	?pause game?
+	turn screen gray
+	move player to home
+	display/spawn boss
+	play ascending notes
+	play with color emphasis
+	?unpause game?
+	boss death flickering
+	victory song/jingle
+phase handling
+	every other is galger?
+		tables for flight path id and spawn count
+		spawning 12 might be max w/o dropping frames
+	7 and d/13 
+		keep spawning until kill count
+		phase 7 == (level+1) * 4
+		phase d == (level+1) * 8
+		on kill count achieved kill all spawns
+	f == boss?
+difficulty
+	multiply enemy health by (difficulty+1)
+	scale player bullets (4 + (difficulty << 2))?
+	?adjust xp values?
+ending cutscene
+	bad ending "Why did you bring me a dead dingle?"
+	ok ending "The dingle is in a coma. It may recover."
+	good ending "What a happy healthy dingle! Jood jorb!"
+cutscene images
+	beginning alien is 8x8 tiles in size
+	ending alien is a variant of the first using half or less additional tiles
+text optimization codepen tool
+	need to be able to move patterns around chr rom
+	text starts with hex characters (0-f lowercase)
+	followed by rest of english characters (can remove unused if necessary) and punctuation
+	spits out tables of strings
+
 
 
 
