@@ -3,10 +3,8 @@ STARFIELD_MASK		EQM %00111111 ; star probability
 STARFIELD_COL0_START	EQM $00
 STARFIELD_COL1_START	EQM $07
 
-starfield_tile		EQM $0f
-starempty_tile		EQM $20
 starfield_sprite	EQM $6b
-star_pattern		EQM $04
+star_pattern		EQM $a0
 
 starfield_msg_cache	= $03e0	; 32 bytes for string data
 
@@ -133,15 +131,16 @@ starfield_cache_next_col:
 	cpy temp00
         bne .empty_tile
 .star_tile
-	lda #starfield_tile
-        lda rng1
+	lda #star_pattern
+        lda rng0
+        lsr
         lsr
         and #$03
         clc
         adc #star_pattern
         jmp .cache_tile
 .empty_tile
-	lda #starempty_tile 
+	lda #tile_empty
 .cache_tile
 	sta star_cache,y
         iny

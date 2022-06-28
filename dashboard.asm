@@ -12,8 +12,8 @@ timer_addr		= $2756
 
 dash_cache		= $0100
 
-tile_empty 		EQM $05
-dash_top_bar_tile 	EQM $0e
+tile_empty 		EQM $ff
+dash_top_bar_tile 	EQM $ad
 
 
 dashboard_init: subroutine
@@ -72,31 +72,36 @@ dashboard_init: subroutine
         
 dashboard_bg_tiles:
 	; row 0 is top bar
-	; row 1 : top hud frames
-	hex 1da0a1a1a1a1a1a3
-        hex a1a1a1a1a1a1a1a1
-        hex a1a1a1a1a1a1a1a1
-        hex a3a1a1a1a1a1a21d
+	; row 1 : top hud frames	
+        hex 1db1bcbcbcbcbcbe
+        hex bcbcbcbcbcbcbcbc
+        hex bcbcbcbcbcbcbcbc
+        hex bebcbcbcbcbcbd1d
         ; row 2 : health, meter, lives
-	hex 1db0a5a6a7a8b1b3
-	hex b1b1b1b1b1b1b1b1
-        hex b1b1b1b1b1b1b1b1
-        hex b31819
+	hex 1db0
+        byte #char_set_offset+$4c
+        byte #char_set_offset+$4d
+        byte #char_set_offset+$4e
+        byte #char_set_offset+$4f
+        hex ffb3
+	hex ffffffffffffffff
+	hex ffffffffffffffff
+        hex b3aeaf
         byte #char_set_x
         hex 30b1b21d
         ; row 3 : middle hud frames
         hex 1db8b9b9b9b9b9b7
-        hex b9b9a4bbb9b9b9b9
-        hex b9b9b9b9a4bbb9b9
+        hex b9b9bfbbb9b9b9b9
+        hex b9b9b9b9bfbbb9b9
         hex b7b9b9b9b9b9ba1d
         ; row 4 : wave, score, time
 	hex 1db0
         byte #char_set_P,#char_set_H,#char_set_A
         byte #char_set_S,#char_set_E
-        hex b1
-	hex b1b1b2b0b1b1b1b1
-	hex b1b1b1b2b2b0b1b1
-	hex b1b1b1b1b1b1b21d
+        hex ff
+	hex ffffb2b0ffffffff
+	hex ffffffb2b2b0ffff
+	hex ffffffffffffb21d
 	; row 5 : bottom hud frames
         hex 1db4b5b5b5b5b5b5
 	hex b5b5b6b4b5b5b5b5
@@ -224,7 +229,7 @@ dashboard_update: subroutine
         sec
         sbc #$04
         sta temp00
-        lda #$20 ; empty tile
+        lda #tile_empty 
         sta dash_cache+$08,y
         iny
         bne .find_top_tile
@@ -233,13 +238,13 @@ dashboard_update: subroutine
         sec
         sbc temp00
         clc
-        adc #$08
+        adc #$a4
         sta dash_cache+$08,y
 .fill_remaining_tiles
         iny
         cpy #$10
         beq .no_lifebar
-	lda #$0b ; full tile
+	lda #$a7 ; full tile
         sta dash_cache+$08,y
         bne .fill_remaining_tiles 
 .no_lifebar
@@ -301,7 +306,7 @@ dashboard_update: subroutine
         lda timer_minutes_1s
         sta dash_cache+$37
         ; colon
-        lda #$aa
+        lda #char_set_colon
         sta dash_cache+$38
         lda timer_seconds_10s
         sta dash_cache+$39

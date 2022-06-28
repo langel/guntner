@@ -16,6 +16,7 @@ scroll_to_counter	EQU $188
 menu_screens_init: subroutine
 
         jsr render_disable
+        jsr nametables_clear
 	jsr sprite_clear
         jsr state_sprite0_disable
         
@@ -106,19 +107,18 @@ menu_screens_render:
 	; pretty much just for options screen
 ; show song id
 	PPU_SETADDR $2512
-	lda #$30
+	lda #char_set_offset
         sta PPU_DATA
 	lda options_song_id
-	clc
-        adc #$30
+        jsr get_char_lo
         sta PPU_DATA
 ; show sound id
 	PPU_SETADDR $2552
-	lda #$30
+	lda options_sound_id
+        jsr get_char_hi
         sta PPU_DATA
 	lda options_sound_id
-	clc
-        adc #$30
+        jsr get_char_lo
         sta PPU_DATA
         jmp state_render_done
         
@@ -260,13 +260,13 @@ menu_screen_tile_data:
 	hex 254a
 	hex 4c484e473d
 	byte #$00
-	; "color1  " + 1d1d
+	; "color1  " + aaaa
 	hex 258a
-	hex 3c4845484b316e6e1d1d
+	hex 3c4845484b316e6eaaaa
 	byte #$00
-	; "color2  " + 1e1e
+	; "color2  " + abab
 	hex 25ca
-	hex 3c4845484b326e6e1e1e
+	hex 3c4845484b326e6eabab
 	byte #$00
 	; "Menu Return"
 	hex 260a
