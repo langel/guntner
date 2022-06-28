@@ -81,14 +81,19 @@ dashboard_bg_tiles:
 	hex 1db0a5a6a7a8b1b3
 	hex b1b1b1b1b1b1b1b1
         hex b1b1b1b1b1b1b1b1
-        hex b318197830b1b21d
+        hex b31819
+        byte #char_set_x
+        hex 30b1b21d
         ; row 3 : middle hud frames
         hex 1db8b9b9b9b9b9b7
         hex b9b9a4bbb9b9b9b9
         hex b9b9b9b9a4bbb9b9
         hex b7b9b9b9b9b9ba1d
         ; row 4 : wave, score, time
-	hex 1db05048415345b1
+	hex 1db0
+        byte #char_set_P,#char_set_H,#char_set_A
+        byte #char_set_S,#char_set_E
+        hex b1
 	hex b1b1b2b0b1b1b1b1
 	hex b1b1b1b2b2b0b1b1
 	hex b1b1b1b1b1b1b21d
@@ -100,11 +105,16 @@ dashboard_bg_tiles:
 
 
 ; DASHBOARD messages
-DASHBOARD_MESSAGES:
-	byte " Y 0 u  D 3 A D " ; y = #$00
-	byte " G A M E O V Er " ; y = #$10
-	byte "gg ConGraTiON gg" ; y = #$20
-	byte " please unpause " ; y = #$30
+; exactly 16 chars wide
+dashboard_messages:
+	;" Y 0 u  D 3 A D "
+	hex 6e6c6e306e4e6e6e576e336e546e576e
+	;" G A M E O V Er "
+	hex 6e5a6e546e606e586e626e696e584b6e
+	;"gg ConGraTiON gg"
+	hex 40406e5648475a4b3a674262616e4040
+	;" please unpause "
+	hex 6e49453e3a4c3e6e4e47493a4e4c3e6e
         
         
         
@@ -112,7 +122,7 @@ dashboard_message_set: subroutine
 ; set y for message start offset
 	ldx #$00
 .loop
-        lda DASHBOARD_MESSAGES,y
+        lda dashboard_messages,y
         sta dash_cache+$08,x
         iny
         inx
@@ -298,7 +308,7 @@ dashboard_update: subroutine
         lda timer_seconds_1s
         sta dash_cache+$3a
         ; period
-        lda #$2e
+        lda #char_set_period
         sta dash_cache+$3b
         lda timer_frames_10s
         sta dash_cache+$3c

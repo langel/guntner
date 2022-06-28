@@ -103,14 +103,14 @@ get_char_hi: subroutine
         lsr
         clc
         ; XXX this should be a defined constant
-        adc #$30
+        adc #char_set_offset
         rts
 get_char_lo: subroutine
 	; a = value in / hex char out
         and #$0f
         clc
         ; XXX this should be a defined constant
-        adc #$30
+        adc #char_set_offset
         rts
         
         
@@ -145,3 +145,74 @@ nametable_tile_planter:
         cmp #$ff
         bne .tileset_loop
         rts
+        
+char_set_offset		EQM $30
+char_set_0		EQM $30
+char_set_1		EQM $31
+char_set_2		EQM $32
+char_set_3		EQM $33
+char_set_4		EQM $34
+char_set_5		EQM $35
+char_set_6		EQM $36
+char_set_7		EQM $37
+char_set_8		EQM $38
+char_set_9		EQM $39
+char_set_a		EQM $3a
+char_set_b		EQM $3b
+char_set_c		EQM $3c
+char_set_d		EQM $3d
+char_set_e		EQM $3e
+char_set_f		EQM $3f
+char_set_g		EQM $40
+char_set_h		EQM $41
+char_set_i		EQM $42
+char_set_j		EQM $43
+char_set_k		EQM $44
+char_set_l		EQM $45
+char_set_m		EQM $46
+char_set_n		EQM $47
+char_set_o		EQM $48
+char_set_p		EQM $49
+char_set_q		EQM $4a
+char_set_r		EQM $4b
+char_set_s		EQM $4c
+char_set_t		EQM $4d
+char_set_u		EQM $4e
+char_set_v		EQM $4f
+char_set_w		EQM $50
+char_set_x		EQM $51
+char_set_y		EQM $52
+char_set_z		EQM $53
+char_set_A		EQM $54
+char_set_B		EQM $55
+char_set_C		EQM $56
+char_set_D		EQM $57
+char_set_E		EQM $58
+char_set_F		EQM $59
+char_set_G		EQM $5a
+char_set_H		EQM $5b
+char_set_I		EQM $5c
+char_set_J		EQM $5d
+char_set_K		EQM $5e
+char_set_L		EQM $5f
+char_set_M		EQM $60
+char_set_N		EQM $61
+char_set_O		EQM $62
+char_set_P		EQM $63
+char_set_Q		EQM $64
+char_set_R		EQM $65
+char_set_S		EQM $66
+char_set_T		EQM $67
+char_set_U		EQM $68
+char_set_V		EQM $69
+char_set_W		EQM $6a
+char_set_X		EQM $6b
+char_set_Y		EQM $6c
+char_set_Z		EQM $6d
+char_set_space		EQM $6e
+char_set_comma		EQM $6f
+char_set_period		EQM $70
+char_set_question		EQM $71
+char_set_bang		EQM $72
+char_set_paren_open		EQM $73
+char_set_paren_close		EQM $74
