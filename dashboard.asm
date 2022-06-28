@@ -5,7 +5,7 @@ dash_page2_top_bar	= $26c0
 
 speed_addr		= $2706
 life_bar_addr		= $2708
-lives_addr		= $271d
+lives_addr		= $271c
 phase_addr		= $2748
 score_addr		= $274c
 timer_addr		= $2756
@@ -138,8 +138,10 @@ dashboard_render: subroutine
 .lives
 	PPU_SETADDR lives_addr
         lda player_lives
-        clc
-        adc #$30
+        jsr get_char_hi
+        sta PPU_DATA
+        lda player_lives
+        jsr get_char_lo
         sta PPU_DATA
         
         ; bottom hud info row

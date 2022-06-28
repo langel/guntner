@@ -35,6 +35,7 @@ menu_screens_init: subroutine
 ; set bg tile palette attributes / colors
 ; $23c0 and $27c0
         ; page 1 attributes
+        ; XXX give TITLE a different palette?
 	PPU_SETADDR $23c0
 	lda #%10101010
         ldx #$c0
