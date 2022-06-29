@@ -3,6 +3,9 @@
 
 timer_update: subroutine
 ; UPDATE TIMER DIGITS
+; but not if game is over
+	lda phase_end_game
+        bne .timer_done
 ; frames 1s
 	inc timer_frames_1s
         lda #$3a
