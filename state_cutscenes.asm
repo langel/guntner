@@ -41,7 +41,7 @@ cut_scene_outro_init: subroutine
         inc phase_end_game
         lda #$2+char_set_offset
         sta timer_minutes_1s
-        lda #$2+char_set_offset
+        lda #$1+char_set_offset
         sta timer_minutes_10s
         
         
