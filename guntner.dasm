@@ -229,7 +229,7 @@ sprite0_done:
         
 ; all includes      
 
-	include "ppu_lib.dasm"
+	include "ppu_lib_and_tables.asm"
         nop	; how much prg space we using?  
         
 	include "state__handler.asm"
