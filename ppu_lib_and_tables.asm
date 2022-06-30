@@ -68,19 +68,35 @@ PrevRandom subroutine
         rts
 
 
+tile_empty 		EQM $03
+
 nametables_clear:
-	ldx #$00
+	; tiles
+	ldx #$07
         ldy #$00
         PPU_SETADDR $2000
-        lda #$ff ; empty tile
+        lda #tile_empty
 .page_loop
 .byte_loop
         sta PPU_DATA
 	iny
         bne .byte_loop
+        dex
+        bpl .page_loop
+        ; attributes
+        ldy #0
+        PPU_SETADDR $23c0
+        ldx #$c0
+.nm1_attr_loop
+	sty PPU_DATA
         inx
-        cpx #$08
-        bne .page_loop
+        bne .nm1_attr_loop
+        PPU_SETADDR $27c0
+        ldx #$c0
+.nm2_attr_loop
+	sty PPU_DATA
+        inx
+        bne .nm2_attr_loop
         rts
         
         
@@ -146,75 +162,212 @@ nametable_tile_planter:
         bne .tileset_loop
         rts
         
-char_set_offset		EQM $30
-char_set_0		EQM $30
-char_set_1		EQM $31
-char_set_2		EQM $32
-char_set_3		EQM $33
-char_set_4		EQM $34
-char_set_5		EQM $35
-char_set_6		EQM $36
-char_set_7		EQM $37
-char_set_8		EQM $38
-char_set_9		EQM $39
-char_set_a		EQM $3a
-char_set_b		EQM $3b
-char_set_c		EQM $3c
-char_set_d		EQM $3d
-char_set_e		EQM $3e
-char_set_f		EQM $3f
-char_set_g		EQM $40
-char_set_h		EQM $41
-char_set_i		EQM $42
-char_set_j		EQM $43
-char_set_k		EQM $44
-char_set_l		EQM $45
-char_set_m		EQM $46
-char_set_n		EQM $47
-char_set_o		EQM $48
-char_set_p		EQM $49
-char_set_q		EQM $4a
-char_set_r		EQM $4b
-char_set_s		EQM $4c
-char_set_t		EQM $4d
-char_set_u		EQM $4e
-char_set_v		EQM $4f
-char_set_w		EQM $50
-char_set_x		EQM $51
-char_set_y		EQM $52
-char_set_z		EQM $53
-char_set_A		EQM $54
-char_set_B		EQM $55
-char_set_C		EQM $56
-char_set_D		EQM $57
-char_set_E		EQM $58
-char_set_F		EQM $59
-char_set_G		EQM $5a
-char_set_H		EQM $5b
-char_set_I		EQM $5c
-char_set_J		EQM $5d
-char_set_K		EQM $5e
-char_set_L		EQM $5f
-char_set_M		EQM $60
-char_set_N		EQM $61
-char_set_O		EQM $62
-char_set_P		EQM $63
-char_set_Q		EQM $64
-char_set_R		EQM $65
-char_set_S		EQM $66
-char_set_T		EQM $67
-char_set_U		EQM $68
-char_set_V		EQM $69
-char_set_W		EQM $6a
-char_set_X		EQM $6b
-char_set_Y		EQM $6c
-char_set_Z		EQM $6d
-char_set_space		EQM $6e
-char_set_comma		EQM $6f
-char_set_period		EQM $70
-char_set_question		EQM $71
-char_set_bang		EQM $72
-char_set_paren_open		EQM $73
-char_set_paren_close		EQM $74
-char_set_colon		EQM $75
-char_set_semicolon		EQM $76
+        
+        
+dashboard_messages:
+	;" Y 0 u  D 3 A D "
+	hex 03970360037d03038503630382038503
+	;" G A M E O V Er "
+	hex 03870382038d0386038f039403867a03
+	;"gg ConGraTiON gg"
+	hex 707003847776877a6a93728f8e037070
+	;" please unpause "
+	hex 0378746e6a7b6e037d76786a7d7b6e03
+
+
+menu_screen_tile_data:
+	; "Please  START"
+	hex 21ea
+	hex 90746e6a7b6e03039293829193
+	byte #$00
+	; "Much  Options"
+	hex 222a
+	hex 8d7d6c7103038f787c7277767b
+	byte #$00
+	; " v2.1e "
+	hex 22d7
+	hex 037e6299616e03
+	byte #$00
+	; "(c)MMXXII puke7, LoBlast"
+	hex 2304
+	hex 9c6c9d8d8d9696898903787d736e6798038c7783746a7b7c
+	byte #$00
+	; "Options Screeen"
+	hex 2448
+	hex 8f787c7277767b03926c7a6e6e6e76
+	byte #$00
+	; "song"
+	hex 250a
+	hex 7b777670
+	byte #$00
+	; "sound"
+	hex 254a
+	hex 7b777d766d
+	byte #$00
+	; "color1  " + aaaa
+	hex 258a
+	hex 6c7774777a610303aaaa
+	byte #$00
+	; "color2  " + abab
+	hex 25ca
+	hex 6c7774777a620303abab
+	byte #$00
+	; "Menu Return"
+	hex 260a
+	hex 8d6e767d03916e7c7d7a76
+	byte #$00
+	byte #$ff
+
+
+cut_scene_intro_tile_data:
+	; "MY DINGLE"
+	hex 2191
+	hex 8d970385898e878c86
+	byte #$00
+	; "is very sick and there are"
+	hex 21c3
+	hex 727b037e6e7a81037b726c73036a766d037c716e7a6e036a7a6e
+	byte #$00
+	; "life saving drugs very far"
+	hex 2203
+	hex 74726f6e037b6a7e727670036d7a7d707b037e6e7a81036f6a7a
+	byte #$00
+	; "away! Please drive through"
+	hex 2243
+	hex 6a7f6a819b0390746e6a7b6e036d7a727e6e037c717a777d7071
+	byte #$00
+	; "the 13th dimension quickly"
+	hex 2283
+	hex 7c716e0361637c71036d72756e767b72777603797d726c737481
+	byte #$00
+	; "so my dingle is saved."
+	hex 22c3
+	hex 7b77037581036d727670746e03727b037b6a7e6e6d99
+	byte #$00
+	byte #$ff
+
+
+cut_scene_ending_bad_tile_data:
+	; "Why did you bring me "
+	hex 21c2
+	hex 957181036d726d0381777d036b7a72767003756e03
+	byte #$00
+	; "a dead dingle?"
+	hex 2210
+	hex 6a036d6e6a6d036d727670746e9a
+	byte #$00
+	; "You took too long!"
+	hex 2287
+	hex 97777d037c777773037c777703747776709b
+	byte #$00
+	byte #$ff
+
+
+cut_scene_ending_ok_tile_data:
+	; "The dingle is now in a coma."
+	hex 21c2
+	hex 93716e036d727670746e03727b0376777f037276036a036c77756a99
+	byte #$00
+	; "It may recover."
+	hex 2228
+	hex 897c03756a81037a6e6c777e6e7a99
+	byte #$00
+	; "You could have been faster."
+	hex 2282
+	hex 97777d036c777d746d03716a7e6e036b6e6e76036f6a7b7c6e7a99
+	byte #$00
+	byte #$ff
+
+
+cut_scene_ending_good_tile_data:
+	; "What a happy,healthy DINGLE!"
+	hex 21c2
+	hex 95716a7c036a03716a78788198716e6a747c71810385898e878c869b
+	byte #$00
+	; "J O O D    J O R B!!"
+	hex 2226
+	hex 8a038f038f0385030303038a038f039103839b9b
+	byte #$00
+	; "You seem to be so expedient!"
+	hex 2282
+	hex 97777d037b6e6e75037c77036b6e037b77036e80786e6d726e767c9b
+	byte #$00
+	byte #$ff
+
+
+cut_scene_ending_time_tile_data:
+	; "Your Time ="
+	hex 2306
+	hex 97777d7a039372756e039f
+	byte #$00
+	byte #$ff
+
+char_set_offset		EQM $60
+char_set_0		EQM $60
+char_set_1		EQM $61
+char_set_2		EQM $62
+char_set_3		EQM $63
+char_set_4		EQM $64
+char_set_5		EQM $65
+char_set_6		EQM $66
+char_set_7		EQM $67
+char_set_8		EQM $68
+char_set_9		EQM $69
+char_set_a		EQM $6a
+char_set_b		EQM $6b
+char_set_c		EQM $6c
+char_set_d		EQM $6d
+char_set_e		EQM $6e
+char_set_f		EQM $6f
+char_set_g		EQM $70
+char_set_h		EQM $71
+char_set_i		EQM $72
+char_set_k		EQM $73
+char_set_l		EQM $74
+char_set_m		EQM $75
+char_set_n		EQM $76
+char_set_o		EQM $77
+char_set_p		EQM $78
+char_set_q		EQM $79
+char_set_r		EQM $7a
+char_set_s		EQM $7b
+char_set_t		EQM $7c
+char_set_u		EQM $7d
+char_set_v		EQM $7e
+char_set_w		EQM $7f
+char_set_x		EQM $80
+char_set_y		EQM $81
+char_set_A		EQM $82
+char_set_B		EQM $83
+char_set_C		EQM $84
+char_set_D		EQM $85
+char_set_E		EQM $86
+char_set_G		EQM $87
+char_set_H		EQM $88
+char_set_I		EQM $89
+char_set_J		EQM $8a
+char_set_K		EQM $8b
+char_set_L		EQM $8c
+char_set_M		EQM $8d
+char_set_N		EQM $8e
+char_set_O		EQM $8f
+char_set_P		EQM $90
+char_set_R		EQM $91
+char_set_S		EQM $92
+char_set_T		EQM $93
+char_set_V		EQM $94
+char_set_W		EQM $95
+char_set_X		EQM $96
+char_set_Y		EQM $97
+char_set_comma		EQM $98
+char_set_period		EQM $99
+char_set_question		EQM $9a
+char_set_bang		EQM $9b
+char_set_paren_open		EQM $9c
+char_set_paren_close		EQM $9d
+char_set_apostrophe		EQM $9e
+char_set_equals		EQM $9f
+char_set_colon		EQM $ac
+char_set_dash		EQM $c0
+char_set_hash		EQM $ff
+char_set_space		EQM $3

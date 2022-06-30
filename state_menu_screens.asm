@@ -231,48 +231,6 @@ options_screen_set_rudy_y: subroutine
         
 ; STRINGS AND NAMETABLES
                 
-menu_screen_tile_data:
-	; "  Please  START "
-	hex 21e8
-	hex 6e6e63453e3a4c3e6e6e66675465676e
-	byte #$00
-	; "  Much  Options "
-	hex 2228
-	hex 6e6e604e3c416e6e62494d4248474c6e
-	byte #$00
-	; " v2.1e "
-	hex 22d7
-	hex 6e4f3270313e6e
-	byte #$00
-	; "(c)MMXXII puke7, LoBlast"
-	hex 2304
-	hex 733c7460606b6b5c5c6e494e443e376f6e5f4855453a4c4d
-	byte #$00
-	; "Options Screeen"
-	hex 2448
-	hex 62494d4248474c6e663c4b3e3e3e47
-	byte #$00
-	; "song"
-	hex 250a
-	hex 4c484740
-	byte #$00
-	; "sound"
-	hex 254a
-	hex 4c484e473d
-	byte #$00
-	; "color1  " + aaaa
-	hex 258a
-	hex 3c4845484b316e6eaaaa
-	byte #$00
-	; "color2  " + abab
-	hex 25ca
-	hex 3c4845484b326e6eabab
-	byte #$00
-	; "Menu Return"
-	hex 260a
-	hex 603e474e6e653e4d4e4b47
-	byte #$00
-	byte #$ff
         
                 
 guntner_title_name_table:  ; 256 bytes

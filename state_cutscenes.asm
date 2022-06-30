@@ -13,14 +13,61 @@ cut_scene_update_generic: subroutine
 	jmp state_update_done
         
         
+cut_scene_intro_palette:
+	hex 0f 0c 30 3c
+	hex    04 1b 37
         
 cut_scene_intro_init: subroutine
+	; zerio everything out
         jsr render_disable
 	jsr sprite_clear
         jsr nametables_clear
-; various stuff on screen        
+        ; colors
+        ldy #6
+.palette_loop:
+	lda cut_scene_intro_palette,y
+        sta pal_uni_bg,y
+	dey
+        bpl .palette_loop
+        ; Distressed Alien
+alien_pattern_placement: 
+        lda #$20
+        sta PPU_ADDR
+        lda #$86
+        sta PPU_ADDR
+        lda #0
+        sta temp00 ; pattern tile counter
+        ldx #8
+.alien_tile_loop
+	ldy #7
+.alien_tile_row_loop
+	lda temp00
+	sta PPU_DATA
+        inc temp00
+	dey
+        bpl .alien_tile_row_loop
+        ldy #23
+        lda #tile_empty
+.alien_row_filler_loop
+	sta PPU_DATA
+	dey
+        bpl .alien_row_filler_loop
+	dex
+        bpl .alien_tile_loop
+alien_attribute_placement:
+	PPU_SETADDR #$23c9
+        ldx #%01010101
+	stx PPU_DATA
+	stx PPU_DATA
+	stx PPU_DATA
+	PPU_SETADDR #$23d1
+	stx PPU_DATA
+	stx PPU_DATA
+	stx PPU_DATA
+	; put text on screen
         NMTP_SETADDR cut_scene_intro_tile_data
         jsr nametable_tile_planter
+        ; setup everything else
         lda #$00
         jsr state_render_set_addr
         lda #$08
@@ -123,96 +170,3 @@ cut_scene_outro_init: subroutine
 	rts
         
         
-
-cut_scene_intro_tile_data:
-	; "" + 969720209697
-	hex 20a6
-	hex 969720209697
-	byte #$00
-	; "" + 20989b9b9920
-	hex 20e6
-	hex 20989b9b9920
-	byte #$00
-	; "MY DINGLE"
-	hex 2110
-	hex 606c6e575c615a5f58
-	byte #$00
-	; "is very sick and there are"
-	hex 2142
-	hex 424c6e4f3e4b526e4c423c446e3a473d6e4d413e4b3e6e3a4b3e
-	byte #$00
-	; "life saving drugs very far"
-	hex 2182
-	hex 45423f3e6e4c3a4f4247406e3d4b4e404c6e4f3e4b526e3f3a4b
-	byte #$00
-	; "away!  Please drive through"
-	hex 21c2
-	hex 3a503a52726e6e63453e3a4c3e6e3d4b424f3e6e4d414b484e4041
-	byte #$00
-	; "the 13th dimension quickly"
-	hex 2202
-	hex 4d413e6e31334d416e3d42463e474c4248476e4a4e423c444552
-	byte #$00
-	; "so my dingle is saved."
-	hex 2242
-	hex 4c486e46526e3d424740453e6e424c6e4c3a4f3e3d70
-	byte #$00
-	byte #$ff
-        
-        
-
-
-cut_scene_ending_bad_tile_data:
-	; "Why did you bring me "
-	hex 21c2
-	hex 6a41526e3d423d6e52484e6e3b4b4247406e463e6e
-	byte #$00
-	; "a dead dingle?"
-	hex 2210
-	hex 3a6e3d3e3a3d6e3d424740453e71
-	byte #$00
-	; "You took too long!"
-	hex 2287
-	hex 6c484e6e4d4848446e4d48486e4548474072
-	byte #$00
-	byte #$ff
-
-
-cut_scene_ending_ok_tile_data:
-	; "The dingle is now in a coma."
-	hex 21c2
-	hex 67413e6e3d424740453e6e424c6e4748506e42476e3a6e3c48463a70
-	byte #$00
-	; "It may recover."
-	hex 2228
-	hex 5c4d6e463a526e4b3e3c484f3e4b70
-	byte #$00
-	; "You could have been faster."
-	hex 2282
-	hex 6c484e6e3c484e453d6e413a4f3e6e3b3e3e476e3f3a4c4d3e4b70
-	byte #$00
-	byte #$ff
-
-
-cut_scene_ending_good_tile_data:
-	; "What a happy,healthy DINGLE!"
-	hex 21c2
-	hex 6a413a4d6e3a6e413a4949526f413e3a454d41526e575c615a5f5872
-	byte #$00
-	; "J O O D    J O R B!!"
-	hex 2226
-	hex 5d6e626e626e576e6e6e6e5d6e626e656e557272
-	byte #$00
-	; "You seem to be so expedient!"
-	hex 2282
-	hex 6c484e6e4c3e3e466e4d486e3b3e6e4c486e3e51493e3d423e474d72
-	byte #$00
-	byte #$ff
-
-
-cut_scene_ending_time_tile_data:
-	; "YOUR TIME : "
-	hex 2306
-	hex 6c6268656e675c60586e756e
-	byte #$00
-	byte #$ff

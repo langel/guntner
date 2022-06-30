@@ -12,7 +12,6 @@ timer_addr		= $2756
 
 dash_cache		= $0100
 
-tile_empty 		EQM $ff
 dash_top_bar_tile 	EQM $ad
 
 
@@ -109,18 +108,6 @@ dashboard_bg_tiles:
         hex b5b5b5b5b5b5b61d
 
 
-; DASHBOARD messages
-; exactly 16 chars wide
-dashboard_messages:
-	;" Y 0 u  D 3 A D "
-	hex 6e6c6e306e4e6e6e576e336e546e576e
-	;" G A M E O V Er "
-	hex 6e5a6e546e606e586e626e696e584b6e
-	;"gg ConGraTiON gg"
-	hex 40406e5648475a4b3a674262616e4040
-	;" please unpause "
-	hex 6e49453e3a4c3e6e4e47493a4e4c3e6e
-        
         
         
 dashboard_message_set: subroutine

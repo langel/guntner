@@ -77,8 +77,8 @@ cart_start:	subroutine
 	;jsr game_init
 	;jsr menu_screens_init
         ;jsr attract_init
-        ;jsr cut_scene_intro_init
-        jsr cut_scene_outro_init
+        jsr cut_scene_intro_init
+        ;jsr cut_scene_outro_init
         
         ;jsr options_screen_init
         ;jsr sandbox_init
