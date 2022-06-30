@@ -17,6 +17,15 @@ dash_top_bar_tile 	EQM $ad
 
 dashboard_init: subroutine
         
+        ; fill nametable 2 with HUB bg color
+	PPU_SETADDR $27c0
+	lda #%11111111
+        ldx #$c0
+.23f0_loop
+        sta PPU_DATA
+        inx
+        bne .23f0_loop
+        
         ; COLOR SPLIT
         ; set split color attr for top row
 	PPU_SETADDR $27e8
@@ -27,15 +36,6 @@ dashboard_init: subroutine
         inx
         bne .27e8_loop
         
-        ; COLOR FULL
-        ; set full color attr for the rest
-	PPU_SETADDR $27f0
-	lda #%11111111
-        ldx #$f0
-.23f0_loop
-        sta PPU_DATA
-        inx
-        bne .23f0_loop
         
         
         ; fill page 2 dashboard top row

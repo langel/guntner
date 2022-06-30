@@ -3,6 +3,7 @@
 game_init_generic: subroutine
 
 	jsr render_disable
+        jsr nametables_clear
         
         lda #179
         sta scroll_speed_lo
@@ -14,9 +15,9 @@ game_init_generic: subroutine
         
         jsr timer_reset
 	jsr player_game_reset
+        jsr dashboard_init
         jsr starfield_init
  	jsr starfield_draw_dash_top_bar_nametable0
-        jsr dashboard_init
         jsr dashboard_update
         jsr dashboard_render
         

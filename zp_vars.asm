@@ -159,6 +159,8 @@ player_color2	byte
 player_damage		byte
 player_death_flag	byte
 
+game_difficulty		byte
+
 player_bullet_collision_temp_x	byte
 
 you_dead_counter	byte

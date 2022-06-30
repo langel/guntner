@@ -173,6 +173,17 @@ dashboard_messages:
 	hex 707003847776877a6a93728f8e037070
 	;" please unpause "
 	hex 0378746e6a7b6e037d76786a7d7b6e03
+        
+        
+difficulty_messages:
+	;" Weiner Burgh "
+	hex 03956e72766e7a03837d7a707103
+	;" Kids' Gloves "
+	hex 038b726d7b9e038774777e6e7b03
+	;"Mega Gooderest"
+	hex 8d6e706a038777776d6e7a6e7b7c
+	;"A-OK #1 Expert"
+	hex 82c08f8b03ff61038680786e7a7c
 
 
 menu_screen_tile_data:
@@ -192,29 +203,33 @@ menu_screen_tile_data:
 	hex 2304
 	hex 9c6c9d8d8d9696898903787d736e6798038c7783746a7b7c
 	byte #$00
-	; "Options Screeen"
-	hex 2448
-	hex 8f787c7277767b03926c7a6e6e6e76
+	; " Options Screen "
+	hex 2422
+	hex 038f787c7277767b03926c7a6e6e7603
 	byte #$00
-	; "song"
+	; "Menu  Return"
+	hex 24ca
+	hex 8d6e767d0303916e7c7d7a76
+	byte #$00
+	; "Song"
 	hex 250a
-	hex 7b777670
+	hex 92777670
 	byte #$00
-	; "sound"
+	; "Sound"
 	hex 254a
-	hex 7b777d766d
+	hex 92777d766d
 	byte #$00
-	; "color1  " + cfcf
+	; "Color 1   " + cfcf
 	hex 258a
-	hex 6c7774777a610303cfcf
+	hex 847774777a0361030303cfcf
 	byte #$00
-	; "color2  " + abab
+	; "Color 2   " + abab
 	hex 25ca
-	hex 6c7774777a620303abab
+	hex 847774777a0362030303abab
 	byte #$00
-	; "Menu Return"
+	; "Difficulties"
 	hex 260a
-	hex 8d6e767d03916e7c7d7a76
+	hex 85726f6f726c7d747c726e7b
 	byte #$00
 	byte #$ff
 

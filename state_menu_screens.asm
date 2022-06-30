@@ -55,23 +55,27 @@ big_title_loop:
         iny
         bne big_title_loop
 
-; hud bar on title screen
+; pinline on title screen
 	PPU_SETADDR $22c0
         lda #$b9
         ldy #$20
-.set_top_bar
+.pinline_footer
 	sta PPU_DATA
         dey
-        bne .set_top_bar
+        bne .pinline_footer
+
+; pinline on options screen
+	PPU_SETADDR $2420
+        lda #$b9
+        ldy #$20
+.pinline_header
+	sta PPU_DATA
+        dey
+        bne .pinline_header
         
 ; various stuff on screen        
         NMTP_SETADDR menu_screen_tile_data
         jsr nametable_tile_planter
-
-; set rudy color blocks' tile attributes
-	PPU_SETADDR $27dc
-        lda #%11111111
-        sta PPU_DATA
         
 ; set rudy stuff
 `	jsr menus_position_rudy
@@ -81,7 +85,6 @@ big_title_loop:
         jsr sfx_rng_chord
         
 ; turn ppu back on
-        jsr WaitSync	; wait for VSYNC
 	jsr render_enable
 	rts
 
@@ -92,20 +95,40 @@ big_title_loop:
 menu_screens_render: 
 	; pretty much just for options screen
 ; show song id
-	PPU_SETADDR $2512
+	PPU_SETADDR $2514
 	lda #char_set_offset
         sta PPU_DATA
 	lda options_song_id
         jsr get_char_lo
         sta PPU_DATA
 ; show sound id
-	PPU_SETADDR $2552
+	PPU_SETADDR $2554
 	lda options_sound_id
         jsr get_char_hi
         sta PPU_DATA
 	lda options_sound_id
         jsr get_char_lo
         sta PPU_DATA
+; show difficulty
+	PPU_SETADDR $2649
+        lda #0
+        clc
+        ldy game_difficulty
+	beq .diff_offset_found
+.diff_offset_finder
+        adc #14
+        dey
+        bne .diff_offset_finder
+.diff_offset_found
+	tay
+        ldx #0
+.diff_place_loop
+        lda difficulty_messages,y
+        sta PPU_DATA
+        inx
+        iny
+        cpx #14
+        bne .diff_place_loop
         jmp state_render_done
         
         
@@ -208,7 +231,7 @@ options_screen_set_rudy_y: subroutine
         asl
         asl
         clc
-        adc #$48
+        adc #$37
         sta player_y_hi
         jmp set_player_sprite
 
@@ -376,9 +399,9 @@ options_screen_update: subroutine
 	lda options_rudy_pos
         cmp #$ff ; min value - 1
         bne .dont_wrap_up
-        lda #$04
+        lda #$05
 .dont_wrap_up
-	cmp #$05 ; max value + 1
+	cmp #$06 ; max value + 1
         bne .dont_wrap_down
         lda #$00
 .dont_wrap_down
@@ -400,33 +423,45 @@ options_screen_update: subroutine
         sta temp01
         jmp (temp00)
 options_table_lo:
+        .byte #<options_menu_return
 	.byte #<options_screen_song_handler
 	.byte #<options_screen_sfx_handler
         .byte #<options_screen_color1_handler
         .byte #<options_screen_color2_handler
-        .byte #<options_menu_return
+        .byte #<options_screen_difficulty_handler
 options_table_hi:
+        .byte #>options_menu_return
 	.byte #>options_screen_song_handler
 	.byte #>options_screen_sfx_handler
         .byte #>options_screen_color1_handler
         .byte #>options_screen_color2_handler
-        .byte #>options_menu_return
+        .byte #>options_screen_difficulty_handler
+
+       
+options_menu_return: subroutine
+	lda player_a_d
+        ora player_b_d
+        ora player_start_d
+        cmp #$00
+        beq .do_nothing
+        lda #4
+        jsr state_update_set_addr
+.do_nothing
+	jmp state_update_done
+        
 
         
 options_screen_song_handler: subroutine
         lda player_right_d
-        cmp #$00
         beq .dont_up_song
         inc options_song_id
 .dont_up_song
 	lda player_left_d
-        cmp #$00
         beq .dont_down_song
     	dec options_song_id
 .dont_down_song
 	lda options_song_id
-        cmp #$ff
-        bne .song_id_no_reset
+        bpl .song_id_no_reset
         lda #$04
         sta options_song_id
 .song_id_no_reset
@@ -449,18 +484,15 @@ options_screen_song_handler: subroutine
         
 options_screen_sfx_handler: subroutine
         lda player_right_d
-        cmp #$00
         beq .dont_up_sound
         inc options_sound_id
 .dont_up_sound
 	lda player_left_d
-        cmp #$00
         beq .dont_down_sound
     	dec options_sound_id
 .dont_down_sound
 	lda options_sound_id
-        cmp #$ff
-        bne .sound_id_no_reset
+        bpl .sound_id_no_reset
         lda #$12
         sta options_sound_id
 .sound_id_no_reset
@@ -488,13 +520,13 @@ options_screen_color1_handler: subroutine
         lda #$1d
         cmp player_color0
         bne .dont_increase
-        lda #$11
+        lda #$10
         sta player_color0
 .dont_increase
 	lda player_left_d
         beq .dont_decrease
         dec player_color0
-        lda #$10
+        lda #$0f
         cmp player_color0
         bne .dont_decrease
         lda #$1c
@@ -526,13 +558,21 @@ options_screen_color2_handler: subroutine
 	jmp state_update_done
         
         
-options_menu_return: subroutine
-	lda player_a_d
-        ora player_b_d
-        ora player_start_d
-        cmp #$00
-        beq .do_nothing
+options_screen_difficulty_handler: subroutine
+	lda player_right_d
+        beq .dont_increase
+        inc game_difficulty
         lda #4
-        jsr state_update_set_addr
-.do_nothing
+        cmp game_difficulty
+        bne .dont_increase
+        lda #0
+        sta game_difficulty
+.dont_increase
+	lda player_left_d
+        beq .dont_decrease
+        dec game_difficulty
+        bpl .dont_decrease
+        lda #3
+        sta game_difficulty
+.dont_decrease
 	jmp state_update_done
