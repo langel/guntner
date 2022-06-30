@@ -48,7 +48,6 @@ dashboard_init: subroutine
         bne .set_top_bar
         
 	; fill page 2 dashboard tiles
-        lda #$1d
         ldx #$00
 .dashboard_fill_tiles
 	lda dashboard_bg_tiles,x
@@ -72,40 +71,37 @@ dashboard_init: subroutine
 dashboard_bg_tiles:
 	; row 0 is top bar
 	; row 1 : top hud frames	
-        hex 1db1bcbcbcbcbcbe
+        hex cfb1bcbcbcbcbcbe
         hex bcbcbcbcbcbcbcbc
         hex bcbcbcbcbcbcbcbc
-        hex bebcbcbcbcbcbd1d
+        hex bebcbcbcbcbcbdcf
         ; row 2 : health, meter, lives
-	hex 1db0
-        byte #char_set_offset+$4c
-        byte #char_set_offset+$4d
-        byte #char_set_offset+$4e
-        byte #char_set_offset+$4f
+	hex cfb0
+        byte #char_set_S
+        hex a8a9aa
         hex ffb3
 	hex ffffffffffffffff
 	hex ffffffffffffffff
         hex b3aeaf
         byte #char_set_x
-        hex 30b1b21d
+        hex 30b1b2cf
         ; row 3 : middle hud frames
-        hex 1db8b9b9b9b9b9b7
+        hex cfb8b9b9b9b9b9b7
         hex b9b9bfbbb9b9b9b9
         hex b9b9b9b9bfbbb9b9
-        hex b7b9b9b9b9b9ba1d
+        hex b7b9b9b9b9b9bacf
         ; row 4 : wave, score, time
-	hex 1db0
+	hex cfb0
         byte #char_set_P,#char_set_H,#char_set_A
-        byte #char_set_S,#char_set_E
-        hex ff
+        byte #char_set_S,#char_set_E,#tile_empty
 	hex ffffb2b0ffffffff
 	hex ffffffb2b2b0ffff
-	hex ffffffffffffb21d
+	hex ffffffffffffb2cf
 	; row 5 : bottom hud frames
         hex 1db4b5b5b5b5b5b5
 	hex b5b5b6b4b5b5b5b5
 	hex b5b5b5b5b6b4b5b5
-        hex b5b5b5b5b5b5b61d
+        hex b5b5b5b5b5b5b6cf
 
 
         
@@ -167,7 +163,7 @@ dashboard_update: subroutine
 ; player speed
         lda player_speed
         clc
-        adc #$31
+        adc #char_set_offset+1
         sta $0100+6
 
 ; LIFEBARF
@@ -239,18 +235,10 @@ dashboard_update: subroutine
 
 ; PHASE
 	lda phase_current
-        and #$f0
-        lsr
-        lsr
-        lsr
-        lsr
-        clc
-        adc #$30
+        jsr get_char_hi
 	sta dash_cache+$28
 	lda phase_current
-        and #$0f
-        clc
-        adc #$30
+        jsr get_char_lo
 	sta dash_cache+$29
        
        
@@ -259,17 +247,10 @@ dashboard_update: subroutine
         ldy #$03
 .score_display_loop
 	lda score_000000xx,y
-        and #%00001111
-        clc
-        adc #$30
+        jsr get_char_lo
         sta dash_cache+$2c,x
         lda score_000000xx,y
-        lsr
-        lsr
-        lsr
-        lsr
-        clc
-        adc #$30
+        jsr get_char_hi
         dex
         sta dash_cache+$2c,x
         dex

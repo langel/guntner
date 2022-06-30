@@ -184,9 +184,9 @@ menu_screen_tile_data:
 	hex 222a
 	hex 8d7d6c7103038f787c7277767b
 	byte #$00
-	; " v2.1e "
+	; " v2.73 "
 	hex 22d7
-	hex 037e6299616e03
+	hex 037e6299676303
 	byte #$00
 	; "(c)MMXXII puke7, LoBlast"
 	hex 2304
@@ -204,9 +204,9 @@ menu_screen_tile_data:
 	hex 254a
 	hex 7b777d766d
 	byte #$00
-	; "color1  " + aaaa
+	; "color1  " + cfcf
 	hex 258a
-	hex 6c7774777a610303aaaa
+	hex 6c7774777a610303cfcf
 	byte #$00
 	; "color2  " + abab
 	hex 25ca
@@ -221,28 +221,28 @@ menu_screen_tile_data:
 
 cut_scene_intro_tile_data:
 	; "MY DINGLE"
-	hex 2191
+	hex 2171
 	hex 8d970385898e878c86
 	byte #$00
 	; "is very sick and there are"
-	hex 21c3
+	hex 21a3
 	hex 727b037e6e7a81037b726c73036a766d037c716e7a6e036a7a6e
 	byte #$00
 	; "life saving drugs very far"
-	hex 2203
+	hex 21e3
 	hex 74726f6e037b6a7e727670036d7a7d707b037e6e7a81036f6a7a
 	byte #$00
-	; "away! Please drive through"
-	hex 2243
-	hex 6a7f6a819b0390746e6a7b6e036d7a727e6e037c717a777d7071
+	; "away. Please drive through"
+	hex 2223
+	hex 6a7f6a81990390746e6a7b6e036d7a727e6e037c717a777d7071
 	byte #$00
 	; "the 13th dimension quickly"
-	hex 2283
+	hex 2263
 	hex 7c716e0361637c71036d72756e767b72777603797d726c737481
 	byte #$00
-	; "so my dingle is saved."
-	hex 22c3
-	hex 7b77037581036d727670746e03727b037b6a7e6e6d99
+	; "so my dingle is saved!"
+	hex 22a3
+	hex 7b77037581036d727670746e03727b037b6a7e6e6d9b
 	byte #$00
 	byte #$ff
 

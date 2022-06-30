@@ -18,9 +18,9 @@ Palette00:		; 25 bytes
         hex 013530	;sprite 3 ; starglasses ; crossbones
         
         
-; bg 0 - stars bg_tiles 1
+; bg 0 - stars bg_tiles 1 / menu screens
 ; bg 1 - stars bg_tiles 2
-; bg 2 - menu screens / bg enemies
+; bg 2 - n/a  (bg enemies)
 ; bg 3 - dashboard
 ; spr 0 - player
 ; spr 1 - enemy

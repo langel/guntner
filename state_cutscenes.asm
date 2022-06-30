@@ -31,10 +31,7 @@ cut_scene_intro_init: subroutine
         bpl .palette_loop
         ; Distressed Alien
 alien_pattern_placement: 
-        lda #$20
-        sta PPU_ADDR
-        lda #$86
-        sta PPU_ADDR
+	PPU_SETADDR #$2086
         lda #0
         sta temp00 ; pattern tile counter
         ldx #8

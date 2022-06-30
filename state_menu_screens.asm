@@ -1,6 +1,5 @@
 
 
-title_screen_color	EQU $180
 title_rudy_pos		EQU $181
 
 options_rudy_pos	EQU $182
@@ -33,25 +32,12 @@ menu_screens_init: subroutine
         jsr timer_reset
         jsr title_screen_set_rudy_y
         
-; set bg tile palette attributes / colors
-; $23c0 and $27c0
-        ; page 1 attributes
-        ; XXX give TITLE a different palette?
-	PPU_SETADDR $23c0
-	lda #%10101010
-        ldx #$c0
-.23c0_loop
-        sta PPU_DATA
-        inx
-        bne .23c0_loop
-        ; page 2 attributes
-	PPU_SETADDR $27c0
-	lda #%10101010
-        ldx #$c0
-.27c0_loop
-        sta PPU_DATA
-        inx
-        bne .27c0_loop
+        lda #$02
+        sta pal_bg_0_1
+        lda #$27
+        sta pal_bg_0_2
+        lda #$34
+        sta pal_bg_0_3
         
 	jsr player_game_reset
         jsr dashboard_init
@@ -234,22 +220,22 @@ options_screen_set_rudy_y: subroutine
         
                 
 guntner_title_name_table:  ; 256 bytes
-	.byte $c0,$c0,$c0,$c1,$c2,$c3,$c4,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2
-	.byte $c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c5,$c0,$c0,$c0
-	.byte $c0,$c0,$c0,$c6,$c7,$c8,$c9,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$cb
-	.byte $cc,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$cb,$cc,$cd,$ce,$c0,$c0,$c0
-	.byte $c0,$c0,$c0,$cf,$d0,$c0,$d1,$d2,$d3,$d4,$d5,$d6,$d7,$d8,$d9,$d2
-	.byte $d3,$d6,$d7,$d8,$d9,$da,$db,$dc,$dd,$d2,$d3,$de,$cf,$c0,$c0,$c0
-	.byte $c0,$c0,$c0,$cf,$df,$e0,$e1,$d2,$d3,$e2,$d5,$e3,$e4,$e5,$d5,$d2
-	.byte $d3,$e3,$e4,$e5,$d5,$d2,$e6,$e7,$d5,$d2,$e8,$e9,$ea,$c0,$c0,$c0
-	.byte $c0,$c0,$c0,$cf,$d0,$e3,$d5,$d2,$d3,$e2,$d5,$e3,$d5,$e2,$d5,$d2
-	.byte $d3,$e3,$d5,$e2,$d5,$d2,$eb,$ec,$ed,$d2,$d3,$e2,$ee,$c0,$c0,$c0
-	.byte $c0,$c0,$c0,$cf,$d0,$e3,$d5,$ef,$f0,$f1,$f2,$f3,$ce,$f4,$d5,$d2
-	.byte $d3,$f3,$ce,$f4,$d5,$ef,$f0,$f1,$f2,$d2,$f5,$f6,$cf,$c0,$c0,$c0
-	.byte $c0,$c0,$c0,$cf,$f7,$f8,$d5,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$d2
-	.byte $d3,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$e2,$cf,$c0,$c0,$c0
-	.byte $c0,$c0,$c0,$f9,$fa,$fa,$fb,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$fc,$fa
-	.byte $fa,$fd,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$c0,$fe,$fa,$fd,$c0,$c0
+	byte $03,$03,$03,$c1,$c2,$c3,$c4,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2
+	byte $c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c5,$03,$03,$03
+	byte $03,$03,$03,$c6,$c7,$c8,$c9,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$cb
+	byte $cc,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$cb,$cc,$cd,$ce,$03,$03,$03
+	byte $03,$03,$03,$cf,$d0,$03,$d1,$d2,$d3,$d4,$d5,$d6,$d7,$d8,$d9,$d2
+	byte $d3,$d6,$d7,$d8,$d9,$da,$db,$dc,$dd,$d2,$d3,$de,$cf,$03,$03,$03
+	byte $03,$03,$03,$cf,$df,$e0,$e1,$d2,$d3,$e2,$d5,$e3,$e4,$e5,$d5,$d2
+	byte $d3,$e3,$e4,$e5,$d5,$d2,$e6,$e7,$d5,$d2,$e8,$e9,$ea,$03,$03,$03
+	byte $03,$03,$03,$cf,$d0,$e3,$d5,$d2,$d3,$e2,$d5,$e3,$d5,$e2,$d5,$d2
+	byte $d3,$e3,$d5,$e2,$d5,$d2,$eb,$ec,$ed,$d2,$d3,$e2,$ee,$03,$03,$03
+	byte $03,$03,$03,$cf,$d0,$e3,$d5,$ef,$f0,$f1,$f2,$f3,$ce,$f4,$d5,$d2
+	byte $d3,$f3,$ce,$f4,$d5,$ef,$f0,$f1,$f2,$d2,$f5,$f6,$cf,$03,$03,$03
+	byte $03,$03,$03,$cf,$f7,$f8,$d5,$03,$03,$03,$03,$03,$03,$03,$03,$d2
+	byte $d3,$03,$03,$03,$03,$03,$03,$03,$03,$03,$03,$e2,$cf,$03,$03,$03
+	byte $03,$03,$03,$f9,$fa,$fa,$fb,$03,$03,$03,$03,$03,$03,$03,$fc,$fa
+	byte $fa,$fd,$03,$03,$03,$03,$03,$03,$03,$03,$03,$fe,$fa,$fd,$03,$03
   
   
 title_screen_super_secret_code:
@@ -266,7 +252,7 @@ title_screen_update: subroutine
         ; number of seconds before demo
 	lda timer_seconds_1s
         ; add #$30 because timer based on numerical tiles
-        cmp #$33
+        cmp #char_set_0+3
         ;cmp #$a3
         ;cmp #$30
         bne .sit_and_wait
@@ -342,21 +328,13 @@ title_screen_update: subroutine
 	jsr title_screen_set_rudy_y
 ; except animate that color tho
         ; increase color
-	inc title_screen_color
-        lda title_screen_color
-        lsr
-        lsr
-        lsr
-        lsr
-        lsr
-        cmp #$0c
-        bne .dont_reset_screen_color
-        lda #$00
-        sta title_screen_color
-.dont_reset_screen_color
-        adc #$01
+        lda wtf
+        and #$f
+        bne .dont_next_title_color
+        lda pal_bg_0_1
+        jsr palette_next_rainbow_color
         sta pal_bg_0_1
-        sta pal_bg_2_1
+.dont_next_title_color
 	jmp state_update_done
         
 

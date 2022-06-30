@@ -69,7 +69,7 @@ starfield_init: subroutine
         sta PPU_ADDR
         lda starfield_col
         sta PPU_ADDR
-        ldy #$16
+        ldy #$15
 .transfer_loop
 	lda star_cache,y
         sta PPU_DATA
@@ -95,7 +95,7 @@ starfield_render: subroutine
         lda starfield_col
         sta PPU_ADDR
 ; rip from cache to PPU
-        ldy #$16
+        ldy #$15
 .col_loop
 	lda star_cache,y
         sta PPU_DATA
