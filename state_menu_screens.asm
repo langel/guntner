@@ -450,26 +450,47 @@ options_menu_return: subroutine
 	jmp state_update_done
         
 
+options_min_max:
+	byte $00, $04	; song
+        byte $00, $12	; sfx
+        byte $10, $1c	; color1
+        byte $20, $2c	; color2
+        byte $00, $03	; difficulty
+        
+options_handle_change: subroutine
+	; a = current value
+        ; y = table offset
+        sta temp00
+        lda player_right_d
+        beq .dont_increase
+        inc temp00
+        lda options_min_max+1,y
+        cmp temp00
+        bcs .done
+        lda options_min_max,y
+        sta temp00
+.dont_increase
+	lda player_left_d
+        beq .dont_decrease
+        dec temp00
+        bmi .go_max
+        lda temp00
+        cmp options_min_max,y
+        bcs .done
+.go_max
+	lda options_min_max+1,y
+        sta temp00
+.dont_decrease
+.done
+	lda temp00
+	rts
         
 options_screen_song_handler: subroutine
-        lda player_right_d
-        beq .dont_up_song
-        inc options_song_id
-.dont_up_song
-	lda player_left_d
-        beq .dont_down_song
-    	dec options_song_id
-.dont_down_song
 	lda options_song_id
-        bpl .song_id_no_reset
-        lda #$04
+        ldy #0
+        jsr options_handle_change
         sta options_song_id
-.song_id_no_reset
-	cmp #$05
-        bne .song_id_not_maxed
-        lda #$00
-        sta options_song_id
-.song_id_not_maxed
+; trigger song with button
 	lda player_b_d
         beq .no_b
         jsr song_stop
@@ -483,24 +504,10 @@ options_screen_song_handler: subroutine
         
         
 options_screen_sfx_handler: subroutine
-        lda player_right_d
-        beq .dont_up_sound
-        inc options_sound_id
-.dont_up_sound
-	lda player_left_d
-        beq .dont_down_sound
-    	dec options_sound_id
-.dont_down_sound
 	lda options_sound_id
-        bpl .sound_id_no_reset
-        lda #$12
+        ldy #2
+        jsr options_handle_change
         sta options_sound_id
-.sound_id_no_reset
-	cmp #$13
-        bne .sound_id_not_maxed
-        lda #$00
-        sta options_sound_id
-.sound_id_not_maxed
 ; trigger sound with button
 	lda player_b_d
         ora player_a_d
@@ -513,66 +520,24 @@ options_screen_sfx_handler: subroutine
         
 
 options_screen_color1_handler: subroutine
-	; starts at 14
-	lda player_right_d
-        beq .dont_increase
-        inc player_color0
-        lda #$1d
-        cmp player_color0
-        bne .dont_increase
-        lda #$10
-        sta player_color0
-.dont_increase
-	lda player_left_d
-        beq .dont_decrease
-        dec player_color0
-        lda #$0f
-        cmp player_color0
-        bne .dont_decrease
-        lda #$1c
-        sta player_color0
-.dont_decrease
+	lda player_color0
+        ldy #4
+        jsr options_handle_change
+	sta player_color0
 	jmp state_update_done
 
 
 options_screen_color2_handler: subroutine
-	; starts at 21
-	lda player_right_d
-        beq .dont_increase
-        inc player_color1
-        lda #$2d
-        cmp player_color1
-        bne .dont_increase
-        lda #$20
-        sta player_color1
-.dont_increase
-	lda player_left_d
-        beq .dont_decrease
-        dec player_color1
-        lda #$1f
-        cmp player_color1
-        bne .dont_decrease
-        lda #$2c
-        sta player_color1
-.dont_decrease
+	lda player_color1
+        ldy #6
+        jsr options_handle_change
+	sta player_color1
 	jmp state_update_done
         
         
 options_screen_difficulty_handler: subroutine
-	lda player_right_d
-        beq .dont_increase
-        inc game_difficulty
-        lda #4
-        cmp game_difficulty
-        bne .dont_increase
-        lda #0
-        sta game_difficulty
-.dont_increase
-	lda player_left_d
-        beq .dont_decrease
-        dec game_difficulty
-        bpl .dont_decrease
-        lda #3
-        sta game_difficulty
-.dont_decrease
+        lda game_difficulty
+        ldy #8
+        jsr options_handle_change
+	sta game_difficulty
 	jmp state_update_done
