@@ -1,13 +1,6 @@
 
 ;;;;;; Constants
 
-;;; player bullet struct
-; byte 0 : x pos
-; byte 1 : y pos
-; byte 2 : x speed
-; byte 3 : y speed
-bullet_x_vel	= $c6
-bullet_y_vel	= $c7
 
 ; oam ram
 bullet0		= $020c

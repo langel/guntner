@@ -205,7 +205,9 @@ enemies_update_all: subroutine
         sta dart_frame_max
 	; if player is dead despawn
 	lda player_health
+        bne .player_alive
         beq player_dead_enemies_despawn
+.player_alive
 	; cycle through all the slots
 	ldx #$00
         stx enemy_slot_id
@@ -252,38 +254,31 @@ update_enemies_handler_next:
 player_dead_enemies_despawn: subroutine
 	; enemies slide off left side of screen
         ; after player dies
-        lda #$05
-        clc
-        adc player_death_flag
-        bcc .carry_clear
-        lda #$ff
-.carry_clear
-        sta player_death_flag
-        lsr
-        lsr
-        lsr
-        lsr
-        sta temp00
-        ldx #$20
+        ldx #$df
 .loop
-        lda oam_ram_x,x
-        beq .do_nothing
-        sec
-        sbc temp00
-        bmi .despawn
-        sta oam_ram_x,x
-        jmp .do_nothing
+        lda oam_enemy_sprites,x
+        beq .next
+        sbc player_death_flag
+        sta oam_enemy_sprites,x
+        cmp #$f0
+        bcc .next
 .despawn
 	lda #$00
-        sta oam_ram_x,x
+        sta oam_enemy_sprites,x
 	lda #$ff
-        sta oam_ram_y,x
-.do_nothing
-        inx
-        inx
-        inx
-        inx
+        sta oam_enemy_sprites-3,x
+.next
+	dex
+        dex
+        dex
+        dex
+        cpx #$ff
         bne .loop
+        lda wtf
+        and #$01
+        bne .dont_increase_velocity
+        inc player_death_flag
+.dont_increase_velocity
         rts
         
         

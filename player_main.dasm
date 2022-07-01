@@ -82,6 +82,17 @@ player_take_damage: subroutine
         sta player_health
         rts
 .player_dead
+	; player can be saved by mask shield!
+        lda mask_shield
+        beq .player_really_dead
+        lda #$00
+        sta mask_shield
+        lda #$ff
+        sta player_health
+        lda #2
+        sta bullet_x_vel
+        rts
+.player_really_dead
 	; player_health 00 means DEATH
 	lda #$00
         sta player_health

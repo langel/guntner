@@ -157,7 +157,7 @@ state_update_done:
 sprite0_wait:
 	lda state_sprite0
         cmp #$00
-        beq sprite0_done
+        beq sprite0_off
 	; wait for Sprite 0; SPRITE 0 WAIT TIME!!!
 .wait0	bit PPU_STATUS
         bvs .wait0
@@ -195,10 +195,11 @@ sprite0_wait:
         ; HUD prepare for next draw
         ; stop updating HUD if game over
         lda player_death_flag
-        cmp #$00
-        bne sprite0_done
+        bne skip_dash_update
 	jsr dashboard_update
-sprite0_done:
+skip_dash_update:
+sprite0_off:
+	; XXX make sure to delete this subroutine
 	;jsr apu_debugger
         jsr song_update
         jsr apu_update

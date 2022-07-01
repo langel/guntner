@@ -234,3 +234,5 @@ sfx_noi_update_type	byte
 apu_temp		byte
 
 
+bullet_x_vel	= $c6
+bullet_y_vel	= $c7

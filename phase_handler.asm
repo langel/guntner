@@ -79,6 +79,8 @@ phase_next: subroutine
         
 phase_handler: subroutine
 
+	jsr demo_phase_skip_after_time    
+
 	lda phase_current
         and #$f
 ; switch on case phase type
@@ -96,8 +98,7 @@ phase_handler: subroutine
         jmp phase_boss_fight
 .not_phase_boss_fight
 
-standard_phase_spawns:
-	;jsr demo_phase_skip_after_time        
+standard_phase_spawns:    
 	lda phase_state
         beq .not_next_phase
         lda phase_kill_counter
