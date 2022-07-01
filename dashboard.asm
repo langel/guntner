@@ -167,25 +167,8 @@ dashboard_update: subroutine
         sta $0100+6
 
 ; LIFEBARF
-	; XXX gut / refactor how lifebar messaging works
-	; check if end game
-	lda phase_end_game
-        cmp #$00
-        beq .lifebarf_not_end_game
-        ; "gg congration gg"
-        ldy #$20
-        jsr dashboard_message_set
-        jmp .no_lifebar
-.lifebarf_not_end_game
-	; if paused then just say P A U S E D
-        ; wait maybe it says PLEASE UNPAUSE
-        lda player_paused
-        cmp #$ff
-        beq .lifebarf_not_live
-        jmp .lifebarf_is_live
-.lifebarf_not_live
-        ; "please unpause"
-        ldy #$30
+	ldy dashboard_message
+        bmi .lifebarf_is_live
         jsr dashboard_message_set
         jmp .no_lifebar
         

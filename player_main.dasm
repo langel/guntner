@@ -18,9 +18,10 @@ player_game_reset: subroutine
         sta score_00xx0000
         sta score_0000xx00
         sta score_000000xx
-        jsr timer_reset
-        lda #$01
+        ;lda #$01
         sta phase_current
+        sta phase_level
+        jsr timer_reset
 	lda #$d0
         sta player_x_hi
         sta player_demo_x

@@ -18,6 +18,8 @@ game_init_generic: subroutine
         jsr dashboard_init
         jsr starfield_init
  	jsr starfield_draw_dash_top_bar_nametable0
+        lda #$ff
+        sta dashboard_message
         jsr dashboard_update
         jsr dashboard_render
         
@@ -186,11 +188,15 @@ game_update: subroutine
 .unpause
 	lda #$00
         sta player_paused
+        lda #$ff
+        sta dashboard_message
         jsr song_unstop
         jmp .read_start_done
 .pause
 	lda #$ff
         sta player_paused
+        lda #$30
+        sta dashboard_message
         jsr song_stop
         jsr sfx_rng_chord
 .read_start_done

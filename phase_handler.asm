@@ -65,7 +65,7 @@ phase_next: subroutine
         sta phase_kill_counter
         sta phase_state
 	inc phase_current
-        ; XXX check for next level here
+        ; increase star speed
         lda #53
         clc
         adc scroll_speed_lo
@@ -79,6 +79,24 @@ phase_next: subroutine
         
 phase_handler: subroutine
 
+	lda phase_current
+        and #$f
+; switch on case phase type
+        bne .not_phase_zero
+        jmp phase_zero
+.not_phase_zero
+        cmp #$7
+        bne .not_phase_spawn_long
+        cmp #$d
+        beq .not_phase_spawn_long
+        jmp phase_spawn_long
+.not_phase_spawn_long
+        cmp #$f
+        bne .not_phase_boss_fight
+        jmp phase_boss_fight
+.not_phase_boss_fight
+
+standard_phase_spawns:
 	;jsr demo_phase_skip_after_time        
 	lda phase_state
         beq .not_next_phase
@@ -212,6 +230,43 @@ phase_handler: subroutine
 .skip_spawn
 .dont_spawn
 	rts
+        
+        
+        
+        
+phase_zero: subroutine
+	lda phase_current
+        bne .congration
+	lda #$40
+        bne .continue
+.congration
+	lda #$20
+.continue
+        sta dashboard_message
+        inc phase_state
+        lda phase_state
+        cmp #100
+        bne .stay_zero
+        lda #$ff
+        sta dashboard_message
+        jsr phase_next
+.stay_zero
+	rts
+        
+        
+phase_spawn_long: subroutine
+	rts
+        
+        
+phase_boss_fight: subroutine
+	rts
+        
+        
+        
+        
+        
+        
+        
         
         
         

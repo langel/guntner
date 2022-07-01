@@ -173,6 +173,8 @@ dashboard_messages:
 	hex 707003847776877a6a93728f8e037070
 	;" please unpause "
 	hex 0378746e6a7b6e037d76786a7d7b6e03
+	;"GooDlucK Hav3fuN"
+	hex 87777785747d6c8b03886a7e636f7d8e
         
         
 difficulty_messages:

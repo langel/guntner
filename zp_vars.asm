@@ -90,6 +90,8 @@ collision_1_y	byte
 collision_1_w	byte
 collision_1_h	byte
 
+dashboard_message	byte
+
 ; 24 bit max value : 16777215
 score_000000xx	byte
 score_0000xx00	byte
@@ -127,6 +129,7 @@ nametable_tile_planter_addr_hi	byte
 
 phase_kill_counter	byte
 phase_current		byte
+phase_level		byte
 phase_state		byte
 phase_table_ptr		byte
 phase_spawn_type	byte
