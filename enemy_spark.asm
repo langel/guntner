@@ -8,17 +8,20 @@ spark_spawn: subroutine
         tay
         lda enemy_hitpoints_table,y
         sta enemy_ram_hp,x 
-        jsr get_next_random
-        and #%01111111
-        sta enemy_ram_x,x
-        jsr get_next_random
-        and #%01111111
-        sta enemy_ram_y,x 
-        lsr
-        and #%00000011
-        sta enemy_ram_ex,x
         lda #$00
         sta enemy_ram_ac,x
+        jsr get_next_random
+        sta enemy_ram_x,x
+        lda wtf
+        and #$01
+        bne .y_top
+.y_bottom
+	lda #4
+        sta enemy_ram_y
+        rts
+.y_top
+	lda #178
+        sta enemy_ram_y
 	rts
 
 

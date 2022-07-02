@@ -258,6 +258,7 @@ player_dead_enemies_despawn: subroutine
 .loop
         lda oam_enemy_sprites,x
         beq .next
+        sec
         sbc player_death_flag
         sta oam_enemy_sprites,x
         cmp #$f0
