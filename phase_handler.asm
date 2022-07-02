@@ -211,8 +211,92 @@ phase_zero: subroutine
 	rts
         
         
+        
 phase_spawn_long: subroutine
+	lda phase_state
+        bne .skip_init
+.init
+        clc
+	lda #1
+        adc phase_level
+        adc game_difficulty
+        sta temp00
+        ldx #8
+        cpx phase_current
+        bcc .mult_set
+        ldx #4
+.mult_set
+	lda #0
+.kill_count_loop
+	clc
+        adc temp00
+        dex
+        bne .kill_count_loop
+        sta phase_kill_counter
+        inc phase_state
+.skip_init
+	lda wtf
+        and #$0f
+        bne .skip_spawn
+        lda phase_level
+        cmp #$03
+        bne .not_final_level
+        ; XXX spawn all 3 types here
+.not_final_level
+        adc #spark_id
+        tay
+	jsr get_enemy_slot_1_sprite
+        cmp #$ff
+        beq .skip_spawn
+.set_and_jump
+	; XXX redundnat with other spawners
+        sta temp00
+        lsr
+        lsr
+        lsr
+        tax
+        inc phase_spawn_table,x
+        lda enemy_spawn_table_lo,y
+        sta temp02
+        lda enemy_spawn_table_hi,y
+        sta temp03
+        ldx temp00
+        jmp (temp02)
+.skip_spawn
+	; XXX redundant with other spawners
+        lda phase_kill_counter
+        bpl .not_next_phase
+        lda phase_state
+        cmp #$40
+        bne .next_phase
+     	jsr sfx_phase_next
+        sec
+        ldy #$0f
+        ldx #$78
+.clear_spawn_loop
+        lda #0
+        sta phase_spawn_table,y
+        lda #crossbones_id
+        sta enemy_ram_type,x
+        txa
+        sbc #$08
+        tax
+        dey
+        bpl .clear_spawn_loop
+.next_phase
+	inc phase_state
+        lda phase_state
+        cmp #$44
+        bne .not_next_phase
+        
+	tax
+        lda #crossbones_id
+        sta enemy_ram_type,x
+        
+	jsr phase_next
+.not_next_phase
 	rts
+        
         
         
 phase_boss_fight: subroutine
