@@ -3,11 +3,11 @@
 
 
 ; oam ram
-bullet0		= $020c
-bullet1		= $0210
-bullet2		= $0214
-bullet3		= $0218
-bullet4_or_opt	= $021c
+bullet0		EQM $020c
+bullet1		EQM $0210
+bullet2		EQM $0214
+bullet3		EQM $0218
+bullet4_or_opt	EQM $021c
 
 player_bullet_sprite EQM $79
 
@@ -87,6 +87,7 @@ player_gun_bullet_dir_table:
         .byte #252, #249
         
 player_gun_fire: subroutine
+	; temp00 holds five_directions == true
 	ldx #$00
         ldy #$0c
 .bullet_loop
@@ -104,7 +105,6 @@ player_gun_fire: subroutine
         sta oam_ram_y,y
         ; direction
         lda temp00
-        cmp #$00
         beq .one_direction
 .five_directions
         lda player_gun_bullet_dir_table,x

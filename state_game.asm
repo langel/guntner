@@ -49,7 +49,6 @@ game_init:
 
 game_update_generic: subroutine
 	lda player_health
-        cmp #$00
         bne .player_not_dead
 .player_dead_anim
         lda player_death_flag
@@ -64,7 +63,6 @@ game_update_generic: subroutine
         ;jsr death_scroll_set_speed_m
         dec player_lives
         lda player_lives
-        cmp #$00
         bne .youdead
         ; attract mode has different behaviour
         lda attract_true
@@ -89,11 +87,10 @@ game_update_generic: subroutine
         bne .done
 ; next life      
         lda player_lives
-        cmp #$00
         bne .next_life
         ; no lives left game over
         ; GO BACK TO TITLE SCREEN AFTER DEATH SEQUENCE
-        jmp .done
+        beq .done
 .trigger_fadeout
         ; demo mode has different behaviour
         lda attract_true
@@ -101,7 +98,6 @@ game_update_generic: subroutine
         beq .return_to_title_screen
      	; do not return to title if game is not over
         lda player_lives
-        cmp #$00
         bne .done
 .return_to_title_screen
         ; GO BACK TO TITLE SCREEN 

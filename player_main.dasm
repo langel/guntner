@@ -87,10 +87,12 @@ player_take_damage: subroutine
         beq .player_really_dead
         lda #$00
         sta mask_shield
-        lda #$ff
-        sta player_health
         lda #2
         sta bullet_x_vel
+        lda #$ff
+        sta player_health
+        lda #30
+        sta state_iframes
         rts
 .player_really_dead
 	; player_health 00 means DEATH
