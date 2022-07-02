@@ -224,8 +224,18 @@ powerup_bomb_update: subroutine
         
         
 powerup_pickup_r_bag: subroutine
-        lda #120
+        lda #$ff
         sta r_bag_counter
+        clc
+        lda #$03
+        adc player_autofire_s
+        sta player_autofire_s
+        lda #$20
+        cmp player_autofire_s
+        bcc .not_maxed_out
+        lda player_autofire_s
+.not_maxed_out
+        sta player_autofire_s
 	rts
         
         

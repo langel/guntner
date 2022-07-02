@@ -57,9 +57,11 @@ player_a	byte
 player_a_d	byte
 player_dir_bits	byte ; matches controller
 player_boundless	byte
+player_autofire_c	byte
+player_autofire_s	byte
 
 bomb_counter	byte ; counts down animation frames
-r_bag_counter	byte ; counts down rapid fire
+r_bag_counter	byte ; counts down autoturbo fire frames
 shroom_counter	byte ; counts down animation frames
 shroom_mod	byte ; apu pitch offset
 mask_shield	byte ; 0 = no skull shield

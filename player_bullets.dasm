@@ -135,6 +135,51 @@ player_gun_fire: subroutine
         
         
 player_bullets_check_controls: subroutine
+	
+	; check for r bag powerup running
+	lda r_bag_counter
+        beq .no_r_bag
+        dec r_bag_counter
+        bne .turbo_fire
+.no_r_bag
+        ; a button = turbo
+        lda player_a
+	cmp #$ff
+        bne .no_turbo
+        ; damage from turbo gun
+	lda wtf
+        and #$02
+        cmp #$02
+        bne .turbo_fire
+        lda #$03
+        sta player_damage
+        jsr player_take_damage
+.turbo_fire
+	lda #$01
+        sta temp00
+        bne .pull_that_mfing_trigger
+.no_turbo
+	lda player_b_d
+        cmp #$ff
+        beq .normal_fire
+        ; hold b button = retrigger
+        lda player_b
+        beq .no_fire
+        lda player_autofire_c
+        clc
+        adc player_autofire_s
+        sta player_autofire_c
+        bcc .no_fire
+.normal_fire
+	lda #$00
+        sta temp00
+.pull_that_mfing_trigger
+	jsr player_gun_fire
+.no_fire
+	rts
+        
+
+
 	lda #$01
         sta temp00
 	; check for r_bag status
@@ -175,7 +220,7 @@ player_bullets_check_controls: subroutine
 	lda player_b_d
         cmp #$ff
         bne .done
-.normal_fire
+;.normal_fire
 	lda #$00
         sta temp00
         jsr player_gun_fire

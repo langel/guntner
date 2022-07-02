@@ -79,7 +79,8 @@ phase_next: subroutine
         
 phase_handler: subroutine
 
-	jsr demo_phase_skip_after_time    
+	;jsr demo_phase_skip_after_time    
+        jsr phase_interval_spawn
 
 	lda phase_current
         and #$f
@@ -115,51 +116,6 @@ standard_phase_spawns:
 	jsr phase_next
 .not_next_phase
 
-; LEVEL LARGE ENEMY SPAWN INTERVAL
-	; large enemy spawn?
-        lda timer_frames_1s
-        cmp #$30
-        bne .no_large_enemy
-        lda timer_frames_10s
-        cmp #$30
-        bne .no_large_enemy
-        ; look for 10 second increments
-        lda timer_seconds_1s
-        cmp #$37
-        beq .spawn_large_enemy
-        bne .no_large_enemy
-        lda timer_seconds_1s
-        cmp #$30
-        bne .no_large_enemy
-        ; XXX look for 20 sec increments
-        lda timer_seconds_10s
-        cmp #$31
-        beq .spawn_large_enemy
-        cmp #$33
-        beq .spawn_large_enemy
-        cmp #$35
-        beq .spawn_large_enemy
-        bne .no_large_enemy
-.spawn_large_enemy
-        jsr get_enemy_slot_4_sprite
-        cmp #$ff
-        beq .no_large_enemy
-        tax
-        ldy phase_large_counter
-        lda level_enemy_table,y
-        bne .dont_reset_large_counter
-        ldy #0
-        sty phase_large_counter
-        lda level_enemy_table,y
-.dont_reset_large_counter	
-	inc phase_large_counter
-        tay
-        lda enemy_spawn_table_lo,y
-        sta temp02
-        lda enemy_spawn_table_hi,y
-        sta temp03
-        jmp (temp02)
-.no_large_enemy
 
 
 	; check for spawning state
@@ -264,6 +220,41 @@ phase_boss_fight: subroutine
         
         
         
+phase_interval_spawn: subroutine
+; LEVEL LARGE ENEMY SPAWN INTERVAL
+	; large enemy spawn?
+        lda timer_frames_1s
+        cmp #char_set_offset
+        bne .no_large_enemy
+        lda timer_frames_10s
+        cmp #char_set_offset
+        bne .no_large_enemy
+        ; look for 10 second increments
+        lda timer_seconds_1s
+        cmp #char_set_offset+7
+        beq .spawn_large_enemy
+        bne .no_large_enemy
+.spawn_large_enemy
+        jsr get_enemy_slot_4_sprite
+        cmp #$ff
+        beq .no_large_enemy
+        tax
+        ldy phase_large_counter
+        lda level_enemy_table,y
+        bne .dont_reset_large_counter
+        ldy #0
+        sty phase_large_counter
+        lda level_enemy_table,y
+.dont_reset_large_counter	
+	inc phase_large_counter
+        tay
+        lda enemy_spawn_table_lo,y
+        sta temp02
+        lda enemy_spawn_table_hi,y
+        sta temp03
+        jmp (temp02)
+.no_large_enemy
+	rts
         
         
         

@@ -36,6 +36,8 @@ player_game_reset: subroutine
 	lda #$03
         sta player_lives
         sta player_gun_str
+        lda #$08
+        sta player_autofire_s
         rts
         
   
