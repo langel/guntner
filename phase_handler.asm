@@ -301,6 +301,18 @@ phase_spawn_long: subroutine
         
         
 phase_boss_fight: subroutine
+	; XXX handle boss intro/outro cinematics here
+	lda phase_state
+        bne .done
+        inc phase_state
+	ldx phase_level
+        ldy level_boss_table,x
+        lda enemy_spawn_table_lo,y
+        sta temp02
+        lda enemy_spawn_table_hi,y
+        sta temp03
+        jmp (temp02)
+.done
 	rts
         
         

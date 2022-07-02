@@ -10,6 +10,9 @@ level_enemy_table:
         ; level 4
         byte 0
 
+level_boss_table:
+	byte boss_scarab_id
+	byte boss_vamp_id
 
 	; phase 0 	: introduce level
         ; even phases	: galger spawns
