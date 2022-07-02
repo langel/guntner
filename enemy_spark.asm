@@ -32,15 +32,20 @@ spark_cycle: subroutine
         jsr enemy_handle_damage_and_death
         
 	inc enemy_ram_ac,x
-        lda #$07
-        cmp enemy_ram_ac,x
+        lda enemy_ram_ac,x
+        and #$07
         bne .dont_reset_dir
-        lda #$00
-        sta enemy_ram_ac,x
         jsr get_next_random
         lsr
         and #%00000011
         sta enemy_ram_ex,x
+        cmp #$03
+        bne .reset_done
+        lda rng2
+        bpl .reset_done
+        lda #$01
+        sta enemy_ram_ex,x
+.reset_done
 .dont_reset_dir
         ; work out the direction
         lda enemy_ram_ex,x

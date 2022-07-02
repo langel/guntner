@@ -6,6 +6,8 @@ player_dead_tile	EQM $0a
 player_game_reset: subroutine
 	lda #$00
         sta phase_state
+        sta phase_current
+        sta phase_level
         sta phase_kill_counter
         sta phase_end_game
         sta player_death_flag
@@ -18,9 +20,9 @@ player_game_reset: subroutine
         sta score_00xx0000
         sta score_0000xx00
         sta score_000000xx
-        ;lda #$01
+        ; XXX testing phase behaviours
+        lda #$0d
         sta phase_current
-        sta phase_level
         jsr timer_reset
 	lda #$d0
         sta player_x_hi
@@ -31,6 +33,7 @@ player_game_reset: subroutine
         lda #$ff
         sta player_health
 ; set player stats
+	; XXX this should be set on boot and left to players' choice
         lda #$02
         sta player_speed
 	lda #$03

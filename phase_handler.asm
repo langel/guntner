@@ -89,9 +89,10 @@ phase_handler: subroutine
         jmp phase_zero
 .not_phase_zero
         cmp #$7
-        bne .not_phase_spawn_long
+        beq .do_phase_spawn_long
         cmp #$d
-        beq .not_phase_spawn_long
+        bne .not_phase_spawn_long
+.do_phase_spawn_long
         jmp phase_spawn_long
 .not_phase_spawn_long
         cmp #$f
