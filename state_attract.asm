@@ -14,8 +14,12 @@ attract_init:
         sta attract_true
         jsr render_enable
         jsr palette_fade_in_init
+        ; turn on iframes
+        lda #20
+        sta state_iframes
         ; XXX testing
-        ;jsr audio_init_song
+        lda #1
+        jsr song_start
         rts
         
         

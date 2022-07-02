@@ -170,6 +170,8 @@ powerup_pickup_mask: subroutine
         
 powerup_pickup_mushroom: subroutine
 	jsr sfx_powerup_mushroom
+	lda #$7f
+        sta shroom_counter
 	rts
 powerup_mushroom_update: subroutine
 	lda shroom_counter
@@ -186,11 +188,12 @@ powerup_mushroom_update: subroutine
         sta shroom_mod
         rts
 .audio_bend_up_or_down
+	lda shroom_counter
         cmp #$3f
         bcc .down
 .up
 	inc shroom_mod
-        bne .shroom_done
+        rts
 .down
 	dec shroom_mod
 .shroom_done

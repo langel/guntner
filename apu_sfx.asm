@@ -259,8 +259,6 @@ sfx_powerup_bomb_update: subroutine
 
 ; sound test 07
 sfx_powerup_mushroom: subroutine
-	lda #$7f
-        sta shroom_counter
 	; slow pu2 sweep up
 	lda #%10001111
         sta $4004
