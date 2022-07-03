@@ -38,7 +38,6 @@ boss_vamp_bat_cycle: subroutine
         jsr enemy_handle_damage_and_death
         
 	lda state_v5
-        cmp #$00
         beq .bats_not_visible
         ; update x pos
         lda enemy_ram_ex,x

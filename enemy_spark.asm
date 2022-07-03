@@ -3,11 +3,6 @@ spark_spawn: subroutine
 	; x = slot in enemy ram
         ; y = boss slot in enemy ram
         ; stash boss slot in pattern counter
-	lda #spark_id
-        sta enemy_ram_type,x
-        tay
-        lda enemy_hitpoints_table,y
-        sta enemy_ram_hp,x 
         lda #$00
         sta enemy_ram_ac,x
         jsr get_next_random

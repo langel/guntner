@@ -132,9 +132,7 @@ starfield_cache_next_col:
         bne .empty_tile
 .star_tile
 	lda #star_pattern
-        lda rng0
-        lsr
-        lsr
+        lda starfield_col
         and #$03
         clc
         adc #star_pattern

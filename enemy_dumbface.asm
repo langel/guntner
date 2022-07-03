@@ -2,11 +2,6 @@
                     
 dumbface_spawn: subroutine
 	; x is set by enemy spawner
-	lda #dumbface_id
-        sta enemy_ram_type,x ; enemy type
-        tay
-        lda enemy_hitpoints_table,y
-        sta enemy_ram_hp,x 
         lda rng0
         sta enemy_ram_ac,x ; animation counter
         lda #$00

@@ -12,6 +12,9 @@ bullet4_or_opt	EQM $021c
 player_bullet_sprite EQM $79
 
 
+player_gun_strength_per_difficulty:
+	byte #4, #5, #6, #7
+
         
 player_bullet_next: subroutine
 	; increase bullet data offset

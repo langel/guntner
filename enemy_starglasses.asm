@@ -2,22 +2,13 @@
                 
 starglasses_spawn: subroutine
 	; x is set by enemy spawner
-	lda #starglasses_id
-        sta enemy_ram_type,x ; enemy type
-        tay
-        lda enemy_hitpoints_table,y
-        sta enemy_ram_hp,x 
-        lda rng0
-        jsr NextRandom
-        sta rng0
+        jsr get_next_random
         sta enemy_ram_ac,x ; animation counter
         lda #$c0
         sta enemy_ram_pc,x ; pattern counter
         lda #$f8
         sta enemy_ram_x,x ; x pos
-        lda rng0
-        jsr NextRandom
-        sta rng0
+        jsr get_next_random
         lsr
         lsr
         clc

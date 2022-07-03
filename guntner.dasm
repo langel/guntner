@@ -63,7 +63,7 @@ cart_start:	subroutine
         lda #$c0
         sta scroll_to_counter
         
-        lda #2
+        lda #1
         sta game_difficulty
         
 ; set default player colors

@@ -4,17 +4,10 @@
         
 maggs_spawn: subroutine
 	; x is set by enemy spawner
-	lda #maggs_id
-        sta enemy_ram_type,x ; enemy type
-        tay
-        lda enemy_hitpoints_table,y
-        sta enemy_ram_hp,x 
         lda #$00
         sta enemy_ram_x,x ; x pos
         sta enemy_ram_ac,x ; animation counter
-        lda rng0
-        jsr NextRandom
-        sta rng0
+        jsr get_next_random
         sta enemy_ram_pc,x ; pattern counter
         jsr enemy_spawn_random_y_pos
         sta enemy_ram_y,x ; y pos      

@@ -33,10 +33,35 @@ enemy_ram_ex   = $0307
 	;include "enemy_birb.dasm"
         
 
-enemy_handler_init: subroutine
-	; set all sprites below the fold
-        lda #$ff
-	rts
+
+enemy_spawn_delegator: subroutine
+	; a = enemy type id
+        ; x = enemy ram slot position
+        sta enemy_ram_type,x 
+        tay
+        sty temp00 ; enemy type
+    	; do hit point maths
+        ; hp * (game difficulty + 1) 
+        lda enemy_hitpoints_table,y
+        sta temp01 ; enemy hp
+        lda #$01
+        clc
+        adc game_difficulty
+        tay
+        lda #$00
+.enemy_hp_loop
+	adc temp01
+        dey
+        bne .enemy_hp_loop
+        ; save hp result
+        sta enemy_ram_hp,x 
+        ; jump to enemy type spawner
+        ldy temp00 ; enemy type
+        lda enemy_spawn_table_lo,y
+        sta temp02
+        lda enemy_spawn_table_hi,y
+        sta temp03
+        jmp (temp02)
         
 
 sprite_4_set_sprite: subroutine

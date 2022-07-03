@@ -9,16 +9,26 @@
 ;phase_large_counter	byte
 ;phase_end_game		byte
 
-; phase_state : 0 = still spawning
 
-; level-phase (4 levels)
-;	starts at x-1
-;	ends at x-9
-;	even levels use galgers
-;	odd levels spawn other small enemy types
-;	x-9 is always a boss fight
-;	starglasses spawns at a certain interval
-;	larger enemies spawn when?
+; phase pattern (final?)
+; 0: "good luck" / "congration"
+; 1: galger
+; 2: spawns
+; 3: galger
+; 4: spawns
+; 5: galger
+; 6: long spawn
+; 7: galger
+; 8: spawns
+; 9: galger
+; a: galger
+; b: spawns
+; c: galger
+; d: long spawn
+; e: galger
+; f: boss
+
+; phase_state : 0 = still spawning
 
 
 
@@ -33,16 +43,6 @@
 ; 8: 12 birbs, 1 skully, 2 maggs
 ; 9: 16 birbs, 6 skullys, 4 maggs, 2 starglasses
         
-; NEW GAME LEVEL PHASES PATTERN
-; 1: some small enemies
-; 2: galger pattern
-; 3: some medium enemies
-; 4: galger pattern
-; 5: constant small spawn -- kill x enemies
-; 6: galger pattern
-; 7: small, medium, & large spawns
-; 8: galger pattern
-; 9: boss fight
 
 ; NEW GAME PERIODIC LARGE ENEMY SPAWNS
 ; period could be every so many seconds
@@ -100,6 +100,7 @@ phase_handler: subroutine
         jmp phase_boss_fight
 .not_phase_boss_fight
 
+
 standard_phase_spawns:    
 	lda phase_state
         beq .not_next_phase
@@ -156,10 +157,6 @@ standard_phase_spawns:
         sta phase_spawn_counter
 .do_spawn
         ldy phase_spawn_type
-        lda enemy_spawn_table_lo,y
-        sta temp02
-        lda enemy_spawn_table_hi,y
-        sta temp03
         ldx enemy_size_table,y
         cpx #1
         bne .not_size_1
@@ -184,31 +181,10 @@ standard_phase_spawns:
 	dec phase_spawn_counter
         inc phase_kill_counter
         ldx temp00
-        jmp (temp02)
+        lda phase_spawn_type
+        jsr enemy_spawn_delegator
 .skip_spawn
 .dont_spawn
-	rts
-        
-        
-        
-        
-phase_zero: subroutine
-	lda phase_current
-        bne .congration
-	lda #$40
-        bne .continue
-.congration
-	lda #$20
-.continue
-        sta dashboard_message
-        inc phase_state
-        lda phase_state
-        cmp #100
-        bne .stay_zero
-        lda #$ff
-        sta dashboard_message
-        jsr phase_next
-.stay_zero
 	rts
         
         
@@ -217,6 +193,7 @@ phase_spawn_long: subroutine
 	lda phase_state
         bne .skip_init
 .init
+	; amount = 1 + level + difficulty * (4 or 8)
         clc
 	lda #1
         adc phase_level
@@ -317,6 +294,26 @@ phase_boss_fight: subroutine
         
         
         
+phase_zero: subroutine
+	lda phase_current
+        bne .congration
+	lda #$40
+        bne .continue
+.congration
+	lda #$20
+.continue
+        sta dashboard_message
+        inc phase_state
+        lda phase_state
+        cmp #100
+        bne .stay_zero
+        lda #$ff
+        sta dashboard_message
+        jsr phase_next
+.stay_zero
+	rts
+        
+        
 phase_interval_spawn: subroutine
 ; LEVEL LARGE ENEMY SPAWN INTERVAL
 	; large enemy spawn?
@@ -339,17 +336,13 @@ phase_interval_spawn: subroutine
         ldy phase_large_counter
         lda level_enemy_table,y
         bne .dont_reset_large_counter
+.reset_large_counter
         ldy #0
         sty phase_large_counter
         lda level_enemy_table,y
 .dont_reset_large_counter	
 	inc phase_large_counter
-        tay
-        lda enemy_spawn_table_lo,y
-        sta temp02
-        lda enemy_spawn_table_hi,y
-        sta temp03
-        jmp (temp02)
+        jsr enemy_spawn_delegator
 .no_large_enemy
 	rts
         

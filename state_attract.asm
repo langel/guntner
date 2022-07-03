@@ -18,8 +18,8 @@ attract_init:
         lda #20
         sta state_iframes
         ; XXX testing
-        lda #1
-        jsr song_start
+        ;lda #1
+        ;jsr song_start
         rts
         
         
@@ -76,24 +76,12 @@ attract_spawn_enemy: subroutine
         lda rng0
         lsr
         and #$03
-        cmp #$01
-        beq .spawn_zigzag
-        cmp #$02
-        beq .spawn_skeet
-        cmp #$03
-        beq .spawn_spark
-        jsr birb_spawn
-        rts
-.spawn_zigzag
-	jsr zigzag_spawn
-        rts
-.spawn_skeet
-	jsr skeet_spawn
-        rts
-.spawn_spark
-	jsr spark_spawn
+        clc
+        adc #birb_id
+	jsr enemy_spawn_delegator
         rts
 .no_1_sprite_spawn
+        
 
 	; 2 sprite enemy slots
 .2_sprite_slots
@@ -104,40 +92,26 @@ attract_spawn_enemy: subroutine
         lda rng0
         lsr
         and #$01
-        beq .no_maggs_spawn
-        jsr maggs_spawn
-        rts
-.no_maggs_spawn
-	jsr chomps_spawn
+        clc
+        adc #chomps_id
+	jsr enemy_spawn_delegator
 	rts
 
 	; 4 sprite enemy slots
 .4_sprite_slots
         jsr get_enemy_slot_4_sprite
         cmp #$ff
-        beq .no_bigs_spawn
+        beq .done
         tax
         lda rng0
-        lsr
-        lsr
         and #$03
-        cmp #$00
-        beq .spawn_starglasses
-        cmp #$01
-        beq .spawn_skully
-        cmp #$02
-        beq .spawn_throber
-        jsr dumbface_spawn
-        jmp .no_bigs_spawn
-.spawn_skully
-        jsr skully_spawn
-        jmp .no_bigs_spawn
-.spawn_starglasses
-        jsr starglasses_spawn
-        jmp .no_bigs_spawn
-.spawn_throber
-	;jsr throber_spawn
-.no_bigs_spawn
+        tay
+        dey
+        tya
+        clc
+        adc #starglasses_id
+	jsr enemy_spawn_delegator
+.done
 	rts
         
         

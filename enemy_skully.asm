@@ -97,7 +97,6 @@ skully_cycle: subroutine
         
 skully_handle_movement: subroutine
 	lda phase_current
-        cmp #$00
         beq .demoshit
         lda #$69
         lda enemy_ram_pc,x
