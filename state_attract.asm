@@ -52,69 +52,26 @@ attract_update: subroutine
 	jmp state_update_done
         
         
-        
+attract_spawn_table:
+	byte #birb_id, #birb_id, #spark_id, #starglasses_id
+        byte #maggs_id, #skully_id, #dumbface_id, #starglasses_id
+        byte #spark_id, #zigzag_id, #zigzag_id, #skully_id
+        byte #skeet_id, #skeet_id, #spark_id, #starglasses_id
         
 attract_spawn_enemy: subroutine
 	lda wtf
-        lsr
-        lsr
-        lsr
-        cmp #0
-        beq .1_sprite_slots
-        cmp #2 
-        beq .2_sprite_slots
-        cmp #4
-        beq .4_sprite_slots
-        rts
-        
-	; 1 sprite enemy slots
-.1_sprite_slots
-        jsr get_enemy_slot_1_sprite
-        cmp #$ff
-        beq .no_1_sprite_spawn
+        and #$07
+        bne .done
+        lda rng1
+        and #$0f
         tax
-        lda rng0
-        lsr
-        and #$03
-        clc
-        adc #birb_id
-	jsr enemy_spawn_delegator
-        rts
-.no_1_sprite_spawn
-        
-
-	; 2 sprite enemy slots
-.2_sprite_slots
-        jsr get_enemy_slot_2_sprite
-        cmp #$ff
-        beq .4_sprite_slots
-        tax
-        lda rng0
-        lsr
-        and #$01
-        clc
-        adc #chomps_id
-	jsr enemy_spawn_delegator
-	rts
-
-	; 4 sprite enemy slots
-.4_sprite_slots
-        jsr get_enemy_slot_4_sprite
+        ldy attract_spawn_table,x
+        sty phase_spawn_type
+        jsr enemy_slot_from_type
         cmp #$ff
         beq .done
         tax
-        lda rng0
-        and #$03
-        tay
-        dey
-        tya
-        clc
-        adc #starglasses_id
+        lda phase_spawn_type
 	jsr enemy_spawn_delegator
 .done
 	rts
-        
-        
-
-
-        

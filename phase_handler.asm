@@ -161,12 +161,12 @@ standard_phase_spawns:
         cpx #1
         bne .not_size_1
 	jsr get_enemy_slot_1_sprite
-        jmp .slot_found_check
+        bne .slot_found_check
 .not_size_1
 	cpx #2
         bne .not_size_2
 	jsr get_enemy_slot_2_sprite
-        jmp .slot_found_check
+        bne .slot_found_check
 .not_size_2
 	jsr get_enemy_slot_4_sprite
 .slot_found_check
