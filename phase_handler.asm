@@ -10,25 +10,47 @@
 ;phase_end_game		byte
 
 
-; phase pattern (final?)
-; 0: "good luck" / "congration"
-; 1: galger
-; 2: spawns
-; 3: galger
-; 4: spawns
-; 5: galger
-; 6: long spawn
-; 7: galger
-; 8: spawns
-; 9: galger
-; a: galger
-; b: spawns
-; c: galger
-; d: long spawn
-; e: galger
-; f: boss
 
 ; phase_state : 0 = still spawning
+
+; phase type constants
+phase_zero_id		EQM	#$00	; "good luck" / "congration"
+phase_galger_id		EQM	#$01
+phase_spawns_id		EQM	#$02
+phase_longspawn_id	EQM	#$03
+phase_bossfight_id	EQM	#$04
+
+phase_type_table:
+	byte #phase_zero_id		; 0
+        byte #phase_galger_id		; 1
+        byte #phase_spawns_id		; 2
+        byte #phase_galger_id		; 3
+        byte #phase_spawns_id		; 4
+        byte #phase_galger_id		; 5
+        byte #phase_longspawn_id	; 6
+        byte #phase_galger_id		; 7
+        byte #phase_spawns_id		; 8
+        byte #phase_galger_id		; 9
+        byte #phase_galger_id		; a
+        byte #phase_spawns_id		; b
+        byte #phase_galger_id		; c
+        byte #phase_longspawn_id	; d
+        byte #phase_galger_id		; e
+        byte #phase_bossfight_id	; f
+        
+   
+phase_handlers_lo:
+	byte #<phase_zero
+        byte #<phase_galger
+        byte #<phase_spawns
+        byte #<phase_spawn_long
+        byte #<phase_boss_fight
+phase_handlers_hi:
+	byte #>phase_zero
+        byte #>phase_galger
+        byte #>phase_spawns
+        byte #>phase_spawn_long
+        byte #>phase_boss_fight
 
 
 
@@ -61,10 +83,17 @@
 
 
 phase_next: subroutine
+	; reset phase vars
         lda #$00
         sta phase_kill_counter
         sta phase_state
 	inc phase_current
+        ; set phase level
+        lda phase_current
+        and #$0f
+        bne .not_next_level
+        inc phase_level   
+.not_next_level
         ; increase star speed
         lda #53
         clc
@@ -78,177 +107,53 @@ phase_next: subroutine
         
         
 phase_handler: subroutine
-
+	; XXX debugging
 	;jsr demo_phase_skip_after_time    
+        ; always check if its time for an interval spawn
         jsr phase_interval_spawn
-
-	lda phase_current
-        and #$f
-; switch on case phase type
-        bne .not_phase_zero
-        jmp phase_zero
-.not_phase_zero
-        cmp #$7
-        beq .do_phase_spawn_long
-        cmp #$d
-        bne .not_phase_spawn_long
-.do_phase_spawn_long
-        jmp phase_spawn_long
-.not_phase_spawn_long
-        cmp #$f
-        bne .not_phase_boss_fight
-        jmp phase_boss_fight
-.not_phase_boss_fight
+        ; call the appropriate phase handler
+        lda phase_current
+        and #$0f
+        tax
+        lda phase_type_table,x
+        tax
+        lda phase_handlers_lo,x
+        sta temp00
+        lda phase_handlers_hi,x
+        sta temp01
+        jmp (temp00)
 
 
-standard_phase_spawns:    
+
+; PHASE UTILITIES
+
+phase_check_next_phase: subroutine
+	; if phase_state == 0 then
+        ; we don't know the kill count yet
 	lda phase_state
         beq .not_next_phase
+        ; kill_counter > 0 means we need more killing
         lda phase_kill_counter
+        bmi .end_of_current_phase
         bne .not_next_phase
+.end_of_current_phase
+        ; transition time
         lda phase_state
+        ; wait ~60 frames before trigger next phase sfx
         cmp #$40
-        bne .next_phase
+        bne .next_phase_setup
      	jsr sfx_phase_next
-.next_phase
+.next_phase_setup
 	inc phase_state
         lda phase_state
+        ; wait ~64 frames before starting next phase
+        ; this should be synced with sfx 2nd chime
         cmp #$44
         bne .not_next_phase
-	jsr phase_next
-.not_next_phase
-
-
-
-	; check for spawning state
-        ; phase_spawn_type
-	; phase_spawn_counter
-	lda wtf
-        ; only spawn every 8th frame
-        and #$07
-        bne .dont_spawn
-        ; phase state > 0 == done spawning
-	lda phase_state
-        bne .dont_spawn
-        ; if downcounter > 0 then spawn
-        lda phase_spawn_counter
-        bne .do_spawn
-        ; check for next spawn type
-        ldy phase_table_ptr
-        inc phase_table_ptr
-        lda phase_enemy_table,y
-        ; if type == 0 then stop spawning
-        bne .next_spawn_type
-        inc phase_state
-        jmp .dont_spawn
-.next_spawn_type
-	sta phase_spawn_type
-        ; set arc sequence regardless of type
-        lda phase_current
-        lsr
-        sec
-        sbc #1
-        tax
-        jsr arc_sequence_set
-        ; load number to spawn
-        ldy phase_table_ptr
-        inc phase_table_ptr
-        lda phase_enemy_table,y
-        sta phase_spawn_counter
-.do_spawn
-        ldy phase_spawn_type
-        ldx enemy_size_table,y
-        cpx #1
-        bne .not_size_1
-	jsr get_enemy_slot_1_sprite
-        bne .slot_found_check
-.not_size_1
-	cpx #2
-        bne .not_size_2
-	jsr get_enemy_slot_2_sprite
-        bne .slot_found_check
-.not_size_2
-	jsr get_enemy_slot_4_sprite
-.slot_found_check
-        cmp #$ff
-        beq .skip_spawn
-        sta temp00
-        lsr
-        lsr
-        lsr
-        tax
-        inc phase_spawn_table,x
-	dec phase_spawn_counter
-        inc phase_kill_counter
-        ldx temp00
-        lda phase_spawn_type
-        jsr enemy_spawn_delegator
-.skip_spawn
-.dont_spawn
-	rts
-        
-        
-        
-phase_spawn_long: subroutine
-	lda phase_state
-        bne .skip_init
-.init
-	; amount = 1 + level + difficulty * (4 or 8)
-        clc
-	lda #1
-        adc phase_level
-        adc game_difficulty
-        sta temp00
-        ldx #8
-        cpx phase_current
-        bcc .mult_set
-        ldx #4
-.mult_set
-	lda #0
-.kill_count_loop
-	clc
-        adc temp00
-        dex
-        bne .kill_count_loop
-        sta phase_kill_counter
-        inc phase_state
-.skip_init
-	lda wtf
-        and #$0f
-        bne .skip_spawn
-        lda phase_level
-        cmp #$03
-        bne .not_final_level
-        ; XXX spawn all 3 types here
-.not_final_level
-        adc #spark_id
-        tay
-	jsr get_enemy_slot_1_sprite
-        cmp #$ff
-        beq .skip_spawn
-.set_and_jump
-	; XXX redundnat with other spawners
-        sta temp00
-        lsr
-        lsr
-        lsr
-        tax
-        inc phase_spawn_table,x
-        lda enemy_spawn_table_lo,y
-        sta temp02
-        lda enemy_spawn_table_hi,y
-        sta temp03
-        ldx temp00
-        jmp (temp02)
-.skip_spawn
-	; XXX redundant with other spawners
-        lda phase_kill_counter
-        bpl .not_next_phase
-        lda phase_state
-        cmp #$40
-        bne .next_phase
-     	jsr sfx_phase_next
-        sec
+	lda phase_spawn_type
+        cmp #galger_id
+        bne .next_phase_process
+; XXX do we want to crossbones all small enemies at end of phase?
         ldy #$0f
         ldx #$78
 .clear_spawn_loop
@@ -261,38 +166,37 @@ phase_spawn_long: subroutine
         tax
         dey
         bpl .clear_spawn_loop
-.next_phase
-	inc phase_state
-        lda phase_state
-        cmp #$44
-        bne .not_next_phase
-        
-	tax
-        lda #crossbones_id
-        sta enemy_ram_type,x
-        
-	jsr phase_next
+.next_phase_process
+	jmp phase_next
 .not_next_phase
 	rts
-        
-        
-        
-phase_boss_fight: subroutine
-	; XXX handle boss intro/outro cinematics here
-	lda phase_state
-        bne .done
-        inc phase_state
-	ldx phase_level
-        ldy level_boss_table,x
-        lda enemy_spawn_table_lo,y
-        sta temp02
-        lda enemy_spawn_table_hi,y
-        sta temp03
-        jmp (temp02)
-.done
+
+phase_check_spawn_frame: subroutine
+	lda wtf
+        and #$07
+        beq .spawn_frame_go
+        pla
+        pla
+        rts
+.spawn_frame_go
 	rts
+
+phase_spawn_track: subroutine
+	; a = enemy ram pos
+        ; kills x
+        sta temp00
+        lsr
+        lsr
+        lsr
+        tax
+        inc phase_spawn_table,x
+        lda temp00
+        rts
+       
         
         
+        
+; PHASE TYPES
         
 phase_zero: subroutine
 	lda phase_current
@@ -312,6 +216,164 @@ phase_zero: subroutine
         jsr phase_next
 .stay_zero
 	rts
+        
+        
+phase_galger: subroutine
+	jsr phase_check_next_phase
+        jsr phase_check_spawn_frame
+        lda phase_state
+        bne .phase_init_done
+        ; set kill counter
+        lda phase_level
+        asl
+        clc
+        adc #$06
+        sta phase_kill_counter
+        sta phase_spawn_counter
+        ; set arctang sequence and advance
+        lda phase_arctang_counter
+        and #$0f
+        tax
+        jsr arc_sequence_set
+        inc phase_arctang_counter
+        ; set phase_state to init done
+        inc phase_state
+.phase_init_done
+	lda phase_spawn_counter
+        beq .dont_spawn
+.do_a_spawn
+	jsr get_enemy_slot_1_sprite
+        cmp #$ff
+        beq .dont_spawn
+        jsr phase_spawn_track
+        tax
+        lda #galger_id
+	sta phase_spawn_type
+        jsr enemy_spawn_delegator
+        dec phase_spawn_counter
+.dont_spawn
+	rts
+
+
+phase_spawns: subroutine
+	jsr phase_check_next_phase
+        jsr phase_check_spawn_frame
+        ; phase state > 0 == done spawning
+	lda phase_state
+        bne .dont_spawn
+        ; if downcounter > 0 then spawn
+        lda phase_spawn_counter
+        bne .do_spawn
+        ; check for next spawn type
+        ldy phase_table_ptr
+        inc phase_table_ptr
+        lda phase_enemy_table,y
+        ; if type == 0 then stop spawning
+        bne .next_spawn_type
+        inc phase_state
+        ; phase_state should be 1 now
+        bne .dont_spawn
+.next_spawn_type
+	sta phase_spawn_type
+        ; load number to spawn
+        ldy phase_table_ptr
+        inc phase_table_ptr
+        lda phase_enemy_table,y
+        sta phase_spawn_counter
+.do_spawn
+        ldy phase_spawn_type
+        jsr enemy_slot_from_type
+        cmp #$ff
+        beq .dont_spawn
+        jsr phase_spawn_track
+        tax
+	dec phase_spawn_counter
+        inc phase_kill_counter
+        lda phase_spawn_type
+        jsr enemy_spawn_delegator
+.dont_spawn
+	rts
+        
+        
+        
+phase_spawn_long: subroutine
+	jsr phase_check_next_phase
+        jsr phase_check_spawn_frame
+        ; phase state > 0 == done spawning
+        lda phase_state
+        bne .phase_init_done
+.init
+	; kill count calculation
+	; 1 + level + difficulty * (4 or 8)
+        clc
+	lda #1
+        adc phase_level
+        adc game_difficulty
+        sta temp00
+        ; store loww digit of current phase
+        lda phase_current
+        and #$0f
+        sta temp01
+        ; get multiplier
+        ldx #8
+        cpx temp01
+        bcc .mult_set
+        ldx #4
+.mult_set
+	lda #0
+.kill_count_loop
+	clc
+        adc temp00
+        dex
+        bne .kill_count_loop
+   	; store kill count target and advance state
+        sta phase_kill_counter
+        inc phase_state
+.phase_init_done
+        lda phase_level
+        cmp #$03
+        bne .not_final_level
+.final_level_spawn_rng
+        jsr get_next_random
+        lsr
+        and #$03
+        beq .final_level_spawn_rng
+        sec
+        sbc #$01
+.not_final_level
+	clc
+        adc #spark_id
+        tay
+	jsr get_enemy_slot_1_sprite
+        cmp #$ff
+        beq .dont_spawn
+.set_and_jump
+        jsr phase_spawn_track
+        tax
+        tya
+        jmp enemy_spawn_delegator
+.dont_spawn
+	rts
+        
+        
+        
+        
+phase_boss_fight: subroutine
+	; XXX handle boss intro/outro cinematics here
+	lda phase_state
+        bne .done
+        inc phase_state
+	ldx phase_level
+        ldy level_boss_table,x
+        lda enemy_spawn_table_lo,y
+        sta temp02
+        lda enemy_spawn_table_hi,y
+        sta temp03
+        jmp (temp02)
+.done
+	rts
+        
+        
         
         
 phase_interval_spawn: subroutine
@@ -353,6 +415,7 @@ phase_interval_spawn: subroutine
         
         
 ; debugger that quickly shows all phase spawns
+; XXX remove before done
 demo_phase_skip_after_time: subroutine
 	lda ftw
         cmp #0

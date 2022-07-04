@@ -13,30 +13,51 @@ level_enemy_table:
 level_boss_table:
 	byte boss_scarab_id
 	byte boss_vamp_id
+	byte boss_scarab_id
+	byte boss_vamp_id
 
-	; phase 0 	: introduce level
-        ; even phases	: galger spawns
-        ; phases 7 & d	: spawn until kill count done
-        ; phase e	: boss fight
-        ; phase f	: level outro
         
 phase_enemy_table:
-	; phase 2
+	; phase 02
 	byte birb_id, 4
         byte 0
-        ; phase 4
+        ; phase 04
         byte maggs_id, 2
         byte 0
-        ; phase 8
+        ; phase 08
         byte birb_id, 4
         byte maggs_id, 4
         byte birb_id, 4
         byte 0
-        ; phase b
+        ; phase 0b
         byte birb_id, 8
         byte skully_id, 1
         byte birb_id, 8
         byte maggs_id, 4
+        byte 0
+        ; phase 12
+        byte 0
+        ; phase 14
+        byte 0
+        ; phase 18
+        byte 0
+        ; phase 1b
+        byte 0
+        ; phase 22
+        byte 0
+        ; phase 24
+        byte 0
+        ; phase 28
+        byte 0
+        ; phase 2b
+        byte 0
+        ; phase 32
+        byte 0
+        ; phase 34
+        byte 0
+        ; phase 38
+        byte 0
+        ; phase 3b
         byte 0
         
 

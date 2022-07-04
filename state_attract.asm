@@ -53,16 +53,24 @@ attract_update: subroutine
         
         
 attract_spawn_table:
-	byte #birb_id, #birb_id, #spark_id, #starglasses_id
-        byte #maggs_id, #skully_id, #dumbface_id, #starglasses_id
-        byte #spark_id, #zigzag_id, #zigzag_id, #skully_id
-        byte #skeet_id, #skeet_id, #spark_id, #starglasses_id
+	byte #birb_id, #birb_id, #birb_id
+        byte #skeet_id, #skeet_id
+        byte #spark_id, #spark_id
+        byte #zigzag_id, #zigzag_id
+        byte #maggs_id
+        byte #starglasses_id, #starglasses_id, #starglasses_id
+        byte #skully_id, #skully_id, #skully_id
+        ;byte #dumbface_id, #dumbface_id
         
 attract_spawn_enemy: subroutine
 	lda wtf
         and #$07
-        bne .done
-        lda rng1
+        beq .spawn
+.done
+        rts
+.spawn
+        lda rng0
+        lsr
         and #$0f
         tax
         ldy attract_spawn_table,x
@@ -72,6 +80,4 @@ attract_spawn_enemy: subroutine
         beq .done
         tax
         lda phase_spawn_type
-	jsr enemy_spawn_delegator
-.done
-	rts
+	jmp enemy_spawn_delegator

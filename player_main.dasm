@@ -21,8 +21,9 @@ player_game_reset: subroutine
         sta score_0000xx00
         sta score_000000xx
         ; XXX testing phase behaviours
-        lda #$0d
+        ;lda #$0d
         sta phase_current
+        sta phase_arctang_counter
         jsr timer_reset
 	lda #$d0
         sta player_x_hi
