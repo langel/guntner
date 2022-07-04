@@ -137,35 +137,26 @@ phase_check_next_phase: subroutine
         bmi .end_of_current_phase
         bne .not_next_phase
 .end_of_current_phase
+	; use phase_state as a timer
+	inc phase_state
         ; transition time
+        lda phase_state
+        cmp #$20
+        bne .dont_crossbones
+        jsr phase_clear_1_sprite_spawns
+        jsr sfx_enemy_death
+.dont_crossbones
         lda phase_state
         ; wait ~60 frames before trigger next phase sfx
         cmp #$40
-        bne .next_phase_setup
+        bne .dont_trigger_sfx
      	jsr sfx_phase_next
-.next_phase_setup
-	inc phase_state
+.dont_trigger_sfx
         lda phase_state
         ; wait ~64 frames before starting next phase
         ; this should be synced with sfx 2nd chime
         cmp #$44
         bne .not_next_phase
-	lda phase_spawn_type
-        cmp #galger_id
-        bne .next_phase_process
-; XXX do we want to crossbones all small enemies at end of phase?
-        ldy #$0f
-        ldx #$78
-.clear_spawn_loop
-        lda #0
-        sta phase_spawn_table,y
-        lda #crossbones_id
-        sta enemy_ram_type,x
-        txa
-        sbc #$08
-        tax
-        dey
-        bpl .clear_spawn_loop
 .next_phase_process
 	jmp phase_next
 .not_next_phase
@@ -179,6 +170,26 @@ phase_check_spawn_frame: subroutine
         pla
         rts
 .spawn_frame_go
+	rts
+        
+phase_clear_1_sprite_spawns: subroutine
+; all small enemies spawned by phase become crossbones
+	sec
+        ldy #$0f
+        ldx #$78
+.clear_spawn_loop
+        lda phase_spawn_table,y
+        beq .prep_next_loop
+        lda #0
+        sta phase_spawn_table,y
+        lda #crossbones_id
+        sta enemy_ram_type,x
+.prep_next_loop
+        txa
+        sbc #$08
+        tax
+        dey
+        bpl .clear_spawn_loop
 	rts
 
 phase_spawn_track: subroutine

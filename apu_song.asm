@@ -14,7 +14,7 @@ song_update: subroutine
         bne .music_on
         rts
 .music_on
-        lax audio_song_id
+        ldx audio_song_id
         lda song_update_table_lo,x
         sta temp00
         lda song_update_table_hi,x
