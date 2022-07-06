@@ -77,8 +77,8 @@ cart_start:	subroutine
         
         
 ;============================== M O D E   I N I T   H E R E
-	jsr game_init
-	;jsr menu_screens_init
+	;jsr game_init
+	jsr menu_screens_init
         ;jsr attract_init
         ;jsr cut_scene_intro_init
         ;jsr cut_scene_outro_init
@@ -223,8 +223,7 @@ sprite0_off:
         lda phase_state
         jsr get_char_lo
         sta $110
-        
-        
+        	
         lda phase_table_ptr
         jsr get_char_hi
         sta $112

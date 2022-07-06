@@ -321,7 +321,7 @@ phase_spawn_long: subroutine
         adc phase_level
         adc game_difficulty
         sta temp00
-        ; store loww digit of current phase
+        ; store low digit of current phase
         lda phase_current
         and #$0f
         sta temp01
@@ -341,6 +341,9 @@ phase_spawn_long: subroutine
         sta phase_kill_counter
         inc phase_state
 .phase_init_done
+	; make sure state is 1 or dont spawn
+	cmp #$01
+        bne .dont_spawn
         lda phase_level
         cmp #$03
         bne .not_final_level
