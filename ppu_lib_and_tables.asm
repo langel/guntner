@@ -175,8 +175,7 @@ dashboard_messages:
 	hex 0378746e6a7b6e037d76786a7d7b6e03
 	;"GooDlucK Hav3fuN"
 	hex 87777785747d6c8b03886a7e636f7d8e
-        
-        
+
 difficulty_messages:
 	;" Weiner Burgh "
 	hex 03956e72766e7a03837d7a707103
@@ -286,11 +285,11 @@ cut_scene_ending_ok_tile_data:
 	hex 93716e036d727670746e03727b0376777f037276036a036c77756a99
 	byte #$00
 	; "It may recover."
-	hex 2228
+	hex 2229
 	hex 897c03756a81037a6e6c777e6e7a99
 	byte #$00
 	; "You could have been faster."
-	hex 2282
+	hex 2283
 	hex 97777d036c777d746d03716a7e6e036b6e6e76036f6a7b7c6e7a99
 	byte #$00
 	byte #$ff
@@ -313,9 +312,9 @@ cut_scene_ending_good_tile_data:
 
 
 cut_scene_ending_time_tile_data:
-	; "Your Time ="
-	hex 2306
-	hex 97777d7a039372756e039f
+	; "Your Time was "
+	hex 2305
+	hex 97777d7a039372756e037f6a7b03
 	byte #$00
 	byte #$ff
 
@@ -383,7 +382,6 @@ char_set_bang		EQM $9b
 char_set_paren_open		EQM $9c
 char_set_paren_close		EQM $9d
 char_set_apostrophe		EQM $9e
-char_set_equals		EQM $9f
 char_set_colon		EQM $ac
 char_set_dash		EQM $c0
 char_set_hash		EQM $ff
