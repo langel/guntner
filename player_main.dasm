@@ -35,9 +35,6 @@ player_game_reset: subroutine
         lda #$ff
         sta player_health
 ; set player stats
-	; XXX this should be set on boot and left to players' choice
-        lda #$02
-        sta player_speed
 	lda #$03
         sta player_lives
         ldx game_difficulty

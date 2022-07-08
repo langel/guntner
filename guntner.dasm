@@ -64,6 +64,8 @@ cart_start:	subroutine
         
         lda #1
         sta game_difficulty
+        lda #$02
+        sta player_speed
         
 ; set default player colors
 	lda #$14
