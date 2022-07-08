@@ -114,11 +114,6 @@ starfield_update: subroutine
 	jsr starfield_scroll
         ; twinkle them stars with palette stuff
         jsr starfield_twinkle_colors
-	; XXX hook this up with tile changing later
-        ; probably hearts after killing a boss
-        ; XXX starfield_tile
-        ; #$0f star
-        ; #$90 heart
 starfield_cache_next_col:
         ; setup rng for star probability
         lda rng0
@@ -130,7 +125,7 @@ starfield_cache_next_col:
 	cpy temp00
         bne .empty_tile
 .star_tile
-	lda #star_pattern
+	; XXX if phase f and boss dead load heart tile
         lda starfield_column
         and #$03
         clc

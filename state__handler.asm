@@ -53,7 +53,6 @@ state_init_call:
         asl
         tax
 	lda STATE_INIT_FUNCTION_TABLE,x
-        ; XXX maybe don't use boss variable space?
         sta temp00
         inx
 	lda STATE_INIT_FUNCTION_TABLE,x

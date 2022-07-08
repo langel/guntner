@@ -405,13 +405,7 @@ options_screen_update: subroutine
         lda #$00
 .dont_wrap_down
 	sta options_rudy_pos
-; show sound id
-; play music if on
-; XXX NMI game loop should auto-handle this?
-	;lda options_music_on
-        ;beq .no_music
-        ;jsr apu_song_update
-.no_music
+        
 ; which option handler?
 .options_case
         ; x = update offset

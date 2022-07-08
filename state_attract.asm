@@ -17,9 +17,6 @@ attract_init:
         ; turn on iframes
         lda #20
         sta state_iframes
-        ; XXX testing
-        ;lda #1
-        ;jsr song_start
         rts
         
         
@@ -47,8 +44,6 @@ attract_update: subroutine
         jsr player_bullets_check_controls
 .done
 	jsr game_update_generic
-        ; XXX testing
-        ;jsr apu_game_music_frame
 	jmp state_update_done
         
         

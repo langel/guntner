@@ -36,7 +36,6 @@ sine_table:
         
         
         
-; XXX !important
 ;     reduce cycle counts by keeping these
 ;     tables on the same page
 ARCTANG_REGION_TO_X_VELOCITY_TABLE:

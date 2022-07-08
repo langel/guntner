@@ -118,14 +118,12 @@ get_char_hi: subroutine
         lsr
         lsr
         clc
-        ; XXX this should be a defined constant
         adc #char_set_offset
         rts
 get_char_lo: subroutine
 	; a = value in / hex char out
         and #$0f
         clc
-        ; XXX this should be a defined constant
         adc #char_set_offset
         rts
         

@@ -131,6 +131,7 @@ cut_scene_outro_init: subroutine
         ldy #3
         jsr palette_load
         
+        
         ; XXX temp for debug purposes
         inc phase_end_game
         lda #$2+char_set_offset

@@ -214,13 +214,13 @@ apu_pu2_envelope	byte
 apu_pu2_last_hi		byte
 apu_noi_counter		byte ; !!! must update apu_env_run if moved
 apu_noi_envelope	byte
-; utility variables
+
+; apu variables
 apu_rng0		byte
 apu_rng1		byte
 sfx_temp00		byte
 sfx_temp01		byte
-; XXX these are for music
-; XXX could user better names?
+
 audio_song_id		byte
 audio_frame_counter     byte
 audio_root_tone         byte
@@ -232,7 +232,7 @@ sfx_noi_counter		byte
 ; table offsets for update subroutines
 sfx_pu2_update_type	byte
 sfx_noi_update_type	byte
-; XXX the temp?
+
 apu_temp		byte
 
 
