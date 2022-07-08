@@ -93,6 +93,7 @@ phase_next: subroutine
         and #$0f
         bne .not_next_level
         inc phase_level   
+        ; XXX load next level palettes
 .not_next_level
         ; increase star speed
         lda #53
@@ -374,6 +375,7 @@ phase_spawn_long: subroutine
         
 phase_boss_fight: subroutine
 	; XXX handle boss intro/outro cinematics here
+        ; XXX need to load boss palettes
 	lda phase_state
         bne .done
         inc phase_state

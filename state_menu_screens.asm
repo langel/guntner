@@ -31,14 +31,13 @@ menu_screens_init: subroutine
         sta scroll_page
         jsr timer_reset
         jsr title_screen_set_rudy_y
-        
-        lda #$02
-        sta pal_bg_0_1
-        lda #$27
-        sta pal_bg_0_2
-        lda #$34
-        sta pal_bg_0_3
-        
+        ; setup colors
+        ldx #18
+        ldy #0
+        jsr palette_load
+	lda #$0f
+        sta pal_uni_bg
+        ; setup everything else
 	jsr player_game_reset
         jsr dashboard_init
         jsr dashboard_update

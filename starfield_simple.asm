@@ -16,9 +16,9 @@ star_oam_end		EQM <(star_oam_start+$80)
 
 starfield_twinkle_reset: subroutine
 	lda #STARFIELD_COL0_START
-        sta starfield_col0
+        sta starfield_color0
         lda #STARFIELD_COL1_START
-        sta starfield_col1
+        sta starfield_color1
 	rts
         
         
@@ -62,12 +62,12 @@ starfield_init: subroutine
         ;stx starfield_page
 	ldx #$00
 .draw_stars_loop
-        stx starfield_col
+        stx starfield_column
         jsr get_next_random
         jsr starfield_cache_next_col
 	lda #$20
         sta PPU_ADDR
-        lda starfield_col
+        lda starfield_column
         sta PPU_ADDR
         ldy #$15
 .transfer_loop
@@ -92,7 +92,7 @@ starfield_render: subroutine
         ; set base PPU address
 	lda starfield_page
         sta PPU_ADDR
-        lda starfield_col
+        lda starfield_column
         sta PPU_ADDR
 ; rip from cache to PPU
         ldy #$15
@@ -114,7 +114,6 @@ starfield_update: subroutine
 	jsr starfield_scroll
         ; twinkle them stars with palette stuff
         jsr starfield_twinkle_colors
-        jsr starfield_twinkle_bg
 	; XXX hook this up with tile changing later
         ; probably hearts after killing a boss
         ; XXX starfield_tile
@@ -132,7 +131,7 @@ starfield_cache_next_col:
         bne .empty_tile
 .star_tile
 	lda #star_pattern
-        lda starfield_col
+        lda starfield_column
         and #$03
         clc
         adc #star_pattern
@@ -193,7 +192,7 @@ starfield_scroll: subroutine
         lsr
         lsr
         lsr
-        sta starfield_col
+        sta starfield_column
         ; set nametable for column updating
         lda scroll_page
         and #$01
@@ -210,29 +209,25 @@ starfield_scroll: subroutine
 
 
 starfield_twinkle_colors: subroutine
-        lda starfield_col0
+	; color 0
+        lda starfield_color0
         jsr palette_next_rainbow_color
-        sta starfield_col0
-        lda starfield_col1
-        jsr palette_next_rainbow_color
-        sta starfield_col1
-	rts
-        
-        
-starfield_twinkle_bg: subroutine
-	lda starfield_col0
+        sta starfield_color0
         sta pal_bg_0_1
         clc
         adc #$21
         sta pal_bg_0_2
         adc #$0d
         sta pal_bg_0_3
-        lda starfield_col1
+        ; color 1
+        lda starfield_color1
+        jsr palette_next_rainbow_color
+        sta starfield_color1
         sta pal_bg_1_1
-        clc
         adc #$21
         sta pal_bg_1_2
         adc #$0d
         sta pal_bg_1_3
 	rts
+        
 

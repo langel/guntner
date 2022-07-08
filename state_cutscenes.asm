@@ -13,22 +13,16 @@ cut_scene_update_generic: subroutine
 	jmp state_update_done
         
         
-cut_scene_intro_palette:
-	hex 0f 0c 30 3c
-	hex    04 1b 37
-        
 cut_scene_intro_init: subroutine
 	; zerio everything out
         jsr render_disable
 	jsr sprite_clear
         jsr nametables_clear
         ; colors
-        ldy #6
-.palette_loop:
-	lda cut_scene_intro_palette,y
-        sta pal_uni_bg,y
-	dey
-        bpl .palette_loop
+        ldx #12
+        ldy #0
+        jsr palette_load
+        jsr palette_load
         ; Distressed Alien
 	PPU_SETADDR #$2086
         jsr cut_scene_alien_main_draw
@@ -132,21 +126,10 @@ cut_scene_outro_init: subroutine
 	stx PPU_DATA
 	stx PPU_DATA
 	stx PPU_DATA
-        ; XXX final colors not picked yet
         ; alien colors
-        lda #$0d
-        sta pal_bg_1_1
-        lda #$3c
-        sta pal_bg_1_2
-        lda #$24
-        sta pal_bg_1_3
-        ; alien colors
-        lda #$3c
-        sta pal_bg_1_1
-        lda #$1c
-        sta pal_bg_1_2
-        lda #$24
-        sta pal_bg_1_3
+        ldx #9
+        ldy #3
+        jsr palette_load
         
         ; XXX temp for debug purposes
         inc phase_end_game
@@ -166,36 +149,27 @@ cut_scene_outro_init: subroutine
         ; palette
         lda #$06
         sta pal_uni_bg
-        lda #$0f
-        sta pal_bg_0_1
-        lda #$30
-        sta pal_bg_0_2
-        lda #$27
-        sta pal_bg_0_3
+        ldx #0
+        ldy #0
+        jsr palette_load
         jmp .plot_screen
 .ok
         NMTP_SETADDR cut_scene_ending_ok_tile_data
         ; palette
         lda #$07
         sta pal_uni_bg
-        lda #$0f
-        sta pal_bg_0_1
-        lda #$10
-        sta pal_bg_0_2
-        lda #$30
-        sta pal_bg_0_3
+        ldx #3
+        ldy #0
+        jsr palette_load
         jmp .plot_screen
 .good
         NMTP_SETADDR cut_scene_ending_good_tile_data
         ; palette
         lda #$02
         sta pal_uni_bg
-        lda #$1d
-        sta pal_bg_0_1
-        lda #$37
-        sta pal_bg_0_2
-        lda #$27
-        sta pal_bg_0_3
+        ldx #6
+        ldy #0
+        jsr palette_load
 
         
 .plot_screen    

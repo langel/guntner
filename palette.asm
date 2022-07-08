@@ -2,20 +2,20 @@
 palette_cache	EQU $e7
 
 
-Palette00:		; 25 bytes
+;Palette00:		; 25 bytes
 
-	hex 0f		;screen color
-	hex 022830	;background 0
-        hex 071624	;background 1
-        hex 02113c	;background 2
-        hex 0b1a3b	;background 3
-        hex 192939	;sprite 0 ; rudy
-        hex 132130	;sprite 1; old birb palete
-        ;hex 051637	; chomps
+;	hex 0f		;screen color
+;	hex 022830	;background 0
+;        hex 071624	;background 1
+;        hex 02113c	;background 2
+;        hex 0b1a3b	;background 3
+;        hex 192939	;sprite 0 ; rudy
+;        hex 132130	;sprite 1; old birb palete
+;       ;hex 051637	; chomps
         ;hex 122130	; vamp eyes & bats
         ;hex 071727	;sprite 2
-        hex 150037	; vamp head/face
-        hex 013530	;sprite 3 ; starglasses ; crossbones
+;        hex 150037	; vamp head/face
+;        hex 013530	;sprite 3 ; starglasses ; crossbones
         
         
 ; bg 0 - stars bg_tiles 1 / menu screens
@@ -28,32 +28,71 @@ Palette00:		; 25 bytes
 ; spr 3 - enemy / stars sprite 2
 
 
-	; XXX need a way to load certain palettes
-        ; at certain times for certain enemies
+; level palettes
+;	spr 1, 2 and 3
+; boss palettes
+;	spr 1 and 2
 
-   
 
+palette_table:
+	; #00 end bad
+	byte #$0f, #$30, #$27
+	; #03 end ok
+	byte #$0f, #$10, #$30
+	; #06 end good
+	byte #$1d, #$37, #$27
+	; #09 end alien
+        ; XXX final colors not picked yet
+	;byte #$0d, #$3c, #$24
+        byte #$3c, #$1c, #$24
+	; #12 intro bg
+	byte #$0c, #$30, #$3c
+	; #15 intro alien
+        byte #$04, #$1b, #$37
+        ; #18 title screen
+        byte #$02, #$27, #$34
+        ; #21 level 0 palettes
+        hex 13 21 30
+        hex 07 17 27
+        hex 01 35 30
+        ; #30 level 1 palettes
+        ; #39 level 2 palettes
+        ; #48 level 3 palettes
+        ; #57 boss 0 palettes
+        ; #63 boss 1 palettes
+        ; #69 boss 2 palettes
+        ; #72 boss 3 palettes
         
-palette_init: subroutine
-	ldy #25
-.loop
-	lda Palette00,y
-        sta pal_uni_bg,y
-        lda #$00
-        sta palette_cache,y
-        dey
-        bpl .loop
+palette_level_offset_table:
+	byte #21, #30, #39, #48
+palette_boss_offset_table:
+	byte #57, #63, #69, #72
+        
+palette_load:
+	; x = pal rom offset 
+        ; y = pal ram offset
+        ; not used to write to main bg color
+        lda #$02
+        sta temp00
+.loader_loop
+	lda palette_table,x
+        sta pal_uni_bg+1,y
+        inx
+        iny
+	dec temp00
+        bpl .loader_loop
         rts
         
-palette_reset: subroutine
-        ldy #25
-.loop
-	lda Palette00,y
-        sta pal_uni_bg,y
-        dey
-        bpl .loop
-	rts
-       
+palette_level_load:
+	ldy phase_level
+        ldx palette_level_offset_table,y
+	ldy #15
+        jsr palette_load
+        jsr palette_load
+        jsr palette_load
+        rts
+        
+        
         
         
 palette_next_rainbow_color: subroutine
@@ -81,7 +120,6 @@ palette_update: subroutine
         beq .no_shroom_effect
         lda wtf
         and #$03
-        cmp #$00
         bne .no_shroom_effect
         ldy #$0e
 .shroom_loop
@@ -93,8 +131,7 @@ palette_update: subroutine
         
 .no_shroom_effect
 ; fade in
-	lda #$00
-        cmp state_fade_in
+        lda state_fade_in
         beq .dont_fade_in
         jmp palette_fade_in_update
 .dont_fade_in

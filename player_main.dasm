@@ -24,6 +24,7 @@ player_game_reset: subroutine
         ;lda #$0d
         sta phase_current
         sta phase_arctang_counter
+        jsr palette_level_load
         jsr timer_reset
 	lda #$d0
         sta player_x_hi
@@ -51,22 +52,20 @@ player_game_reset: subroutine
         
 player_update_colors: subroutine
 	; dashboard is bg_3
+        ; player is spr_0
 	lda player_color0
-        ; XXX lets feel this out for a bit
+        sta pal_spr_0_3
+        ; darken dash bg color
         sec
         sbc #$10
         sta pal_bg_3_1
+        ; do the rest of player colours
 	lda player_color1
         sta pal_bg_3_2
+        sta pal_spr_0_2
 	lda player_color2
         sta pal_bg_3_3
-        ; player is spr_0
-	lda player_color2
         sta pal_spr_0_1
-	lda player_color1
-        sta pal_spr_0_2
-	lda player_color0
-        sta pal_spr_0_3
 	rts
         
         

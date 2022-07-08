@@ -71,11 +71,11 @@ rng0		byte
 rng1		byte
 rng2		byte
 
-starfield_state	byte
-starfield_col	byte
-starfield_page	byte
-starfield_col0	byte
-starfield_col1	byte
+starfield_state		byte
+starfield_column	byte
+starfield_page		byte
+starfield_color0	byte
+starfield_color1	byte
 starfield_trans_frame	byte
 starfield_msg_pos_lo	byte
 starfield_msg_pos_hi	byte
