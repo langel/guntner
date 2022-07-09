@@ -47,8 +47,8 @@ enemy_hitpoints_table:
 	byte $11 ; ant
 	byte $17 ; lasso
 	byte $25 ; uzi
-	byte $2b ; boss_scarab
-	byte $2b ; boss_vamp
+	byte $3f ; boss_scarab
+	byte $3f ; boss_vamp
 
 enemy_player_points_table:
 	byte $00, $00, $00, $00 ; null

@@ -300,60 +300,6 @@ apu_update: subroutine
     
 
 
-
-; XXX this will definitely go before release
-apu_debugger: subroutine
-	; dash cache meter is $108-$118
-        lda player_select_d
-        beq .dont_increase_counter
-        dec apu_temp
-        bpl .dont_reset_counter
-        lda #$1f
-        sta apu_temp
-.dont_reset_counter
-	;jsr sfx_powerup_mushroom
-        ;jsr powerup_pickup_mushroom
-        ;jsr sfx_powerup_1up
-        jsr sfx_phase_next
-.dont_increase_counter
-	lda apu_temp
-        jsr get_char_hi
-        sta $109
-        lda apu_temp
-        jsr get_char_lo
-        sta $10a
-        
-        lda $144
-        jsr get_char_hi
-        sta $10c
-        lda $144
-        jsr get_char_lo
-        sta $10d
-        
-        lda $145
-        jsr get_char_hi
-        sta $10f
-        lda $145
-        jsr get_char_lo
-        sta $110
-        
-        lda $146
-        jsr get_char_hi
-        sta $112
-        lda $146
-        jsr get_char_lo
-        sta $113
-        
-        lda $147
-        jsr get_char_hi
-        sta $115
-        lda $147
-        jsr get_char_lo
-        sta $116
-        
-        rts
-        
-        
         
   
   

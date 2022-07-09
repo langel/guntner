@@ -18,7 +18,6 @@ scroll_speed_hi	byte
 scroll_cache_lo	byte
 scroll_cache_hi	byte
 bg_tile_default	byte
-ppu_mask_cache	byte ; used to enable various rendering scenarios
 player_health	byte
 player_lives	byte
 player_heal_c	byte

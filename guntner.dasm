@@ -78,8 +78,10 @@ cart_start:	subroutine
         
         
 ;============================== M O D E   I N I T   H E R E
-	;jsr game_init
-	jsr menu_screens_init
+	lda #$0f
+        sta pal_uni_bg
+	jsr game_init
+	;jsr menu_screens_init
         ;jsr attract_init
         ;jsr cut_scene_intro_init
         ;jsr cut_scene_outro_init
@@ -87,11 +89,6 @@ cart_start:	subroutine
         ;jsr options_screen_init
         ;jsr sandbox_init
    	;jsr sandbox2_init
-        
-        ; XXX why does this need to exist here?
-        ;     shouldn't render_enable handle this?
-        lda #MASK_BG|MASK_SPR
-        sta ppu_mask_cache
         
         
 .endless
@@ -145,7 +142,7 @@ state_render_done:
         and #$01
         ora #CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
-        lda ppu_mask_cache
+        lda #MASK_BG|MASK_SPR
         sta PPU_MASK	
         
         ; hope everything above was under

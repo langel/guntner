@@ -106,10 +106,9 @@ boss_vamp_bat_cycle: subroutine
         ; SUCK YOUR
         ; BLEEDS !!       
 boss_vamp_spawn: subroutine
-	ldx #boss_vamp_id
-        stx $03b8
-        lda enemy_hitpoints_table,x
-        sta $03b9
+
+        lda #do_nothing_id
+        sta $03d8
         ; set spawn x
         lda #$00
         sta state_v1

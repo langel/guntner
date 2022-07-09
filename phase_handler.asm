@@ -379,13 +379,11 @@ phase_boss_fight: subroutine
 	lda phase_state
         bne .done
         inc phase_state
+        ; spawn boss
 	ldx phase_level
-        ldy level_boss_table,x
-        lda enemy_spawn_table_lo,y
-        sta temp02
-        lda enemy_spawn_table_hi,y
-        sta temp03
-        jmp (temp02)
+        lda level_boss_table,x
+        ldx #$b8
+        jmp enemy_spawn_delegator
 .done
 	rts
         

@@ -11,10 +11,10 @@ level_enemy_table:
         byte 0
 
 level_boss_table:
-	byte boss_scarab_id
 	byte boss_vamp_id
 	byte boss_scarab_id
 	byte boss_vamp_id
+	byte boss_scarab_id
 
         
 phase_enemy_table:

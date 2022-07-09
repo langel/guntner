@@ -14,8 +14,8 @@
 
 boss_scarab_spawn: subroutine
 	; claim highest 4 sprite slot for beetle body
-	ldx #boss_scarab_id
-        stx $03b8
+	;ldx #boss_scarab_id
+        ;stx $03b8
         ; claim 4 more slots for the wings
         lda #do_nothing_id
         sta $03c0
@@ -23,8 +23,6 @@ boss_scarab_spawn: subroutine
         sta $03d0
         sta $03d8
         ; setup initial state
-        lda enemy_hitpoints_table,x
-        sta $03b9
         lda #$0
         sta boss_x
         lda #$1c
@@ -48,17 +46,8 @@ boss_scarab_spawn: subroutine
         ; DEATHLESS
         
 boss_scarab_cycle: subroutine
-
-	lda enemy_ram_y,x
-        sec
-        sbc #$1c
-        bcs .y_greater_than_0
-        lda #$00
-.y_greater_than_0
-        sta collision_0_y
-        lda #$0a
+        lda #$10
         sta collision_0_w
-        lda #$4a
         sta collision_0_h
         
         inc boss_dmg_handle_true
