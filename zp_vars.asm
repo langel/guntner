@@ -58,6 +58,15 @@ player_dir_bits	byte ; matches controller
 player_boundless	byte
 player_autofire_c	byte
 player_autofire_s	byte
+player_damage		byte
+
+player_death_flag	byte
+you_dead_counter	byte
+
+game_difficulty		byte
+
+player_bullet_collision_temp_x	byte
+
 
 bomb_counter	byte ; counts down animation frames
 r_bag_counter	byte ; counts down autoturbo fire frames
@@ -158,26 +167,17 @@ arc_sequence_length	byte
 arctang_velocity_lo	byte
 arctang_velocity_hi	byte
 
-player_color0	byte
-player_color1	byte
-player_color2	byte
-player_damage		byte
-player_death_flag	byte
-
-game_difficulty		byte
-
-player_bullet_collision_temp_x	byte
-
-you_dead_counter	byte
 
 temp00	byte
 temp01	byte
 temp02	byte
 temp03	byte
 
+
 pal_fade_c	byte
 pal_fade_offset	byte
 pal_fade_target	byte
+
 pal_uni_bg	byte
 pal_bg_0_1	byte
 pal_bg_0_2	byte
@@ -203,6 +203,10 @@ pal_spr_2_3	byte
 pal_spr_3_1	byte
 pal_spr_3_2	byte
 pal_spr_3_3	byte
+
+player_color0	byte
+player_color1	byte
+player_color2	byte
 
 
 apu_pu1_counter		byte

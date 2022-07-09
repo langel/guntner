@@ -23,12 +23,6 @@ boss_vamp_bat_spawn: subroutine
 	lda #boss_vamp_bat_id
         sta enemy_ram_type,x
         rts
-        tay
-        lda enemy_hitpoints_table,y
-        sta enemy_ram_hp,x 
-        lda #$20
-        sta state_v7
-	rts
         
         
 boss_vamp_bat_cycle: subroutine
@@ -110,7 +104,182 @@ boss_vamp_bat_cycle: subroutine
         
         ; I VANT TO
         ; SUCK YOUR
-        ; BLEEDS !!
+        ; BLEEDS !!       
+boss_vamp_spawn: subroutine
+	ldx #boss_vamp_id
+        stx $03b8
+        lda enemy_hitpoints_table,x
+        sta $03b9
+        ; set spawn x
+        lda #$00
+        sta state_v1
+        lda #$a0
+        sta state_v2
+        ; set mouth closed
+        lda #$00
+        sta state_v7
+        sta enemy_ram_x,x
+        ; set spawn y
+        lda #$15
+        sta enemy_ram_y,x 
+        ; bats are visible
+        lda #$01
+        sta state_v5
+        ; target count of bat underlings; d = 13
+        lda #$0d
+        sta temp00 
+        lda #$00
+        sta temp01
+        sta temp02
+        lda #$40
+        sta state_v4 ; minimum bat circle size
+        ; rando target
+        lda #$80
+        sta state_v6
+.bat_spawn_loop
+	; a = animation counter / v1
+	; x = slot in enemy ram 
+        ; y = boss slot in ram  / v3
+        ; stash boss slot in pattern counter
+        ldx temp02
+        lda temp01
+        sta enemy_ram_ex,x
+        clc
+        adc #$14
+        sta temp01
+        lda #$08
+        adc temp02
+        sta temp02
+	dec temp00
+        beq .done
+        jmp .bat_spawn_loop
+.done
+	; colors
+        ldx #63
+        ldy #15
+        jsr palette_load
+        jsr palette_load
+   	rts
+
+
+
+boss_vamp_cycle: subroutine
+        clc
+        lda oam_ram_x,y
+        adc #$01
+        sta collision_0_x
+        lda #$0d
+        sta collision_0_w
+        lda #$10
+        sta collision_0_h
+        
+        inc boss_dmg_handle_true
+        jsr enemy_handle_damage_and_death
+        dec boss_dmg_handle_true
+        
+
+	; MOUTH HANDLER
+; state_v7 : mouth frame current
+; enemy_ram_pc : mouth frame target
+	lda state_v7
+        cmp enemy_ram_pc,x
+        beq .mouth_is_fine
+        bcs .mouth_close
+.mouth_open
+	inc state_v7
+        bne .mouth_is_fine
+.mouth_close
+	dec state_v7
+.mouth_is_fine
+
+
+; STATE behavior     
+        jsr boss_vamp_update_state_delegator
+        ldy enemy_oam_offset
+        
+	; SPRITE tiles
+        lda state_v7
+        lsr
+        lsr
+        lsr
+        and #$03
+        cmp #$03
+        bne .good_frame
+        lda #$02
+.good_frame
+        asl
+        clc
+        adc #$9a
+        ;lda #$9c
+        jsr sprite_4_set_sprite
+        ; palette
+        lda #$02
+        jsr enemy_set_palette
+        sta oam_ram_att+4,y
+        sta oam_ram_att+8,y
+        sta oam_ram_att+12,y
+        cmp #$02
+        beq .not_hit
+        lda #$20
+        sta state_v7
+.not_hit
+        
+        ; EYE SPRITE
+.now_lets_add_eyes
+	ldx #$fc
+        lda #$a9
+        sta oam_ram_spr,x
+        lda #$01
+        sta oam_ram_att,x
+        ; find x
+        lda oam_ram_x,y
+        clc
+        adc #$03
+        sta oam_ram_x,x
+        ; check if rudy is left of vampire
+        lda oam_ram_x,y
+        cmp player_x_hi
+        bcc .looking_right
+.looking_left
+        lda #$99
+        sta oam_ram_spr,x
+	inc oam_ram_x,x
+.looking_right
+	; find y
+        lda oam_ram_y,y
+        sta oam_ram_y,x
+        lda oam_ram_spr,y
+        cmp #$9e
+        bne .dont_adjust_for_open_mouth
+        dec oam_ram_y,x
+.dont_adjust_for_open_mouth
+        lda oam_ram_y,x
+        clc
+        adc #$1c
+        sec
+        sbc player_y_hi
+        bcc .looking_down
+        clc
+        adc #$cc
+        bcs .looking_up
+.looking_across
+	lda oam_ram_spr,x
+        cmp #$99
+        beq .adjust_for_left_looking
+	inc oam_ram_x,x
+        jmp .done
+.adjust_for_left_looking
+	dec oam_ram_x,x
+        jmp .done
+.looking_up
+	dec oam_ram_y,x
+        jmp .done
+.looking_down
+	inc oam_ram_y,x
+.done
+	jmp update_enemies_handler_next
+        
+        
 boss_vamp_state_lo:
 	.byte <boss_vamp_state_idle_update
         .byte <boss_vamp_state_suck_bats
@@ -235,9 +404,7 @@ boss_vamp_state_idle_update: subroutine
         inc enemy_ram_ex,x
         ; respawn if slot is empty
         lda enemy_ram_type,x
-        cmp #$00
         bne .dont_respawn_bat
-        lda enemy_ram_ex,x
         jsr boss_vamp_bat_spawn
 .dont_respawn_bat
         lda #$08
@@ -380,174 +547,4 @@ boss_vamp_state_blow_bats: subroutine
 .done
 	rts
 
-        
-boss_vamp_spawn: subroutine
-	lda #boss_vamp_id
-        sta enemy_ram_type,x
-        tay
-        lda enemy_hitpoints_table,y
-        sta enemy_ram_hp,x 
-        ; set spawn x
-        lda #$00
-        sta state_v1
-        lda #$a0
-        sta state_v2
-        ; set mouth closed
-        lda #$00
-        sta state_v7
-        sta enemy_ram_x,x
-        ; set spawn y
-        lda #$15
-        sta enemy_ram_y,x 
-        ; bats are visible
-        lda #$01
-        sta state_v5
-        ; target count of bat underlings; d = 13
-        lda #$0d
-        sta temp00 
-        lda #$00
-        sta temp01
-        sta temp02
-        lda #$40
-        sta state_v4 ; minimum bat circle size
-        ; rando target
-        lda #$80
-        sta state_v6
-.bat_spawn_loop
-	; a = animation counter / v1
-	; x = slot in enemy ram 
-        ; y = boss slot in ram  / v3
-        ; stash boss slot in pattern counter
-        ldx temp02
-        lda temp01
-        sta enemy_ram_ex,x
-        clc
-        adc #$14
-        sta temp01
-        lda #$08
-        adc temp02
-        sta temp02
-	dec temp00
-        beq .done
-        jmp .bat_spawn_loop
-.done
-   	rts
-
-
-
-boss_vamp_cycle: subroutine
-        clc
-        lda oam_ram_x,y
-        adc #$01
-        sta collision_0_x
-        lda #$0d
-        sta collision_0_w
-        lda #$10
-        sta collision_0_h
-        
-        inc boss_dmg_handle_true
-        jsr enemy_handle_damage_and_death
-        dec boss_dmg_handle_true
-        
-
-	; MOUTH HANDLER
-; state_v7 : mouth frame current
-; enemy_ram_pc : mouth frame target
-	lda state_v7
-        cmp enemy_ram_pc,x
-        beq .mouth_is_fine
-        bcs .mouth_close
-.mouth_open
-	inc state_v7
-        bne .mouth_is_fine
-.mouth_close
-	dec state_v7
-.mouth_is_fine
-
-
-; STATE behavior     
-        jsr boss_vamp_update_state_delegator
-        ldy enemy_oam_offset
-        
-	; SPRITE tiles
-        lda state_v7
-        lsr
-        lsr
-        lsr
-        and #$03
-        cmp #$03
-        bne .good_frame
-        lda #$02
-.good_frame
-        asl
-        clc
-        adc #$9a
-        ;lda #$9c
-        jsr sprite_4_set_sprite
-        ; palette
-        lda #$02
-        jsr enemy_set_palette
-        sta oam_ram_att+4,y
-        sta oam_ram_att+8,y
-        sta oam_ram_att+12,y
-        cmp #$02
-        beq .not_hit
-        lda #$20
-        sta state_v7
-.not_hit
-        
-        ; EYE SPRITE
-.now_lets_add_eyes
-	ldx #$fc
-        lda #$a9
-        sta oam_ram_spr,x
-        lda #$01
-        sta oam_ram_att,x
-        ; find x
-        lda oam_ram_x,y
-        clc
-        adc #$03
-        sta oam_ram_x,x
-        ; check if rudy is left of vampire
-        lda oam_ram_x,y
-        cmp player_x_hi
-        bcc .looking_right
-.looking_left
-        lda #$99
-        sta oam_ram_spr,x
-	inc oam_ram_x,x
-.looking_right
-	; find y
-        lda oam_ram_y,y
-        sta oam_ram_y,x
-        lda oam_ram_spr,y
-        cmp #$9e
-        bne .dont_adjust_for_open_mouth
-        dec oam_ram_y,x
-.dont_adjust_for_open_mouth
-        lda oam_ram_y,x
-        clc
-        adc #$1c
-        sec
-        sbc player_y_hi
-        bcc .looking_down
-        clc
-        adc #$cc
-        bcs .looking_up
-.looking_across
-	lda oam_ram_spr,x
-        cmp #$99
-        beq .adjust_for_left_looking
-	inc oam_ram_x,x
-        jmp .done
-.adjust_for_left_looking
-	dec oam_ram_x,x
-        jmp .done
-.looking_up
-	dec oam_ram_y,x
-        jmp .done
-.looking_down
-	inc oam_ram_y,x
-.done
-	jmp update_enemies_handler_next
-        
+ 

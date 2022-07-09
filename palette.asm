@@ -56,17 +56,29 @@ palette_table:
         hex 07 17 27
         hex 01 35 30
         ; #30 level 1 palettes
+        ; XXX filler palettes
+        hex 13 21 30
+        hex 07 17 27
+        hex 01 35 30
         ; #39 level 2 palettes
+        ; XXX filler palettes
+        hex 13 21 30
+        hex 07 17 27
+        hex 01 35 30
         ; #48 level 3 palettes
-        ; #57 boss 0 palettes
+        ; XXX filler palettes
+        hex 13 21 30
+        hex 07 17 27
+        hex 01 35 30
+        ; #57 boss scarab palettes
+        hex 03 1a 39 0c 27 37
         ; #63 boss 1 palettes
+        hex 12 21 30 15 00 37
         ; #69 boss 2 palettes
         ; #72 boss 3 palettes
         
 palette_level_offset_table:
 	byte #21, #30, #39, #48
-palette_boss_offset_table:
-	byte #57, #63, #69, #72
         
 palette_load:
 	; x = pal rom offset 

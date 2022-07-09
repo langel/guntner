@@ -21,7 +21,7 @@ player_game_reset: subroutine
         sta score_0000xx00
         sta score_000000xx
         ; XXX testing phase behaviours
-        ;lda #$0d
+        ;lda #$0f
         sta phase_current
         sta phase_arctang_counter
         jsr palette_level_load

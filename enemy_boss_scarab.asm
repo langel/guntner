@@ -37,18 +37,10 @@ boss_scarab_spawn: subroutine
         sta state_v2
         
         ; palette
-        lda #$03
-        sta pal_spr_1_1
-        lda #$1a
-        sta pal_spr_1_2
-        lda #$39
-        sta pal_spr_1_3
-        lda #$0c
-        sta pal_spr_2_1
-        lda #$27
-        sta pal_spr_2_2
-        lda #$38
-        sta pal_spr_2_3
+        ldx #57
+        ldy #15
+        jsr palette_load
+        jsr palette_load
 	rts
         
         ;   KNOW
