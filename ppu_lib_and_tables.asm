@@ -182,7 +182,7 @@ difficulty_messages:
 	;"Mega Gooderest"
 	hex 8d6e706a038777776d6e7a6e7b7c
 	;"A-OK #1 Expert"
-	hex 82c08f8b03ff61038680786e7a7c
+	hex 82ab8f8b039f61038680786e7a7c
 
 
 menu_screen_tile_data:
@@ -222,9 +222,9 @@ menu_screen_tile_data:
 	hex 258a
 	hex 847774777a0361030303cfcf
 	byte #$00
-	; "Color 2   " + abab
+	; "Color 2   " + c0c0
 	hex 25ca
-	hex 847774777a0362030303abab
+	hex 847774777a0362030303c0c0
 	byte #$00
 	; "Difficulties"
 	hex 260a
@@ -380,7 +380,7 @@ char_set_bang		EQM $9b
 char_set_paren_open		EQM $9c
 char_set_paren_close		EQM $9d
 char_set_apostrophe		EQM $9e
+char_set_hash		EQM $9f
+char_set_dash		EQM $ab
 char_set_colon		EQM $ac
-char_set_dash		EQM $c0
-char_set_hash		EQM $ff
 char_set_space		EQM $3

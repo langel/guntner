@@ -384,6 +384,22 @@ phase_boss_fight: subroutine
         sta player_x_hi
         lda #$00
         sta player_y_hi
+        ; setup palette colors
+        ldx phase_level
+        lda #57
+        clc
+.pal_add_loop
+        dex
+        bmi .pal_add_done
+        adc #$06
+        bne .pal_add_loop
+.pal_add_done
+	tax
+        ldy #15
+        jsr palette_load
+        jsr palette_load
+        ; do a fade in
+        jsr palette_fade_in_init
         ; play boss fight song
         lda #$04
         jsr song_start

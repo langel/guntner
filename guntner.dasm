@@ -80,6 +80,7 @@ cart_start:	subroutine
 ;============================== M O D E   I N I T   H E R E
 	lda #$0f
         sta pal_uni_bg
+        
 	jsr game_init
 	;jsr menu_screens_init
         ;jsr attract_init

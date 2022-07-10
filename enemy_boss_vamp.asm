@@ -153,11 +153,6 @@ boss_vamp_spawn: subroutine
         beq .done
         jmp .bat_spawn_loop
 .done
-	; colors
-        ldx #63
-        ldy #15
-        jsr palette_load
-        jsr palette_load
    	rts
 
 
