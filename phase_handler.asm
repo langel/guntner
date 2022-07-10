@@ -379,6 +379,14 @@ phase_boss_fight: subroutine
 	lda phase_state
         bne .done
         inc phase_state
+        ; debug shit
+        lda #$ff
+        sta player_x_hi
+        lda #$00
+        sta player_y_hi
+        ; play boss fight song
+        lda #$04
+        jsr song_start
         ; spawn boss
 	ldx phase_level
         lda level_boss_table,x

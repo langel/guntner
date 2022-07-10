@@ -265,7 +265,9 @@ song_03: subroutine
 song_04: subroutine
 	lda audio_frame_counter
         cmp #5
-        bne .done
+        beq .do_all_the_stuff
+        jmp .done
+.do_all_the_stuff
         lda #0
         sta audio_frame_counter
         inc audio_pattern_pos
@@ -273,25 +275,68 @@ song_04: subroutine
         cmp #18
         bne .dont_loop
 .do_loop
-	inc audio_pattern_num 
+        ; TENSION ANTI_MELODY
+        lda audio_pattern_num
+        and #$04
+        bne .root_raise
+.root_lower
+	inc audio_root_tone
+        bne .root_done
+.root_raise
+	dec audio_root_tone
+.root_done
 	lda #0
         sta audio_pattern_pos
+	inc audio_pattern_num 
+	; KICK (pulse 2)
         jsr sfx_kick
 .dont_loop
+	; SNARE
         lda audio_pattern_pos
         cmp #10
         beq .snare
         lda rng0
-        and #2
+        and #7
         beq .snare
         bne .no_snare
 .snare
         jsr sfx_snare
 .no_snare
+        ; TENSION ANTI_MELODY (pulse 1)
+	lda #6
+        sta apu_pu1_envelope
+	lda #$05
+        sta apu_pu1_counter
+        ldx audio_root_tone
+        lda apu_rng1
+        lsr
+        and #$08
+        beq .change_root
+        txa
+        bne .stay_root
+.change_root
+        lda apu_rng0
+        and #$07
+        sta temp00
+        txa
+        adc temp00
+.stay_root
+        clc
+        adc #36
+        tax
+        ldy #$02
+        jsr apu_set_pitch
+	; BASSLINE
         ldx audio_pattern_pos
-        lda song_04_length,x
+        ldy song_04_length,x
         beq .done
-        sta apu_tri_counter
+        ; chance of staccato
+        lda apu_rng0
+        and #$0b
+        bne .full_length
+        ldy #$02
+.full_length
+        sty apu_tri_counter
         lda song_04_pitch,x
         clc
         adc #24
@@ -299,13 +344,13 @@ song_04: subroutine
         lda audio_pattern_num
         and #4
         lsr
-        lsr
-        asl
         adc apu_temp
         tax
         ldy #10
         jsr apu_set_pitch
+        ; hats in unison with bassline
         jsr sfx_hat
+        ; we're done
 .done
 	inc audio_frame_counter
 	rts

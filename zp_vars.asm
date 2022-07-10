@@ -221,6 +221,7 @@ apu_noi_envelope	byte
 ; apu variables
 apu_rng0		byte
 apu_rng1		byte
+apu_temp		byte
 sfx_temp00		byte
 sfx_temp01		byte
 
@@ -236,7 +237,6 @@ sfx_noi_counter		byte
 sfx_pu2_update_type	byte
 sfx_noi_update_type	byte
 
-apu_temp		byte
 
 
 bullet_x_vel	= $c6
