@@ -303,6 +303,8 @@ song_04: subroutine
         jsr sfx_snare
 .no_snare
         ; TENSION ANTI_MELODY (pulse 1)
+        lda sfx_pu1_counter
+        bne .no_melody
 	lda #6
         sta apu_pu1_envelope
 	lda #$05
@@ -326,13 +328,14 @@ song_04: subroutine
         tax
         ldy #$02
         jsr apu_set_pitch
+.no_melody
 	; BASSLINE
         ldx audio_pattern_pos
         ldy song_04_length,x
         beq .done
         ; chance of staccato
         lda apu_rng0
-        and #$0b
+        and #$0c
         bne .full_length
         ldy #$02
 .full_length

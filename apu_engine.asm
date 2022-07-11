@@ -113,8 +113,7 @@ apu_set_pitch: subroutine
         sta apu_cache+1,y
         ; make sure counter resets in engine
         lda #$ff
-        sta apu_pu1_last_hi
-        sta apu_pu2_last_hi
+        sta apu_pu1_last_hi-2,y
         rts
         
        
@@ -287,14 +286,14 @@ apu_update: subroutine
         jsr PrevRandom
         sta apu_rng1
 ; SFX counter updates
-	lda sfx_pu2_counter
-        beq .skip_sfx_pu2_dec
-        dec sfx_pu2_counter
-.skip_sfx_pu2_dec
-	lda sfx_noi_counter
-        beq .skip_sfx_noi_dec
-        dec sfx_noi_counter
-.skip_sfx_noi_dec
+	ldx #2
+.sfx_counter_update
+	lda sfx_pu1_counter,x
+        beq .skip_sfx_counter
+        dec sfx_pu1_counter,x
+.skip_sfx_counter
+	dex
+        bpl .sfx_counter_update
 	rts
         
     

@@ -231,6 +231,7 @@ audio_root_tone         byte
 audio_pattern_pos	byte
 audio_pattern_num       byte
 ; counters to mask other channel audio
+sfx_pu1_counter		byte
 sfx_pu2_counter		byte
 sfx_noi_counter		byte
 ; table offsets for update subroutines

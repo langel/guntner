@@ -95,8 +95,6 @@ sfx_pewpew: subroutine
         lda #0
         sta apu_pu2_counter
         sta sfx_pu2_update_type
-        ;lda #$10
-        ;sta sfx_pu2_counter
 .no
 	rts
 
@@ -398,7 +396,7 @@ sfx_powerup_battery_update: subroutine
 
 ; sound test 0d
 sfx_shoot_dart: subroutine
-	; pulse 2
+	; pulse 1
 	lda #%00001111
         sta $4000
         lda #%10000011
@@ -409,8 +407,8 @@ sfx_shoot_dart: subroutine
         sta $4002
         lda #%00001000
         sta $4003
-        lda #$10
-        sta sfx_pu2_counter
+        lda #$03
+        sta sfx_pu1_counter
 	rts
         
 ; sound test 0e
