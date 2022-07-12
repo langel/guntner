@@ -2,22 +2,11 @@
 spark_spawn: subroutine
 	; x = slot in enemy ram
         ; y = boss slot in enemy ram
-        ; stash boss slot in pattern counter
-        lda #$00
-        sta enemy_ram_ac,x
         jsr get_next_random
         sta enemy_ram_x,x
-        lda wtf
-        and #$01
-        bne .y_top
-.y_bottom
 	lda #4
-        sta enemy_ram_y
+        sta enemy_ram_y,x
         rts
-.y_top
-	lda #178
-        sta enemy_ram_y
-	rts
 
 
 spark_cycle: subroutine
@@ -30,15 +19,17 @@ spark_cycle: subroutine
         lda enemy_ram_ac,x
         and #$07
         bne .dont_reset_dir
+; 50% chance of downward movement
+        jsr get_next_random
+        bpl .not_hard_down
+        lda #$02
+        bne .set_dir
+.not_hard_down
+; otherwise random 4 directions
         jsr get_next_random
         lsr
         and #%00000011
-        sta enemy_ram_ex,x
-        cmp #$03
-        bne .reset_done
-        lda rng2
-        bpl .reset_done
-        lda #$01
+.set_dir
         sta enemy_ram_ex,x
 .reset_done
 .dont_reset_dir

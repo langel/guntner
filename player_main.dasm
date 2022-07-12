@@ -21,7 +21,7 @@ player_game_reset: subroutine
         sta score_0000xx00
         sta score_000000xx
         ; XXX testing phase behaviours
-        lda #$0
+        lda #$d
         sta phase_current
         ;lda #1
         ;sta phase_level

@@ -97,7 +97,6 @@ song_01: subroutine
         tax
         lda octoscale,x
         sta audio_root_tone
-        ;inc phase_current
 .trigger_note
         ; pulse 1
         lda apu_rng1
