@@ -81,8 +81,8 @@ cart_start:	subroutine
 	lda #$0f
         sta pal_uni_bg
         
-	jsr game_init
-	;jsr menu_screens_init
+	;jsr game_init
+	jsr menu_screens_init
         ;jsr attract_init
         ;jsr cut_scene_intro_init
         ;jsr cut_scene_outro_init
@@ -390,13 +390,11 @@ sprite0_off:
 ;ea9f bookmark new
 ;e666 bookmark old
         
-; LOOKUP TABLES AT TOP OF RAM
+; LOOKUP TABLES AT TOP OF ROM
         org $fe00
 	include "tables_at_top_of_rom.asm"
-        nop	; how much prg space we using?
+        lda #13 ; super secret operation
 
-	byte "hello n00b good for you n00b n0b"
-        nop	; how much prg space we using?
 
 ;;;;; CPU VECTORS
 	seg Vectors		; segment "Vectors"
@@ -406,5 +404,5 @@ sprite0_off:
 	.word nmi_handler	; $fffe irq / brk
 
 ;;;;; GRAPHX
-	org $10000
+	org $010000
 	incbin "guntner.chr"

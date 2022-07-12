@@ -35,6 +35,21 @@ sine_table:
 	hex 676a6d707376797c
         
         
+;  0 = right
+;  6 = up
+; 12 = left
+; 18 = down
+
+ARCTANG_TRANSLATION_LOOKUP_TABLE:
+	byte  9, 3,15,21
+	byte 10, 2,14,22
+	byte 11, 1,13,23
+	byte 12, 0,12, 0
+	byte  9, 3,15,21
+	byte  8, 4,16,20
+	byte  7, 5,17,19
+	byte  6, 6,18,18
+        
         
 ;     reduce cycle counts by keeping these
 ;     tables on the same page
@@ -65,14 +80,14 @@ ARCTANG_REGION_Y_PLUS_OR_MINUS_TABLE:
 
 
 arctang_velocity_tables:
-	; region id = angle degrees
-        ; 0 = 0
-        ; 1 = 15
-        ; 2 = 30
-        ; 3 = 45
-        ; 4 = 60
-        ; 5 = 75
-        ; 6 = 90
+	; region id	angle degrees
+        ; 	0	0
+        ; 	1 	15
+        ; 	2	30
+        ; 	3	45
+        ; 	4	60
+        ; 	5	75
+        ; 	6	90
 arctang_velocity_6.66:
 	byte 168, 6
         byte 109, 6
