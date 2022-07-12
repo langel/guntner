@@ -25,29 +25,6 @@
 phase_handling_stuff
 
         
-phase_next: subroutine
-	; reset phase vars
-        lda #$00
-        sta phase_kill_counter
-        sta phase_spawn_counter
-        sta phase_state
-	inc phase_current
-        ; set phase level
-        lda phase_current
-        and #$0f
-        bne .not_next_level
-        inc phase_level   
-        ; XXX load next level palettes
-.not_next_level
-        ; increase star speed
-        lda #53
-        clc
-        adc scroll_speed_lo
-        sta scroll_speed_lo
-        bcc .scroll_hi_done
-        inc scroll_speed_hi
-.scroll_hi_done
-	rts
         
         
         
@@ -80,7 +57,9 @@ phase_check_next_phase: subroutine
         ; kill_counter > 0 means we need more killing
         lda phase_kill_counter
         bmi .end_of_current_phase
-        bne .not_next_phase
+        beq .end_of_current_phase
+.not_next_phase
+        rts
 .end_of_current_phase
 	; use phase_state as a timer
 	inc phase_state
@@ -103,8 +82,31 @@ phase_check_next_phase: subroutine
         cmp #$44
         bne .not_next_phase
 	; next phase process
-	jmp phase_next
-.not_next_phase
+        
+phase_next: subroutine
+	; reset phase vars
+        lda #$00
+        sta phase_kill_counter
+        sta phase_spawn_counter
+        sta phase_state
+	inc phase_current
+        ; set phase level
+        lda phase_current
+        and #$0f
+        bne .not_next_level
+        inc phase_level   
+        ; XXX load next level palettes
+.not_next_level
+        ; increase star speed
+        lda #53
+        clc
+        adc scroll_speed_lo
+        sta scroll_speed_lo
+        bcc .scroll_hi_done
+        inc scroll_speed_hi
+.scroll_hi_done
+	pla
+        pla
 	rts
 
 phase_check_spawn_frame: subroutine

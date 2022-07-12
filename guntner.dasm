@@ -201,33 +201,33 @@ sprite0_off:
         
         
         ; XXX phase handler debugging
-        lda phase_spawn_counter
-        jsr get_char_hi
-        sta $109
-        lda phase_spawn_counter
-        jsr get_char_lo
-        sta $10a
+        ;lda phase_spawn_counter
+        ;jsr get_char_hi
+        ;sta $109
+        ;lda phase_spawn_counter
+        ;jsr get_char_lo
+        ;sta $10a
         
-        lda phase_kill_counter
-        jsr get_char_hi
-        sta $10c
-        lda phase_kill_counter
-        jsr get_char_lo
-        sta $10d
+        ;lda phase_kill_counter
+        ;jsr get_char_hi
+        ;sta $10c
+        ;lda phase_kill_counter
+        ;jsr get_char_lo
+        ;sta $10d
         
-        lda phase_state
-        jsr get_char_hi
-        sta $10f
-        lda phase_state
-        jsr get_char_lo
-        sta $110
+        ;lda phase_state
+        ;jsr get_char_hi
+        ;sta $10f
+        ;lda phase_state
+        ;jsr get_char_lo
+        ;sta $110
         	
-        lda phase_table_ptr
-        jsr get_char_hi
-        sta $112
-        lda phase_table_ptr
-        jsr get_char_lo
-        sta $113
+        ;lda phase_table_ptr
+        ;jsr get_char_hi
+        ;sta $112
+        ;lda phase_table_ptr
+        ;jsr get_char_lo
+        ;sta $113
         ; XXX end debug code
         
         
