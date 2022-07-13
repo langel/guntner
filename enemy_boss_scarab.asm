@@ -23,7 +23,7 @@ boss_scarab_spawn: subroutine
         sta $03d0
         sta $03d8
         ; setup initial state
-        lda #$0
+        lda #$10
         sta boss_x
         lda #$1c
         sta boss_y

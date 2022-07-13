@@ -40,6 +40,7 @@ menu_screens_init: subroutine
         sta pal_uni_bg
         ; setup everything else
 	jsr player_game_reset
+        jsr song_stop
         jsr dashboard_init
         jsr dashboard_update
         jsr dashboard_render

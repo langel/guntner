@@ -1,8 +1,10 @@
 
 song_rng_chord		EQM $00
 song_sick_dingle	EQM $01
-song_boss_intro		EQM $02
-song_boss_fight		EQM $03
+song_in_game		EQM $02
+song_boss_intro		EQM $03
+song_boss_fight		EQM $04
+song_game_over		EQM $05
 
 do_nothing_id        EQM $01
 crossbones_id        EQM $02
@@ -26,12 +28,14 @@ song_update_table_lo:
         byte #<song_02			; in game
         byte #<song_03			; boss intro
         byte #<song_04			; boss fight
+        byte #<song_05			; game over
 song_update_table_hi:
 	byte #>do_nothing		; rng chord
         byte #>song_01			; sick dingle
         byte #>song_02			; in game
         byte #>song_03			; boss intro
         byte #>song_04			; boss fight
+        byte #>song_05			; game over
 
         
 song_start: subroutine
@@ -295,9 +299,12 @@ song_04: subroutine
 	lda #0
         sta audio_pattern_pos
 	inc audio_pattern_num 
-	; KICK (pulse 2)
-        jsr sfx_kick
 .dont_loop
+	; KICK (pulse 2)
+        lda audio_pattern_pos
+        bne .no_kick
+        jsr sfx_kick
+.no_kick
 	; SNARE
         lda audio_pattern_pos
         cmp #10
@@ -368,3 +375,29 @@ song_04_pitch:
 	byte 12,0,17,0,0,12,12,0,17,0,0,15,0,0,13,0,0,12
 song_04_length:
 	byte 18,0,10,0,0, 3,18,0,10,0,0, 8,0,0, 8,0,0, 3
+        
+        
+        
+        
+song_05: subroutine
+	inc $142
+        inc $146
+        inc $14a
+	lda audio_frame_counter
+        cmp #$70
+        beq .do_chord
+        cmp #$40
+        beq .do_chord
+        cmp #$30
+        beq .do_chord
+        cmp #$10
+        beq .do_chord
+	lda audio_frame_counter
+        bne .done
+        jsr sfx_snare
+.do_chord
+        jsr sfx_rng_chord
+.done
+	inc audio_frame_counter
+	rts
+        

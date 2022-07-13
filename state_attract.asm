@@ -10,8 +10,12 @@ attract_init:
         sta scroll_speed_lo
         lda #5
         jsr state_update_set_addr
+        lda attract_true
+        bne .attract_mode_set
+        jsr clear_all_enemies
         lda #$ff
         sta attract_true
+.attract_mode_set
         jsr render_enable
         jsr palette_fade_in_init
         ; turn on iframes

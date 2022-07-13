@@ -330,7 +330,7 @@ phase_boss_fight: subroutine
         bne .dont_init_cinematics
 .init_cinematics
         ; play boss fight encounter jingle
-        lda #3
+        lda #song_boss_intro
         jsr song_start
         ; increase scroll speed
         inc scroll_speed_hi
@@ -340,7 +340,6 @@ phase_boss_fight: subroutine
         lda #$a0
         sta phase_spawn_counter
 .dont_init_cinematics
-	inc player_x_hi
 	inc player_x_hi
 	inc player_x_hi
         lda rng2
@@ -357,7 +356,7 @@ phase_boss_fight: subroutine
         dec scroll_speed_hi
         dec scroll_speed_hi
         ; play boss fight song
-        lda #$04
+        lda #song_boss_fight
         jsr song_start
         ; setup palette colors
         ldx phase_level

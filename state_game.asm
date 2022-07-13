@@ -55,14 +55,13 @@ game_update_generic: subroutine
         bne .death_already_set
         inc player_death_flag
         jsr song_stop
-        jsr sfx_player_death
         lda scroll_speed_hi
         sta scroll_cache_hi
         lda scroll_speed_lo
         sta scroll_cache_lo
         ;jsr death_scroll_set_speed_m
         dec player_lives
-        lda player_lives
+        ;lda player_lives
         bne .youdead
         ; attract mode has different behaviour
         lda attract_true
@@ -71,11 +70,18 @@ game_update_generic: subroutine
         ; set to grayscale
 	lda #%00000001
         sta ppu_mask_emph
+        ; cinematics
+        sta scroll_speed_hi
+        lda #song_game_over
+        jsr song_start
+        lda #121
+        sta you_dead_counter
         ; "GAME OVER"
         ldy #$10
         jsr dashboard_message_set
         jmp .done
 .youdead
+        jsr sfx_player_death
         ; "YOU DEAD"
         ldy #$00
         jsr dashboard_message_set
@@ -165,7 +171,9 @@ player_change_speed:
         jsr enemies_update_all
         jsr set_player_sprite
 	rts
-        
+      
+      
+      
         
         
 game_update: subroutine
