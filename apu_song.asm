@@ -168,7 +168,9 @@ song_01: subroutine
 song_02: subroutine
 	lda wtf
         and #$07
-        bne .done
+        beq .do_this_shit
+        rts
+.do_this_shit
 	; triangle
         lda audio_pattern_pos
         eor apu_rng0
@@ -192,6 +194,33 @@ song_02: subroutine
         ldy #$0a
         jsr apu_set_pitch
 .no_triangle
+        ; pulse 1
+        lda apu_rng1
+        and #%0000001
+        bne .no_pulse_lead
+        lda #$05
+        sta apu_pu1_counter
+        sta apu_pu2_counter
+        lda #$06
+        sta apu_pu1_envelope
+        sta apu_pu2_envelope
+        lda apu_rng0
+        and #%00000111
+        clc
+        adc audio_root_tone
+        tax
+        lda octoscale,x
+        clc
+        adc #24
+        tax
+        ldy #$02
+        jsr apu_set_pitch
+        txa
+        adc #9
+        tax
+        ldy #$06
+        jsr apu_set_pitch
+.no_pulse_lead
         ; kick
         lda audio_pattern_pos
         bne .no_kick
