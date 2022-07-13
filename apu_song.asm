@@ -29,6 +29,9 @@ song_update_table_lo:
         byte #<song_03			; boss intro
         byte #<song_04			; boss fight
         byte #<song_05			; game over
+        byte #<song_06			; end bad
+        byte #<song_07			; end ok
+        byte #<song_08			; end good
 song_update_table_hi:
 	byte #>do_nothing		; rng chord
         byte #>song_01			; sick dingle
@@ -36,6 +39,9 @@ song_update_table_hi:
         byte #>song_03			; boss intro
         byte #>song_04			; boss fight
         byte #>song_05			; game over
+        byte #>song_06			; end bad
+        byte #>song_07			; end ok
+        byte #>song_08			; end good
 
         
 song_start: subroutine
@@ -118,7 +124,7 @@ song_01: subroutine
         tax
         lda octoscale,x
         clc
-        adc #$0c
+        adc #12
         tax
         ldy #$02
         jsr apu_set_pitch
@@ -137,7 +143,7 @@ song_01: subroutine
         ldx audio_root_tone
         lda octoscale,x
         clc
-        adc #$18
+        adc #24
         tax
         ldy #$06
         jsr apu_set_pitch
@@ -216,6 +222,13 @@ song_02: subroutine
         sta audio_root_tone
         lda #0
         sta audio_pattern_pos
+       	inc audio_frame_counter
+        lda #16
+        cmp audio_frame_counter
+        bne .done
+        jsr apu_rng_reset
+        lda #0
+        sta audio_frame_counter
 .done
 	rts
         
@@ -378,11 +391,17 @@ song_04_length:
         
         
         
-        
+; game over        
 song_05: subroutine
-	inc $142
-        inc $146
-        inc $14a
+	lda audio_frame_counter
+        cmp #$ff
+        bne .do_normal
+        lda #$00
+        sta ppu_mask_emph
+        rts
+.do_normal
+	jsr apu_bend_down
+	jsr apu_bend_down
 	lda audio_frame_counter
         cmp #$70
         beq .do_chord
@@ -397,7 +416,35 @@ song_05: subroutine
         jsr sfx_snare
 .do_chord
         jsr sfx_rng_chord
+        jsr ppu_mess_emph
+        inc ppu_mask_emph
 .done
 	inc audio_frame_counter
 	rts
         
+        
+; ending bad
+song_06: subroutine
+	; rng chord about every 2 seconds (bends down)
+	jsr apu_bend_down
+	jsr apu_bend_down
+	lda audio_frame_counter
+        and #$7d
+        bne .no_chord
+        jsr sfx_rng_chord
+.no_chord
+	inc audio_frame_counter
+	rts
+        
+        
+; ending ok
+song_07: subroutine
+	; sick dingle but different seed and bends down
+	jsr apu_bend_down
+        jsr song_01
+	rts
+        
+        
+; ending good
+song_08: subroutine
+	rts

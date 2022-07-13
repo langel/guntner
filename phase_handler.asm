@@ -342,9 +342,7 @@ phase_boss_fight: subroutine
 .dont_init_cinematics
 	inc player_x_hi
 	inc player_x_hi
-        lda rng2
-        and #%11100000
-        sta ppu_mask_emph
+        jsr ppu_mess_emph
 .done_messing_emph
 	inc phase_spawn_counter
         bne .done

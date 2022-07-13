@@ -446,7 +446,7 @@ options_menu_return: subroutine
         
 
 options_min_max:
-	byte $00, $04	; song
+	byte $00, $08	; song
         byte $00, $12	; sfx
         byte $10, $1c	; color1
         byte $20, $2c	; color2

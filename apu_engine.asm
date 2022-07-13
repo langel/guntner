@@ -113,9 +113,22 @@ apu_set_pitch: subroutine
         sta apu_cache+1,y
         ; make sure counter resets in engine
         lda #$ff
-        sta apu_pu1_last_hi-2,y
+        ;sta apu_pu1_last_hi-2,y
+        ; this makes "sick dingle" work
+        sta apu_pu1_last_hi
+        sta apu_pu2_last_hi
         rts
         
+apu_bend_down: subroutine
+	inc $142
+        inc $146
+        inc $14a
+        rts
+apu_bend_up: subroutine
+	dec $142
+        dec $146
+        dec $14a
+        rts
        
 apu_env_run: subroutine
 	; x = channel counter offset

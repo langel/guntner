@@ -108,7 +108,12 @@ sprite_clear:
         inx
         bne .clear_sprite_ram
 	rts
-        
+ 
+ppu_mess_emph: subroutine
+        lda rng2
+        and #%11100000
+        sta ppu_mask_emph
+        rts
         
 ; HEX views
 get_char_hi: subroutine
