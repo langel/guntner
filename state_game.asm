@@ -68,6 +68,9 @@ game_update_generic: subroutine
         lda attract_true
         cmp #$ff
         beq .youdead
+        ; set to grayscale
+	lda #%00000001
+        sta ppu_mask_emph
         ; "GAME OVER"
         ldy #$10
         jsr dashboard_message_set
@@ -193,9 +196,8 @@ game_update: subroutine
 .read_start_done
         ; test for paused
         lda player_paused
-        cmp #$ff
-        ;bne .player_check_for_dead
-        beq .done_and_paused
+        bne .done_and_paused
+        
         jsr phase_handler
         jsr game_update_generic
         

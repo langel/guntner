@@ -318,38 +318,56 @@ phase_spawn_long: subroutine
 	rts
         
         
-        
+phase_boss_palette_offset_table:
+	byte #57, #63, #69, #72
         
 phase_boss_fight: subroutine
 	; XXX handle boss intro/outro cinematics here
         ; XXX need to load boss palettes
 	lda phase_state
         bne .done
+        lda phase_spawn_counter
+        bne .dont_init_cinematics
+.init_cinematics
+        ; play boss fight encounter jingle
+        lda #3
+        jsr song_start
+        ; increase scroll speed
+        inc scroll_speed_hi
+        inc scroll_speed_hi
+        inc scroll_speed_hi
+        ; set spawn_counter timing
+        lda #$a0
+        sta phase_spawn_counter
+.dont_init_cinematics
+	inc player_x_hi
+	inc player_x_hi
+	inc player_x_hi
+        lda rng2
+        and #%11100000
+        sta ppu_mask_emph
+.done_messing_emph
+	inc phase_spawn_counter
+        bne .done
+
         inc phase_state
-        ; debug shit
-        lda #$ff
-        sta player_x_hi
-        lda #$00
-        sta player_y_hi
+        lda #0
+        sta ppu_mask_emph
+        
+        dec scroll_speed_hi
+        dec scroll_speed_hi
+        ; play boss fight song
+        lda #$04
+        jsr song_start
         ; setup palette colors
         ldx phase_level
-        lda #57
-        clc
-.pal_add_loop
-        dex
-        bmi .pal_add_done
-        adc #$06
-        bne .pal_add_loop
-.pal_add_done
+        lda phase_boss_palette_offset_table,x
 	tax
         ldy #15
         jsr palette_load
         jsr palette_load
         ; do a fade in
         jsr palette_fade_in_init
-        ; play boss fight song
-        lda #$04
-        jsr song_start
         ; spawn boss
 	ldx phase_level
         lda level_boss_table,x

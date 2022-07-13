@@ -29,6 +29,7 @@ menu_screens_init: subroutine
         sta state_v2 ; code
         sta scroll_x_hi
         sta scroll_page
+        sta ppu_mask_emph ; reset mask
         jsr timer_reset
         jsr title_screen_set_rudy_y
         ; setup colors

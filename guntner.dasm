@@ -81,8 +81,8 @@ cart_start:	subroutine
 	lda #$0f
         sta pal_uni_bg
         
-	;jsr game_init
-	jsr menu_screens_init
+	jsr game_init
+	;jsr menu_screens_init
         ;jsr attract_init
         ;jsr cut_scene_intro_init
         ;jsr cut_scene_outro_init
@@ -143,7 +143,8 @@ state_render_done:
         and #$01
         ora #CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
-        lda #MASK_BG|MASK_SPR
+        lda ppu_mask_emph
+        eor #MASK_BG|MASK_SPR
         sta PPU_MASK	
         
         ; hope everything above was under
@@ -182,7 +183,8 @@ sprite0_wait:
 	; set bg pos to page 2 for dashboard
 	lda #$01|#CTRL_NMI|CTRL_BG_1000
         sta PPU_CTRL
-        lda #MASK_BG
+        lda ppu_mask_emph
+        eor #MASK_BG
         sta PPU_MASK	
         
         

@@ -255,6 +255,14 @@ song_03: subroutine
         jsr apu_set_pitch
         ldy #10
         jsr apu_set_pitch
+        ; set noise
+        lda #$f
+        sbc audio_pattern_pos
+        sta apu_cache+$e
+	lda #$00
+        sta apu_noi_envelope
+        lda #$40
+        sta apu_noi_counter
 .done
 	rts
         

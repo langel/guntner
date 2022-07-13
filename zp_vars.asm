@@ -17,6 +17,7 @@ scroll_speed_lo	byte
 scroll_speed_hi	byte
 scroll_cache_lo	byte
 scroll_cache_hi	byte
+ppu_mask_emph	byte
 bg_tile_default	byte
 player_health	byte
 player_lives	byte
