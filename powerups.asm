@@ -169,9 +169,8 @@ powerup_pickup_mask: subroutine
         
         
 powerup_pickup_mushroom: subroutine
+	; shroom_counter set inside sfx call
 	jsr sfx_powerup_mushroom
-	lda #$7f
-        sta shroom_counter
 	rts
 powerup_mushroom_update: subroutine
 	lda shroom_counter
