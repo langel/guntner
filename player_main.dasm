@@ -28,9 +28,9 @@ player_game_reset: subroutine
         sta phase_arctang_counter
         jsr palette_level_load
         jsr timer_reset
-	lda #$d0
         ; XXX testing boss spawn stuff
-	lda #$a0
+	lda #$d0
+	;lda #$a0
         sta player_x_hi
         sta player_demo_x
 	lda #$70

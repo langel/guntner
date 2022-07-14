@@ -139,6 +139,8 @@ cut_scene_outro_init: subroutine
         lda #$0+char_set_offset
         sta timer_minutes_10s
         
+        ; allow future plays to be boundless
+        inc player_boundless
         
         ; use timer to decide end screen?
         lda timer_minutes_10s

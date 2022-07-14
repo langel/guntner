@@ -122,9 +122,7 @@ powerups_cycle: subroutine
 	lda enemy_ram_hp,x
         cmp #$00
         bne .done
- 	;; XXX needs its own sfx
         ;; despawns to the right
-        ;jsr apu_trigger_enemy_death
         jsr enemy_death
 .done   
 	jmp update_enemies_handler_next

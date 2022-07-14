@@ -160,8 +160,6 @@ player_change_speed:
         sta player_speed
 .read_select_done
         
-        ; XXX is this default damage from enemies?
-        ; XXX actually seems like a testing mechanic
         ;lda #$04
         ;sta player_damage
 ;; XXX FORCE QUICK DEATH
