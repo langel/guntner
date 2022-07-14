@@ -5,6 +5,9 @@ song_in_game		EQM $02
 song_boss_intro		EQM $03
 song_boss_fight		EQM $04
 song_game_over		EQM $05
+song_end_bad		EQM $06
+song_end_ok		EQM $07
+song_end_good		EQM $08
 
 do_nothing_id        EQM $01
 crossbones_id        EQM $02
@@ -85,6 +88,20 @@ song_unstop: subroutine
         sta options_music_on
 	rts
         
+        
+        
+song_01_lda_note: subroutine
+	; x = note offset
+        ; returns note id in a
+        lda apu_temp
+        beq .octoscale
+.majorpentscale
+	lda majpentscale,x
+        rts
+.octoscale
+	lda octoscale,x
+        rts
+        
 
 ; sick dingle
 song_01: subroutine
@@ -96,7 +113,6 @@ song_01: subroutine
         lda #$0a
         sta audio_frame_counter
         lda audio_pattern_pos
-        cmp #$00
         bne .trigger_note
         ; change the note
         lda #$08
@@ -105,13 +121,12 @@ song_01: subroutine
         lda apu_rng1
         and #%00000111
         tax
-        lda octoscale,x
+        jsr song_01_lda_note
         sta audio_root_tone
 .trigger_note
         ; pulse 1
         lda apu_rng1
         and #%0000001
-        cmp #$00
         bne .no_pulse_lead
         lda #$20
         sta apu_pu1_counter
@@ -122,7 +137,7 @@ song_01: subroutine
         clc
         adc audio_root_tone
         tax
-        lda octoscale,x
+        jsr song_01_lda_note
         clc
         adc #12
         tax
@@ -141,7 +156,7 @@ song_01: subroutine
         lda #$00
         sta apu_pu2_envelope
         ldx audio_root_tone
-        lda octoscale,x
+        jsr song_01_lda_note
         clc
         adc #24
         tax
@@ -159,7 +174,8 @@ song_01: subroutine
         jsr apu_set_pitch
         dec audio_pattern_pos
 .do_nothing
-	;dec audio_frame_counter
+        lda #$00
+        sta apu_temp
 	rts
         
         
@@ -493,4 +509,6 @@ song_07: subroutine
         
 ; ending good
 song_08: subroutine
+	inc apu_temp
+        jsr song_01
 	rts

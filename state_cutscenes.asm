@@ -136,7 +136,7 @@ cut_scene_outro_init: subroutine
         inc phase_end_game
         lda #$2+char_set_offset
         sta timer_minutes_1s
-        lda #$1+char_set_offset
+        lda #$0+char_set_offset
         sta timer_minutes_10s
         
         
@@ -153,6 +153,8 @@ cut_scene_outro_init: subroutine
         ldx #0
         ldy #0
         jsr palette_load
+        lda #song_end_bad
+        jsr song_start
         jmp .plot_screen
 .ok
         NMTP_SETADDR cut_scene_ending_ok_tile_data
@@ -162,15 +164,19 @@ cut_scene_outro_init: subroutine
         ldx #3
         ldy #0
         jsr palette_load
+        lda #song_end_ok
+        jsr song_start
         jmp .plot_screen
 .good
         NMTP_SETADDR cut_scene_ending_good_tile_data
         ; palette
-        lda #$02
+        lda #$01
         sta pal_uni_bg
         ldx #6
         ldy #0
         jsr palette_load
+        lda #song_end_good
+        jsr song_start
 
         
 .plot_screen    

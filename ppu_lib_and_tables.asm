@@ -208,7 +208,7 @@ menu_screen_tile_data:
 	hex 9c6c9d8d8d9696898903787d736e6798038c7783746a7b7c
 	byte #$00
 	; " Options Screen "
-	hex 2422
+	hex 2423
 	hex 038f787c7277767b03926c7a6e6e7603
 	byte #$00
 	; "Menu  Return"

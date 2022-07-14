@@ -206,6 +206,7 @@ sfx_enemy_death: subroutine
         sta sfx_noi_update_type
         lda #$10
         sta apu_noi_counter
+        sta sfx_noi_counter
         rts
         
 sfx_enemy_death_update: subroutine
@@ -242,6 +243,7 @@ sfx_powerup_hit: subroutine
 sfx_powerup_bomb: subroutine
 	lda #44
         sta bomb_counter
+        sta sfx_noi_counter
 	lda #$04
         sta sfx_noi_update_type
 	rts

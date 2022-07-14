@@ -40,7 +40,7 @@ palette_table:
 	; #03 end ok
 	byte #$0f, #$10, #$30
 	; #06 end good
-	byte #$1d, #$37, #$27
+	byte #$0a, #$37, #$27
 	; #09 end alien
         ; XXX final colors not picked yet
 	;byte #$0d, #$3c, #$24
