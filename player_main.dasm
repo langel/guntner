@@ -26,7 +26,7 @@ player_game_reset: subroutine
         ;lda #1
         ;sta phase_level
         sta phase_arctang_counter
-        jsr palette_level_load
+        jsr phase_palette_load
         jsr timer_reset
         ; XXX testing boss spawn stuff
 	lda #$d0

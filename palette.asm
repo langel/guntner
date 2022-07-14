@@ -95,14 +95,7 @@ palette_load:
         bpl .loader_loop
         rts
         
-palette_level_load:
-	ldy phase_level
-        ldx palette_level_offset_table,y
-	ldy #15
-        jsr palette_load
-        jsr palette_load
-        jsr palette_load
-        rts
+        
         
         
         

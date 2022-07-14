@@ -95,7 +95,7 @@ phase_next: subroutine
         and #$0f
         bne .not_next_level
         inc phase_level   
-        ; XXX load next level palettes
+        jsr phase_palette_load
 .not_next_level
         ; increase star speed
         lda #53
@@ -150,6 +150,28 @@ phase_spawn_track: subroutine
         inc phase_spawn_table,x
         lda temp00
         rts
+        
+phase_palette_load: subroutine
+	; each level has its own palette
+	ldy phase_level
+        ldx palette_level_offset_table,y
+	ldy #15
+        jsr palette_load
+        jsr palette_load
+        jsr palette_load
+        ; boss phases have palettes too!
+        lda phase_current
+        and #$0f
+        cmp #$0f
+        bne .done
+        ldx phase_level
+        lda phase_boss_palette_offset_table,x
+	tax
+        ldy #15
+        jsr palette_load
+        jsr palette_load
+.done
+	rts
        
         
         
@@ -323,7 +345,6 @@ phase_boss_palette_offset_table:
         
 phase_boss_fight: subroutine
 	; XXX handle boss intro/outro cinematics here
-        ; XXX need to load boss palettes
 	lda phase_state
         bne .done
         lda phase_spawn_counter
@@ -356,13 +377,6 @@ phase_boss_fight: subroutine
         ; play boss fight song
         lda #song_boss_fight
         jsr song_start
-        ; setup palette colors
-        ldx phase_level
-        lda phase_boss_palette_offset_table,x
-	tax
-        ldy #15
-        jsr palette_load
-        jsr palette_load
         ; do a fade in
         jsr palette_fade_in_init
         ; spawn boss

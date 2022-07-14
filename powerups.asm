@@ -179,8 +179,7 @@ powerup_mushroom_update: subroutine
         dec shroom_counter
         bne .audio_bend_up_or_down
 .end_of_shroom
-	; XXX this will load wrong colors during boss fights
-        jsr palette_level_load
+        jsr phase_palette_load
         jsr player_update_colors
         lda #$00
         sta shroom_mod

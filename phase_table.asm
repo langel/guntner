@@ -79,16 +79,16 @@ phase_enemy_table:
         byte maggs_id, 2
         byte 0
         ; phase 08
-        byte birb_id, 4
-        byte maggs_id, 4
-        byte birb_id, 4
+        byte birb_id, 3
+        byte maggs_id, 3
+        byte birb_id, 6
         byte 0
         ; phase 0b
-        byte maggs_id, 4
+        byte maggs_id, 3
         byte birb_id, 8
+        byte maggs_id, 4
+        byte birb_id, 12
         byte skully_id, 1
-        byte birb_id, 8
-        byte maggs_id, 4
         byte 0
 	; === LEVEL 01 =========
         ; phase 12
