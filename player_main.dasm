@@ -82,7 +82,14 @@ player_take_damage: subroutine
         beq .apply_damage
         rts
 .apply_damage
-; damage amount in player_damage
+	; check if turbo gun is enabled
+        lda player_a
+        bne .skip_iframes
+	; set iframes
+        lda #8
+        sta state_iframes
+.skip_iframes
+	; damage amount in player_damage
 	lda player_health
         sec
         sbc player_damage
@@ -99,8 +106,6 @@ player_take_damage: subroutine
         sta bullet_x_vel
         lda #$ff
         sta player_health
-        lda #30
-        sta state_iframes
         rts
 .player_really_dead
 	; player_health 00 means DEATH

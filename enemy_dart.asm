@@ -79,10 +79,13 @@ dart_cycle: subroutine
         sta collision_0_y
         jsr player_collision_detect
         beq .no_collision
-        lda #4
+        ; XXX this shouldn't be hardcoded
+        lda #8
         sta player_damage
         jsr player_take_damage
-        jmp .despawn
+.despawn
+        jsr enemy_death
+        jmp .done
 .no_collision
 
 	; handle direction movement
@@ -98,10 +101,6 @@ dart_cycle: subroutine
         cmp sprite_0_y
         bcs .despawn
         
-        
 .done	
 	jmp update_enemies_handler_next
-.despawn
-        jsr enemy_death
-        jmp .done
 	

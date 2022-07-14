@@ -54,7 +54,7 @@ uzi_cycle: subroutine
         and #$0f
         bne .dont_shoot
         jsr bullet_spawn  
-        ; XXX makes for less repetitive patterns
+        ; makes for less repetitive patterns
         jsr get_next_random
         jsr get_next_random
 .dont_shoot
@@ -67,8 +67,8 @@ bullet_spawn: subroutine
         sta temp02
         lda oam_ram_y,y
         sta temp03
-	jsr get_enemy_slot_1_sprite
-        cmp #$ff
+        jsr get_enemy_slot_next
+        cpx #$ff
         beq .done
         ; sprite
 	lda #bullet_id
