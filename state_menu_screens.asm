@@ -369,10 +369,8 @@ title_screen_update: subroutine
 ; OPTION SCREEN UPDATES        
 
 options_screen_update: subroutine
-        lda shroom_counter
-        bne .skip_player_colors
+        
 	jsr player_update_colors
-.skip_player_colors
 	lda player_start_d
         beq .dont_start_game
         lda #$04 ; menu return pos

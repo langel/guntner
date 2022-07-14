@@ -112,29 +112,26 @@ enemy_get_direction_of_player:
         bcc .region3
         jmp .region2
 .region0  ; L / S < 1.25	; d = 3,9,15,21
-	jmp .result_lookup
+	lda temp01
+        clc
+	bmi .result_lookup
 .region1  ; 1.25 < L / S < 2.5	; d = 2,4,8,10,14,16,20,22
 	lda temp01
         clc 
         adc #4
-        sta temp01
         bpl .result_lookup
 .region2  ; 2.5 < L / S < 7.5	; d = 1,5,7,11,13,17,19,23
 	lda temp01
         clc
         adc #8
-        sta temp01
         bpl .result_lookup
 .region3 ; 7.5 < L / S		; d = 0,6,12,18
 	lda temp01
         clc
         adc #12
-        sta temp01
 .result_lookup
-	; XXX isn't temp01 already in the accumulator?
-	lda temp00
-        clc
-        adc temp01
+	; temp01 should be ready in the accumulator
+        adc temp00
         tax
         lda ARCTANG_TRANSLATION_LOOKUP_TABLE,x
         ; restore enemy_ram_offset

@@ -149,7 +149,6 @@ phase_large_counter	byte
 phase_end_game		byte
 
 dart_frame_max		byte
-starglasses_count	byte
 
 enemy_ram_offset	byte
 enemy_oam_offset	byte

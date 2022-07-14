@@ -81,8 +81,8 @@ cart_start:	subroutine
 	lda #$0f
         sta pal_uni_bg
         
-	;jsr game_init
-	jsr menu_screens_init
+	jsr game_init
+	;jsr menu_screens_init
         ;jsr attract_init
         ;jsr cut_scene_intro_init
         ;jsr cut_scene_outro_init
@@ -373,7 +373,6 @@ sprite0_off:
 	include "apu_song.asm"
         nop	; how much prg space we using?
         
-;fbb8 - all audio done
 ;fa5d - phase engine and all text and distress alien
 ;f535 - super secret code / a new song
 ;f3c0 - gutted superfluous enemy handling code

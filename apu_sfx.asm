@@ -255,16 +255,12 @@ sfx_powerup_bomb_update: subroutine
         and #%00001111
         ora #%00000011
         sta apu_cache+$e
-        ; set powerup counter
         lda bomb_counter
         beq sfx_noi_update_clear
 	rts
 
 ; sound test 07
 sfx_powerup_mushroom: subroutine
-	; set powerup counter
-	lda #$7f
-        sta shroom_counter
 	; slow pu2 sweep up
 	lda #%10001111
         sta $4004
@@ -283,7 +279,6 @@ sfx_powerup_mushroom: subroutine
 
 ; sound test 08
 sfx_powerup_mask: subroutine
-	; XXX not exactly satisfied
 	; fast pu2 sweep up
 	lda #%10001111
         sta $4004

@@ -18,10 +18,10 @@ palette_cache	EQU $e7
 ;        hex 013530	;sprite 3 ; starglasses ; crossbones
         
         
-; bg 0 - stars bg_tiles 1 / title screen
+; bg 0 - stars bg_tiles 1 / menu screens
 ; bg 1 - stars bg_tiles 2
 ; bg 2 - n/a  (bg enemies)
-; bg 3 - dashboard / options screen
+; bg 3 - dashboard
 ; spr 0 - player
 ; spr 1 - enemy
 ; spr 2 - enemy / stars sprites 1
@@ -140,6 +140,7 @@ palette_update: subroutine
         sta pal_bg_3_1,y
         dey
         bpl .shroom_loop
+        
 .no_shroom_effect
 ; fade in
         lda state_fade_in

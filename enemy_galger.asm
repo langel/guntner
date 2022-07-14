@@ -160,17 +160,12 @@ galger_spawn: subroutine
 	rts
         
 galger_cycle: subroutine
-; saved for later
         lda #$08
         sta collision_0_w
-        lda #$08
         sta collision_0_h
         jsr enemy_handle_damage_and_death
         
 	; time to shoot a dart?
-        ;inc enemy_ram_ac,x
-        ;lda enemy_ram_ac,x
-        lda wtf
         lda rng0
         lsr
         and #$3f
@@ -187,17 +182,12 @@ galger_cycle: subroutine
         
 	jsr arc_leg
         ; current sprite
-        lda wtf
-        and #$01
-        clc
-        ; XXX dunno if animation is good here
-        adc #$7e
-        ;lda #$7e
+        lda #$7f
         sta oam_ram_spr,y
         ; do palette
         lda enemy_ram_pc,x
         and #$c0
-        ora #$02
+        ora #$01
         jsr enemy_set_palette
 .done	
 	jmp update_enemies_handler_next

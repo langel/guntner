@@ -167,14 +167,14 @@ enemy_fix_y_visible: subroutine
 	
         
 clear_all_enemies: subroutine
-	; XXX clears entire page and then some
-	ldx #$00
-        txa
+	; clears all enemy ram
+	ldx #$f0
+        lda #$00
 .enemy_loop
+	dex
 	sta enemy_ram_type,x
-        inx
         bne .enemy_loop
-        ; XXX only clears enemy sprites
+        ; clears all enemy sprites
         lda #$ff
 	ldx #$20
 .sprite_loop
@@ -449,17 +449,13 @@ enemy_handle_damage_and_death: subroutine
         ldy enemy_oam_offset
 ; 4 sprite cleanup
 	cpx #$80
-        bcc .not_4_sprite
+        bcc .dont_cleanup_4_sprite
         jsr sprite_4_dead_cleanup
-.not_4_sprite
+.dont_cleanup_4_sprite
 ; starglasses 
         lda enemy_ram_type,x
         cmp #starglasses_id
         bne .not_starglasses
-        ;lda bomb_counter
-        ;bne .not_starglasses
-        ; XXX this var might not be needed
-        dec starglasses_count
         ; spawn powerup
         pla 
         pla
