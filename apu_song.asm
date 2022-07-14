@@ -173,10 +173,11 @@ song_02: subroutine
 .do_this_shit
 	; triangle
         lda audio_pattern_pos
-        eor apu_rng0
+        eor rng1
         and #7
         beq .no_triangle
-	lda #$03
+        ; XXX change note length based on health?
+	lda #$05
         sta apu_tri_counter
         lda audio_root_tone
         clc
@@ -190,57 +191,73 @@ song_02: subroutine
         sta apu_temp
 .no_octave
         ldx apu_temp
-        lda minorscale,x
+        lda octoscale,x
         ldy #$0a
         jsr apu_set_pitch
 .no_triangle
-        ; pulse 1
-        lda apu_rng1
-        and #%0000001
-        bne .no_pulse_lead
-        lda #$05
-        sta apu_pu1_counter
-        sta apu_pu2_counter
-        lda #$06
-        sta apu_pu1_envelope
-        sta apu_pu2_envelope
-        lda apu_rng0
-        and #%00000111
-        clc
-        adc audio_root_tone
-        tax
-        lda octoscale,x
-        clc
-        adc #24
-        tax
-        ldy #$02
-        jsr apu_set_pitch
-        txa
-        adc #9
-        tax
-        ldy #$06
-        jsr apu_set_pitch
-.no_pulse_lead
+        ; pulse lead
+;        lda sfx_pu1_counter
+;        bne .no_pulse_lead
+;        lda sfx_pu2_counter
+;        bne .no_pulse_lead
+;        lda apu_rng0
+;        and #$01
+        ;bne .no_pulse_lead
+;        lda apu_rng1
+;        and #%00000001
+;        beq .no_pulse_lead
+;        lda #$0e
+;        sta apu_pu1_counter
+;        lda #$0c
+;        sta apu_pu2_counter
+;        lda #$05
+;        sta apu_pu1_envelope
+;        sta apu_pu2_envelope
+;        lda apu_rng0
+;        and #%00000111
+;        clc
+;        adc audio_root_tone
+;        tax
+;        lda octoscale,x
+;        clc
+;        adc #24
+;        tax
+;        ldy #$02
+;        jsr apu_set_pitch
+;        txa
+;        adc #19
+;        tax
+;        ldy #$06
+;        jsr apu_set_pitch
+;.no_pulse_lead
         ; kick
         lda audio_pattern_pos
         bne .no_kick
         jsr sfx_kick
 .no_kick
+	; check for sfx noise
+        lda sfx_noi_counter
+        bne .no_noise
 	; hats
         lda apu_rng0
         and #6
         beq .no_hat
         jsr sfx_hat
 .no_hat
+	; ghost snare
+        lda rng0
+        and #$c
+        bne .no_g_snare
+        jsr sfx_ghost_snare
+.no_g_snare
 	; snare
-        lda apu_noi_counter
-        cmp #$f
-        bne .no_snare
         lda audio_pattern_pos
         cmp #6
         bne .no_snare
+.do_snare
         jsr sfx_snare
 .no_snare
+.no_noise
         ; next tic
         inc audio_pattern_pos
         lda audio_pattern_pos
@@ -252,7 +269,7 @@ song_02: subroutine
         lda #0
         sta audio_pattern_pos
        	inc audio_frame_counter
-        lda #16
+        lda #24
         cmp audio_frame_counter
         bne .done
         jsr apu_rng_reset

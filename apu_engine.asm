@@ -198,15 +198,15 @@ apu_env_exp_tiny: subroutine
         lda apu_env_exp_tiny_table,y
 	rts
 apu_env_exp_tiny_table:
-	.byte $00,$01,$01,$01,$01,$01,$01,$01,
-        .byte $01,$01,$02,$03,$08,$0b,$0f
+	.byte $00,$01,$01,$01,$01,$01,$02,$02,
+        .byte $03,$04,$05,$07,$0a,$0c,$0f
 apu_env_exp_pico: subroutine
 	; #$06 counter =~ 15 frames / 0.25 second
         ldy apu_pu1_counter,x
         lda apu_env_exp_pico_table,y
 	rts
 apu_env_exp_pico_table:
-        .byte $00,$01,$03,$05,$0a,$0f
+        .byte $00,$01,$04,$07,$0a,$0f
         
         
 apu_update: subroutine

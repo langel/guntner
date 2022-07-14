@@ -55,6 +55,7 @@ sfx_test_table_lo:
         byte #<sfx_phase_next			; 10
         byte #<sfx_snare			; 11
         byte #<sfx_hat				; 12
+        byte #<sfx_ghost_snare			; 13
 sfx_test_table_hi:
 	byte #>sfx_pewpew
         byte #>sfx_player_damage
@@ -75,6 +76,7 @@ sfx_test_table_hi:
         byte #>sfx_phase_next
         byte #>sfx_snare
         byte #>sfx_hat
+        byte #>sfx_ghost_snare
 
 
 ; sound test 00
@@ -407,7 +409,7 @@ sfx_shoot_dart: subroutine
         sta $4002
         lda #%00001000
         sta $4003
-        lda #$03
+        lda #$10
         sta sfx_pu1_counter
 	rts
         
@@ -485,9 +487,11 @@ sfx_phase_next_update: subroutine
         beq .trigger_last
         bne .done
 .trigger_first
-        lda #$20
+        lda #$40
         sta apu_pu2_counter
-        lda #4
+        lda #$20
+        sta sfx_pu2_counter
+        lda #3
         sta apu_pu2_envelope
 	lda audio_root_tone
         clc
@@ -500,7 +504,7 @@ sfx_phase_next_update: subroutine
         lda #$40
         sta apu_pu1_counter
         sta apu_pu2_counter
-        lda #$10
+        lda #$20
         sta sfx_pu2_counter
         lda #3
         sta apu_pu1_envelope
@@ -536,14 +540,27 @@ sfx_snare: subroutine
         
 ; sound test 12
 sfx_hat: subroutine
-	lda sfx_pu2_counter
+	lda sfx_noi_counter
         bne .no
         lda apu_rng1
         and #3
         sta apu_cache+$e
-        lda #$f
+        lda #$e
         sta apu_noi_counter
         lda #$05
         sta apu_noi_envelope
 .no
+        rts
+        
+        
+; sound test 13
+sfx_ghost_snare: subroutine
+	lda rng2
+        and #$01
+        adc #$0b
+        sta apu_cache+$e
+        lda #$04
+        sta apu_noi_counter
+        lda #$06
+        sta apu_noi_envelope
         rts
