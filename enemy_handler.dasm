@@ -225,6 +225,8 @@ enemy_slot_offset_to_oam_offset:
         
         
 enemies_update_all: subroutine
+	lda boss_death_happening
+        bne .done
 	; set max darts launched per frame
         lda #$03
         sta dart_frame_max
@@ -271,6 +273,7 @@ update_enemies_handler_next:
         ldy enemy_slot_offset_to_oam_offset,x
         sty enemy_oam_offset
         bne .handler_loop
+.done
         rts
         
         
@@ -395,38 +398,9 @@ enemy_handle_damage_and_death: subroutine
         ; boss death check
         lda boss_dmg_handle_true
         beq .not_boss_death
-        ; cache enemy type
-        lda enemy_ram_type,x
-        sta temp01
-        lda #$00
-.boss_dead_kill_all
-	tax
-        lda #crossbones_id
-        sta enemy_ram_type,x
-        ldy temp00
-        txa
-	cmp #$a0
-        bcc .not_4_sprites
-        sta temp00
-        lsr
-        lsr
-        lsr
-        tax
-        ldy enemy_slot_offset_to_oam_offset,x
-        ldx temp00
-        jsr sprite_4_dead_cleanup
-        lda temp00
-.not_4_sprites
-        clc
-        adc #$08
-        cmp #$e0
-        bne .boss_dead_kill_all
-        ; XXX boss death sfx / music?
-        ; XXX boss death state (explosion)?
-        lda #$00
-        sta boss_dmg_handle_true
-        lda temp01
-        bne .enemy_type_already_set
+        inc boss_death_happening
+        inc boss_heart_stars
+        rts
 .not_boss_death
 	; handle point bonus
 	lda enemy_ram_type,x
@@ -559,15 +533,14 @@ enemy_slot_from_type: subroutine
         cpx #1
         bne .not_size_1
 	jsr get_enemy_slot_1_sprite
-        bne .slot_found_check
+        rts
 .not_size_1
 	cpx #2
         bne .not_size_2
 	jsr get_enemy_slot_2_sprite
-        bne .slot_found_check
+        rts
 .not_size_2
 	jsr get_enemy_slot_4_sprite
-.slot_found_check
 	rts
         
 

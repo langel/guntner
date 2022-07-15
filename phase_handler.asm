@@ -179,6 +179,9 @@ phase_palette_load: subroutine
 ; PHASE TYPES
         
 phase_zero: subroutine
+	jsr phase_check_next_phase
+        lda phase_state
+        bne .done
 	lda phase_current
         bne .congration
 	lda #$40
@@ -187,14 +190,25 @@ phase_zero: subroutine
 	lda #$20
 .continue
         sta dashboard_message
-        inc phase_state
-        lda phase_state
-        cmp #100
+        inc phase_spawn_counter
+        lda #100
+        cmp phase_spawn_counter
         bne .stay_zero
         lda #$ff
         sta dashboard_message
-        jsr phase_next
+        lda phase_current
+        cmp #$10
+        beq .end_game
+        inc phase_state
 .stay_zero
+.done
+	rts
+.end_game
+        lda #$00
+        sta scroll_x_hi
+        sta scroll_page
+	lda #$04
+	jsr palette_fade_out_init
 	rts
         
         
@@ -341,10 +355,27 @@ phase_spawn_long: subroutine
         
         
         
+        
 phase_boss_fight: subroutine
-	; XXX handle boss intro/outro cinematics here
-	lda phase_state
-        bne .done
+	; handle boss intro/outro cinematics here
+        ; phase_spawn_counter = scene timer
+        ; phase_kill_counter = which scene
+        lda phase_kill_counter
+        bne .not_intro
+        jmp phase_boss_fight_intro
+.not_intro
+	cmp #$02
+        bne .not_cooldown
+        jmp phase_boss_fight_cooldown
+.not_cooldown
+	lda boss_death_happening
+        beq .not_death
+        jmp phase_boss_dying
+.not_death
+	rts
+        
+        
+phase_boss_fight_intro:
         lda phase_spawn_counter
         bne .dont_init_cinematics
 .init_cinematics
@@ -373,9 +404,10 @@ phase_boss_fight: subroutine
 	inc phase_spawn_counter
         bne .done
 
-        inc phase_state
+        inc phase_kill_counter
         lda #0
         sta ppu_mask_emph
+        sta phase_spawn_counter
         
         dec scroll_speed_hi
         dec scroll_speed_hi
@@ -393,6 +425,96 @@ phase_boss_fight: subroutine
 	rts
         
         
+phase_boss_dying_sfx_table:
+	hex 03 06 0d 11
+        
+phase_boss_dying: subroutine
+	lda phase_spawn_counter
+        bne .dont_init
+        jsr song_stop
+        lda phase_level
+        clc
+        adc #$01
+        asl
+        asl
+        asl
+        sta state_v0
+        inc phase_spawn_counter
+.dont_init
+	ldy #8
+.rng_pal_loop
+	jsr get_next_random
+        lsr
+        and #%00111100
+        sta pal_spr_1_1,y
+        dey
+        bpl .rng_pal_loop
+        ; spawn a sfx every 8th frame
+	jsr phase_check_spawn_frame
+        lda rng1
+        and #$03
+        tay
+        ldx phase_boss_dying_sfx_table,y
+        jsr sfx_test_delegator
+        dec state_v0
+        bne .done
+        ; boss dead do stuff
+        lda #$00
+.boss_dead_kill_all
+	tax
+        lda #crossbones_id
+        sta enemy_ram_type,x
+        ldy temp00
+        txa
+	cmp #$a0
+        bcc .not_4_sprites
+        sta temp00
+        lsr
+        lsr
+        lsr
+        tax
+        ldy enemy_slot_offset_to_oam_offset,x
+        ldx temp00
+        jsr sprite_4_dead_cleanup
+        lda temp00
+.not_4_sprites
+        clc
+        adc #$08
+        cmp #$e0
+        bne .boss_dead_kill_all
+        inc phase_kill_counter
+        lda #$40
+        sta phase_spawn_counter
+        ; setup next scene
+        jsr phase_palette_load
+        jsr sfx_enemy_death
+        jsr powerup_pickup_plus_one
+        ; startup in game music
+        lda #song_in_game
+        jsr song_start
+        ; let crossbones animate
+        lda #$00
+        sta boss_death_happening
+.done
+	rts
+        
+        
+phase_boss_fight_cooldown:
+	dec phase_spawn_counter
+        bne .dont_advance
+        lda #$00
+        sta boss_death_happening
+        sta boss_heart_stars
+        sta boss_dmg_handle_true
+        sta phase_kill_counter
+        lda #song_in_game
+        jsr song_start
+        jsr phase_next
+.dont_advance
+	rts
+        
+        
+        
         
         
 phase_interval_spawn: subroutine
@@ -400,31 +522,33 @@ phase_interval_spawn: subroutine
 	; large enemy spawn?
         lda timer_frames_1s
         cmp #char_set_offset
-        bne .no_large_enemy
+        bne .no_enemy
         lda timer_frames_10s
         cmp #char_set_offset
-        bne .no_large_enemy
+        bne .no_enemy
         ; look for 10 second increments
         lda timer_seconds_1s
+        cmp #char_set_offset+1
+        beq .spawn_enemy
         cmp #char_set_offset+7
-        beq .spawn_large_enemy
-        bne .no_large_enemy
-.spawn_large_enemy
+        beq .spawn_enemy
+        bne .no_enemy
+.spawn_enemy
         jsr get_enemy_slot_4_sprite
         cmp #$ff
-        beq .no_large_enemy
+        beq .no_enemy
         tax
-        ldy phase_large_counter
+        ldy phase_interval_counter
         lda level_enemy_table,y
-        bne .dont_reset_large_counter
-.reset_large_counter
+        bne .dont_reset_counter
+.reset_counter
         ldy #0
-        sty phase_large_counter
+        sty phase_interval_counter
         lda level_enemy_table,y
-.dont_reset_large_counter	
-	inc phase_large_counter
+.dont_reset_counter	
+	inc phase_interval_counter
         jsr enemy_spawn_delegator
-.no_large_enemy
+.no_enemy
 	rts
         
         

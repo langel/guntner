@@ -47,6 +47,7 @@ STATE_INIT_FUNCTION_TABLE:
         .word	attract_init			; 1
         .word	game_init			; 2
         .word	cut_scene_intro_init		; 3
+        .word	cut_scene_outro_init		; 4
         
 state_init_call:
 	; a = function table slot

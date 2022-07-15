@@ -145,7 +145,7 @@ phase_table_ptr		byte
 phase_spawn_type	byte
 phase_arctang_counter	byte
 phase_spawn_counter	byte
-phase_large_counter	byte
+phase_interval_counter	byte
 phase_end_game		byte
 
 dart_frame_max		byte
@@ -155,6 +155,8 @@ enemy_oam_offset	byte
 enemy_slot_id		byte
 enemy_dmg_accumulator	byte
 boss_dmg_handle_true	byte
+boss_death_happening	byte
+boss_heart_stars	byte
 boss_x		byte
 boss_y		byte
 

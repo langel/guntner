@@ -125,12 +125,17 @@ starfield_cache_next_col:
 	cpy temp00
         bne .empty_tile
 .star_tile
-	; XXX if phase f and boss dead load heart tile
+        lda boss_heart_stars
+        beq .normal_stars
+.heart_stars
+	lda #$ff
+        bne .cache_tile
+.normal_stars
         lda starfield_column
         and #$03
         clc
         adc #star_pattern
-        jmp .cache_tile
+        bne .cache_tile
 .empty_tile
 	lda #tile_empty
 .cache_tile

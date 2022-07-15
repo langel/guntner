@@ -21,7 +21,7 @@ player_game_reset: subroutine
         sta score_0000xx00
         sta score_000000xx
         ; XXX testing phase behaviours
-        lda #$0
+        lda #$f
         sta phase_current
         ;lda #1
         ;sta player_boundless
@@ -71,7 +71,9 @@ player_update_colors: subroutine
 	rts
         
         
-        
+    
+player_difficulty_damage_table:
+	byte #58, #77, #109, #191
         
 player_take_damage: subroutine
 	; make sure iframes are not enable

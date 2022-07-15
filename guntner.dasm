@@ -81,8 +81,8 @@ cart_start:	subroutine
 	lda #$0f
         sta pal_uni_bg
         
-	;jsr game_init
-	jsr menu_screens_init
+	jsr game_init
+	;jsr menu_screens_init
         ;jsr attract_init
         ;jsr cut_scene_intro_init
         ;jsr cut_scene_outro_init
@@ -156,7 +156,6 @@ state_update_done:
 
 sprite0_wait:
 	lda state_sprite0
-        cmp #$00
         beq sprite0_off
 	; wait for Sprite 0; SPRITE 0 WAIT TIME!!!
 .wait0	bit PPU_STATUS

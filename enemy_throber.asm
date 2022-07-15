@@ -1,18 +1,11 @@
 
 throber_spawn: subroutine
 	; x is set by enemy spawner
-	lda #throber_id
-        sta enemy_ram_type,x 
-        tay
-        lda enemy_hitpoints_table,y
-        sta enemy_ram_hp,x 
         jsr get_oam_offset_from_slot_offset
         lda #$42
         sta oam_ram_y,y   ; y pos
         lda #$00
         sta oam_ram_x,y   ; x pos
-        sta enemy_ram_pc,x ; pattern counter
-        sta enemy_ram_ac,x ; animation counter
         sta enemy_ram_ex,x
    	rts
         
@@ -21,7 +14,7 @@ throber_cycle: subroutine
         lda #$10
         sta collision_0_w
         sta collision_0_h
-        ;jsr enemy_handle_damage_and_death
+        jsr enemy_handle_damage_and_death
         
 	inc enemy_ram_pc,x
         lda enemy_ram_pc,x

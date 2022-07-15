@@ -102,6 +102,11 @@ cut_scene_outro_init: subroutine
 	jsr sprite_clear
         jsr nametables_clear
         
+        lda #$00
+        sta state_sprite0
+        sta scroll_page
+        sta scroll_x_hi
+        
         ; draw original alien
 	PPU_SETADDR #$208c
         jsr cut_scene_alien_main_draw

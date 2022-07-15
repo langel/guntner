@@ -1,10 +1,5 @@
 
 uzi_spawn: subroutine
-	lda #uzi_id
-        sta enemy_ram_type,x
-        tay
-        lda enemy_hitpoints_table,y
-        sta enemy_ram_hp,x
         lda #$20
         sta enemy_ram_x,x
         lda #$28
