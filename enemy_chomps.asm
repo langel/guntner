@@ -10,8 +10,7 @@ chomps_spawn: subroutine
         sta enemy_ram_y,x ; y pos
    	rts
         
-        byte "0123456789abcdef YuDAGMEOVrgConTiNplsPSRhtv.()XIk,LByw!mqW?JxU="
-        
+     
 chomps_cycle: subroutine
         lda #$08
         sta collision_0_w

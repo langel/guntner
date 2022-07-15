@@ -51,34 +51,38 @@ palette_table:
         byte #$04, #$1b, #$37
         ; #18 title screen
         byte #$02, #$27, #$34
-        ; #21 level 0 palettes
+        ; #21 level 0 palettes (and attract mode)
         hex 13 21 30
         hex 07 17 27
         hex 01 35 30
         ; #30 level 1 palettes
-        ; XXX filler not final
-        hex 13 21 30
-        hex 07 17 27
-        hex 01 35 30
+        hex 16 1a 30
+        hex 06 16 38
+        hex 08 35 20
         ; #39 level 2 palettes
-        ; XXX filler not final
         hex 13 21 30
+        hex 06 16 38
         hex 07 17 27
-        hex 01 35 30
         ; #48 level 3 palettes
         ; XXX filler not final
+        hex 06 16 38
+        hex 16 1a 30
         hex 13 21 30
-        hex 07 17 27
-        hex 01 35 30
         ; #57 boss scarab palettes
         hex 03 1a 39 0c 27 37
         ; #63 boss vamp+bats palettes
         hex 12 21 30 15 00 37
         ; #69 boss swordtner palettes
-        ; #72 boss lazerface palettes
+        ; XXX filler not final
+        hex 12 21 30 15 00 37
+        ; #75 boss lazerface palettes
+        ; XXX filler not final
+        hex 12 21 30 15 00 37
         
 palette_level_offset_table:
 	byte #21, #30, #39, #48
+palette_boss_offset_table:
+	byte #57, #63, #69, #72
         
 palette_load:
 	; x = pal rom offset 

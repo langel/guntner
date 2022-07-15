@@ -54,13 +54,24 @@ phase_handlers_hi:
 
 level_enemy_table:
 	; level 1
-        byte starglasses_id, starglasses_id, dumbface_id
+        byte starglasses_id, spark_id
+        byte starglasses_id, spark_id
+        byte dumbface_id
         byte 0
         ; level 2
+        byte birb_id, starglasses_id, ant_id, zigzag_id
+        byte starglasses_id, zigzag_id, dumbface_id
         byte 0
         ; level 3
+        byte maggs_id, skeet_id, starglasses_id
+        byte ant_id, skeet_id, ant_id, starglasses_id
+        byte skeet_id, lasso_id, starglasses_id
+        byte chomps_id, skeet_id, skeet_id, starglasses_id
         byte 0
         ; level 4
+        byte chomps_id, maggs_id, birb_id, starglasses_id
+        byte lasso_id, ant_id, uzi_id, lasso_id, ant_id, uzi_id
+        byte dumbface_id, skully_id, throber_id, starglasses_id
         byte 0
 
 level_boss_table:
@@ -87,35 +98,64 @@ phase_enemy_table:
         byte maggs_id, 3
         byte birb_id, 8
         byte maggs_id, 4
-        byte birb_id, 12
         byte skully_id, 1
+        byte birb_id, 12
         byte 0
 	; === LEVEL 01 =========
         ; phase 12
+        byte birb_id, 1
         byte 0
         ; phase 14
+        byte chomps_id, 4
         byte 0
         ; phase 18
+        byte skully_id, 2
         byte 0
         ; phase 1b
+        byte birb_id, 8
+        byte skully_id, 2
+        byte birb_id, 12
+        byte chomps_id, 6
+        byte throber_id, 2
         byte 0
 	; === LEVEL 02 =========
         ; phase 22
         byte 0
+        byte maggs_id, 2
+        byte throber_id, 1
         ; phase 24
         byte 0
+        byte chomps_id, 2
+        byte throber_id, 1
         ; phase 28
         byte 0
+        byte maggs_id, 2
+        byte birb_id, 6
+        byte chomps_id, 2
+        byte birb_id, 6
+        byte maggs_id, 2
+        byte birb_id, 6
+        byte chomps_id, 2
+        byte birb_id, 6
         ; phase 2b
+        byte birb_id, 8
+        byte throber_id, 2
+        byte birb_id, 12
         byte 0
 	; === LEVEL 03 =========
         ; phase 32
+        byte birb_id, 32
         byte 0
         ; phase 34
+        byte throber_id, 4
         byte 0
         ; phase 38
+        byte birb_id, 4
         byte 0
         ; phase 3b
+        byte uzi_id, 1
+        byte birb_id, 24
+        byte throber_id, 2
         byte 0
         
 

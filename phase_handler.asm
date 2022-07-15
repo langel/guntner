@@ -95,7 +95,6 @@ phase_next: subroutine
         and #$0f
         bne .not_next_level
         inc phase_level   
-        jsr phase_palette_load
 .not_next_level
         ; increase star speed
         lda #53
@@ -105,6 +104,7 @@ phase_next: subroutine
         bcc .scroll_hi_done
         inc scroll_speed_hi
 .scroll_hi_done
+        jsr phase_palette_load
 	pla
         pla
 	rts
@@ -165,7 +165,7 @@ phase_palette_load: subroutine
         cmp #$0f
         bne .done
         ldx phase_level
-        lda phase_boss_palette_offset_table,x
+        lda palette_boss_offset_table,x
 	tax
         ldy #15
         jsr palette_load
@@ -340,8 +340,6 @@ phase_spawn_long: subroutine
 	rts
         
         
-phase_boss_palette_offset_table:
-	byte #57, #63, #69, #72
         
 phase_boss_fight: subroutine
 	; XXX handle boss intro/outro cinematics here
