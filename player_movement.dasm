@@ -38,6 +38,9 @@ player_move_position: subroutine
         sta player_y_hi
 .up_enuff
 .done
+        lda player_y_hi
+        jsr enemy_fix_y_visible
+        sta player_y_hi
 	rts
 
 

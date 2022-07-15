@@ -359,8 +359,15 @@ phase_boss_fight: subroutine
         lda #$a0
         sta phase_spawn_counter
 .dont_init_cinematics
+	; WHOOOOOSH!!~
 	inc player_x_hi
 	inc player_x_hi
+        lda player_x_hi
+        cmp #232
+        bcc .right_max
+        lda #230
+        sta player_x_hi
+.right_max
         jsr ppu_mess_emph
 .done_messing_emph
 	inc phase_spawn_counter

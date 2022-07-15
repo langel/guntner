@@ -24,6 +24,7 @@ player_game_reset: subroutine
         lda #$0
         sta phase_current
         ;lda #1
+        ;sta player_boundless
         ;sta phase_level
         sta phase_arctang_counter
         jsr phase_palette_load
