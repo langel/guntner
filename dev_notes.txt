@@ -17,23 +17,12 @@ enemies
 bosses
 	lazerface
 	swordtner
-boss cinematics
-	?pause game?
-	turn screen gray
-	move player to home
-	display/spawn boss
-	play ascending notes
-	play with color emphasis
-	?unpause game?
-	boss death flickering
-	victory song/jingle
-palettes
-	phase tables 
-phase handling
-	what is the bug??!?!
 difficulty
 	?adjust xp values?
-reset attract mode enemies on player game over
+	player damage from enemies
+phases
+	handle different level interval spawns
+game over glitches
 
 
 
