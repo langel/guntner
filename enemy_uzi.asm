@@ -2,7 +2,7 @@
 uzi_spawn: subroutine
         lda #$20
         sta enemy_ram_x,x
-        lda #$28
+        lda #$24
         sta enemy_ram_ac,x
 	rts
         

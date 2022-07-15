@@ -139,10 +139,10 @@ cut_scene_outro_init: subroutine
         
         ; XXX temp for debug purposes
         inc phase_end_game
-        lda #$2+char_set_offset
-        sta timer_minutes_1s
-        lda #$0+char_set_offset
-        sta timer_minutes_10s
+        ;lda #$2+char_set_offset
+        ;sta timer_minutes_1s
+        ;lda #$0+char_set_offset
+        ;sta timer_minutes_10s
         
         ; allow future plays to be boundless
         inc player_boundless

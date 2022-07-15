@@ -96,14 +96,7 @@ phase_next: subroutine
         bne .not_next_level
         inc phase_level   
 .not_next_level
-        ; increase star speed
-        lda #53
-        clc
-        adc scroll_speed_lo
-        sta scroll_speed_lo
-        bcc .scroll_hi_done
-        inc scroll_speed_hi
-.scroll_hi_done
+	jsr starfield_speed_increase
         jsr phase_palette_load
 	pla
         pla
@@ -197,7 +190,8 @@ phase_zero: subroutine
         lda #$ff
         sta dashboard_message
         lda phase_current
-        cmp #$10
+        ; XXX this should #$40 for the full game
+        cmp #$40
         beq .end_game
         inc phase_state
 .stay_zero
@@ -500,6 +494,11 @@ phase_boss_dying: subroutine
         
         
 phase_boss_fight_cooldown:
+	lda phase_spawn_counter
+        and #$0f
+        bne .dont_slow_stars
+        dec scroll_speed_hi
+.dont_slow_stars
 	dec phase_spawn_counter
         bne .dont_advance
         lda #$00
@@ -518,8 +517,7 @@ phase_boss_fight_cooldown:
         
         
 phase_interval_spawn: subroutine
-; LEVEL LARGE ENEMY SPAWN INTERVAL
-	; large enemy spawn?
+	; interval enemy spawn?
         lda timer_frames_1s
         cmp #char_set_offset
         bne .no_enemy
@@ -534,79 +532,28 @@ phase_interval_spawn: subroutine
         beq .spawn_enemy
         bne .no_enemy
 .spawn_enemy
-        jsr get_enemy_slot_4_sprite
-        cmp #$ff
-        beq .no_enemy
-        tax
+	ldy phase_level
+	lda level_intervals_lo,y
+        sta temp02
+	lda level_intervals_hi,y
+        sta temp03
         ldy phase_interval_counter
-        lda level_enemy_table,y
+        lda (temp02),y
         bne .dont_reset_counter
 .reset_counter
-        ldy #0
-        sty phase_interval_counter
-        lda level_enemy_table,y
+        sta phase_interval_counter
+        lda (temp02),y
 .dont_reset_counter	
+	tay
+        jsr enemy_slot_from_type
+        cmp #$ff
+        beq .no_enemy
 	inc phase_interval_counter
+        tax
+        tya
         jsr enemy_spawn_delegator
 .no_enemy
 	rts
         
         
         
-        
-        
-        
-        
-; debugger that quickly shows all phase spawns
-; XXX remove before done
-demo_phase_skip_after_time: subroutine
-	lda ftw
-        cmp #0
-        bne .done
-        lda wtf
-        cmp #150
-        bne .done
-        ; reset wtf/ftw
-        lda #0
-        sta wtf
-        sta ftw
-        ; clear all enemies
-	lda #$0
-        sta temp00
-        sta enemy_ram_offset
-        lda #$20
-        sta enemy_oam_offset
-.enemy_clear_loop
-	ldx temp00
-        lda phase_spawn_table,x
-        beq .enemy_clear_skip
-        jsr enemy_death
-        lda #0
-        ldx temp00
-        sta phase_spawn_table,x
-.enemy_clear_skip
-        clc
-        lda #$08
-        adc enemy_ram_offset
-        cmp #$e0
-        beq .enemy_clear_done
-        sta enemy_ram_offset
-        lda #$04
-        clc
-        adc enemy_oam_offset
-        sta enemy_oam_offset
-        inc temp00
-        bne .enemy_clear_loop
-.enemy_clear_done
-	jsr phase_next
-.done
-	rts
-        
-
-        
-
-        
-        
-        
-        
-	

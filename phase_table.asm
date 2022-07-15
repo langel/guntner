@@ -50,25 +50,34 @@ phase_handlers_hi:
 ; 8: 12 birbs, 1 skully, 2 maggs
 ; 9: 16 birbs, 6 skullys, 4 maggs, 2 starglasses
 
+level_intervals_lo:
+	byte #<level_0_interval_spawn_table
+	byte #<level_1_interval_spawn_table
+	byte #<level_2_interval_spawn_table
+	byte #<level_3_interval_spawn_table
+level_intervals_hi:
+	byte #>level_0_interval_spawn_table
+	byte #>level_1_interval_spawn_table
+	byte #>level_2_interval_spawn_table
+	byte #>level_3_interval_spawn_table
 
 
-level_enemy_table:
-	; level 1
+level_0_interval_spawn_table:
         byte starglasses_id, spark_id
         byte starglasses_id, spark_id
         byte dumbface_id
         byte 0
-        ; level 2
+level_1_interval_spawn_table:
         byte birb_id, starglasses_id, ant_id, zigzag_id
         byte starglasses_id, zigzag_id, dumbface_id
         byte 0
-        ; level 3
+level_2_interval_spawn_table:
         byte maggs_id, skeet_id, starglasses_id
         byte ant_id, skeet_id, ant_id, starglasses_id
         byte skeet_id, lasso_id, starglasses_id
         byte chomps_id, skeet_id, skeet_id, starglasses_id
         byte 0
-        ; level 4
+level_3_interval_spawn_table:
         byte chomps_id, maggs_id, birb_id, starglasses_id
         byte lasso_id, ant_id, uzi_id, lasso_id, ant_id, uzi_id
         byte dumbface_id, skully_id, throber_id, starglasses_id

@@ -12,6 +12,9 @@ star_cache		= $d0
 star_oam_start		EQM $40
 star_oam_end		EQM <(star_oam_start+$80)
 
+scroll_speed_lo_default	EQM #179
+scroll_speed_hi_default	EQM #2
+
 
 
 starfield_twinkle_reset: subroutine
@@ -21,6 +24,18 @@ starfield_twinkle_reset: subroutine
         sta starfield_color1
 	rts
         
+        
+starfield_speed_increase
+	jsr starfield_speed_increase
+        ; increase star speed
+        lda #57
+        clc
+        adc scroll_speed_lo
+        sta scroll_speed_lo
+        bcc .scroll_hi_done
+        inc scroll_speed_hi
+.scroll_hi_done
+	rts
         
    
 starfield_init: subroutine

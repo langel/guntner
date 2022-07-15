@@ -1,7 +1,7 @@
 
 ant_spawn: subroutine
 	; x is set by enemy spawner
-        lda #$f7
+        lda #$fc
         sta enemy_ram_x,x ; x pos
         lda #$00
         sta enemy_ram_ac,x ; animation counter

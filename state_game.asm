@@ -5,9 +5,9 @@ game_init_generic: subroutine
 	jsr render_disable
         jsr nametables_clear
         
-        lda #179
+        lda #scroll_speed_lo_default
         sta scroll_speed_lo
-        lda #2
+        lda #scroll_speed_hi_default
         sta scroll_speed_hi
         
         lda #2
