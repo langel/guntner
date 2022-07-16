@@ -75,30 +75,7 @@ enemy_player_points_table:
 	byte $0b, $c6, $01, $1f ; boss_scarab
 	byte $15, $cc, $8f, $4b ; boss_vamp
 
-enemy_player_collision_table:
-	byte $00 ; null
-	byte $00 ; do_nothing
-	byte $00 ; crossbones
-	byte $00 ; powerups
-	byte $02 ; birb
-	byte $03 ; spark
-	byte $03 ; zigzag
-	byte $03 ; skeet
-	byte $02 ; galger
-	byte $01 ; bullet
-	byte $01 ; dart
-	byte $0a ; boss_vamp_bat
-	byte $07 ; chomps
-	byte $09 ; maggs
-	byte $05 ; starglasses
-	byte $1d ; skully
-	byte $0b ; dumbface
-	byte $0d ; throber
-	byte $11 ; ant
-	byte $35 ; lasso
-	byte $1d ; uzi
-	byte $3f ; boss_scarab
-	byte $3f ; boss_vamp
+
 
 enemy_size_table:
 	byte $00 ; null

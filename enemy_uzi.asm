@@ -104,9 +104,7 @@ bullet_cycle: subroutine
         sta collision_0_y
         jsr player_collision_detect
         beq .no_collision
-        lda #4
-        sta player_damage
-        jsr player_take_damage
+        jsr enemy_gives_damage
         jmp .despawn
 .no_collision
 	lda wtf

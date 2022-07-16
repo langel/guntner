@@ -29,8 +29,6 @@ phase_handling_stuff
         
         
 phase_handler: subroutine
-	; XXX debugging
-	;jsr demo_phase_skip_after_time    
         ; always check if its time for an interval spawn
         jsr phase_interval_spawn
         ; call the appropriate phase handler
@@ -426,12 +424,13 @@ phase_boss_dying: subroutine
 	lda phase_spawn_counter
         bne .dont_init
         jsr song_stop
+        ; calculate length of boss death
+        ; 8 frame increments
         lda phase_level
         clc
-        adc #$01
-        asl
-        asl
-        asl
+        adc #$02
+        asl ; ( phase level + 2 ) * 2 = 4, 6, 8, 10
+        adc #$08 ; + 8 = 12, 14, 16, 18
         sta state_v0
         inc phase_spawn_counter
 .dont_init
