@@ -26,7 +26,6 @@ starfield_twinkle_reset: subroutine
         
         
 starfield_speed_increase
-	jsr starfield_speed_increase
         ; increase star speed
         lda #57
         clc

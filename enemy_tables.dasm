@@ -45,7 +45,7 @@ enemy_hitpoints_table:
 	byte $0b ; dumbface
 	byte $0d ; throber
 	byte $11 ; ant
-	byte $2f ; lasso
+	byte $35 ; lasso
 	byte $1d ; uzi
 	byte $3f ; boss_scarab
 	byte $3f ; boss_vamp
@@ -95,7 +95,7 @@ enemy_player_collision_table:
 	byte $0b ; dumbface
 	byte $0d ; throber
 	byte $11 ; ant
-	byte $2f ; lasso
+	byte $35 ; lasso
 	byte $1d ; uzi
 	byte $3f ; boss_scarab
 	byte $3f ; boss_vamp

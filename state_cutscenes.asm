@@ -6,7 +6,14 @@ cut_scene_update_generic: subroutine
         ora player_a_d
         cmp #$00
         beq .do_nothing
+        lda phase_end_game
+        beq .start_game
+        ; game complete go back to title screen
+        lda #0
+        bne .trigger_fadeout
+.start_game
         lda #2
+.trigger_fadeout
         jsr palette_fade_out_init
         jsr song_stop
 .do_nothing
@@ -41,6 +48,8 @@ cut_scene_intro_init: subroutine
         jsr nametable_tile_planter
         ; setup everything else
         lda #$00
+        sta scroll_page
+        sta scroll_x_hi
         jsr state_render_set_addr
         lda #$08
         jsr state_update_set_addr

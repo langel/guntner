@@ -34,6 +34,7 @@ game_init:
         jsr state_update_set_addr
         lda #$00
         sta attract_true
+        jsr clear_all_enemies
         jsr render_enable
         jsr palette_fade_in_init
         lda #2

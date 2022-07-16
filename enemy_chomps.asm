@@ -14,7 +14,6 @@ chomps_spawn: subroutine
 chomps_cycle: subroutine
         lda #$08
         sta collision_0_w
-        lda #$05
         sta collision_0_h
         jsr enemy_handle_damage_and_death
         

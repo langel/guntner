@@ -37,6 +37,7 @@ cart_start:	subroutine
         sta rng1
         lda #$ff
         sta rng2
+        sta dashboard_message
         
         lda #232
         sta scroll_y ; just seems right

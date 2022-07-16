@@ -334,16 +334,8 @@ title_screen_update: subroutine
         lda title_rudy_pos
         cmp #$01
         beq .goto_options
-.start_game
-        ;; disable start_d so game doesn't instantly pause
-        lda #$00
-        sta player_start_d
-        sta player_a_d
-        sta player_b_d
-        ; init cut scene 00
-        lda #3
-        jsr palette_fade_out_init
-        jsr clear_all_enemies
+.start_game:
+	jsr menu_start_game
         jmp .do_nothing
 .goto_options
 	lda #2
@@ -362,6 +354,16 @@ title_screen_update: subroutine
 	jmp state_update_done
         
 
+menu_start_game: subroutine
+        ;; disable start_d so game doesn't instantly pause
+        lda #$00
+        sta player_start_d
+        sta player_a_d
+        sta player_b_d
+        ; init cut scene 00
+        lda #3
+        jsr palette_fade_out_init
+	rts
   
 
 
@@ -378,12 +380,8 @@ options_screen_update: subroutine
         lda #$04 ; menu return pos
         cmp options_rudy_pos
         beq .dont_start_game
-        lda #$00
-        sta player_start_d
-        jsr game_init
-        lda #6
-        jsr state_update_set_addr
-        rts
+	jsr menu_start_game
+	jmp state_update_done
         
 .dont_start_game
 	jsr options_screen_set_rudy_y

@@ -345,7 +345,10 @@ crossbones_cycle: subroutine
 	jmp update_enemies_handler_next
         
 
-        
+      
+    
+game_difficulty_damage_table:
+	byte #58, #77, #109, #191  
         
 enemy_handle_damage_and_death: subroutine
 	; x = enemy ram offset
@@ -358,9 +361,13 @@ enemy_handle_damage_and_death: subroutine
         beq .no_collision
 ; handle player collision
 	; player damage
-        ldy enemy_ram_type,x
-        lda enemy_player_collision_table,y
-        ldy enemy_ram_ex,x
+	; XXX put damage amount in player_damage
+        ; XXX this might be set in 3 different places rn
+        ldy game_difficulty
+        lda game_difficulty_damage_table,y
+        ;ldy enemy_ram_type,x
+        ;lda enemy_player_collision_table,y
+        ;ldy enemy_ram_ex,x
         sta player_damage
         jsr player_take_damage
         jsr sfx_player_damage
