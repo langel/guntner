@@ -29,6 +29,11 @@ phase_handling_stuff
         
         
 phase_handler: subroutine
+	; only advance phase activity if player is alive
+	lda player_death_flag
+        beq .player_not_dead
+        rts
+.player_not_dead
         ; always check if its time for an interval spawn
         jsr phase_interval_spawn
         ; call the appropriate phase handler
