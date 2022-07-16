@@ -126,6 +126,11 @@ sprite_4_set_y: subroutine
 	sta oam_ram_y+12,y
 	rts
         
+sprite_2_dead_cleanup: subroutine
+	lda #$ff
+        sta oam_ram_y+4,y
+        rts
+        
 sprite_4_dead_cleanup: subroutine
 	lda #$04 ; move first sprite over 4 pixels
         clc
@@ -434,10 +439,17 @@ enemy_handle_damage_and_death: subroutine
         ldx enemy_ram_offset
         ldy enemy_oam_offset
 ; 4 sprite cleanup
-	cpx #$80
+	cpx #$a0
         bcc .dont_cleanup_4_sprite
         jsr sprite_4_dead_cleanup
+        bne .check_for_powerup_drop
 .dont_cleanup_4_sprite
+; 2 sprite cleanup
+	cpx #$80
+        bcc .dont_cleanup_2_sprite
+	jsr sprite_2_dead_cleanup
+.dont_cleanup_2_sprite
+.check_for_powerup_drop
 ; starglasses 
         lda enemy_ram_type,x
         cmp #starglasses_id

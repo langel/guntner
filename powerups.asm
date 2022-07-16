@@ -53,6 +53,7 @@ powerups_cycle: subroutine
 	ldx enemy_ram_offset
         ldy enemy_oam_offset
         lda oam_ram_x,y
+        sbc #3
         sta collision_0_x
         lda oam_ram_y,y
         sbc #3
