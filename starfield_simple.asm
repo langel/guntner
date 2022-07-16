@@ -223,25 +223,29 @@ starfield_scroll: subroutine
 
 
 starfield_twinkle_colors: subroutine
+	lda wtf
+        and #$07
+        bne .done
 	; color 0
         lda starfield_color0
         jsr palette_next_rainbow_color
         sta starfield_color0
         sta pal_bg_0_1
         clc
-        adc #$21
+        adc #$11
         sta pal_bg_0_2
-        adc #$0d
+        adc #$0e
         sta pal_bg_0_3
         ; color 1
         lda starfield_color1
         jsr palette_next_rainbow_color
         sta starfield_color1
         sta pal_bg_1_1
-        adc #$21
+        adc #11
         sta pal_bg_1_2
-        adc #$0d
+        adc #$0e
         sta pal_bg_1_3
+.done
 	rts
         
 

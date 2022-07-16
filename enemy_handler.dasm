@@ -348,8 +348,10 @@ crossbones_cycle: subroutine
         
     
 game_difficulty_damage_table:
+	;hits to die	 13   10    7    5 
+        byte		#20, #26, #37, #58
 	;hits to die	 23   17   11    5 
-	byte 		#11, #15, #25, #58
+	;byte 		#11, #15, #25, #58
         ;hits to die	5    4    3     2
 	;byte 		#58, #77, #109, #191  
         

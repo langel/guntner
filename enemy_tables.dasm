@@ -41,7 +41,7 @@ enemy_hitpoints_table:
 	byte $07 ; chomps
 	byte $09 ; maggs
 	byte $05 ; starglasses
-	byte $1d ; skully
+	byte $1f ; skully
 	byte $0b ; dumbface
 	byte $0d ; throber
 	byte $11 ; ant
@@ -74,8 +74,6 @@ enemy_player_points_table:
 	byte $00, $00, $00, $7b ; uzi
 	byte $0b, $c6, $01, $1f ; boss_scarab
 	byte $15, $cc, $8f, $4b ; boss_vamp
-
-
 
 enemy_size_table:
 	byte $00 ; null

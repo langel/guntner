@@ -119,9 +119,11 @@ palette_next_rainbow_color: subroutine
         sec
         sbc #$0c
         rts
+        
      
 bomb_bg_animation_table: 
 	.byte $0f,$07,$06,$05,$16,$26,$27,$28,$37,$38,$30
+     
      
 palette_update: subroutine
 ; shroom
