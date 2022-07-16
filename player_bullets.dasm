@@ -183,53 +183,6 @@ player_bullets_check_controls: subroutine
         
 
 
-	lda #$01
-        sta temp00
-	; check for r_bag status
-        lda r_bag_counter
-        cmp #$02
-        bcc .not_r_bag_turbo
-        jsr player_gun_fire
-        dec r_bag_counter
-        jmp .done
-.not_r_bag_turbo
-	; check if a button is pressed
-        lda player_a
-        cmp #$ff
-        bne .not_turbo
-        ; damage from turbo gun
-	lda wtf
-        and #$02
-        cmp #$02
-        bne .no_turbo_damage
-        lda #$03
-        sta player_damage
-        jsr player_take_damage
-.no_turbo_damage
-        jsr player_gun_fire
-        jmp .done
-.not_turbo
-	; check if b button has been pressed
-        lda r_bag_counter
-        cmp #$00
-        beq .no_r_bag_rapid
-        lda player_b
-        cmp #$ff
-        bne .done
-        lda wtf
-        and #$0f
-        beq .normal_fire
-.no_r_bag_rapid
-	lda player_b_d
-        cmp #$ff
-        bne .done
-;.normal_fire
-	lda #$00
-        sta temp00
-        jsr player_gun_fire
-.done
-	rts
-        
         
 
         

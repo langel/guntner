@@ -37,7 +37,7 @@ attract_update: subroutine
 	jmp state_update_done
 .menu_return_buttons_not_pressed
 	lda wtf
-        and #$03
+        and #$07
         bne .no_enemy_spawn
 	jsr attract_spawn_enemy
 .no_enemy_spawn
@@ -51,32 +51,35 @@ attract_update: subroutine
 	jmp state_update_done
         
         
-attract_spawn_table:
-	byte #birb_id, #birb_id, #birb_id
-        byte #skeet_id, #skeet_id
-        byte #spark_id, #spark_id
-        byte #zigzag_id, #zigzag_id
-        byte #maggs_id
-        byte #starglasses_id, #starglasses_id, #starglasses_id
-        byte #skully_id, #skully_id, #skully_id
-        ;byte #dumbface_id, #dumbface_id
         
 attract_spawn_enemy: subroutine
-	lda wtf
-        and #$07
-        beq .spawn
-.done
-        rts
-.spawn
-        lda rng0
-        lsr
-        and #$0f
-        tax
-        ldy attract_spawn_table,x
-        sty phase_spawn_type
-        jsr enemy_slot_from_type
+	lda $03a0
+        bne .no_starglasses
+        ldx #$a0
+        lda #starglasses_id
+        bne .delegate
+.no_starglasses
+	jsr get_enemy_slot_1_sprite
         cmp #$ff
-        beq .done
+        beq .no_birb
         tax
-        lda phase_spawn_type
-	jmp enemy_spawn_delegator
+        lda #birb_id
+        bne .delegate
+.no_birb
+	jsr get_enemy_slot_2_sprite
+        cmp #$ff
+        beq .no_maggs
+        tax
+        lda #maggs_id
+        bne .delegate
+.no_maggs
+	jsr get_enemy_slot_4_sprite
+        tax
+        lda #skully_id
+        cpx #$c0
+        bcc .delegate
+	rts
+.delegate
+        jmp enemy_spawn_delegator
+
+

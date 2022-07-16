@@ -46,7 +46,7 @@ player_game_reset: subroutine
         ldx game_difficulty
         lda player_gun_strength_per_difficulty,x
         sta player_gun_str
-        lda #$08
+        lda #$0f
         sta player_autofire_s
         rts
         
