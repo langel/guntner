@@ -1,14 +1,32 @@
 	
 	
-spawning refactor
-	phase method to spawn formations
-sprite stars handled by enemy_handler?
-scroll_x_hi & scroll_x_lo
-	
+
 
 tools? #nesdev #GunTneR [ !ks for info ]\
 
 
+249/year agent services
+280/year total compliance
+510/year
+
+159/month full survice tax
+49/month legal protect
+218/month
+
+* 12 = 2616 + 510
+3126/year
+260.5/month
+
+fix these:
+	vampire doesn't always show hit/damage?
+	
+	test - start on end scene should go back to menu
+	test - pause enemy spawns during player death animation
+	
+	more forgiving autofire
+	
+	mask doesn't always give life and leave on player death
+	random game reset happened in easiest mode
 
 enemies
 	muya
@@ -20,8 +38,6 @@ bosses
 difficulty
 	?adjust xp values?
 	player damage from enemies
-phases
-	handle different level interval spawns
 game over glitches
 
 
