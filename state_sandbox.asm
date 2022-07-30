@@ -40,6 +40,26 @@ sandbox_init: subroutine
         lda #zigzag_id
         jsr enemy_spawn_delegator
         
+	jsr get_enemy_slot_1_sprite
+        tax
+        lda #zigzag_id
+        jsr enemy_spawn_delegator
+        
+	jsr get_enemy_slot_1_sprite
+        tax
+        lda #zigzag_id
+        jsr enemy_spawn_delegator
+        
+	jsr get_enemy_slot_1_sprite
+        tax
+        lda #zigzag_id
+        jsr enemy_spawn_delegator
+        
+	jsr get_enemy_slot_1_sprite
+        tax
+        lda #zigzag_id
+        jsr enemy_spawn_delegator
+        
         
 	jsr get_enemy_slot_1_sprite
         tax

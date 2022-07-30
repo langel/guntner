@@ -373,6 +373,7 @@ sprite0_off:
 	include "apu_song.asm"
         nop	; how much prg space we using?
         
+;f9ea - optimized enemy code / using arctang more
 ;fbb8 - all audio done
 ;fa5d - phase engine and all text and distress alien
 ;f535 - super secret code / a new song

@@ -15,6 +15,7 @@ zigzag_spawn: subroutine
         sta enemy_ram_pc,x
         tax
         lda zigzag_dir_table,x
+        ldx enemy_ram_offset
         sta enemy_ram_ex,x
         ; set position
         jmp enemy_spawn_set_x_y_rng
@@ -78,9 +79,5 @@ zigzag_cycle: subroutine
         lda zigzag_att_table,y
         ldy enemy_oam_offset
         jsr enemy_set_palette
-.go_done
-	lda oam_ram_y,y
-        jsr enemy_fix_y_visible
-        sta oam_ram_y,y
-.done
+        
 	jmp update_enemies_handler_next
