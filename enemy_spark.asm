@@ -1,4 +1,10 @@
 
+	;       U     R     D     L
+spark_dir_x_table:
+	byte #$00, #$01, #$00, #$ff
+spark_dir_y_table:
+	byte #$ff, #$00, #$01, #$00
+
 spark_spawn: subroutine
 	; x = slot in enemy ram
         ; y = boss slot in enemy ram
@@ -8,15 +14,13 @@ spark_spawn: subroutine
         sta enemy_ram_y,x
         rts
 
-
 spark_cycle: subroutine
         lda #$08
         sta collision_0_w
         sta collision_0_h
         jsr enemy_handle_damage_and_death
-        
-	inc enemy_ram_ac,x
-        lda enemy_ram_ac,x
+        ; change direction?
+        lda wtf
         and #$07
         bne .dont_reset_dir
 ; 50% chance of downward movement
@@ -33,34 +37,24 @@ spark_cycle: subroutine
         sta enemy_ram_ex,x
 .reset_done
 .dont_reset_dir
-        ; work out the direction
-        lda enemy_ram_ex,x
-        cmp #$00
-        beq .go_up
-        cmp #$01
-        beq .go_right
-        cmp #$02
-        beq .go_down
-.go_left
-	dec enemy_ram_x,x
-        bne .dir_done
-.go_up
-	dec enemy_ram_y,x
-        bne .dir_done
-        lda sprite_0_y
+        ; apply direction
+        ldy enemy_ram_ex,x
+        lda spark_dir_x_table,y
+        sta temp00
+        lda spark_dir_y_table,y
+        sta temp01
+        ldy enemy_oam_offset
+        lda enemy_ram_x,x
+        clc
+        adc temp00
+        sta enemy_ram_x,x
+        sta oam_ram_x,y
+        lda enemy_ram_y,x
+        clc
+        adc temp01
+        jsr enemy_fix_y_visible
         sta enemy_ram_y,x
-        bne .dir_done
-.go_right
-	inc enemy_ram_x,x
-        bne .dir_done
-.go_down
-	inc enemy_ram_y,x
-	lda enemy_ram_y,x
-        cmp sprite_0_y
-        bcc .dir_done
-        lda #$00
-        sta enemy_ram_y,x
-.dir_done
+        sta oam_ram_y,y
 	; attributes
         jsr get_next_random
         sta oam_ram_att,y
@@ -70,10 +64,5 @@ spark_cycle: subroutine
         clc
         adc #$6c
         sta oam_ram_spr,y
-        ; x and y pos
-	lda enemy_ram_x,x
-        sta oam_ram_x,y
-        lda enemy_ram_y,x
-        sta oam_ram_y,y
 .done
 	jmp update_enemies_handler_next

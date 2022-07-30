@@ -17,33 +17,7 @@ zigzag_spawn: subroutine
         lda zigzag_dir_table,x
         sta enemy_ram_ex,x
         ; set position
-        jsr get_next_random
-        lsr
-        and #$01
-        bne .rng_y
-.rng_x
-	lda rng0
-        sta oam_ram_x,y
-        lda rng0
-        and #$80
-        bne .on_top
-.on_bottom
-	lda sprite_0_y
-        sta oam_ram_y,y
-.on_top
-        rts
-.rng_y
-	jsr enemy_spawn_random_y_pos
-        sta oam_ram_y,y
-        lda rng0
-        and #$80
-        bne .on_left
-.on_right
-	lda #$ff
-        sta oam_ram_y,y
-.on_left
-        rts
-        
+        jmp enemy_spawn_set_x_y_rng
 
 
 zigzag_cycle: subroutine

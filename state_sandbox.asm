@@ -41,6 +41,26 @@ sandbox_init: subroutine
         jsr enemy_spawn_delegator
         
         
+	jsr get_enemy_slot_1_sprite
+        tax
+        lda #spark_id
+        jsr enemy_spawn_delegator
+        
+	jsr get_enemy_slot_1_sprite
+        tax
+        lda #spark_id
+        jsr enemy_spawn_delegator
+        
+	jsr get_enemy_slot_1_sprite
+        tax
+        lda #skeet_id
+        jsr enemy_spawn_delegator
+        
+	jsr get_enemy_slot_1_sprite
+        tax
+        lda #skeet_id
+        jsr enemy_spawn_delegator
+        
         
 	jsr get_enemy_slot_4_sprite
         tax
@@ -67,10 +87,8 @@ sandbox_init: subroutine
         
 	jsr get_enemy_slot_4_sprite
         tax
-        ;ldx #$c8
         lda #throber_id
         ;jsr enemy_spawn_delegator
-        ;jsr throber_spawn
         
         ;lda #$40
         lda #$ff

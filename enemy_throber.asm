@@ -49,9 +49,6 @@ throber_cycle: subroutine
         lda oam_ram_x,y
         jsr sprite_4_set_x
         lda oam_ram_y,y
-        jsr enemy_fix_y_visible
-        sta oam_ram_y,y
-.y_viewable
         jsr sprite_4_set_y
         lda #$03
         jsr sprite_4_set_palette

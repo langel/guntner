@@ -141,7 +141,22 @@ enemy_get_direction_of_player:
 
         
         
-        
+   
+arctang_bound_dir: subroutine
+	; a = value to be bounded
+        ; returns value 0..23 in a
+        bpl .check_above_24
+.below_0
+	clc
+        adc #24
+        rts
+.check_above_24
+	cmp #23 ; XXX this might need to be 24
+        bcc .bounded
+        sec
+        sbc #24
+.bounded
+	rts
 
         
 
@@ -235,6 +250,7 @@ enemy_update_arctang_path:
         jsr arctang_update_y
         ldy enemy_oam_offset
         lda temp00
+        jsr enemy_fix_y_visible
         sta oam_ram_y,y
 	ldx enemy_ram_offset
         lda temp01
