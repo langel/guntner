@@ -107,7 +107,7 @@ boss_scarab_cycle: subroutine
         jsr sprite_4_set_x
         lda state_v5
         sec
-        sbc #$c
+        sbc #$0c
         sbc state_v7
         jsr sprite_4_set_y
         lda #$80
@@ -137,7 +137,7 @@ boss_scarab_cycle: subroutine
         jsr sprite_4_set_x
         lda state_v5
         clc
-        adc #$c
+        adc #$0c
         adc state_v7
         jsr sprite_4_set_y
         lda #$80
@@ -161,29 +161,18 @@ boss_scarab_cycle: subroutine
 	; palette
 	lda #$01
         ldy enemy_oam_offset
-        jsr enemy_set_palette
-        sta oam_ram_att+4,y
-        sta oam_ram_att+8,y
-        sta oam_ram_att+$c,y
+        jsr sprite_4_set_palette
         clc
         adc #$01
-        sta oam_ram_att+$10,y
-        sta oam_ram_att+$14,y
-        sta oam_ram_att+$18,y
-        sta oam_ram_att+$1c,y
-        sta oam_ram_att+$20,y
-        sta oam_ram_att+$24,y
-        sta oam_ram_att+$28,y
-        sta oam_ram_att+$2c,y
+        ldy #$90
+        jsr sprite_4_set_palette
+        ldy #$a0
+        jsr sprite_4_set_palette
         ora #$80
-        sta oam_ram_att+$30,y
-        sta oam_ram_att+$34,y
-        sta oam_ram_att+$38,y
-        sta oam_ram_att+$3c,y
-        sta oam_ram_att+$40,y
-        sta oam_ram_att+$44,y
-        sta oam_ram_att+$48,y
-        sta oam_ram_att+$4c,y
+        ldy #$b0
+        jsr sprite_4_set_palette
+        ldy #$c0
+        jsr sprite_4_set_palette
         
 ; SHOOT
 	lda wtf

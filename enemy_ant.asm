@@ -104,10 +104,7 @@ ant_cycle: subroutine
         jsr sprite_4_set_sprite_flip
         lda #$81
 .ant_pos_done
-        jsr enemy_set_palette
-        sta oam_ram_att+4,y
-        sta oam_ram_att+8,y
-        sta oam_ram_att+12,y
+        jsr sprite_4_set_palette
 .done
 	jmp update_enemies_handler_next
         

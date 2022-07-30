@@ -6,7 +6,6 @@ throber_spawn: subroutine
         sta oam_ram_y,y   ; y pos
         lda #$00
         sta oam_ram_x,y   ; x pos
-        sta enemy_ram_ex,x
    	rts
         
         
@@ -29,8 +28,8 @@ throber_cycle: subroutine
         ldx enemy_ram_offset
         cmp #$05
         bcc .do_movement
-        cmp #$05
         bne .dont_change_dir
+.update_direction
         jsr enemy_get_direction_of_player
         sta enemy_ram_ex,x
 .dont_change_dir
@@ -55,8 +54,5 @@ throber_cycle: subroutine
 .y_viewable
         jsr sprite_4_set_y
         lda #$03
-        jsr enemy_set_palette
-        sta oam_ram_att+4,y
-        sta oam_ram_att+8,y
-        sta oam_ram_att+12,y
+        jsr sprite_4_set_palette
 	jmp update_enemies_handler_next

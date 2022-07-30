@@ -1,56 +1,49 @@
+; pattern counter holds direction index 0..3
+zigzag_dir_table:
+	;     r/u   l/u   l/d   r/d
+	byte #$03, #$09, #$0f, #$15
+zigzag_att_table:
+	;     r/u   l/u   l/d   r/d
+        byte #$81, #$c1, #$41, #$01 
+
+
 zigzag_spawn: subroutine
-	; x is set by enemy spawner
-	lda #zigzag_id
-        sta enemy_ram_type,x 
-        tay
-        lda enemy_hitpoints_table,y
-        sta enemy_ram_hp,x 
-        lda #$00
-        sta enemy_ram_x,x ; x pos
-        sta enemy_ram_pc,x ; pattern counter
-        sta enemy_ram_ac,x ; animation counter
+        ; set direction
         jsr get_next_random
         lsr
-        and #%00000011
-        cmp #$00
-        beq .spawn_left
-        cmp #$01
-        beq .spawn_top
-        cmp #$02
-        beq .spawn_right
-.spawn_bottom
-	lda rng0
-        sta enemy_ram_x,x
-        lda #$b0
-        sta enemy_ram_y,x
-        lda #$00
+        and #$03
+        sta enemy_ram_pc,x
+        tax
+        lda zigzag_dir_table,x
         sta enemy_ram_ex,x
-        jmp .dir_picked
-.spawn_left
-        lda #$00
-        sta enemy_ram_x,x
+        ; set position
+        jsr get_next_random
+        lsr
+        and #$01
+        bne .rng_y
+.rng_x
 	lda rng0
-        sta enemy_ram_y,x
-        lda #$01
-        sta enemy_ram_ex,x
-        jmp .dir_picked
-.spawn_top
-	lda rng0
-        sta enemy_ram_x,x
-        lda #$00
-        sta enemy_ram_y,x
-        lda #$02
-        sta enemy_ram_ex,x
-        jmp .dir_picked
-.spawn_right
-        lda #$f0
-        sta enemy_ram_x,x
-	lda rng0
-        sta enemy_ram_y,x
-        lda #$03
-        sta enemy_ram_ex,x
-.dir_picked
-	rts
+        sta oam_ram_x,y
+        lda rng0
+        and #$80
+        bne .on_top
+.on_bottom
+	lda sprite_0_y
+        sta oam_ram_y,y
+.on_top
+        rts
+.rng_y
+	jsr enemy_spawn_random_y_pos
+        sta oam_ram_y,y
+        lda rng0
+        and #$80
+        bne .on_left
+.on_right
+	lda #$ff
+        sta oam_ram_y,y
+.on_left
+        rts
+        
 
 
 zigzag_cycle: subroutine
@@ -58,13 +51,14 @@ zigzag_cycle: subroutine
         sta collision_0_w
         sta collision_0_h
         jsr enemy_handle_damage_and_death
-	; animation
-        inc enemy_ram_ac,x
-        lda enemy_ram_ac,x
-        cmp #$20
+        lda wtf
+        and #$03
         bne .dont_reset_ac
+	; animation
+        dec enemy_ram_ac,x
+        bpl .dont_reset_ac
         ; reset ac and pick new direction
-        lda #$00
+        lda #$05
         sta enemy_ram_ac,x
         ; get range 0..2 from 8bit value
         jsr get_next_random
@@ -81,68 +75,38 @@ zigzag_cycle: subroutine
 .dir_same
 	jmp .ac_reset_done
 .dir_add
-        inc enemy_ram_ex,x
-        lda enemy_ram_ex,x
-        cmp #$05
-        bne .ac_reset_done
-        lda #$00
-        sta enemy_ram_ex,x
+	inc enemy_ram_pc,x
         jmp .ac_reset_done
 .dir_sub
-        dec enemy_ram_ex,x
-        lda enemy_ram_ex,x
-        cmp #$ff
-        bne .ac_reset_done
-        lda #$00
-        sta enemy_ram_ex,x
+	dec enemy_ram_pc,x
 .ac_reset_done
-.dont_reset_ac
-        lda enemy_ram_ac,x
-        lsr
-        lsr
-        lsr
-        clc
-        adc #$5c ; base sprite tile
-	ldx enemy_ram_offset
+	lda enemy_ram_pc,x
+        and #$03
+        tay
+        lda zigzag_dir_table,y
+        sta enemy_ram_ex,x
         ldy enemy_oam_offset
+.dont_reset_ac
+        ; set sprite
+        lda enemy_ram_ac,x
+        clc
+        adc #$5a ; base sprite tile
         sta oam_ram_spr,y
+        
         ; work out the direction
-        lda enemy_ram_ex,x
-        cmp #$00
-        beq .go_right_up
-        cmp #$01
-        beq .go_right_down
-        cmp #$02
-        beq .go_left_down
-.go_left_up
-	dec enemy_ram_x,x
-        dec enemy_ram_y,x
-        lda #$d1
-        jsr enemy_set_palette
-        bcc .go_done
-.go_right_up
-	inc enemy_ram_x,x
-        dec enemy_ram_y,x
-        lda #$a1
-        jsr enemy_set_palette
-        bcc .go_done
-.go_right_down
-	inc enemy_ram_x,x
-        inc enemy_ram_y,x
-        lda #$21
-        jsr enemy_set_palette
-        bcc .go_done
-.go_left_down
-        dec enemy_ram_x,x
-        inc enemy_ram_y,x
-        lda #$61
+        lda #<arctang_velocity_1.25
+        sta arctang_velocity_lo
+        jsr enemy_update_arctang_path
+        
+        lda enemy_ram_pc,x
+        and #$03
+        tay
+        lda zigzag_att_table,y
+        ldy enemy_oam_offset
         jsr enemy_set_palette
 .go_done
-        lda enemy_ram_x,x
-        sta oam_ram_x,y
-        lda enemy_ram_y,x
+	lda oam_ram_y,y
         jsr enemy_fix_y_visible
-        sta enemy_ram_y,x
-        sta oam_ram_y,y       
+        sta oam_ram_y,y
 .done
 	jmp update_enemies_handler_next

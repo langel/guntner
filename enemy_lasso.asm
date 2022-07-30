@@ -79,10 +79,7 @@ lasso_cycle: subroutine
         
         ; palette & attributes
         lda #$02
-        jsr enemy_set_palette
-        sta oam_ram_att+4,y
-        sta oam_ram_att+8,y
-        sta oam_ram_att+$c,y
+        jsr sprite_4_set_palette
         
 .done
 	jmp update_enemies_handler_next

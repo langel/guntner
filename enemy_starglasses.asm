@@ -67,17 +67,13 @@ starglasses_cycle: subroutine
 	and #$40
 	beq .frame1
 .frame0
-	lda #$0c
-        jsr sprite_4_set_sprite
-	jmp .frame_done
+	lda #$7a
+	bne .frame_done
 .frame1
-	lda #$0e
-        jsr sprite_4_set_sprite
+	lda #$7c
 .frame_done
+        jsr sprite_4_set_sprite
         lda #$03
-        jsr enemy_set_palette
-        sta oam_ram_att+4,y
-        sta oam_ram_att+8,y
-        sta oam_ram_att+12,y
+        jsr sprite_4_set_palette
 .done
 	jmp update_enemies_handler_next

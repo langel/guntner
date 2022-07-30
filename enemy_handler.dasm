@@ -63,6 +63,16 @@ enemy_spawn_delegator: subroutine
         sta temp03
         jmp (temp02)
         
+        
+sprite_4_set_palette: subroutine
+	; a = palette id
+        ; x = enemy ram offset
+        ; y = oam ram offset
+	jsr enemy_set_palette
+        sta oam_ram_att+$04,y
+        sta oam_ram_att+$08,y
+        sta oam_ram_att+$0c,y
+        rts
 
 sprite_4_set_sprite: subroutine
 	; a = top left tile id
@@ -89,20 +99,6 @@ sprite_4_set_sprite_flip: subroutine
 	adc #$01
 	sta oam_ram_spr+4,y
         rts
-        
-sprite_4_set_sprite_mirror: subroutine
-	; a = top left tile id
-        ; y = oam ram offset
-	sta oam_ram_spr+4,y
-        clc
-        adc #$01
-	sta oam_ram_spr+0,y
-        adc #$0f
-	sta oam_ram_spr+12,y
-	adc #$01
-	sta oam_ram_spr+8,y
-        rts
-	
         
 sprite_4_set_x: subroutine
 	; a = x pos
@@ -193,20 +189,21 @@ enemy_death: subroutine
         ; clear OAM data
         ldy enemy_oam_offset
         lda #$ff
-        sta oam_ram_x,y
-        sta oam_ram_y,y
-        sta oam_ram_spr,y
-        sta oam_ram_att,y
+        ldx #$03
+.enemy_oam_loop
+	sta oam_ram_x,y
+        iny
+        dex
+        bne .enemy_oam_loop
         ; clear enemy data
-        lda #$00
 	ldx enemy_ram_offset
+        lda #$00
+	ldy #$06 ; 7 would clear _ex
+.enemy_ram_loop
         sta enemy_ram_type,x
-        sta enemy_ram_x,x
-        sta enemy_ram_y,x
-        sta enemy_ram_hp,x
-        sta enemy_ram_pc,x
-        sta enemy_ram_ac,x
-        sta enemy_ram_hc,x
+        inx
+        dey
+        bne .enemy_ram_loop
         ; enemy_ram_ex is allowed to carry over
         ; entities using _ex should set it on spawn
         rts
@@ -339,7 +336,7 @@ crossbones_cycle: subroutine
         cmp sprite_0_y
         bcs .crossbones_death
         sta oam_ram_y,y
-        lda #$0b
+        lda #$c1
         sta oam_ram_spr,y
         lda #$03
         sta oam_ram_att,y

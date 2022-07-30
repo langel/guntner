@@ -208,10 +208,7 @@ boss_vamp_cycle: subroutine
         jsr sprite_4_set_sprite
         ; palette
         lda #$02
-        jsr enemy_set_palette
-        sta oam_ram_att+4,y
-        sta oam_ram_att+8,y
-        sta oam_ram_att+12,y
+        jsr sprite_4_set_palette
         cmp #$02
         beq .not_hit
         lda #$20

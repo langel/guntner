@@ -23,24 +23,39 @@ sandbox_init: subroutine
         
  
         
-        ldx #$80
-        ;jsr chomps_spawn
-        ldx #$88
-        ;jsr chomps_spawn
+        ;ldx #$80
+        ;lda #chomps_id
+        ;jsr enemy_spawn_delegator
+        ;ldx #$88
+        ;lda #chomps_id
+        ;jsr enemy_spawn_delegator
+        
+	jsr get_enemy_slot_1_sprite
+        tax
+        lda #zigzag_id
+        jsr enemy_spawn_delegator
+        
+	jsr get_enemy_slot_1_sprite
+        tax
+        lda #zigzag_id
+        jsr enemy_spawn_delegator
+        
+        
         
 	jsr get_enemy_slot_4_sprite
         tax
-        jsr ant_spawn
+        ;lda #dumbface_id
+        lda #ant_id
+        jsr enemy_spawn_delegator
         
 	jsr get_enemy_slot_4_sprite
         tax
-        jsr ant_spawn
+        lda #ant_id
+        jsr enemy_spawn_delegator
         
-	jsr get_enemy_slot_4_sprite
-        tax
-        jsr uzi_spawn
-	;jsr boss_vamp_spawn
-        ;jsr boss_scarab_spawn
+        ;lda #boss_scarab_id
+        lda #boss_vamp_id
+        ;jsr enemy_spawn_delegator
         
 	jsr get_enemy_slot_4_sprite
         tax
@@ -52,7 +67,9 @@ sandbox_init: subroutine
         
 	jsr get_enemy_slot_4_sprite
         tax
-        ldx #$c8
+        ;ldx #$c8
+        lda #throber_id
+        ;jsr enemy_spawn_delegator
         ;jsr throber_spawn
         
         ;lda #$40

@@ -1,6 +1,6 @@
 
 oam_ram_rudy		EQU $0204
-player_dead_tile	EQM $0a
+player_dead_tile	EQM $c0
 
 
 player_game_reset: subroutine
