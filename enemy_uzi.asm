@@ -77,45 +77,39 @@ bullet_spawn: subroutine
         clc
         adc #$03
         sta enemy_ram_y,x
-        ; trigger sfx
-        jsr sfx_shoot_bullet
         ; animate uzi kickback
         ldx enemy_ram_offset
         lda enemy_ram_ac,x
         clc
         adc #$05 ; kickback in pixels
         sta enemy_ram_ac,x
+        ; trigger sfx
+        jsr sfx_shoot_bullet
 .done
 	rts
         
 bullet_cycle: subroutine
-	; check for player collision
         lda #$08
         sta collision_0_w
         lda #$04
         sta collision_0_h
-        ; XXX might be redundant with dart code
-        lda oam_ram_x,y
-        sta collision_0_x
-        lda oam_ram_y,y
-        sta collision_0_y
-        jsr player_collision_detect
-        beq .no_collision
-        jsr enemy_gives_damage
-        jmp .despawn
-.no_collision
+        jsr enemy_handle_damage_and_death
+        ; animate gleam
 	lda wtf
+        lsr
         and #$01
         clc
         adc #$ee
         sta oam_ram_spr,y
+        ; move to the right
         lda enemy_ram_x,x
         adc #$03
         sta enemy_ram_x,x
+        ; despawn check
         cmp #$08
         bcs .dont_despawn
 .despawn
-	jsr enemy_death
+	jmp enemy_death
 .dont_despawn
         sta oam_ram_x,y
         lda enemy_ram_y,x

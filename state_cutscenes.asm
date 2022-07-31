@@ -10,7 +10,7 @@ cut_scene_update_generic: subroutine
         beq .start_game
         ; game complete go back to title screen
         lda #0
-        bne .trigger_fadeout
+        beq .trigger_fadeout
 .start_game
         lda #2
 .trigger_fadeout
