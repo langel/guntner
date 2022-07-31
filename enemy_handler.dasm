@@ -601,7 +601,6 @@ get_enemy_slot_1_sprite: subroutine
 	tax
         stx temp00
         lda $0300,x
-        cmp #$00
         beq .slot_found
         lda #$08
         clc
@@ -621,7 +620,6 @@ get_enemy_slot_2_sprite: subroutine
 	tax
         stx temp00
         lda $0300,x
-        cmp #$00
         beq .slot_found
         lda #$08
         clc
@@ -641,7 +639,6 @@ get_enemy_slot_4_sprite: subroutine
 	tax
         stx temp00
         lda $0300,x
-        cmp #$00
         beq .slot_found
         lda #$08
         clc

@@ -53,12 +53,14 @@ attract_update: subroutine
         
         
 attract_spawn_enemy: subroutine
+	; starglasses
 	lda $03a0
         bne .no_starglasses
         ldx #$a0
         lda #starglasses_id
         bne .delegate
 .no_starglasses
+	; birb
 	jsr get_enemy_slot_1_sprite
         cmp #$ff
         beq .no_birb
@@ -66,6 +68,7 @@ attract_spawn_enemy: subroutine
         lda #birb_id
         bne .delegate
 .no_birb
+	; maggs
 	jsr get_enemy_slot_2_sprite
         cmp #$ff
         beq .no_maggs
@@ -73,6 +76,7 @@ attract_spawn_enemy: subroutine
         lda #maggs_id
         bne .delegate
 .no_maggs
+	; skully
 	jsr get_enemy_slot_4_sprite
         tax
         lda #skully_id
