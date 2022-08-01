@@ -582,16 +582,13 @@ enemy_slot_from_type: subroutine
         ldx enemy_size_table,y
         cpx #1
         bne .not_size_1
-	jsr get_enemy_slot_1_sprite
-        rts
+	jmp get_enemy_slot_1_sprite
 .not_size_1
 	cpx #2
         bne .not_size_2
-	jsr get_enemy_slot_2_sprite
-        rts
+	jmp get_enemy_slot_2_sprite
 .not_size_2
-	jsr get_enemy_slot_4_sprite
-	rts
+	jmp get_enemy_slot_4_sprite
         
 
 get_enemy_slot_1_sprite: subroutine

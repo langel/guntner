@@ -85,6 +85,7 @@ bullet_spawn: subroutine
         sta enemy_ram_ac,x
         ; trigger sfx
         jsr sfx_shoot_bullet
+        
 .done
 	rts
         
