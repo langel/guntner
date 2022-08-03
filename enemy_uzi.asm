@@ -43,7 +43,7 @@ uzi_cycle: subroutine
 .bullet_spawn
 	lda rng0
         lsr
-        and #$0f
+        and #$07
         bne .dont_shoot
         jsr bullet_spawn  
         ; makes for less repetitive patterns
@@ -67,6 +67,7 @@ bullet_spawn: subroutine
         sta enemy_ram_type,x
         tay
         lda enemy_hitpoints_table,y
+        sta enemy_ram_hp,x
         ; x pos
         lda temp02
         clc
@@ -85,7 +86,6 @@ bullet_spawn: subroutine
         sta enemy_ram_ac,x
         ; trigger sfx
         jsr sfx_shoot_bullet
-        
 .done
 	rts
         
@@ -107,14 +107,16 @@ bullet_cycle: subroutine
         adc #$03
         sta enemy_ram_x,x
         ; despawn check
-        cmp #$08
+        cmp #$04
         bcs .dont_despawn
 .despawn
-	jmp enemy_death
+	jsr enemy_death
+        jmp .done
 .dont_despawn
         sta oam_ram_x,y
         lda enemy_ram_y,x
         sta oam_ram_y,y
 	lda #$01
         jsr enemy_set_palette
+.done
 	jmp update_enemies_handler_next

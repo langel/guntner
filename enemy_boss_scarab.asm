@@ -159,19 +159,19 @@ boss_scarab_cycle: subroutine
         jsr sprite_4_set_sprite_flip
         
 	; palette
-	lda #$01
+	lda #$02
         ldy enemy_oam_offset
         jsr sprite_4_set_palette
         clc
         adc #$01
-        ldy #$90
+        ldy #$c0
         jsr sprite_4_set_palette
-        ldy #$a0
+        ldy #$d0
         jsr sprite_4_set_palette
         ora #$80
-        ldy #$b0
+        ldy #$e0
         jsr sprite_4_set_palette
-        ldy #$c0
+        ldy #$f0
         jsr sprite_4_set_palette
         
 ; SHOOT

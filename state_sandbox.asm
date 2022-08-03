@@ -21,7 +21,7 @@ sandbox_init: subroutine
         sta state_v6
         sta state_v7
         
- 
+        
         
         ;ldx #$80
         ;lda #chomps_id
@@ -30,49 +30,23 @@ sandbox_init: subroutine
         ;lda #chomps_id
         ;jsr enemy_spawn_delegator
         
-        
 	jsr get_enemy_slot_1_sprite
         tax
         lda #spark_id
-        jsr enemy_spawn_delegator
+        ;jsr enemy_spawn_delegator
         
-	jsr get_enemy_slot_1_sprite
-        tax
-        lda #spark_id
-        jsr enemy_spawn_delegator
-        
-	jsr get_enemy_slot_1_sprite
-        tax
-        lda #skeet_id
-        jsr enemy_spawn_delegator
-        
-	jsr get_enemy_slot_1_sprite
-        tax
-        lda #skeet_id
-        jsr enemy_spawn_delegator
         
         
 	jsr get_enemy_slot_4_sprite
         tax
         ;lda #dumbface_id
         lda #ant_id
-        jsr enemy_spawn_delegator
-        
-	jsr get_enemy_slot_4_sprite
-        tax
-        lda #uzi_id
-        jsr enemy_spawn_delegator
-        
-        ;lda #boss_scarab_id
-        lda #boss_vamp_id
         ;jsr enemy_spawn_delegator
         
 	jsr get_enemy_slot_4_sprite
         tax
-	;jsr starglasses_spawn
-	jsr get_enemy_slot_4_sprite
-        tax
-	;jsr starglasses_spawn
+        lda #uzi_id
+        ;jsr enemy_spawn_delegator
         
         
 	jsr get_enemy_slot_4_sprite
@@ -103,30 +77,8 @@ sandbox_init: subroutine
         
         
 sandbox_update: subroutine
-	jsr get_enemy_slot_1_sprite
-        cmp #$ff
-        ;mp #$40
-        beq .no_enemy_spawn
-        tax
-        lda rng0
-        lsr
-        and #%00000010
-        cmp #$00
-        bne .zigzag
-        ;jsr skeet_spawn
-        ;jsr spark_spawn
-        jmp .no_enemy_spawn
-.zigzag
-        ;jsr zigzag_spawn
-.no_enemy_spawn
-	lda wtf
-        bne .no_noose
-	jsr get_enemy_slot_4_sprite
-        cmp #$ff
-        beq .no_noose
-        ;jsr lasso_spawn
-        
-.no_noose
+
+
 	; read user controls even in demo mode!
 	;jsr apu_game_music_frame
 

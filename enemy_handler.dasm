@@ -80,35 +80,35 @@ sprite_4_set_sprite: subroutine
 	sta oam_ram_spr,y
         clc
         adc #$01
-	sta oam_ram_spr+4,y
+	sta oam_ram_spr+$04,y
         adc #$0f
-	sta oam_ram_spr+8,y
+	sta oam_ram_spr+$08,y
 	adc #$01
-	sta oam_ram_spr+12,y
+	sta oam_ram_spr+$0c,y
         rts
         
 sprite_4_set_sprite_flip: subroutine
 	; a = top left tile id
         ; y = oam ram offset
-	sta oam_ram_spr+8,y
+	sta oam_ram_spr+$08,y
         clc
         adc #$01
-	sta oam_ram_spr+12,y
+	sta oam_ram_spr+$0c,y
         adc #$0f
-	sta oam_ram_spr+0,y
+	sta oam_ram_spr,y
 	adc #$01
-	sta oam_ram_spr+4,y
+	sta oam_ram_spr+$04,y
         rts
         
 sprite_4_set_x: subroutine
 	; a = x pos
         ; y = oam ram offset
 	sta oam_ram_x,y
-	sta oam_ram_x+8,y
+	sta oam_ram_x+$08,y
 	clc
 	adc #$08
-	sta oam_ram_x+4,y
-	sta oam_ram_x+12,y
+	sta oam_ram_x+$04,y
+	sta oam_ram_x+$0c,y
 	rts
         
 sprite_4_set_y: subroutine
@@ -220,7 +220,7 @@ enemy_death: subroutine
         lda #$ff
         ldx #$03
 .enemy_oam_loop
-	sta oam_ram_x,y
+	sta oam_ram_y,y
         iny
         dex
         bne .enemy_oam_loop
