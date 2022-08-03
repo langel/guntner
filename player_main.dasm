@@ -120,18 +120,22 @@ player_take_damage: subroutine
         
 set_player_sprite: subroutine
 	; sprite
-        lda #$8e
-        sta oam_ram_rudy+5
-        lda #$8f
+        lda #$4a
         sta oam_ram_rudy+1
+        lda #$4b
+        sta oam_ram_rudy+5
         ; x pos
         lda player_x_hi
         sta $207
         clc
         adc #$08
         sta $20b
+        ; y pos
+	lda player_y_hi
+        sta $204
+        sta $208
         ; attributes
-        lda #$40
+        lda #$00
         sta $206
         sta $20a
         
@@ -152,15 +156,12 @@ set_player_sprite: subroutine
         lsr
         and #$01
         beq .not_iframes
-        ; y pos
-	lda #$ff
-        sta $204
-        sta $208
+        ; iframes
+        lda #$4c
+        sta oam_ram_rudy+1
+        lda #$4d
+        sta oam_ram_rudy+5
         rts
 .not_iframes
-        ; y pos
-	lda player_y_hi
-        sta $204
-        sta $208
         rts
         
