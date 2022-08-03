@@ -119,11 +119,22 @@ player_take_damage: subroutine
         
         
 set_player_sprite: subroutine
-	; sprite
+	lda state_render_addr_lo
+        cmp #$ca
+        bne .not_menu_screens
+        ; sprite (menus)
+        lda #$8e
+        sta oam_ram_rudy+1
+        lda #$8f
+        sta oam_ram_rudy+5
+        bne .sprite_set
+.not_menu_screens
+	; sprite (game)
         lda #$4a
         sta oam_ram_rudy+1
         lda #$4b
         sta oam_ram_rudy+5
+.sprite_set
         ; x pos
         lda player_x_hi
         sta $207
@@ -152,7 +163,6 @@ set_player_sprite: subroutine
         beq .not_iframes
         dec state_iframes
         ; flash rudy based on iframe counter
-        lsr
         lsr
         and #$01
         beq .not_iframes
