@@ -17,11 +17,13 @@ tools? #nesdev #GunTneR [ !ks for info ]\
 3126/year
 260.5/month
 
+
 fix these:
 	vampire doesn't always show hit/damage?
+	brighter bg colors during boss death and hearts
 	
-	test - start on end scene should go back to menu
 	test - pause enemy spawns during player death animation
+	test - start on end scene should go back to menu
 	
 	more forgiving autofire
 	
@@ -30,8 +32,8 @@ fix these:
 
 enemies
 	muya
-	finger
 	ikes mom
+	finger
 bosses
 	lazerface
 	swordtner
@@ -39,7 +41,7 @@ difficulty
 	?adjust xp values?
 	player damage from enemies
 game over glitches
-
+player damage should use dithered transparency sprite instead of disappearing during iframes
 
 
 
