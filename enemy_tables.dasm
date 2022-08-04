@@ -1,4 +1,4 @@
-	; 24 enemy entities defined
+	; 25 enemy entities defined
 
 ; enemy id list: 
 null_id              EQM $00
@@ -15,16 +15,17 @@ dart_id              EQM $0a
 boss_vamp_bat_id     EQM $0b
 chomps_id            EQM $0c
 maggs_id             EQM $0d
-starglasses_id       EQM $0e
-skully_id            EQM $0f
-dumbface_id          EQM $10
-throber_id           EQM $11
-ant_id               EQM $12
-lasso_id             EQM $13
-uzi_id               EQM $14
-boss_scarab_id       EQM $15
-boss_vamp_id         EQM $16
-boss_swordtner_id    EQM $17
+muya_id              EQM $0e
+starglasses_id       EQM $0f
+skully_id            EQM $10
+dumbface_id          EQM $11
+throber_id           EQM $12
+ant_id               EQM $13
+lasso_id             EQM $14
+uzi_id               EQM $15
+boss_scarab_id       EQM $16
+boss_vamp_id         EQM $17
+boss_swordtner_id    EQM $18
 
 enemy_hitpoints_table:
 	byte $00 ; null
@@ -41,6 +42,7 @@ enemy_hitpoints_table:
 	byte $0a ; boss_vamp_bat
 	byte $07 ; chomps
 	byte $09 ; maggs
+	byte $0d ; muya
 	byte $05 ; starglasses
 	byte $1f ; skully
 	byte $0b ; dumbface
@@ -67,6 +69,7 @@ enemy_player_points_table:
 	byte $00, $01, $5a, $d5 ; boss_vamp_bat
 	byte $00, $03, $9b, $ad ; chomps
 	byte $00, $0b, $dc, $65 ; maggs
+	byte $00, $0e, $ea, $6f ; muya
 	byte $00, $0f, $4d, $f9 ; starglasses
 	byte $00, $78, $be, $ed ; skully
 	byte $00, $1d, $cb, $4f ; dumbface
@@ -93,6 +96,7 @@ enemy_size_table:
 	byte $01 ; boss_vamp_bat
 	byte $02 ; chomps
 	byte $02 ; maggs
+	byte $02 ; muya
 	byte $04 ; starglasses
 	byte $04 ; skully
 	byte $04 ; dumbface
@@ -119,6 +123,7 @@ enemy_update_table_lo:
 	byte <boss_vamp_bat_cycle
 	byte <chomps_cycle
 	byte <maggs_cycle
+	byte <muya_cycle
 	byte <starglasses_cycle
 	byte <skully_cycle
 	byte <dumbface_cycle
@@ -145,6 +150,7 @@ enemy_update_table_hi:
 	byte >boss_vamp_bat_cycle
 	byte >chomps_cycle
 	byte >maggs_cycle
+	byte >muya_cycle
 	byte >starglasses_cycle
 	byte >skully_cycle
 	byte >dumbface_cycle
@@ -171,6 +177,7 @@ enemy_spawn_table_lo:
 	byte <boss_vamp_bat_spawn
 	byte <chomps_spawn
 	byte <maggs_spawn
+	byte <muya_spawn
 	byte <starglasses_spawn
 	byte <skully_spawn
 	byte <dumbface_spawn
@@ -197,6 +204,7 @@ enemy_spawn_table_hi:
 	byte >boss_vamp_bat_spawn
 	byte >chomps_spawn
 	byte >maggs_spawn
+	byte >muya_spawn
 	byte >starglasses_spawn
 	byte >skully_spawn
 	byte >dumbface_spawn

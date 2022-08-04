@@ -344,6 +344,8 @@ sprite0_off:
         nop
 	include "enemy_maggs.asm"
         nop	; how much prg space we using?
+	include "enemy_muya.asm"
+	nop
 	include "enemy_lasso.asm"
         nop	; how much prg space we using?
 	include "enemy_skeet.asm"
