@@ -26,7 +26,7 @@ sandbox_init: subroutine
         
         ldx #$b8
         lda #boss_swordtner_id
-        ;jsr enemy_spawn_delegator
+        jsr enemy_spawn_delegator
         
         ; SWORDTNER palettes
         ldx #69
@@ -62,15 +62,6 @@ sandbox_init: subroutine
         lda #muya_id
         jsr enemy_spawn_delegator
         
-	jsr get_enemy_slot_2_sprite
-        tax
-        lda #muya_id
-        jsr enemy_spawn_delegator
-        
-	jsr get_enemy_slot_2_sprite
-        tax
-        lda #muya_id
-        jsr enemy_spawn_delegator
         
         
         

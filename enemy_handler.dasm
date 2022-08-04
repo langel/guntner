@@ -382,7 +382,7 @@ crossbones_cycle: subroutine
         sta oam_ram_spr,y
         lda #$03
         sta oam_ram_att,y
-        jmp .crossbones_done
+        bne .crossbones_done
 .crossbones_death
         jsr enemy_death
 .crossbones_done
