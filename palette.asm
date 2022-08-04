@@ -68,13 +68,15 @@ palette_table:
         hex 06 16 38
         hex 16 1a 30
         hex 13 21 30
-        ; #57 boss scarab palettes
+        ; #57 boss 
+        ; scarab palettes
         hex 03 1a 39 0c 27 37
-        ; #63 boss vamp+bats palettes
+        ; #63 boss 
+        ; vamp+bats palettes
         hex 12 21 30 15 00 37
-        ; #69 boss swordtner palettes
-        ; XXX filler not final
-        hex 12 21 30 15 00 37
+        ; #69 boss 
+        ; swordtner palettes
+        hex 07 17 3d 11 2d 31
         ; #75 boss lazerface palettes
         ; XXX filler not final
         hex 12 21 30 15 00 37
@@ -85,8 +87,9 @@ palette_boss_offset_table:
 	byte #57, #63, #69, #72
         
 palette_load:
-	; x = pal rom offset 
+	; x = palette table offset 
         ; y = pal ram offset
+        ; loads 1 set of 3 colors
         ; not used to write to main bg color
         lda #$02
         sta temp00

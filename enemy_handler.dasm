@@ -77,6 +77,15 @@ sprite_4_set_palette: subroutine
         sta oam_ram_att+$08,y
         sta oam_ram_att+$0c,y
         rts
+        
+sprite_4_set_palette_no_process: subroutine
+	; a = palette id
+        ; y = oam ram offset
+        sta oam_ram_att+$00,y
+        sta oam_ram_att+$04,y
+        sta oam_ram_att+$08,y
+        sta oam_ram_att+$0c,y
+        rts
 
 sprite_4_set_sprite: subroutine
 	; a = top left tile id

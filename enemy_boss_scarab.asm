@@ -93,6 +93,9 @@ boss_scarab_cycle: subroutine
         and #1
         sta state_v6
         
+        
+        ; XXX save some bytes making a loop here
+        
 	; top middle
 	lda #$10
         clc
@@ -162,17 +165,20 @@ boss_scarab_cycle: subroutine
 	lda #$02
         ldy enemy_oam_offset
         jsr sprite_4_set_palette
+        beq .hit
         clc
         adc #$01
+.hit
         ldy #$c0
-        jsr sprite_4_set_palette
+        jsr sprite_4_set_palette_no_process
         ldy #$d0
-        jsr sprite_4_set_palette
+        jsr sprite_4_set_palette_no_process
         ora #$80
         ldy #$e0
-        jsr sprite_4_set_palette
+        jsr sprite_4_set_palette_no_process
         ldy #$f0
-        jsr sprite_4_set_palette
+        jsr sprite_4_set_palette_no_process
+        
         
 ; SHOOT
 	lda wtf

@@ -29,19 +29,15 @@ sandbox_init: subroutine
         jsr enemy_spawn_delegator
         
         ; SWORDTNER palettes
-        lda #$07
-        sta pal_spr_2_1        
-        lda #$17
-        sta pal_spr_2_2        
-        lda #$3d
-        sta pal_spr_2_3
-        
-        lda #$0c
-        sta pal_spr_3_1        
-        lda #$2d
-        sta pal_spr_3_2        
-        lda #$31
-        sta pal_spr_3_3
+        ldx #69
+        ldy #18
+        jsr palette_load
+        ldx #72
+        ldy #21
+        jsr palette_load
+        ; eye pupil
+        lda #$16
+        sta pal_spr_1_1
         
         ;ldx #$80
         ;lda #chomps_id

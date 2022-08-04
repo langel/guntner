@@ -51,13 +51,33 @@ swordtner_metasprite_id:
 	byte 	#$82, #$a2, #$a2, #$c2
         
 boss_swordtner_cycle: subroutine
-        lda #$10
+	; shrink width of hit box
+	lda #$04
         sta collision_0_w
-        sta collision_0_h
+        adc collision_0_x
+        sta collision_0_x
         
+	; check for player collision with blade
+        lda #$50
+        sta collision_0_h
+        jsr player_collision_detect
+        beq .no_collision
+        jsr enemy_gives_damage
+        ldy enemy_oam_offset
+        lda #$b0
+        adc oam_ram_x,y
+        sta oam_ram_x,y
+.no_collision
+
+	; hitbox is face of swordtner
+        lda #$10
+        sta collision_0_h
+        adc collision_0_y
+        sta collision_0_y
         inc boss_dmg_handle_true
-        ;jsr enemy_handle_damage_and_death
+        jsr enemy_handle_damage_and_death
         dec boss_dmg_handle_true
+        
 
 ; MOVEMENT
 	lda state_v2
@@ -71,7 +91,7 @@ boss_swordtner_cycle: subroutine
         jsr sprite_4_set_y
         
         lda state_v5
-        cmp #$10
+        cmp #$04
         bcs .check_down_dir
         lda #sword_down_dir
         sta enemy_ram_ex,x
@@ -113,22 +133,24 @@ boss_swordtner_cycle: subroutine
         bpl .next_meta_sprite
         
         ldx enemy_ram_offset
-        
+        ldy enemy_oam_offset
         
 	; palette
 	lda #$02
-        ldy enemy_oam_offset
         jsr sprite_4_set_palette
+        beq .hit
         clc
         adc #$01
+.hit
         ldy #$c0
-        jsr sprite_4_set_palette
+        jsr sprite_4_set_palette_no_process
         ldy #$d0
-        jsr sprite_4_set_palette
+        jsr sprite_4_set_palette_no_process
         ldy #$e0
-        jsr sprite_4_set_palette
+        jsr sprite_4_set_palette_no_process
         ldy #$f0
-        jsr sprite_4_set_palette
+        jsr sprite_4_set_palette_no_process
+        
         
         ; move last sprite to higher spot
         ; make room for eyeballs
