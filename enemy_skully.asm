@@ -59,11 +59,25 @@ skully_handle_movement: subroutine
         lda enemy_ram_pc,x
         cmp #$40
         bne .not_chasing
+        ; CHASE MODE
         dec enemy_ram_x,x
-        
+        lda wtf
+        and #$03
+        bne .done
+        lda enemy_ram_y,x
+        clc
+        adc #$09
+        cmp player_y_hi
+        beq .done
+        bcc .down
+.up
+	dec enemy_ram_y,x
+        rts
+.down
+	inc enemy_ram_y,x
         rts
 .not_chasing
-        ; but we are zooming
+        ; ZOOM MODE
         lda #$20
         sta enemy_ram_pc,x
         lda #$04
@@ -76,7 +90,8 @@ skully_handle_movement: subroutine
         sta enemy_ram_pc,x
 	rts
 .demoshit
-        ; move skully to the right
+        ; DEMO MODE
         inc enemy_ram_x,x
+.done
 	rts
    

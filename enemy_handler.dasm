@@ -62,6 +62,10 @@ enemy_spawn_delegator: subroutine
         lda enemy_spawn_table_hi,y
         sta temp03
         jmp (temp02)
+
+
+enemy_do_nothing: subroutine
+	jmp update_enemies_handler_next
         
         
 sprite_4_set_palette: subroutine
@@ -115,11 +119,11 @@ sprite_4_set_y: subroutine
 	; a = y pos
         ; y = oam ram offset
 	sta oam_ram_y,y
-	sta oam_ram_y+4,y
+	sta oam_ram_y+$04,y
 	clc
 	adc #$08
-	sta oam_ram_y+8,y
-	sta oam_ram_y+12,y
+	sta oam_ram_y+$08,y
+	sta oam_ram_y+$0c,y
 	rts
         
 sprite_2_dead_cleanup: subroutine

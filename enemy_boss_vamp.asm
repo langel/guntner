@@ -215,59 +215,20 @@ boss_vamp_cycle: subroutine
         sta state_v7
 .not_hit
         
-        ; EYE SPRITE
-.now_lets_add_eyes
-	ldx #$fc
-        lda #$a9
-        sta oam_ram_spr,x
-        lda #$01
-        sta oam_ram_att,x
-        ; find x
+        ; eyeballs
         lda oam_ram_x,y
         clc
         adc #$03
-        sta oam_ram_x,x
-        ; check if rudy is left of vampire
-        lda oam_ram_x,y
-        cmp player_x_hi
-        bcc .looking_right
-.looking_left
-        lda #$99
-        sta oam_ram_spr,x
-	inc oam_ram_x,x
-.looking_right
-	; find y
+        sta temp00
         lda oam_ram_y,y
-        sta oam_ram_y,x
+        sta temp01
         lda oam_ram_spr,y
         cmp #$9e
         bne .dont_adjust_for_open_mouth
-        dec oam_ram_y,x
+        dec temp01
 .dont_adjust_for_open_mouth
-        lda oam_ram_y,x
-        clc
-        adc #$1c
-        sec
-        sbc player_y_hi
-        bcc .looking_down
-        clc
-        adc #$cc
-        bcs .looking_up
-.looking_across
-	lda oam_ram_spr,x
-        cmp #$99
-        beq .adjust_for_left_looking
-	inc oam_ram_x,x
-        jmp .done
-.adjust_for_left_looking
-	dec oam_ram_x,x
-        jmp .done
-.looking_up
-	dec oam_ram_y,x
-        jmp .done
-.looking_down
-	inc oam_ram_y,x
-.done
+	jsr enemy_boss_eyes
+
 	jmp update_enemies_handler_next
         
         

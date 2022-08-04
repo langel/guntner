@@ -21,7 +21,27 @@ sandbox_init: subroutine
         sta state_v6
         sta state_v7
         
+        lda #$01
+        sta phase_current
         
+        ldx #$b8
+        lda #boss_swordtner_id
+        jsr enemy_spawn_delegator
+        
+        ; SWORDTNER palettes
+        lda #$07
+        sta pal_spr_2_1        
+        lda #$17
+        sta pal_spr_2_2        
+        lda #$3d
+        sta pal_spr_2_3
+        
+        lda #$0c
+        sta pal_spr_3_1        
+        lda #$2d
+        sta pal_spr_3_2        
+        lda #$31
+        sta pal_spr_3_3
         
         ;ldx #$80
         ;lda #chomps_id
@@ -40,7 +60,8 @@ sandbox_init: subroutine
 	jsr get_enemy_slot_4_sprite
         tax
         ;lda #dumbface_id
-        lda #ant_id
+        ;lda #ant_id
+        lda #skully_id
         ;jsr enemy_spawn_delegator
         
 	jsr get_enemy_slot_4_sprite

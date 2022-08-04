@@ -83,13 +83,13 @@ cart_start:	subroutine
         sta pal_uni_bg
         
 	;jsr game_init
-	jsr menu_screens_init
+	;jsr menu_screens_init
         ;jsr attract_init
         ;jsr cut_scene_intro_init
         ;jsr cut_scene_outro_init
         
         ;jsr options_screen_init
-        ;jsr sandbox_init
+        jsr sandbox_init
    	;jsr sandbox2_init
         
         
@@ -321,6 +321,12 @@ sprite0_off:
         nop	; how much prg space we using?
 	include "enemy_boss_vamp.asm"
         nop	; how much prg space we using?
+	include "enemy_boss_swordtner.asm"
+        nop
+        
+	include "enemy_boss_eyes.asm"
+
+
         
 	include "enemy_ant.asm"
         nop	; how much prg space we using?

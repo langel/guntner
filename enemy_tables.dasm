@@ -1,4 +1,4 @@
-	; 23 enemy entities defined
+	; 24 enemy entities defined
 
 ; enemy id list: 
 null_id              EQM $00
@@ -24,6 +24,7 @@ lasso_id             EQM $13
 uzi_id               EQM $14
 boss_scarab_id       EQM $15
 boss_vamp_id         EQM $16
+boss_swordtner_id    EQM $17
 
 enemy_hitpoints_table:
 	byte $00 ; null
@@ -49,6 +50,7 @@ enemy_hitpoints_table:
 	byte $1d ; uzi
 	byte $3f ; boss_scarab
 	byte $3f ; boss_vamp
+	byte $3f ; boss_swordtner
 
 enemy_player_points_table:
 	byte $00, $00, $00, $00 ; null
@@ -74,6 +76,7 @@ enemy_player_points_table:
 	byte $00, $00, $00, $7b ; uzi
 	byte $0b, $c6, $01, $1f ; boss_scarab
 	byte $15, $cc, $8f, $4b ; boss_vamp
+	byte $3b, $7b, $cf, $87 ; boss_swordtner
 
 enemy_size_table:
 	byte $00 ; null
@@ -99,10 +102,11 @@ enemy_size_table:
 	byte $04 ; uzi
 	byte $04 ; boss_scarab
 	byte $04 ; boss_vamp
+	byte $04 ; boss_swordtner
 
 enemy_update_table_lo:
-	byte <do_nothing
-	byte <do_nothing
+	byte <enemy_do_nothing
+	byte <enemy_do_nothing
 	byte <crossbones_cycle
 	byte <powerups_cycle
 	byte <birb_cycle
@@ -124,10 +128,11 @@ enemy_update_table_lo:
 	byte <uzi_cycle
 	byte <boss_scarab_cycle
 	byte <boss_vamp_cycle
+	byte <boss_swordtner_cycle
 
 enemy_update_table_hi:
-	byte >do_nothing
-	byte >do_nothing
+	byte >enemy_do_nothing
+	byte >enemy_do_nothing
 	byte >crossbones_cycle
 	byte >powerups_cycle
 	byte >birb_cycle
@@ -149,6 +154,7 @@ enemy_update_table_hi:
 	byte >uzi_cycle
 	byte >boss_scarab_cycle
 	byte >boss_vamp_cycle
+	byte >boss_swordtner_cycle
 
 enemy_spawn_table_lo:
 	byte <do_nothing
@@ -174,6 +180,7 @@ enemy_spawn_table_lo:
 	byte <uzi_spawn
 	byte <boss_scarab_spawn
 	byte <boss_vamp_spawn
+	byte <boss_swordtner_spawn
 
 enemy_spawn_table_hi:
 	byte >do_nothing
@@ -199,3 +206,4 @@ enemy_spawn_table_hi:
 	byte >uzi_spawn
 	byte >boss_scarab_spawn
 	byte >boss_vamp_spawn
+	byte >boss_swordtner_spawn
