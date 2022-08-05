@@ -91,7 +91,7 @@ boss_swordtner_cycle: subroutine
         jsr sprite_4_set_y
         
         lda state_v5
-        cmp #$04
+        cmp #$10
         bcs .check_down_dir
         lda #sword_down_dir
         sta enemy_ram_ex,x

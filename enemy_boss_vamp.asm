@@ -60,10 +60,6 @@ boss_vamp_bat_cycle: subroutine
         lda temp01
         clc
         adc #$40
-        ;clc
-        ;adc enemy_ram_ac,x
-        ;clc
-        ;adc wtf
         tax
         lda temp02
         jsr sine_of_scale
@@ -78,20 +74,14 @@ boss_vamp_bat_cycle: subroutine
         lsr
         lsr
         and #%00000011
-        cmp #$00
-        bne .not_frame0
-        lda #$39
-        jmp .frame_done
-.not_frame0
-        cmp #$02
-        bne .not_frame2
-        lda #$3b
-        jmp .frame_done
-.not_frame2
-	lda #$3a        	
-.frame_done
+        cmp #$03
+        bne .frame_found
+        lda #$01   	
+.frame_found
+	clc
+        adc #$39
         sta oam_ram_spr,y
-        lda #$01
+        lda #$03
         jsr enemy_set_palette
 .done
 	jmp update_enemies_handler_next

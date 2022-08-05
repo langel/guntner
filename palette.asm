@@ -73,7 +73,7 @@ palette_table:
         hex 03 1a 39 0c 27 37
         ; #63 boss 
         ; vamp+bats palettes
-        hex 12 21 30 15 00 37
+        hex 15 2d 37 12 21 30
         ; #69 boss 
         ; swordtner palettes
         hex 07 17 3d 11 2d 31

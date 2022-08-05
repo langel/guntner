@@ -25,7 +25,8 @@ sandbox_init: subroutine
         sta phase_current
         
         ldx #$b8
-        lda #boss_swordtner_id
+        ;lda #boss_swordtner_id
+        lda #boss_vamp_id
         jsr enemy_spawn_delegator
         
         ; SWORDTNER palettes
@@ -35,8 +36,16 @@ sandbox_init: subroutine
         ldx #72
         ldy #21
         jsr palette_load
+        ; VAMP palettes
+        ldx #63
+        ldy #18
+        jsr palette_load
+        ldx #66
+        ldy #21
+        jsr palette_load
         ; eye pupil
-        lda #$16
+        ;lda #$16 ; swordtner eyes
+        lda #$07 ; vamp eyes
         sta pal_spr_1_1
         
         ;ldx #$80

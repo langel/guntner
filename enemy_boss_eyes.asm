@@ -1,6 +1,6 @@
 
 ; temp00 = eye sprite x origin
-; temp01 = eye srpite y origin
+; temp01 = eye sprite y origin
 
 enemy_boss_eyes: subroutine
         ; EYE SPRITE
@@ -19,10 +19,13 @@ enemy_boss_eyes: subroutine
 .looking_left
         lda #$99
         sta oam_ram_spr,x
-	inc oam_ram_x,x
+	;inc oam_ram_x,x
 .looking_right
 	; find y
-        lda temp01
+        ldy temp01
+        iny
+        tya
+        ldy enemy_oam_offset
         sta oam_ram_y,x
         clc
         adc #$1c
@@ -36,10 +39,10 @@ enemy_boss_eyes: subroutine
 	lda oam_ram_spr,x
         cmp #$99
         beq .adjust_for_left_looking
-	inc oam_ram_x,x
+	;inc oam_ram_x,x
         jmp .done
 .adjust_for_left_looking
-	dec oam_ram_x,x
+	;dec oam_ram_x,x
         rts
 .looking_up
 	dec oam_ram_y,x
