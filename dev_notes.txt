@@ -18,6 +18,9 @@ tools? #nesdev #GunTneR [ !ks for info ]\
 260.5/month
 
 
+Moufs Lipps 04 16 30
+
+
 fix these:
 	vampire doesn't always show hit/damage?
 	brighter bg colors during boss death and hearts
