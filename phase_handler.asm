@@ -376,6 +376,15 @@ phase_boss_fight_intro:
         lda phase_spawn_counter
         bne .dont_init_cinematics
 .init_cinematics
+        ; brighten stars
+        ldx #$07
+.star_lumen_loop
+	lda palette_cache,x
+        clc
+        adc #$10
+        sta palette_cache,x
+        dex
+        bne .star_lumen_loop
         ; play boss fight encounter jingle
         lda #song_boss_intro
         jsr song_start
@@ -428,6 +437,7 @@ phase_boss_dying_sfx_table:
 phase_boss_dying: subroutine
 	lda phase_spawn_counter
         bne .dont_init
+        ; stop music
         jsr song_stop
         ; calculate length of boss death
         ; 8 frame increments
@@ -497,7 +507,7 @@ phase_boss_dying: subroutine
 	rts
         
         
-phase_boss_fight_cooldown:
+phase_boss_fight_cooldown: subroutine
 	lda phase_spawn_counter
         and #$0f
         bne .dont_slow_stars
@@ -513,6 +523,15 @@ phase_boss_fight_cooldown:
         lda #song_in_game
         jsr song_start
         jsr phase_next
+        ; dim stars
+        ldx #$07
+.star_lumen_loop
+	lda palette_cache,x
+        sec
+        sbc #$10
+        sta palette_cache,x
+        dex
+        bne .star_lumen_loop
 .dont_advance
 	rts
         

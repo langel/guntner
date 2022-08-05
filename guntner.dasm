@@ -83,9 +83,9 @@ cart_start:	subroutine
         sta pal_uni_bg
         
 	;jsr game_init
-	jsr menu_screens_init
+	;jsr menu_screens_init
         ;jsr attract_init
-        ;jsr cut_scene_intro_init
+        jsr cut_scene_intro_init
         ;jsr cut_scene_outro_init
         
         ;jsr options_screen_init
@@ -342,12 +342,12 @@ sprite0_off:
         nop
 	include "enemy_galger.asm"
         nop
+	include "enemy_lasso.asm"
+        nop	; how much prg space we using?
 	include "enemy_maggs.asm"
         nop	; how much prg space we using?
 	include "enemy_muya.asm"
 	nop
-	include "enemy_lasso.asm"
-        nop	; how much prg space we using?
 	include "enemy_skeet.asm"
         nop	; how much prg space we using
 	include "enemy_skully.asm"

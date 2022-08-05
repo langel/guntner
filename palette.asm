@@ -42,8 +42,6 @@ palette_table:
 	; #06 end good
 	byte #$0a, #$37, #$27
 	; #09 end alien
-        ; XXX final colors not picked yet
-	;byte #$0d, #$3c, #$24
         byte #$3c, #$1c, #$24
 	; #12 intro bg
 	byte #$0c, #$30, #$3c
@@ -184,7 +182,6 @@ palette_fade_in_init: subroutine
         sta pal_fade_target
         ; make sure we're not already fading out
 	lda state_fade_out
-        cmp #$00
         bne .init_skip
 .init_fade
         lda #$00
@@ -196,16 +193,20 @@ palette_fade_in_init: subroutine
         
 palette_fade_in_update: subroutine
 	lda pal_fade_c
-        ora #%00001111
+        and #%00110000
+        eor #%00110000
         sta pal_fade_offset
-	ldx #$00
+	ldx #23
 .loop
 	lda pal_uni_bg,x
-        and pal_fade_offset
+        sec
+        sbc pal_fade_offset
+        bpl .dont_set_black
+        lda #$0f
+.dont_set_black
 	sta palette_cache,x
-        inx
-        cpx #25
-        bne .loop
+        dex
+        bpl .loop
         lda pal_fade_c
         clc
         adc #$03
@@ -222,7 +223,6 @@ palette_fade_out_init: subroutine
         sta pal_fade_target
         ; make sure we're not already fading out
 	lda state_fade_out
-        cmp #$00
         bne .init_skip
 .init_fade
         lda #$10
