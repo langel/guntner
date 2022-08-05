@@ -1,15 +1,9 @@
 
 lasso_spawn: subroutine
 	; x is set by enemy spawner
-	lda #lasso_id
-        sta enemy_ram_type,x ; enemy type
-        tay
-        lda enemy_hitpoints_table,y
-        sta enemy_ram_hp,x 
+	jsr get_oam_offset_from_slot_offset
         lda #$00
-        sta enemy_ram_x,x ; x pos
-        sta enemy_ram_ac,x ; animation counter
-        sta enemy_ram_pc,x ; pattern counter
+        sta oam_ram_x,y
    	rts
         
 lariat_sine_table:

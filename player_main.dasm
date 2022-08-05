@@ -1,6 +1,11 @@
 
+iframe_length		EQM $0190
 oam_ram_rudy		EQU $0204
+
+; CONST
 player_dead_tile	EQM $c0
+iframe_attract_length	EQM $08
+iframe_game_length	EQM $03
 
 
 player_game_reset: subroutine
@@ -87,7 +92,7 @@ player_take_damage: subroutine
         lda player_a
         bne .skip_iframes
 	; set iframes
-        lda #8
+        lda iframe_length
         sta state_iframes
 .skip_iframes
 	; damage amount in player_damage

@@ -37,6 +37,8 @@ game_init:
         jsr clear_all_enemies
         jsr render_enable
         jsr palette_fade_in_init
+        lda #iframe_game_length
+        sta iframe_length
         lda #2
         jsr song_start
         lda state_v1
