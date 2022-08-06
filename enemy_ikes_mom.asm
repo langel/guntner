@@ -84,7 +84,7 @@ ikes_mom_cycle:
         jsr sprite_4_set_y
         ; sprite
         lda player_x_hi
-        sbc #$09
+        sbc #$07
         cmp oam_ram_x,y
         bcc .face_left
 .face_right
