@@ -20,7 +20,7 @@ palette_cache	EQU $e7
         
 ; bg 0 - stars bg_tiles 1 / title screen
 ; bg 1 - stars bg_tiles 2
-; bg 2 - n/a  (bg enemies)
+; bg 2 - n/a  (bg enemies haha)
 ; bg 3 - dashboard / options screen
 ; spr 0 - player
 ; spr 1 - enemy
@@ -68,16 +68,20 @@ palette_table:
         hex 13 21 30
         ; #57 boss 
         ; scarab palettes
-        hex 03 1a 39 0c 27 37
+        hex 03 1a 39
+        hex 0c 27 37
         ; #63 boss 
         ; vamp+bats palettes
-        hex 15 2d 37 12 21 30
+        hex 12 21 30
+        hex 15 2d 37
         ; #69 boss 
         ; swordtner palettes
-        hex 07 17 3d 11 2d 31
-        ; #75 boss lazerface palettes
-        ; XXX filler not final
-        hex 12 21 30 15 00 37
+        hex 07 17 3d 
+        hex 11 2d 31
+        ; #75 boss 
+        ; moufs palettes
+        hex 03 16 20
+        hex 02 07 38
         
 palette_level_offset_table:
 	byte #21, #30, #39, #48

@@ -107,10 +107,13 @@ boss_moufs_cycle: subroutine
         
 	lda #$b6
         jsr sprite_3_set_sprite
+        ; x
 	lda #$40
         jsr sprite_3_set_x
+        ; y
 	lda state_v2
         jsr sprite_3_set_y
+        ; palette
         lda #$01
         jsr sprite_4_set_palette
         

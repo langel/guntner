@@ -27,27 +27,28 @@ sandbox_init: subroutine
         ldx #$b8
         ;lda #boss_swordtner_id
         ;lda #boss_vamp_id
+        ;lda #boss_scarab_id
         lda #boss_moufs_id
         jsr enemy_spawn_delegator
         
-        ; SWORDTNER palettes
-        ldx #69
-        ldy #18
+        ; for vamp testing
+        lda #$f0
+        sta player_x_hi
+        lda #$08
+        sta player_y_hi
+        
+        ;ldx #63 ; VAMP palettes
+        ldx #75 ; MOUFS palettes
+        ;ldx #69 ; SWORDTNER palettes
+        ;ldx #57 ; scarab palette
+        ldy #15
         jsr palette_load
-        ldx #72
-        ldy #21
         jsr palette_load
-        ; VAMP palettes
-        ldx #63
-        ldy #18
-        jsr palette_load
-        ldx #66
-        ldy #21
-        jsr palette_load
+        
         ; eye pupil
         ;lda #$16 ; swordtner eyes
-        lda #$07 ; vamp eyes
-        sta pal_spr_1_1
+        ;lda #$07 ; vamp eyes
+        ;sta pal_spr_3_1
         
         ;ldx #$80
         ;lda #chomps_id
@@ -59,7 +60,7 @@ sandbox_init: subroutine
 	jsr get_enemy_slot_1_sprite
         tax
         lda #spark_id
-        ;jsr enemy_spawn_delegator
+        jsr enemy_spawn_delegator
         
         
 	jsr get_enemy_slot_2_sprite
@@ -98,11 +99,6 @@ sandbox_init: subroutine
         lda #$ff
         sta player_health
         
-        ; for vamp testing
-        ;lda #$f0
-        ;sta player_x_hi
-        ;lda #$08
-        ;sta player_y_hi
         
 	;jsr get_enemy_slot_1_sprite
         ;tax

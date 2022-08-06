@@ -117,8 +117,8 @@ enemy_size_table:
 	byte $04 ; boss_vamp
 
 enemy_update_table_lo:
-	byte <do_nothing
-	byte <do_nothing
+	byte <enemy_do_nothing
+	byte <enemy_do_nothing
 	byte <crossbones_cycle
 	byte <powerups_cycle
 	byte <birb_cycle
@@ -146,8 +146,8 @@ enemy_update_table_lo:
 	byte <boss_vamp_cycle
 
 enemy_update_table_hi:
-	byte >do_nothing
-	byte >do_nothing
+	byte >enemy_do_nothing
+	byte >enemy_do_nothing
 	byte >crossbones_cycle
 	byte >powerups_cycle
 	byte >birb_cycle

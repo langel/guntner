@@ -162,7 +162,7 @@ boss_scarab_cycle: subroutine
         jsr sprite_4_set_sprite_flip
         
 	; palette
-	lda #$02
+	lda #$01
         ldy enemy_oam_offset
         jsr sprite_4_set_palette
         beq .hit

@@ -81,7 +81,7 @@ boss_vamp_bat_cycle: subroutine
 	clc
         adc #$39
         sta oam_ram_spr,y
-        lda #$03
+        lda #$01
         jsr enemy_set_palette
 .done
 	jmp update_enemies_handler_next
