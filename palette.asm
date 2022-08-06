@@ -80,7 +80,7 @@ palette_table:
         hex 11 2d 31
         ; #75 boss 
         ; moufs palettes
-        hex 03 16 20
+        hex 04 16 20
         hex 02 07 38
         
 palette_level_offset_table:

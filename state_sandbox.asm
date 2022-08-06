@@ -33,9 +33,9 @@ sandbox_init: subroutine
         
         ; for vamp testing
         lda #$f0
-        sta player_x_hi
+        ;sta player_x_hi
         lda #$08
-        sta player_y_hi
+        ;sta player_y_hi
         
         ;ldx #63 ; VAMP palettes
         ldx #75 ; MOUFS palettes
@@ -60,7 +60,7 @@ sandbox_init: subroutine
 	jsr get_enemy_slot_1_sprite
         tax
         lda #spark_id
-        jsr enemy_spawn_delegator
+        ;jsr enemy_spawn_delegator
         
         
 	jsr get_enemy_slot_2_sprite
@@ -82,7 +82,7 @@ sandbox_init: subroutine
         ;lda #ant_id
         ;lda #skully_id
         lda #ikes_mom_id
-        jsr enemy_spawn_delegator
+        ;jsr enemy_spawn_delegator
         
 	jsr get_enemy_slot_4_sprite
         tax

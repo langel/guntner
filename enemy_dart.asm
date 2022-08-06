@@ -92,11 +92,11 @@ dart_cycle: subroutine
 
 	; check for despawn
         lda oam_ram_x,y
-        cmp #$09
+        cmp #$08
         bcc .despawn
 	lda oam_ram_y,y
-        cmp sprite_0_y
-        bcs .despawn
+        cmp #$04
+        bcc .despawn
         
 .done	
 	jmp update_enemies_handler_next
