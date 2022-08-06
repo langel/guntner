@@ -239,6 +239,8 @@ sprite0_off:
         jsr powerup_bomb_update
         jsr powerup_mushroom_update
         jsr palette_update
+        
+        
 	inc wtf	; frame counter lo 
         bne .skip_ftw
         inc ftw ; frame counter hi
@@ -317,13 +319,15 @@ sprite0_off:
         nop	; how much prg space we using?
 	
         
+	include "enemy_boss_moufs.asm"
+        nop
+	include "enemy_boss_swordtner.asm"
+        nop
 	include "enemy_boss_scarab.asm"
         nop	; how much prg space we using?
 	include "enemy_boss_vamp.asm"
         nop	; how much prg space we using?
-	include "enemy_boss_swordtner.asm"
-        nop
-        
+
 	include "enemy_boss_eyes.asm"
 
 

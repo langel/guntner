@@ -26,8 +26,9 @@ sandbox_init: subroutine
         
         ldx #$b8
         ;lda #boss_swordtner_id
-        lda #boss_vamp_id
-        ;jsr enemy_spawn_delegator
+        ;lda #boss_vamp_id
+        lda #boss_moufs_id
+        jsr enemy_spawn_delegator
         
         ; SWORDTNER palettes
         ldx #69

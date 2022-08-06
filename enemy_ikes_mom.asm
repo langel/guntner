@@ -13,57 +13,61 @@ ikes_mom_spawn:
         
         
 ikes_mom_cycle:
+        lda #$10
+        sta collision_0_w
+        sta collision_0_h
+        ;jsr enemy_handle_damage_and_death
 
 	lda wtf
-        and #$07
+        and #$0f
         bne .dir_update_done
-        ; current direction
-        lda enemy_ram_ex,x
-        sta temp00 
         ; next direction
         jsr enemy_get_direction_of_player
-        sta temp01
-.dec_border_check
-        ; if current direction < 6
-        ; and next direction > 18
-        ; then we decrease
+        sta temp00
+        ; current direction
+        lda enemy_ram_ex,x
+        sta temp01 
+        
+        ; diff 1
+        sec
+        sbc temp00
+        bpl .diff_1_set
+        clc
+        adc #24
+.diff_1_set
+        sta temp02
+        ; diff 2
         lda temp00
-        cmp #6
-        bcs .inc_border_check
-        lda temp01
-        cmp #18
-        bcc .inc_border_check
-        jmp .dir_dec
-.inc_border_check
-        ; OR
-        ; if current direction > 18
-        ; and next direction < 6
-        ; then we increase
-        lda temp00
-        cmp #18
-        bcc .basic_check
-        lda temp01
-        cmp #6
-        bcs .basic_check
-        jmp .dir_inc
-.basic_check
-        ; OR basic comparison
-        ; current_direction < next_direction
-        cmp enemy_ram_ex,x
-        bcc .dir_inc
-.dir_dec
-	dec enemy_ram_ex,x
-        bpl .dir_update_done
-.fix_minus
-	lda #23
-        sta enemy_ram_ex,x
-        jmp .dir_update_done
-.dir_inc
-	inc enemy_ram_ex,x
-        lda #24
-        cmp enemy_ram_ex,x
-        bcs .dir_update_done
-        lda #$00
+        sec
+        sbc temp01
+        bpl .diff_2_set
+        clc
+        adc #24
+.diff_2_set
+        sta temp03
+        ; which dir faster
+        cmp temp02
+        beq .dir_set
+        bcs .counterclockwise
+.clockwise
+	lda #$01
+        sta enemy_ram_pc,x
+        bne .dir_set
+.counterclockwise
+	lda #$ff
+        sta enemy_ram_pc,x
+.dir_set
+	lda enemy_ram_ex,x
+        clc
+        adc enemy_ram_pc,x
+        bpl .skip_neg_fix
+        clc
+        adc #24
+.skip_neg_fix
+	cmp #24
+        bne .skip_over_fix
+        lda #0
+.skip_over_fix
         sta enemy_ram_ex,x
 .dir_update_done
 
@@ -79,7 +83,16 @@ ikes_mom_cycle:
 	lda oam_ram_y,y
         jsr sprite_4_set_y
         ; sprite
+        lda player_x_hi
+        sbc #$09
+        cmp oam_ram_x,y
+        bcc .face_left
+.face_right
 	lda #$22
+        bne .set_face
+.face_left
+	lda #$20
+.set_face
         jsr sprite_4_set_sprite
         ; palette
         lda #$02

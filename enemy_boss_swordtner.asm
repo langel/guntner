@@ -15,9 +15,6 @@ sword_down_dir	EQM	23
 ; $0c, $2d, $31
 
 boss_swordtner_spawn: subroutine
-	; claim highest 4 sprite slot for control
-	;ldx #boss_scarab_id
-        ;stx $03b8
         ; claim 4 more slots for rest of body
         lda #do_nothing_id
         sta $03c0
