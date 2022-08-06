@@ -27,7 +27,7 @@ sandbox_init: subroutine
         ldx #$b8
         ;lda #boss_swordtner_id
         lda #boss_vamp_id
-        jsr enemy_spawn_delegator
+        ;jsr enemy_spawn_delegator
         
         ; SWORDTNER palettes
         ldx #69
@@ -64,12 +64,12 @@ sandbox_init: subroutine
 	jsr get_enemy_slot_2_sprite
         tax
         lda #muya_id
-        jsr enemy_spawn_delegator
+        ;jsr enemy_spawn_delegator
         
 	jsr get_enemy_slot_2_sprite
         tax
         lda #muya_id
-        jsr enemy_spawn_delegator
+        ;jsr enemy_spawn_delegator
         
         
         
@@ -78,8 +78,9 @@ sandbox_init: subroutine
         tax
         ;lda #dumbface_id
         ;lda #ant_id
-        lda #skully_id
-        ;jsr enemy_spawn_delegator
+        ;lda #skully_id
+        lda #ikes_mom_id
+        jsr enemy_spawn_delegator
         
 	jsr get_enemy_slot_4_sprite
         tax

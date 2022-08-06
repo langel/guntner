@@ -1,4 +1,4 @@
-	; 25 enemy entities defined
+	; 26 enemy entities defined
 
 ; enemy id list: 
 null_id              EQM $00
@@ -22,10 +22,11 @@ dumbface_id          EQM $11
 throber_id           EQM $12
 ant_id               EQM $13
 lasso_id             EQM $14
-uzi_id               EQM $15
-boss_scarab_id       EQM $16
-boss_vamp_id         EQM $17
-boss_swordtner_id    EQM $18
+ikes_mom_id          EQM $15
+uzi_id               EQM $16
+boss_scarab_id       EQM $17
+boss_vamp_id         EQM $18
+boss_swordtner_id    EQM $19
 
 enemy_hitpoints_table:
 	byte $00 ; null
@@ -49,6 +50,7 @@ enemy_hitpoints_table:
 	byte $0d ; throber
 	byte $11 ; ant
 	byte $35 ; lasso
+	byte $1f ; ikes_mom
 	byte $1d ; uzi
 	byte $3f ; boss_scarab
 	byte $3f ; boss_vamp
@@ -76,6 +78,7 @@ enemy_player_points_table:
 	byte $00, $30, $c7, $f1 ; throber
 	byte $00, $3b, $ec, $fd ; ant
 	byte $00, $6b, $ef, $ab ; lasso
+	byte $00, $42, $ad, $43 ; ikes_mom
 	byte $00, $00, $00, $7b ; uzi
 	byte $0b, $c6, $01, $1f ; boss_scarab
 	byte $15, $cc, $8f, $4b ; boss_vamp
@@ -103,14 +106,15 @@ enemy_size_table:
 	byte $04 ; throber
 	byte $04 ; ant
 	byte $04 ; lasso
+	byte $04 ; ikes_mom
 	byte $04 ; uzi
 	byte $04 ; boss_scarab
 	byte $04 ; boss_vamp
 	byte $04 ; boss_swordtner
 
 enemy_update_table_lo:
-	byte <enemy_do_nothing
-	byte <enemy_do_nothing
+	byte <do_nothing
+	byte <do_nothing
 	byte <crossbones_cycle
 	byte <powerups_cycle
 	byte <birb_cycle
@@ -130,14 +134,15 @@ enemy_update_table_lo:
 	byte <throber_cycle
 	byte <ant_cycle
 	byte <lasso_cycle
+	byte <ikes_mom_cycle
 	byte <uzi_cycle
 	byte <boss_scarab_cycle
 	byte <boss_vamp_cycle
 	byte <boss_swordtner_cycle
 
 enemy_update_table_hi:
-	byte >enemy_do_nothing
-	byte >enemy_do_nothing
+	byte >do_nothing
+	byte >do_nothing
 	byte >crossbones_cycle
 	byte >powerups_cycle
 	byte >birb_cycle
@@ -157,6 +162,7 @@ enemy_update_table_hi:
 	byte >throber_cycle
 	byte >ant_cycle
 	byte >lasso_cycle
+	byte >ikes_mom_cycle
 	byte >uzi_cycle
 	byte >boss_scarab_cycle
 	byte >boss_vamp_cycle
@@ -184,6 +190,7 @@ enemy_spawn_table_lo:
 	byte <throber_spawn
 	byte <ant_spawn
 	byte <lasso_spawn
+	byte <ikes_mom_spawn
 	byte <uzi_spawn
 	byte <boss_scarab_spawn
 	byte <boss_vamp_spawn
@@ -211,6 +218,7 @@ enemy_spawn_table_hi:
 	byte >throber_spawn
 	byte >ant_spawn
 	byte >lasso_spawn
+	byte >ikes_mom_spawn
 	byte >uzi_spawn
 	byte >boss_scarab_spawn
 	byte >boss_vamp_spawn
