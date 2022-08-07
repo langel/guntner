@@ -9,11 +9,9 @@
 ; $300 entity data
 ; $400-7ff sine scale tables
 
-spare_stack	EQU	$191
-top_of_stack	EQU	$1e0
-;unused_ram	EQU	$3e0
-;more_free_ram	EQU	$400
-end_of_ram 	EQU 	$0800
+spare_stack	EQM	$190
+top_of_stack	EQM	$1e0
+end_of_ram 	EQM 	$800
 
 
 ;;;;; NES CARTRIDGE HEADER
@@ -83,13 +81,13 @@ cart_start:	subroutine
         sta pal_uni_bg
         
 	;jsr game_init
-	;jsr menu_screens_init
+	jsr menu_screens_init
         ;jsr attract_init
         ;jsr cut_scene_intro_init
         ;jsr cut_scene_outro_init
         
         ;jsr options_screen_init
-        jsr sandbox_init
+        ;jsr sandbox_init
    	;jsr sandbox2_init
         
         

@@ -1,5 +1,5 @@
 
-iframe_length		EQM $0190
+iframe_length		EQU $018f
 oam_ram_rudy		EQU $0204
 
 ; CONST

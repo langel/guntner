@@ -65,12 +65,15 @@ ant_cycle: subroutine
         bne .dont_advance
 .dart_fire
         lda enemy_ram_x,x
-        sta collision_0_x
+        sta dart_x_origin
         lda enemy_ram_pc,x
-        sta collision_0_y
+        sta dart_y_origin
+        lda #$03
+        sta dart_velocity
+        lda #$00
+        sta dart_sprite
+        sta dart_dir_adjust
         jsr dart_spawn
-        ldx enemy_ram_offset
-        ldy enemy_oam_offset
         bne .dont_advance
 .butt_down
 	lda #$e8

@@ -192,22 +192,17 @@ boss_scarab_cycle: subroutine
         lda state_v4
         clc
         adc #$10
-        sta collision_0_x
+        sta dart_x_origin
         lda state_v5
         clc
         adc #$04
-        sta collision_0_y
-        jsr dart_spawn
-        cpx #$ff
-        beq .done
-        lda #<arctang_velocity_2.5
-        sta enemy_ram_pc,x
+        sta dart_y_origin
         lda #$02
-        sta oam_ram_att,y
-        lda #$fe
-        sta oam_ram_spr,y
-        ldx enemy_ram_offset
-        ldy enemy_oam_offset
+        sta dart_velocity
+        lda #$00
+        sta dart_sprite
+        sta dart_dir_adjust
+        jsr dart_spawn
         
 
 .done

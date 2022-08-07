@@ -51,7 +51,7 @@ enemy_hitpoints_table:
 	byte $0d ; throber
 	byte $11 ; ant
 	byte $35 ; lasso
-	byte $1f ; ikes_mom
+	byte $25 ; ikes_mom
 	byte $1d ; uzi
 	byte $3f ; boss_moufs
 	byte $3f ; boss_swordtner

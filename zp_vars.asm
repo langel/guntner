@@ -149,6 +149,12 @@ phase_interval_counter	byte
 phase_end_game		byte
 
 dart_frame_max		byte
+dart_x_origin		byte
+dart_y_origin		byte
+dart_velocity		byte
+dart_sprite		byte
+dart_dir_adjust		byte
+
 
 enemy_ram_offset	byte
 enemy_oam_offset	byte
@@ -232,13 +238,6 @@ audio_frame_counter     byte
 audio_root_tone         byte
 audio_pattern_pos	byte
 audio_pattern_num       byte
-; counters to mask other channel audio
-sfx_pu1_counter		byte
-sfx_pu2_counter		byte
-sfx_noi_counter		byte
-; table offsets for update subroutines
-sfx_pu2_update_type	byte
-sfx_noi_update_type	byte
 
 
 

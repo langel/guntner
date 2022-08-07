@@ -172,9 +172,14 @@ galger_cycle: subroutine
         bne .dont_fire
 .dart_fire
 	lda oam_ram_x,y
-        sta collision_0_x
+        sta dart_x_origin
         lda oam_ram_y,y
-        sta collision_0_y
+        sta dart_y_origin
+        lda #$04
+        sta dart_velocity
+        lda #$00
+        sta dart_sprite
+        sta dart_dir_adjust
         jsr dart_spawn
         ldy enemy_oam_offset
 .dont_fire

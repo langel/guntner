@@ -1,3 +1,13 @@
+
+sfx_phase_next_counter		EQU $150 
+; counters to mask other channel audio
+sfx_pu1_counter			EQU $151
+sfx_pu2_counter			EQU $152
+sfx_noi_counter			EQU $153
+; table offsets for update subroutines
+sfx_pu2_update_type		EQU $154
+sfx_noi_update_type		EQU $155
+
 ; these should only use Pulse 2 and Noise channels
 ; unless its a non-music moment (like player death)
 
@@ -475,7 +485,6 @@ sfx_rng_chord: subroutine
 	rts
         
         
-sfx_phase_next_counter		= $150        
         
 ; sound test 10
 sfx_phase_next: subroutine

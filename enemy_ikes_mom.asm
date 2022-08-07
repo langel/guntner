@@ -1,5 +1,5 @@
 
-
+ikes_mom_spawn_counter	EQM $0191
 
 ikes_mom_spawn:
 	jsr get_oam_offset_from_slot_offset
@@ -16,7 +16,7 @@ ikes_mom_cycle:
         lda #$10
         sta collision_0_w
         sta collision_0_h
-        ;jsr enemy_handle_damage_and_death
+        jsr enemy_handle_damage_and_death
 
 	lda wtf
         and #$0f

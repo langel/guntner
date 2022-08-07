@@ -22,21 +22,30 @@ dart_spawn: subroutine
         lda #0
         sta enemy_ram_x,x ; sub pixel pos
         sta enemy_ram_y,x ; sub pixel pos
-        ;sta enemy_ram_pc,x
         ; velocity
-        lda #<arctang_velocity_1.75
+        ldy dart_velocity
+        lda arctang_velocities_lo,y
         sta enemy_ram_pc,x
         ; get y register and set origin
         jsr get_oam_offset_from_slot_offset
-        lda collision_0_x
+        lda dart_x_origin
         sta oam_ram_x,y
-        lda collision_0_y
+        lda dart_y_origin
         sta oam_ram_y,y
+        ; direction
         jsr enemy_get_direction_of_player
-        ; stash x
-        stx temp00
-        ; sprite
+        clc
+        adc dart_dir_adjust
+        cmp #24
+        bcc .no_fix
+        sec
+        sbc #24
+.no_fix
         sta enemy_ram_ex,x
+        ; sprite
+        lda dart_sprite
+        bne .sprite_custom
+        lda enemy_ram_ex,x
         tax
         lda dart_direction_to_sprite_table,x
         clc
@@ -44,13 +53,19 @@ dart_spawn: subroutine
         sta oam_ram_spr,y
         ; attributes
         lda dart_direction_to_attribute_table,x
-        clc
-        adc #$01
+        ora #$01
         sta oam_ram_att,y
-        ; pull x
-        ldx temp00
+        bne .sprite_done
+.sprite_custom
+	sta oam_ram_spr,y
+        lda #$01
+        sta oam_ram_att,y
+.sprite_done
         ; sfx
         jsr sfx_shoot_dart
+        ; register happy town
+        ldx enemy_ram_offset
+        ldy enemy_oam_offset
 .done
 	rts
 
@@ -95,7 +110,7 @@ dart_cycle: subroutine
         cmp #$08
         bcc .despawn
 	lda oam_ram_y,y
-        cmp #$04
+        cmp #$05
         bcc .despawn
         
 .done	

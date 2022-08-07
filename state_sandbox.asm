@@ -27,9 +27,9 @@ sandbox_init: subroutine
         ldx #$b8
         ;lda #boss_swordtner_id
         ;lda #boss_vamp_id
-        ;lda #boss_scarab_id
-        lda #boss_moufs_id
-        jsr enemy_spawn_delegator
+        lda #boss_scarab_id
+        ;lda #boss_moufs_id
+        ;jsr enemy_spawn_delegator
         
         ; for vamp testing
         lda #$f0
@@ -57,10 +57,12 @@ sandbox_init: subroutine
         ;lda #chomps_id
         ;jsr enemy_spawn_delegator
         
+        ldx #$05
+        jsr arc_sequence_set
 	jsr get_enemy_slot_1_sprite
         tax
-        lda #spark_id
-        ;jsr enemy_spawn_delegator
+        lda #galger_id
+        jsr enemy_spawn_delegator
         
         
 	jsr get_enemy_slot_2_sprite
@@ -79,15 +81,15 @@ sandbox_init: subroutine
 	jsr get_enemy_slot_4_sprite
         tax
         ;lda #dumbface_id
-        ;lda #ant_id
+        lda #ant_id
         ;lda #skully_id
-        lda #ikes_mom_id
-        ;jsr enemy_spawn_delegator
+        ;lda #ikes_mom_id
+        jsr enemy_spawn_delegator
         
 	jsr get_enemy_slot_4_sprite
         tax
-        lda #uzi_id
-        ;jsr enemy_spawn_delegator
+        lda #ant_id
+        jsr enemy_spawn_delegator
         
         
 	jsr get_enemy_slot_4_sprite

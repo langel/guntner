@@ -64,6 +64,18 @@ sprite_3_set_y: subroutine
   
   
 boss_moufs_cycle: subroutine
+        lda state_v4
+        sta collision_0_x
+        lda state_v5
+        sta collision_0_y
+        lda #$14
+        sta collision_0_w
+        lda #$20
+        sta collision_0_h
+        
+        inc boss_dmg_handle_true
+        jsr enemy_handle_damage_and_death
+        dec boss_dmg_handle_true
 
 	; sine bounce moevemtn
         ; ac does x axis
@@ -227,6 +239,7 @@ boss_moufs_cycle: subroutine
         
         inc state_v1
         inc state_v1
+        inc state_v1
         
         ; fire time?
         lda state_v0
@@ -237,26 +250,38 @@ boss_moufs_cycle: subroutine
         bne .done
         
 .dart_fire
+	; x
         lda state_v4
         clc
         adc #$0a
-        sta collision_0_x
+        sta dart_x_origin
+        ; y
         lda state_v5
         clc
         adc #$0f
-        sta collision_0_y
-        jsr dart_spawn
-        cpx #$ff
-        beq .done
-        lda #<arctang_velocity_2.5
-        sta enemy_ram_pc,x
-        lda #$02
-        sta oam_ram_att,y
+        sta dart_y_origin
+        ; velocity
+        lda enemy_ram_pc,x
+        sbc #$80
+        lsr
+        lsr
+        lsr
+        lsr
+        sta dart_velocity
+        ; sprite
         lda #$fe
-        sta oam_ram_spr,y
-        ldx enemy_ram_offset
-        ldy enemy_oam_offset
-        
+        ;lda #$00
+        sta dart_sprite
+        ; dir adjustor
+        lda #$00
+        sta dart_dir_adjust
+        jsr dart_spawn
+        lda #$ff
+        sta dart_dir_adjust
+        jsr dart_spawn
+        lda #$01
+        sta dart_dir_adjust
+        jsr dart_spawn
 
 .done
         
