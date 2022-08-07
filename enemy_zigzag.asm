@@ -71,7 +71,7 @@ zigzag_cycle: subroutine
         ; work out the direction
         lda #<arctang_velocity_1.25
         sta arctang_velocity_lo
-        jsr enemy_update_arctang_path
+	jsr arctang_enemy_update
         
         lda enemy_ram_pc,x
         and #$03

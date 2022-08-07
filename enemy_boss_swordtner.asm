@@ -4,6 +4,7 @@
 ; boss_y  : topleft offset
 ; state_v0 : up velocity
 ; state_v1 : down velocity
+; state_v2 : current velocity
 ; state_v4 : x body position
 ; state_v5 : y body position
 
@@ -27,7 +28,7 @@ boss_swordtner_spawn: subroutine
         ldx #$04
         lda arctang_velocities_lo,x
         sta state_v0 ; up velocity
-        sta arctang_velocity_lo ; current velocity
+        sta state_v2 ; current velocity
         ldx #$00
         lda arctang_velocities_lo,x
         sta state_v1 ; down velocity
@@ -78,8 +79,9 @@ boss_swordtner_cycle: subroutine
 
 ; MOVEMENT
 	lda state_v2
-        ldx enemy_ram_offset
-        jsr enemy_update_arctang_path
+        sta arctang_velocity_lo ; current velocity
+        ;ldx enemy_ram_offset
+        jsr arctang_enemy_update
         lda oam_ram_x,y
         sta state_v4
         jsr sprite_4_set_x
@@ -93,7 +95,7 @@ boss_swordtner_cycle: subroutine
         lda #sword_down_dir
         sta enemy_ram_ex,x
         lda state_v1
-        sta arctang_velocity_lo
+        sta state_v2
         bne .done_change_dir
 .check_down_dir
         cmp #$80
@@ -101,7 +103,7 @@ boss_swordtner_cycle: subroutine
         lda #sword_up_dir
         sta enemy_ram_ex,x
         lda state_v0
-        sta arctang_velocity_lo
+        sta state_v2
 .done_change_dir
 
 

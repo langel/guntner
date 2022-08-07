@@ -5,7 +5,7 @@ oam_ram_rudy		EQU $0204
 ; CONST
 player_dead_tile	EQM $c0
 iframe_attract_length	EQM $08
-iframe_game_length	EQM $03
+iframe_game_length	EQM $04
 
 
 player_game_reset: subroutine

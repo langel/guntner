@@ -219,7 +219,7 @@ arctang_16bit_maths: subroutine
 
         
 
-enemy_update_arctang_path:
+arctang_enemy_update:
 	; updates both x and y position given:
         ;	- enemy_ram_ex holds region/direction
         ;	- enemy_ram_x/y holds lo bytes

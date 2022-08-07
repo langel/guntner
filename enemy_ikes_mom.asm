@@ -73,7 +73,7 @@ ikes_mom_cycle:
 
 	lda arctang_velocities_lo+2
         sta arctang_velocity_lo
-        jsr enemy_update_arctang_path
+	jsr arctang_enemy_update
         
         
 	; x

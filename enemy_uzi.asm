@@ -98,6 +98,7 @@ bullet_cycle: subroutine
         ; animate gleam
 	lda wtf
         lsr
+        lsr
         and #$01
         clc
         adc #$ee

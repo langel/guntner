@@ -103,7 +103,7 @@ dart_cycle: subroutine
 	; handle direction movement
         lda enemy_ram_pc,x
         sta arctang_velocity_lo
-	jsr enemy_update_arctang_path
+	jsr arctang_enemy_update
 
 	; check for despawn
         lda oam_ram_x,y

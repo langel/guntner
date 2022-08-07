@@ -422,7 +422,7 @@ boss_vamp_state_shake: subroutine
 boss_vamp_state_lunge: subroutine
         lda #<arctang_velocity_6.66
         sta arctang_velocity_lo
-	jsr enemy_update_arctang_path
+	jsr arctang_enemy_update
         ldy enemy_oam_offset
         lda oam_ram_x,y
         jsr boss_vamp_plot_x
@@ -447,7 +447,7 @@ boss_vamp_state_lunge: subroutine
 boss_vamp_state_retreat: subroutine
         lda #<arctang_velocity_6.66
         sta arctang_velocity_lo
-	jsr enemy_update_arctang_path
+	jsr arctang_enemy_update
         ldy enemy_oam_offset
         lda oam_ram_x,y
         jsr boss_vamp_plot_x

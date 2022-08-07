@@ -24,10 +24,13 @@ sandbox_init: subroutine
         lda #$01
         sta phase_current
         
+        lda #$03
+        sta iframe_length
+        
         ldx #$b8
-        ;lda #boss_swordtner_id
+        lda #boss_swordtner_id
         ;lda #boss_vamp_id
-        lda #boss_scarab_id
+        ;lda #boss_scarab_id
         ;lda #boss_moufs_id
         jsr enemy_spawn_delegator
         
@@ -57,12 +60,16 @@ sandbox_init: subroutine
         ;lda #chomps_id
         ;jsr enemy_spawn_delegator
         
-        ldx #$05
-        jsr arc_sequence_set
+        lda #$10
+        sta dart_velocity
+.skeet_loop
 	jsr get_enemy_slot_1_sprite
         tax
         lda #skeet_id
         jsr enemy_spawn_delegator
+        dec dart_velocity
+        bpl .skeet_loop
+        
         
         ldx #$05
         jsr arc_sequence_set
@@ -71,11 +78,6 @@ sandbox_init: subroutine
         lda #galger_id
         ;jsr enemy_spawn_delegator
         
-        
-	jsr get_enemy_slot_2_sprite
-        tax
-        lda #muya_id
-        ;jsr enemy_spawn_delegator
         
 	jsr get_enemy_slot_2_sprite
         tax

@@ -35,7 +35,7 @@ throber_cycle: subroutine
 .dont_change_dir
         inc enemy_ram_ac,x
 .do_movement
-	jsr enemy_update_arctang_path
+	jsr arctang_enemy_update
 .dont_advance
 	lda enemy_ram_ac,x
         lsr

@@ -68,7 +68,7 @@ skeet_cycle: subroutine
         lda arctang_velocities_lo,x
         sta arctang_velocity_lo
         ldx enemy_ram_offset
-	jsr enemy_update_arctang_path
+	jsr arctang_enemy_update
         ; sprite
         lda enemy_ram_ac,x
         lsr
