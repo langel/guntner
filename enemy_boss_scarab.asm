@@ -199,8 +199,9 @@ boss_scarab_cycle: subroutine
         sta dart_y_origin
         lda #$02
         sta dart_velocity
-        lda #$00
+        lda #$fe
         sta dart_sprite
+        lda #$00
         sta dart_dir_adjust
         jsr dart_spawn
         

@@ -151,7 +151,7 @@ arctang_bound_dir: subroutine
         adc #24
         rts
 .check_above_24
-	cmp #23 ; XXX this might need to be 24
+	cmp #24
         bcc .bounded
         sec
         sbc #24
