@@ -5,8 +5,9 @@
 ;phase_state		byte
 ;phase_table_ptr	byte
 ;phase_spawn_type	byte
+;phase_arctang_counter	byte
 ;phase_spawn_counter	byte
-;phase_large_counter	byte
+;phase_interval_counter	byte
 ;phase_end_game		byte
 
 

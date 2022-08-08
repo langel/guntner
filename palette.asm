@@ -86,7 +86,7 @@ palette_table:
 palette_level_offset_table:
 	byte #21, #30, #39, #48
 palette_boss_offset_table:
-	byte #57, #63, #69, #72
+	byte #57, #63, #69, #75
         
 palette_load:
 	; x = palette table offset 

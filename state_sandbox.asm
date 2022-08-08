@@ -41,8 +41,8 @@ sandbox_init: subroutine
         ;sta player_y_hi
         
         ;ldx #63 ; VAMP palettes
-        ldx #75 ; MOUFS palettes
-        ;ldx #69 ; SWORDTNER palettes
+        ;ldx #75 ; MOUFS palettes
+        ldx #69 ; SWORDTNER palettes
         ;ldx #57 ; scarab palette
         ldy #15
         jsr palette_load

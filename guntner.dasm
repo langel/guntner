@@ -81,13 +81,13 @@ cart_start:	subroutine
         sta pal_uni_bg
         
 	;jsr game_init
-	;jsr menu_screens_init
+	jsr menu_screens_init
         ;jsr attract_init
         ;jsr cut_scene_intro_init
         ;jsr cut_scene_outro_init
         
         ;jsr options_screen_init
-        jsr sandbox_init
+        ;jsr sandbox_init
    	;jsr sandbox2_init
         
         
@@ -385,6 +385,7 @@ sprite0_off:
 	include "apu_song.asm"
         nop	; how much prg space we using?
       
+;fdf5 - all 4 bosses and game play able
 ;f953 - moar optimized 1197 bytes left! \:U/
 ;f9ea - optimized enemy code / using arctang more
 ;fbb8 - all audio done

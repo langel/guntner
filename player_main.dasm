@@ -14,6 +14,10 @@ player_game_reset: subroutine
         sta phase_current
         sta phase_level
         sta phase_kill_counter
+	sta phase_spawn_counter
+	sta phase_arctang_counter
+	sta phase_interval_counter
+        sta phase_table_ptr
         sta phase_end_game
         sta player_death_flag
         sta bomb_counter
@@ -26,18 +30,13 @@ player_game_reset: subroutine
         sta score_0000xx00
         sta score_000000xx
         ; XXX testing phase behaviours
-        lda #$0
-        sta phase_current
-        ;lda #1
-        ;sta player_boundless
-        ;lda #1
+        ;lda #3
         ;sta phase_level
-        sta phase_arctang_counter
+        ;lda #$3f
+        ;sta phase_current
         jsr phase_palette_load
         jsr timer_reset
-        ; XXX testing boss spawn stuff
 	lda #$d0
-	;lda #$a0
         sta player_x_hi
         sta player_demo_x
 	lda #$70
