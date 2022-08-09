@@ -36,6 +36,14 @@
 ;	reenable rendering and nmi
 
 
+state_clear:
+	ldx #$07
+        lda #$00
+.loop
+        sta state_v0,x
+        dex
+        bpl .loop
+	rts
 
 
 ; more problems...

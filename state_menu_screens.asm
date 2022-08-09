@@ -23,10 +23,7 @@ menu_screens_init: subroutine
         jsr state_render_set_addr
 	lda #$01
         jsr state_update_set_addr
-        lda #$00
-        sta state_v0 ; super
-        sta state_v1 ; secret
-        sta state_v2 ; code
+        jsr state_clear ; a = 0
         sta scroll_x_hi
         sta scroll_page
         sta ppu_mask_emph ; reset mask
