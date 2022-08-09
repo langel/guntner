@@ -292,7 +292,6 @@ title_screen_update: subroutine
         cmp state_v2
         beq .super_secret_code_done
         sta state_v2
-        cmp #0
         beq .super_secret_code_done
         cmp title_screen_super_secret_code,y
         beq .super_secret_code_next

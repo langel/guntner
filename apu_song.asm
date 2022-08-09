@@ -192,8 +192,16 @@ song_02: subroutine
         eor rng1
         and #7
         beq .no_triangle
-        ; XXX change note length based on health?
-	lda #$05
+        ; change note length based on health?
+        lda player_health
+        eor #$ff
+        lsr
+        lsr
+        lsr
+        lsr
+        lsr
+        adc #$02
+	;lda #$05 ; original length
         sta apu_tri_counter
         lda audio_root_tone
         clc
