@@ -36,11 +36,7 @@ dart_spawn: subroutine
         jsr enemy_get_direction_of_player
         clc
         adc dart_dir_adjust
-        cmp #24
-        bcc .no_fix
-        sec
-        sbc #24
-.no_fix
+        jsr arctang_bound_dir
         sta enemy_ram_ex,x
         ; sprite
         lda dart_sprite

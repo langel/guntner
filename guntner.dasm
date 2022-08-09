@@ -81,13 +81,13 @@ cart_start:	subroutine
         sta pal_uni_bg
         
 	;jsr game_init
-	jsr menu_screens_init
+	;jsr menu_screens_init
         ;jsr attract_init
         ;jsr cut_scene_intro_init
         ;jsr cut_scene_outro_init
         
         ;jsr options_screen_init
-        ;jsr sandbox_init
+        jsr sandbox_init
    	;jsr sandbox2_init
         
         
@@ -266,125 +266,126 @@ sprite0_off:
 ; all includes      
 
 	include "ppu_lib_and_tables.asm"
-        nop	; how much prg space we using?  
+        ;nop	; how much prg space we using?  
         
 	include "state__handler.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "state_menu_screens.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "state_cutscenes.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "state_attract.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "state_game.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 
 	include "state_sandbox.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	;include "state_sandbox2.asm"
         ;nop	; how much prg space we using?
 
 	include "arctang.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "collision_detection.dasm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
         
 	include "dashboard.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "palette.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "powerups.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "sine.dasm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	;include "starfield.dasm"
         ;nop	; how much prg space we using?
 	include "starfield_simple.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 
         
 	include "timer_global.dasm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
         
         
 	include "phase_handler.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "phase_table.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "enemy_handler.dasm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "enemy_tables.dasm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	
         
 	include "enemy_boss_moufs.asm"
-        nop
+        ;nop
 	include "enemy_boss_swordtner.asm"
-        nop
+        ;nop
 	include "enemy_boss_scarab.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "enemy_boss_vamp.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 
 	include "enemy_boss_eyes.asm"
 
 
         
 	include "enemy_ant.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	;include "enemy_bat.asm"
         ;nop	; how much prg space we using?
 	include "enemy_birb.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "enemy_chomps.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "enemy_dart.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "enemy_dumbface.asm"
-        nop
+        ;nop
 	include "enemy_galger.asm"
-        nop
+        ;nop
 	include "enemy_ikes_mom.asm"
-        nop
+        ;nop
 	include "enemy_lasso.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "enemy_maggs.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "enemy_muya.asm"
-	nop
+	;nop
 	include "enemy_skeet.asm"
-        nop	; how much prg space we using
+        ;nop	; how much prg space we using
 	include "enemy_skully.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "enemy_spark.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "enemy_starglasses.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "enemy_throber.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "enemy_uzi.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "enemy_zigzag.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
         
 	include "player_main.dasm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "player_bullets.dasm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "player_controls.dasm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "player_movement.dasm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "player_demo.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
         
 	include "apu_engine.asm"
-        nop	; how much prg space we using?    
+        ;nop	; how much prg space we using?    
 	include "apu_sfx.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "apu_song.asm"
         nop	; how much prg space we using?
-      
+
+;fdc6 - nop's used for size gauges commented out
 ;fdf5 - all 4 bosses and game play able
 ;f953 - moar optimized 1197 bytes left! \:U/
 ;f9ea - optimized enemy code / using arctang more

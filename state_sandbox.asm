@@ -28,10 +28,10 @@ sandbox_init: subroutine
         sta iframe_length
         
         ldx #$b8
-        lda #boss_swordtner_id
+        ;lda #boss_swordtner_id
         ;lda #boss_vamp_id
         ;lda #boss_scarab_id
-        ;lda #boss_moufs_id
+        lda #boss_moufs_id
         jsr enemy_spawn_delegator
         
         ; for vamp testing
@@ -40,10 +40,10 @@ sandbox_init: subroutine
         lda #$08
         ;sta player_y_hi
         
+        ldx #57 ; MOUFS palettes
         ;ldx #63 ; VAMP palettes
-        ;ldx #75 ; MOUFS palettes
-        ldx #69 ; SWORDTNER palettes
-        ;ldx #57 ; scarab palette
+        ;ldx #69 ; scarab palette
+        ;ldx #75 ; SWORDTNER palettes
         ldy #15
         jsr palette_load
         jsr palette_load
@@ -66,7 +66,7 @@ sandbox_init: subroutine
 	jsr get_enemy_slot_1_sprite
         tax
         lda #skeet_id
-        jsr enemy_spawn_delegator
+        ;jsr enemy_spawn_delegator
         dec dart_velocity
         bpl .skeet_loop
         
@@ -92,19 +92,9 @@ sandbox_init: subroutine
         ;lda #dumbface_id
         lda #ant_id
         ;lda #skully_id
-        ;lda #ikes_mom_id
+        lda #ikes_mom_id
         ;jsr enemy_spawn_delegator
         
-	jsr get_enemy_slot_4_sprite
-        tax
-        lda #ant_id
-        ;jsr enemy_spawn_delegator
-        
-        
-	jsr get_enemy_slot_4_sprite
-        tax
-        lda #throber_id
-        ;jsr enemy_spawn_delegator
         
         ;lda #$40
         lda #$ff
@@ -124,7 +114,6 @@ sandbox_init: subroutine
         
         
 sandbox_update: subroutine
-
 
 	; read user controls even in demo mode!
 	;jsr apu_game_music_frame
