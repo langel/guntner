@@ -106,12 +106,12 @@ boss_scarab_cycle: subroutine
 		
 		
 	; palette
-	lda #$01
+	lda #$02
         ldy enemy_oam_offset
         jsr sprite_4_set_palette
         beq .hit
-        clc
-        adc #$01
+        sec
+        sbc #$01
 .hit
 	sta temp01
         

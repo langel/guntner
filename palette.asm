@@ -76,8 +76,8 @@ palette_table:
         hex 15 2d 37
         ; #69 boss 
         ; scarab palettes
-        hex 03 1a 39
         hex 0c 27 37
+        hex 03 1a 39
         ; #75 boss 
         ; swordtner palettes
         hex 07 17 3d 
