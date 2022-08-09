@@ -35,9 +35,18 @@ boss_scarab_spawn: subroutine
         sta state_v2
 	rts
         
+        
         ;   KNOW
         ;  THYSELF
         ; DEATHLESS
+        
+scarab_oam_offset_table:
+	byte $c0, $d0, $e0, $f0
+scarab_wing_y_offset_table:
+	byte $f4, $e4, $0c, $1c
+scarab_wing_sprite_table:
+	byte $80, $60, $80, $60
+                
         
 boss_scarab_cycle: subroutine
         lda #$10
@@ -94,73 +103,8 @@ boss_scarab_cycle: subroutine
         sta state_v6
         
         
-        ; XXX save some bytes making a loop here
-        
-	; top middle
-	lda #$10
-        clc
-	adc enemy_oam_offset
-        tay
-        lda state_v4
-        sec
-        sbc #$6
-        clc
-        adc state_v6
-        sta temp00
-        jsr sprite_4_set_x
-        lda state_v5
-        sec
-        sbc #$0c
-        sbc state_v7
-        jsr sprite_4_set_y
-        lda #$80
-        jsr sprite_4_set_sprite
-        
-        ; top end
-	lda #$20
-        clc
-	adc enemy_oam_offset
-        tay
-        lda temp00
-        jsr sprite_4_set_x
-        lda state_v5
-        sec
-        sbc #$1c
-        sbc state_v7
-        jsr sprite_4_set_y
-        lda #$60
-        jsr sprite_4_set_sprite
-        
-	; bottom middle
-	lda #$30
-        clc
-	adc enemy_oam_offset
-        tay
-        lda temp00
-        jsr sprite_4_set_x
-        lda state_v5
-        clc
-        adc #$0c
-        adc state_v7
-        jsr sprite_4_set_y
-        lda #$80
-        jsr sprite_4_set_sprite_flip
-        
-        ; bottom end
-	lda #$40
-        clc
-	adc enemy_oam_offset
-        tay
-        lda temp00
-        jsr sprite_4_set_x
-        lda state_v5
-        clc
-        adc #$1c
-        adc state_v7
-        jsr sprite_4_set_y
-        lda #$60
-        jsr sprite_4_set_sprite_flip
-        
+		
+		
 	; palette
 	lda #$01
         ldy enemy_oam_offset
@@ -169,15 +113,46 @@ boss_scarab_cycle: subroutine
         clc
         adc #$01
 .hit
-        ldy #$c0
-        jsr sprite_4_set_palette_no_process
-        ldy #$d0
-        jsr sprite_4_set_palette_no_process
+	sta temp01
+        
+        ; calc x pos of wing set
+        lda state_v4
+        sec
+        sbc #$6
+        clc
+        adc state_v6
+        sta temp00
+		
+		
+	ldx #$03
+.wing_sprites_loop
+	ldy scarab_oam_offset_table,x
+	; x
+	lda temp00
+        jsr sprite_4_set_x
+	; y
+	lda state_v5
+	clc
+	adc scarab_wing_y_offset_table,x
+	jsr sprite_4_set_y
+        ; sprite
+	lda scarab_wing_sprite_table,x
+        ; flipped wing?
+        cpx #$02
+        bcc .no_flip
+        jsr sprite_4_set_sprite_flip
+        ; att flipped
+        lda temp01
         ora #$80
-        ldy #$e0
+        bne .sprite_done
+.no_flip
+        jsr sprite_4_set_sprite
+	; att
+	lda temp01
+.sprite_done
         jsr sprite_4_set_palette_no_process
-        ldy #$f0
-        jsr sprite_4_set_palette_no_process
+	dex
+	bpl .wing_sprites_loop
         
         
 ; SHOOT
