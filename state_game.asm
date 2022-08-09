@@ -43,7 +43,7 @@ game_init:
         jsr song_start
         lda state_v1
         beq .no_super_secret_code
-	lda #30
+	lda #$20
         sta player_lives
 .no_super_secret_code
         rts
