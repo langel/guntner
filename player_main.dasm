@@ -99,6 +99,7 @@ player_take_damage: subroutine
         sec
         sbc player_damage
         bcc .player_dead
+        beq .player_dead
         sta player_health
         rts
 .player_dead
@@ -107,7 +108,7 @@ player_take_damage: subroutine
         beq .player_really_dead
         lda #$00
         sta mask_shield
-        lda #2
+        lda #1
         sta bullet_x_vel
         lda #$ff
         sta player_health
