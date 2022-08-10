@@ -385,6 +385,7 @@ sprite0_off:
 	include "apu_song.asm"
         nop	; how much prg space we using?
 
+;fd82 - refactored scarab sprite handlings
 ;fdc6 - nop's used for size gauges commented out
 ;fdf5 - all 4 bosses and game play able
 ;f953 - moar optimized 1197 bytes left! \:U/

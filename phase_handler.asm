@@ -543,6 +543,19 @@ phase_boss_fight_cooldown: subroutine
         
         
 phase_interval_spawn: subroutine
+	; dont spawn if boss is dying
+	lda boss_death_happening
+        bne .no_enemy
+	; check for ike's mom spawn
+        lda ftw
+        ;cmp #84 ; about 6 minutes
+        cmp #42 ; about 3 minutes
+        bne .no_ikes_mom
+        ; important to keep counter still
+	dec phase_interval_counter
+        lda #ikes_mom_id
+        bne .dont_reset_counter
+.no_ikes_mom
 	; interval enemy spawn?
         lda timer_frames_1s
         cmp #char_set_offset
@@ -563,6 +576,8 @@ phase_interval_spawn: subroutine
 	lda timer_seconds_10s
         and #$01
         bne .no_enemy
+        ; important to keep counter still
+	dec phase_interval_counter
         lda #starglasses_id
         bne .dont_reset_counter
 .spawn_enemy

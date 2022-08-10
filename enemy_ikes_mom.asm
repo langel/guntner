@@ -9,6 +9,9 @@ ikes_mom_spawn:
         sta oam_ram_y,y
         lda #$05
         sta enemy_ram_ex,x
+        ; reset spawn counter
+        lda #$00
+        sta ftw
 	rts
         
         
