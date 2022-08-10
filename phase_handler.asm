@@ -552,11 +552,19 @@ phase_interval_spawn: subroutine
         bne .no_enemy
         ; look for 10 second increments
         lda timer_seconds_1s
+        cmp #char_set_offset
+        beq .starglasses_possible
         cmp #char_set_offset+1
         beq .spawn_enemy
         cmp #char_set_offset+7
         beq .spawn_enemy
         bne .no_enemy
+.starglasses_possible
+	lda timer_seconds_10s
+        and #$01
+        bne .no_enemy
+        lda #starglasses_id
+        bne .dont_reset_counter
 .spawn_enemy
 	ldy phase_level
 	lda level_intervals_lo,y

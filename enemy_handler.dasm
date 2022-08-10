@@ -384,6 +384,10 @@ crossbones_cycle: subroutine
         sta oam_ram_att,y
         bne .crossbones_done
 .crossbones_death
+	lda sfx_noi_counter
+        bne .die_already
+        jsr sfx_ghost_snare
+.die_already
         jsr enemy_death
 .crossbones_done
 	jmp update_enemies_handler_next
