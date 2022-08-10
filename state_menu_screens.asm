@@ -185,7 +185,6 @@ scrollto_titles_update: subroutine
 
 menus_position_rudy: subroutine
 	lda scroll_x_hi
-        cmp #$00
         bne .do_eeet
         rts
 .do_eeet
@@ -374,6 +373,8 @@ options_screen_update: subroutine
 .skip_player_colors
 	lda player_start_d
         beq .dont_start_game
+        lda #$c0 ; set scroll to title screen
+	sta scroll_to_counter
         lda #$04 ; menu return pos
         cmp options_rudy_pos
         beq .dont_start_game
@@ -433,8 +434,6 @@ options_table_hi:
 options_menu_return: subroutine
 	lda player_a_d
         ora player_b_d
-        ora player_start_d
-        cmp #$00
         beq .do_nothing
         lda #4
         jsr state_update_set_addr
