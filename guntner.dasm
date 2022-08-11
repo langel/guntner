@@ -9,7 +9,7 @@
 ; $300 entity data
 ; $400-7ff sine scale tables
 
-spare_stack	EQM	$190
+spare_stack	EQM	$194
 top_of_stack	EQM	$1e0
 end_of_ram 	EQM 	$800
 

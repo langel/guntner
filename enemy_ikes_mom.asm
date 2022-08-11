@@ -1,5 +1,4 @@
 
-ikes_mom_spawn_counter	EQM $0191
 
 ikes_mom_spawn:
 	jsr get_oam_offset_from_slot_offset

@@ -181,7 +181,7 @@ starfield_draw_dash_top_bar_nametable0: subroutine
         ; fill page 1 bar for sprite 0 collisions
 	PPU_SETADDR dash_page1_top_bar
         lda #dash_top_bar_tile
-        ldy #$20
+        ldy #$1f
 .tile_dash_set_page1
         sta PPU_DATA
         dey

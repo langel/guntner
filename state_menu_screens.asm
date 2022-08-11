@@ -55,7 +55,7 @@ big_title_loop:
 
 ; pinline on title screen
 	PPU_SETADDR $22c0
-        lda #$b9
+        lda #$b1
         ldy #$20
 .pinline_footer
 	sta PPU_DATA
@@ -64,7 +64,7 @@ big_title_loop:
 
 ; pinline on options screen
 	PPU_SETADDR $2420
-        lda #$b9
+        lda #$b1
         ldy #$20
 .pinline_header
 	sta PPU_DATA

@@ -64,23 +64,20 @@ attract_spawn_enemy: subroutine
 .no_starglasses
 	; birb
 	jsr get_enemy_slot_1_sprite
-        cmp #$ff
+        cpx #$ff
         beq .no_birb
-        tax
         lda #birb_id
         bne .delegate
 .no_birb
 	; maggs
 	jsr get_enemy_slot_2_sprite
-        cmp #$ff
+        cpx #$ff
         beq .no_maggs
-        tax
         lda #maggs_id
         bne .delegate
 .no_maggs
 	; skully
 	jsr get_enemy_slot_4_sprite
-        tax
         lda #skully_id
         cpx #$c0
         bcc .delegate

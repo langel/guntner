@@ -236,8 +236,9 @@ phase_galger: subroutine
         beq .dont_spawn
 .do_a_spawn
 	jsr get_enemy_slot_1_sprite
-        cmp #$ff
+        cpx #$ff
         beq .dont_spawn
+        txa
         jsr phase_spawn_track
         tax
         lda #galger_id
@@ -276,8 +277,9 @@ phase_spawns: subroutine
 .do_spawn
         ldy phase_spawn_type
         jsr enemy_slot_from_type
-        cmp #$ff
+        cpx #$ff
         beq .dont_spawn
+        txa
         jsr phase_spawn_track
         tax
 	dec phase_spawn_counter
@@ -341,9 +343,10 @@ phase_spawn_long: subroutine
         adc #spark_id
         tay
 	jsr get_enemy_slot_1_sprite
-        cmp #$ff
+        cpx #$ff
         beq .dont_spawn
 .set_and_jump
+	txa
         jsr phase_spawn_track
         tax
         tya
@@ -550,11 +553,9 @@ phase_interval_spawn: subroutine
         lda ftw
         ;cmp #84 ; about 6 minutes
         cmp #42 ; about 3 minutes
-        bne .no_ikes_mom
-        ; important to keep counter still
-	dec phase_interval_counter
-        lda #ikes_mom_id
-        bne .dont_reset_counter
+        bcc .no_ikes_mom
+        ldy #ikes_mom_id
+        bne phase_interval_spawn_special_4_sprite
 .no_ikes_mom
 	; interval enemy spawn?
         lda timer_frames_1s
@@ -574,12 +575,14 @@ phase_interval_spawn: subroutine
         bne .no_enemy
 .starglasses_possible
 	lda timer_seconds_10s
-        and #$01
+        ;and #$01
+        cmp #char_set_offset+3
+        beq .starglasses_happening
+        cmp #char_set_offset+5
         bne .no_enemy
-        ; important to keep counter still
-	dec phase_interval_counter
-        lda #starglasses_id
-        bne .dont_reset_counter
+.starglasses_happening
+        ldy #starglasses_id
+        bne phase_interval_spawn_special_4_sprite
 .spawn_enemy
 	ldy phase_level
 	lda level_intervals_lo,y
@@ -595,14 +598,23 @@ phase_interval_spawn: subroutine
 .dont_reset_counter	
 	tay
         jsr enemy_slot_from_type
-        cmp #$ff
+        cpx #$ff
         beq .no_enemy
 	inc phase_interval_counter
-        tax
         tya
         jsr enemy_spawn_delegator
 .no_enemy
 	rts
+        
+phase_interval_spawn_special_4_sprite: subroutine
+	jsr get_enemy_slot_4_sprite
+        cpx #$ff
+        beq .nope
+        tya
+        jsr enemy_spawn_delegator
+.nope
+	rts
+        
         
         
         

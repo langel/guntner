@@ -595,7 +595,7 @@ get_enemy_slot_next: subroutine
         
 enemy_slot_from_type: subroutine
 	; y = enemy type id
-        ; returns slot offset in a
+        ; returns slot offset in x
         ldx enemy_size_table,y
         cpx #1
         bne .not_size_1
@@ -609,7 +609,7 @@ enemy_slot_from_type: subroutine
         
 
 get_enemy_slot_1_sprite: subroutine
-	; returns enemy_ram offset
+	; returns enemy_ram offset in x
         lda #$00
 .slot_loop
 	tax
@@ -624,11 +624,10 @@ get_enemy_slot_1_sprite: subroutine
 .no_available_slot
         ldx #$ff 
 .slot_found
-	txa
 	rts
         
 get_enemy_slot_2_sprite: subroutine
-	; returns enemy_ram offset
+	; returns enemy_ram offset in x
         lda #$80
 .slot_loop
 	tax
@@ -643,11 +642,10 @@ get_enemy_slot_2_sprite: subroutine
 .no_available_slot
         ldx #$ff 
 .slot_found
-	txa
 	rts
         
 get_enemy_slot_4_sprite: subroutine
-	; returns enemy_ram offset
+	; returns enemy_ram offset in x
         lda #$a0
 .slot_loop
 	tax
@@ -662,5 +660,4 @@ get_enemy_slot_4_sprite: subroutine
 .no_available_slot
         ldx #$ff 
 .slot_found
-	txa
 	rts

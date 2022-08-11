@@ -64,7 +64,6 @@ sandbox_init: subroutine
         sta dart_velocity
 .skeet_loop
 	jsr get_enemy_slot_1_sprite
-        tax
         lda #skeet_id
         ;jsr enemy_spawn_delegator
         dec dart_velocity
@@ -74,13 +73,11 @@ sandbox_init: subroutine
         ldx #$05
         jsr arc_sequence_set
 	jsr get_enemy_slot_1_sprite
-        tax
         lda #galger_id
         ;jsr enemy_spawn_delegator
         
         
 	jsr get_enemy_slot_2_sprite
-        tax
         lda #muya_id
         ;jsr enemy_spawn_delegator
         
@@ -88,7 +85,6 @@ sandbox_init: subroutine
         
         
 	jsr get_enemy_slot_4_sprite
-        tax
         ;lda #dumbface_id
         lda #ant_id
         ;lda #skully_id

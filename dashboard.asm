@@ -71,12 +71,12 @@ dashboard_init: subroutine
 dashboard_bg_tiles:
 	; row 0 is top bar
 	; row 1 : top hud frames	
-        hex cfb1bcbcbcbcbcbe
+        hex b4b4bcbcbcbcbcbe
         hex bcbcbcbcbcbcbcbc
         hex bcbcbcbcbcbcbcbc
-        hex bebcbcbcbcbcbdcf
+        hex bebcbcbcbcbcbdb4
         ; row 2 : health, meter, lives
-	hex cfb0
+	hex b4b0
         byte #char_set_S
         hex a8a9aa
         hex ffb3
@@ -84,24 +84,24 @@ dashboard_bg_tiles:
 	hex ffffffffffffffff
         hex b3aeaf
         byte #char_set_x
-        hex 30b1b2cf
+        hex 30b1b2b4
         ; row 3 : middle hud frames
-        hex cfb8b9b9b9b9b9b7
+        hex b4b8b9b9b9b9b9b7
         hex b9b9bfbbb9b9b9b9
         hex b9b9b9b9bfbbb9b9
-        hex b7b9b9b9b9b9bacf
+        hex b7b9b9b9b9b9bab4
         ; row 4 : wave, score, time
-	hex cfb0
+	hex b4b0
         byte #char_set_P,#char_set_H,#char_set_A
         byte #char_set_S,#char_set_E,#tile_empty
 	hex ffffb2b0ffffffff
 	hex ffffffb2b2b0ffff
-	hex ffffffffffffb2cf
+	hex ffffffffffffb2b4
 	; row 5 : bottom hud frames
-        hex 1db4b5b5b5b5b5b5
+        hex b4b4b5b5b5b5b5b5
 	hex b5b5b6b4b5b5b5b5
 	hex b5b5b5b5b6b4b5b5
-        hex b5b5b5b5b5b5b6cf
+        hex b5b5b5b5b5b5b6b4
 
 
         
