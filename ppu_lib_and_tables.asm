@@ -199,13 +199,13 @@ menu_screen_tile_data:
 	hex 222a
 	hex 8d7d6c7103038f787c7277767b
 	byte #$00
-	; " v2.73 "
-	hex 22d7
-	hex 037e6299676303
+	; " ax1147 "
+	hex 22d5
+	hex 036a806161646703
 	byte #$00
-	; "(c)MMXXII puke7, LoBlast"
-	hex 2304
-	hex 9c6c9d8d8d9696898903787d736e6798038c7783746a7b7c
+	; "(C)opyright MMXXII LoBlast"
+	hex 2303
+	hex 9c849d7778817a7270717c038d8d96968989038c7783746a7b7c
 	byte #$00
 	; " Options Screen "
 	hex 2423
