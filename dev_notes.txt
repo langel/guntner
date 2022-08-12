@@ -23,29 +23,48 @@ Moufs Lipps 04 16 30
 
 fix these:
 	vampire doesn't always show hit/damage?
+	vampire bats should be out for death 
 	brighter bg colors during boss death and hearts
+	hearts stay bright longer
+	sprite_2's 2nd sprite not cleared on boss death
 	
-	test - pause enemy spawns during player death animation
-	test - start on end scene should go back to menu
+	swordtner sucks
+	replace score with data
 	
-	more forgiving autofire
-	
-	mask doesn't always give life and leave on player death
-	random game reset happened in easiest mode
+Kaytse bugs:
+	enemy spawn feels a bit cheap sometimes. i think i died a few times because of enemies hitting me at the right side of the screen (i think the stars), although they were spawning left.
+	after playing the death music (song 5), the palette will turn into the one after going game over
 
 enemies
-	muya
 	ikes mom
+		shake with sound effect
 	finger
-bosses
-	lazerface
-	swordtner
-difficulty
-	?adjust xp values?
-	player damage from enemies
+continues --
+	only if past first level
+	takes player back to beginning of level
+	countdown from 3 using rng chord
+	reset score
 game over glitches
-player damage should use dithered transparency sprite instead of disappearing during iframes
+	
 
+dart spawner
+	what shoots? boss_moufs, boss_scarab, ants, galgers
+	spawn arguments:
+		dart_x_origin
+		dart_y_origin
+		dart_velocity
+		dart_sprite
+		dart_dir_adjust
+
+arctang_velocities_lo:
+	byte #<arctang_velocity_6.66
+	byte #<arctang_velocity_4.5
+	byte #<arctang_velocity_3.33
+	byte #<arctang_velocity_2.5
+	byte #<arctang_velocity_1.75  -- default currently
+	byte #<arctang_velocity_1.25
+	byte #<arctang_velocity_0.75
+	byte #<arctang_velocity_0.33
 
 
 
