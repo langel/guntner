@@ -63,21 +63,29 @@ level_intervals_hi:
 
 
 level_0_interval_spawn_table:
+	; spawn count = 5
+	; starglasses = 2
         byte starglasses_id, spark_id
         byte starglasses_id, spark_id
         byte dumbface_id
         byte 0
 level_1_interval_spawn_table:
+	; spawn count = 7
+	; starglasses = 2
         byte birb_id, starglasses_id, ant_id, zigzag_id
         byte starglasses_id, zigzag_id, dumbface_id
         byte 0
 level_2_interval_spawn_table:
+	; spawn count = 14
+	; starglasses = 2
         byte maggs_id, skeet_id, starglasses_id
         byte ant_id, skeet_id, ant_id, starglasses_id
         byte skeet_id, lasso_id, starglasses_id
         byte chomps_id, skeet_id, skeet_id, starglasses_id
         byte 0
 level_3_interval_spawn_table:
+	; spawn count = 14
+	; starglasses = 2
         byte chomps_id, maggs_id, birb_id, starglasses_id
         byte lasso_id, ant_id, uzi_id, lasso_id, ant_id, uzi_id
         byte dumbface_id, skully_id, throber_id, starglasses_id
