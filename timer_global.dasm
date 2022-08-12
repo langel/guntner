@@ -44,8 +44,15 @@ timer_update: subroutine
 ; minutes 10s
 	; we really checking this?
         ; let it go into tile limbo
-        ; XXX GAME OVER at 99:59.59 !!
+        ; GAME OVER at 99:59.59 !!
 	inc timer_minutes_10s
+        lda timer_seconds_10s
+        cmp #char_set_offset+$a
+        bne .timer_done
+        lda #$00
+        sta player_health
+        lda #$01
+        sta player_lives
 .timer_done
 	rts
         

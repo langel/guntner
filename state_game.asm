@@ -62,9 +62,7 @@ game_update_generic: subroutine
         sta scroll_cache_hi
         lda scroll_speed_lo
         sta scroll_cache_lo
-        ;jsr death_scroll_set_speed_m
         dec player_lives
-        ;lda player_lives
         bne .youdead
         ; attract mode has different behaviour
         lda attract_true

@@ -145,23 +145,20 @@ cut_scene_outro_init: subroutine
         ldy #3
         jsr palette_load
         
-        
-        ; XXX temp for debug purposes
-        inc phase_end_game
-        ;lda #$2+char_set_offset
-        ;sta timer_minutes_1s
-        ;lda #$0+char_set_offset
-        ;sta timer_minutes_10s
+        inc phase_end_game    
         
         ; allow future plays to be boundless
         inc player_boundless
         
-        ; use timer to decide end screen?
+        ; use timer to decide end screen
         lda timer_minutes_10s
-        cmp #$1+char_set_offset
-        beq .ok
-        bcc .good
+        cmp ##$0+char_set_offset
+        beq .good
+        lda timer_minutes_1s
+        cmp #$5+char_set_offset
+        bcc .ok
 .bad
+	; 15+ minutes
         NMTP_SETADDR cut_scene_ending_bad_tile_data
         ; palette
         lda #$06
@@ -173,6 +170,7 @@ cut_scene_outro_init: subroutine
         jsr song_start
         jmp .plot_screen
 .ok
+	; 10+ minutes
         NMTP_SETADDR cut_scene_ending_ok_tile_data
         ; palette
         lda #$07
@@ -184,6 +182,7 @@ cut_scene_outro_init: subroutine
         jsr song_start
         jmp .plot_screen
 .good
+	; under 10 minutes
         NMTP_SETADDR cut_scene_ending_good_tile_data
         ; palette
         lda #$01

@@ -11,21 +11,10 @@
 ;phase_end_game		byte
 
 
-
 ; phase_state : 0 = still spawning
-
-
-        
-; XXX need to try different rates of periodic enemy spawns
-; NEW GAME PERIODIC LARGE ENEMY SPAWNS
-; every level has a table for periodic enemy spawns
-;	enemy id, (repeat); null terminated
-;	enemies spawn every nth frame
-;	rate could be set by level (and/or difficulty)
 
 phase_handling_stuff
 
-        
         
         
         
@@ -194,7 +183,7 @@ phase_zero: subroutine
         lda #$ff
         sta dashboard_message
         lda phase_current
-        ; XXX this should #$40 for the full game
+        ; phase #$40 == game done/end
         cmp #$40
         beq .end_game
         inc phase_state

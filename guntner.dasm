@@ -84,7 +84,7 @@ cart_start:	subroutine
 	jsr menu_screens_init
         ;jsr attract_init
         ;jsr cut_scene_intro_init
-        ;jsr cut_scene_outro_init
+        jsr cut_scene_outro_init
         
         ;jsr options_screen_init
         ;jsr sandbox_init
@@ -164,7 +164,12 @@ sprite0_wait:
         beq .wait1
         
 	; HUD POSITIONING
-        ; XXX vertical scroll solution
+        ; Horizontal Scroll Solution
+        bit PPU_STATUS
+        lda #$00
+        sta PPU_SCROLL
+        sta PPU_SCROLL
+        ; Vertical Scroll Solution
         ;lda #$26
         ;sta PPU_ADDR
         ;lda #$c0
@@ -172,11 +177,6 @@ sprite0_wait:
         ;lda #$00
         ;sta PPU_SCROLL
         ;sta PPU_SCROLL
-        ; XXX horizontal scroll solution
-        bit PPU_STATUS
-        lda #$00
-        sta PPU_SCROLL
-        sta PPU_SCROLL
         
 	; set bg pos to page 2 for dashboard
 	lda #$01|#CTRL_NMI|CTRL_BG_1000
@@ -200,7 +200,8 @@ skip_dash_update:
 sprite0_off:
         
         
-        ; XXX phase handler debugging
+        ; debug in lifebar space
+        
         ;lda phase_spawn_counter
         ;jsr get_char_hi
         ;sta $109
@@ -214,21 +215,6 @@ sprite0_off:
         ;lda phase_kill_counter
         ;jsr get_char_lo
         ;sta $10d
-        
-        ;lda phase_state
-        ;jsr get_char_hi
-        ;sta $10f
-        ;lda phase_state
-        ;jsr get_char_lo
-        ;sta $110
-        	
-        ;lda phase_table_ptr
-        ;jsr get_char_hi
-        ;sta $112
-        ;lda phase_table_ptr
-        ;jsr get_char_lo
-        ;sta $113
-        ; XXX end debug code
         
         
         jsr song_update
