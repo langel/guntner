@@ -18,7 +18,6 @@
 
 
 boss_vamp_bat_spawn: subroutine
-	; a = animation counter for ex
 	; x = bat slot in enemy ram
 	lda #boss_vamp_bat_id
         sta enemy_ram_type,x
@@ -70,6 +69,7 @@ boss_vamp_bat_cycle: subroutine
 	ldx enemy_ram_offset
         sta oam_ram_y,y
         ; interpret animation
+        ; XXX add sprite to reduce complexity here
         lda enemy_ram_ex,x
         lsr
         lsr
@@ -90,6 +90,7 @@ boss_vamp_bat_cycle: subroutine
 	lda #$ff
         sta oam_ram_y,y
         bne .done
+        
 	
         
         ; I VANT TO
@@ -99,37 +100,39 @@ boss_vamp_spawn: subroutine
 
         lda #do_nothing_id
         sta $03d8
-        ; set spawn x
+        ; SET STUFF to #$00
         lda #$00
+        ; set spawn x
         sta state_v1
+        ; set mouth closed
+        sta state_v7
+        ;related but unecessary
+        ;sta enemy_ram_x,x
+        ; temps
+        sta temp01
+        sta temp02
+        ; set spawn x
         lda #$a0
         sta state_v2
-        ; set mouth closed
-        lda #$00
-        sta state_v7
-        sta enemy_ram_x,x
         ; set spawn y
         lda #$15
         sta enemy_ram_y,x 
         ; bats are visible
         lda #$01
         sta state_v5
-        ; target count of bat underlings; d = 13
-        lda #$0d
-        sta temp00 
-        lda #$00
-        sta temp01
-        sta temp02
+        ; minimum bat circle size
         lda #$40
-        sta state_v4 ; minimum bat circle size
+        sta state_v4 
         ; rando target
         lda #$80
         sta state_v6
+        ; target count of bat underlings; 
+        ; #$0d = 13 but we `bpl loopin`
+        ldy #$0c
+        sta temp00 
 .bat_spawn_loop
 	; a = animation counter / v1
 	; x = slot in enemy ram 
-        ; y = boss slot in ram  / v3
-        ; stash boss slot in pattern counter
         ldx temp02
         lda temp01
         sta enemy_ram_ex,x
@@ -139,19 +142,14 @@ boss_vamp_spawn: subroutine
         lda #$08
         adc temp02
         sta temp02
-	dec temp00
-        beq .done
-        jmp .bat_spawn_loop
+	dey 
+        bpl .bat_spawn_loop
 .done
    	rts
 
 
 
 boss_vamp_cycle: subroutine
-        clc
-        lda oam_ram_x,y
-        adc #$01
-        sta collision_0_x
         lda #$0d
         sta collision_0_w
         lda #$10
@@ -160,9 +158,16 @@ boss_vamp_cycle: subroutine
         inc boss_dmg_handle_true
         jsr enemy_handle_damage_and_death
         dec boss_dmg_handle_true
+; IS DEAD?
+        lda boss_death_happening
+        beq .not_dead
+        inc state_v5 ; bats are visible
+        lda #$56
+        sta state_v4 ; bat circle size
+        sta state_v7 ; mouf open
+.not_dead
         
-
-	; MOUTH HANDLER
+; MOUTH HANDLER
 ; state_v7 : mouth frame current
 ; enemy_ram_pc : mouth frame target
 	lda state_v7
@@ -175,7 +180,6 @@ boss_vamp_cycle: subroutine
 .mouth_close
 	dec state_v7
 .mouth_is_fine
-
 
 ; STATE behavior     
         jsr boss_vamp_update_state_delegator
@@ -194,14 +198,13 @@ boss_vamp_cycle: subroutine
         asl
         clc
         adc #$9a
-        ;lda #$9c
         jsr sprite_4_set_sprite
+        
         ; palette
         lda #$02
         jsr sprite_4_set_palette
-        cmp #$02
-        beq .not_hit
-        lda #$20
+        bne .not_hit
+        lda #$80
         sta state_v7
 .not_hit
         
@@ -280,6 +283,7 @@ boss_vamp_calc_boss_x_y: subroutine
         sta boss_y
 	rts
         
+        ; XXX fix the sprites so we don't need this
 boss_vamp_plot_x: subroutine
 	sta oam_ram_x,y
 	sta oam_ram_x+8,y
@@ -289,7 +293,6 @@ boss_vamp_plot_x: subroutine
 	sta oam_ram_x+12,y
         rts
 
-boss_vamp_plot_y:; jsr sprite_4_set_y
 
 boss_vamp_x_target_new: subroutine
 	lda rng2
@@ -348,6 +351,8 @@ boss_vamp_state_idle_update: subroutine
         lda enemy_ram_type,x
         bne .dont_respawn_bat
         jsr boss_vamp_bat_spawn
+        lda #$20
+        sta state_v7
 .dont_respawn_bat
         lda #$08
         clc

@@ -39,10 +39,8 @@ enemy_boss_eyes: subroutine
 	lda oam_ram_spr,x
         cmp #$99
         beq .adjust_for_left_looking
-	;inc oam_ram_x,x
         jmp .done
 .adjust_for_left_looking
-	;dec oam_ram_x,x
         rts
 .looking_up
 	dec oam_ram_y,x

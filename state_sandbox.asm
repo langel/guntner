@@ -29,16 +29,16 @@ sandbox_init: subroutine
         
         ldx #$b8
         ;lda #boss_swordtner_id
-        ;lda #boss_vamp_id
-        lda #boss_scarab_id
+        lda #boss_vamp_id
+        ;lda #boss_scarab_id
         ;lda #boss_moufs_id
         jsr enemy_spawn_delegator
         
         ; for vamp testing
         lda #$f0
-        ;sta player_x_hi
+        sta player_x_hi
         lda #$08
-        ;sta player_y_hi
+        sta player_y_hi
         
         ;ldx #57 ; MOUFS palettes
         ;ldx #63 ; VAMP palettes
