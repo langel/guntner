@@ -55,21 +55,20 @@ chomps_cycle: subroutine
         adc #$d0
         cmp #$80
         bcs .not_closed
-	lda #$38
+	lda #$58
         bne .sprite_done
 .not_closed
         cmp #$a0
         bcs .half_open
-	lda #$48
+	lda #$68
         bne .sprite_done
 .half_open
-	lda #$49
-        ;bne .sprite_done
+	lda #$78
 .sprite_done
         sta oam_ram_spr+4,y
         
 .frame_done
-        lda #$02
+        lda #$01
         jsr enemy_set_palette
         sta oam_ram_att+4,y
 .done

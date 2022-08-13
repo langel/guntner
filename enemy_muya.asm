@@ -54,9 +54,9 @@ muya_cycle: subroutine
 .reset_skip
         
 	; sprite
-        lda #$58
+        lda #$64
         sta oam_ram_spr,y
-        lda #$68
+        lda #$74
         sta oam_ram_spr+4,y
         
         ; palette

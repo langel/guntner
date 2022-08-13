@@ -84,7 +84,7 @@ dashboard_bg_tiles:
 	hex ffffffffffffffff
         hex b3aeaf
         byte #char_set_x
-        hex 30b1b2b4
+        hex 30b1b2b6
         ; row 3 : middle hud frames
         hex b4b8b9b9b9b9b9b7
         hex b9b9bfbbb9b9b9b9
@@ -94,14 +94,14 @@ dashboard_bg_tiles:
 	hex b4b0
         byte #char_set_P,#char_set_H,#char_set_A
         byte #char_set_S,#char_set_E,#tile_empty
-	hex ffffb2b0ffffffff
-	hex ffffffb2b2b0ffff
+	hex ffffb2b6ffffffff
+	hex ffffffffb2b0ffff
 	hex ffffffffffffb2b4
 	; row 5 : bottom hud frames
         hex b4b4b5b5b5b5b5b5
 	hex b5b5b6b4b5b5b5b5
 	hex b5b5b5b5b6b4b5b5
-        hex b5b5b5b5b5b5b6b4
+        hex b5b5b5b5b5b5b6b6
 
 
         

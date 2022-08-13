@@ -8,6 +8,7 @@
 ; state_v3 : y bounce sine direction
 ; state_v4 : sprite x position
 ; state_v5 : sprite y position
+; state_v6 : upper lip up sprite offset
 
 
 boss_moufs_spawn: subroutine
@@ -28,6 +29,12 @@ boss_moufs_spawn: subroutine
         sta boss_x
         lda #$20
         sta boss_y
+        lda #chomps_id
+        ldx #$90
+        jsr enemy_spawn_delegator
+        lda #chomps_id
+        ldx #$98
+        jsr enemy_spawn_delegator
 	rts
         
 sprite_3_set_sprite: subroutine
@@ -77,7 +84,11 @@ boss_moufs_cycle: subroutine
         jsr enemy_handle_damage_and_death
         dec boss_dmg_handle_true
 
-	; sine bounce moevemtn
+	; set upper lip default sprite
+        lda #$00
+        sta state_v6
+        
+	; sine bounce movement
         ; ac does x axis
 	inc enemy_ram_ac,x
         ; pc does y axis
@@ -86,9 +97,17 @@ boss_moufs_cycle: subroutine
         bne .y_increase
 .y_decrease
         dec enemy_ram_pc,x
+        lda enemy_ram_pc,x
+        cmp #$b6
+        bcs .y_change_done
+        inc state_v6
         jmp .y_change_done
 .y_increase
         inc enemy_ram_pc,x
+        lda enemy_ram_pc,x
+        cmp #$c4
+        bcc .y_change_done
+        inc state_v6
 .y_change_done
         ldy enemy_ram_pc,x
         lda sine_table,y
@@ -153,8 +172,18 @@ boss_moufs_cycle: subroutine
         sta state_v2
 
 	; row 1
+        lda state_v6
+        beq .lip_up
+.lip_down
+	lda #$65
+        sta state_v6
+        bne .upper_lip_set_sprite
+.lip_up
 	lda #$86
+        sta state_v6
+.upper_lip_set_sprite
         jsr sprite_3_set_sprite
+        
 	lda state_v4
         jsr sprite_3_set_x
 	lda state_v2
@@ -169,7 +198,9 @@ boss_moufs_cycle: subroutine
         adc #$08
         sta state_v2
         
-	lda #$96
+	lda #$10
+        clc
+        adc state_v6
         jsr sprite_3_set_sprite
 	lda state_v4
         jsr sprite_3_set_x
