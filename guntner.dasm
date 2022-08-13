@@ -87,7 +87,7 @@ cart_start:	subroutine
         ;jsr cut_scene_outro_init
         
         ;jsr options_screen_init
-        jsr sandbox_init
+        ;jsr sandbox_init
    	;jsr sandbox2_init
         
         

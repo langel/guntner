@@ -68,18 +68,13 @@ boss_vamp_bat_cycle: subroutine
         sbc temp03
 	ldx enemy_ram_offset
         sta oam_ram_y,y
-        ; interpret animation
-        ; XXX add sprite to reduce complexity here
+        ; interpret animation frame
         lda enemy_ram_ex,x
         lsr
         lsr
         and #%00000011
-        cmp #$03
-        bne .frame_found
-        lda #$01   	
-.frame_found
 	clc
-        adc #$39
+        adc #$38
         sta oam_ram_spr,y
         lda #$01
         jsr enemy_set_palette
@@ -169,6 +164,10 @@ boss_vamp_cycle: subroutine
         sta state_v7 ; mouf open
         ; track bats are gonna spawn
         inc boss_death_happening
+        lda oam_ram_x,y
+        sta boss_x
+        lda oam_ram_y,y
+        sta boss_y
         ; reset enemy handler so bats show
 	jmp update_enemies_reset
 .bats_spawned
@@ -269,7 +268,7 @@ boss_vamp_calc_boss_x_y: subroutine
         adc sine_6bits,y
         sta boss_x
         ldy enemy_oam_offset
-        jsr boss_vamp_plot_x
+        jsr sprite_4_set_x
         lda boss_x
         clc
         adc #$04 ; add half of vampire size and subtract half of bat size?
@@ -290,26 +289,7 @@ boss_vamp_calc_boss_x_y: subroutine
         sta boss_y
 	rts
         
-        ; XXX fix the sprites so we don't need this
-boss_vamp_plot_x: subroutine
-	sta oam_ram_x,y
-	sta oam_ram_x+8,y
-	clc
-	adc #$07
-	sta oam_ram_x+4,y
-	sta oam_ram_x+12,y
-        rts
 
-
-boss_vamp_x_target_new: subroutine
-	lda rng2
-        lsr
-        lsr
-        clc
-        adc #$20
-        sta state_v1
-	rts
-        
         
 boss_vamp_state_idle_update: subroutine
 	; update x home pos
@@ -407,7 +387,7 @@ boss_vamp_state_shake: subroutine
         and #%00000111
         clc
         adc boss_x
-        jsr boss_vamp_plot_x
+        jsr sprite_4_set_x
         ; y shake
 	lda rng1
         and #%00000111
@@ -437,7 +417,7 @@ boss_vamp_state_lunge: subroutine
 	jsr arctang_enemy_update
         ldy enemy_oam_offset
         lda oam_ram_x,y
-        jsr boss_vamp_plot_x
+        jsr sprite_4_set_x
         lda oam_ram_y,y
         jsr sprite_4_set_y
 	inc state_v4
@@ -462,7 +442,7 @@ boss_vamp_state_retreat: subroutine
 	jsr arctang_enemy_update
         ldy enemy_oam_offset
         lda oam_ram_x,y
-        jsr boss_vamp_plot_x
+        jsr sprite_4_set_x
         lda oam_ram_y,y
         jsr sprite_4_set_y
 	dec state_v4
