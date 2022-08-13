@@ -161,10 +161,17 @@ boss_vamp_cycle: subroutine
 ; IS DEAD?
         lda boss_death_happening
         beq .not_dead
+        cmp #$02
+        beq .bats_spawned
         inc state_v5 ; bats are visible
         lda #$56
         sta state_v4 ; bat circle size
         sta state_v7 ; mouf open
+        ; track bats are gonna spawn
+        inc boss_death_happening
+        ; reset enemy handler so bats show
+	jmp update_enemies_reset
+.bats_spawned
 .not_dead
         
 ; MOUTH HANDLER

@@ -279,12 +279,14 @@ enemies_update_all: subroutine
         bne .player_alive
         beq player_dead_enemies_despawn
 .player_alive
-	; cycle through all the slots
+update_enemies_reset:
+	; set vars for processing
 	ldx #$00
         stx enemy_slot_id
         stx enemy_ram_offset
         ldy enemy_slot_offset_to_oam_offset,x
         sty enemy_oam_offset
+	; cycle through all the slots
 .handler_loop
         ldx enemy_ram_offset
 	; get enemy type
