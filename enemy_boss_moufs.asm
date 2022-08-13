@@ -96,16 +96,18 @@ boss_moufs_cycle: subroutine
         and #$01
         bne .y_increase
 .y_decrease
+	; arc backwards
         dec enemy_ram_pc,x
         lda enemy_ram_pc,x
-        cmp #$b6
+        cmp #$b3
         bcs .y_change_done
         inc state_v6
         jmp .y_change_done
 .y_increase
+	; arc forwards
         inc enemy_ram_pc,x
         lda enemy_ram_pc,x
-        cmp #$c4
+        cmp #$ce
         bcc .y_change_done
         inc state_v6
 .y_change_done
