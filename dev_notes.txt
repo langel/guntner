@@ -21,15 +21,18 @@ tools? #nesdev #GunTneR [ !ks for info ]\
 Moufs Lipps 04 16 30
 
 
+
 fix these:
-	vampire doesn't always show hit/damage?
 	vampire bats should be out for death 
+	vampire bats save code space with another frame in graphics
 	brighter bg colors during boss death and hearts
 	hearts stay bright longer
 	sprite_2's 2nd sprite not cleared on boss death
 	
 	swordtner sucks
 	replace score with data
+	
+	rudy hit flash sprite not shown long enough (separate counter/rate from iframes?)
 	
 Kaytse bugs:
 	enemy spawn feels a bit cheap sometimes. i think i died a few times because of enemies hitting me at the right side of the screen (i think the stars), although they were spawning left.
