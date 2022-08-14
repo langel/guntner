@@ -2,8 +2,11 @@
 
 chomps_spawn: subroutine
 	; x is set by enemy spawner
-        jsr enemy_spawn_random_y_pos
-        sta enemy_ram_y,x ; y pos
+        lda #$c1
+        sta enemy_ram_ac,x
+        jsr get_oam_offset_from_slot_offset
+        lda #$00
+        sta oam_ram_x,y
    	rts
         
      
@@ -13,8 +16,17 @@ chomps_cycle: subroutine
         sta collision_0_h
         jsr enemy_handle_damage_and_death
         
+        lda oam_ram_x,y
+        cmp #$01
+        bcs .dont_reset_y
+        ; y
+        jsr enemy_spawn_random_y_pos
+        sta oam_ram_y,y
+        sta oam_ram_y+4,y
+.dont_reset_y
+        
         ; x movement
-        inc enemy_ram_pc,x ; actualy x origin position
+        inc enemy_ram_pc,x ; actual x origin position
         inc enemy_ram_ac,x
         inc enemy_ram_ac,x
         lda wtf
@@ -30,17 +42,13 @@ chomps_cycle: subroutine
         ldx enemy_ram_offset
         clc
         adc enemy_ram_pc,x
-        sta enemy_ram_x,x
-        
-        ; winder sprite
-        lda enemy_ram_x,x
+        ; x
         sta oam_ram_x,y
         clc
         adc #$01
         sta oam_ram_x+4,y
-        lda enemy_ram_y,x
-        sta oam_ram_y,y
-        sta oam_ram_y+4,y
+        
+        ; winder sprite
         lda wtf
         lsr
         lsr
