@@ -7,8 +7,6 @@
 
 nmi_lockout	byte
 
-sprite_0_y	byte
-sprite_0_y_diff	byte
 scroll_x_hi	byte
 scroll_x_lo	byte
 scroll_y	byte

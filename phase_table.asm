@@ -81,14 +81,14 @@ level_2_interval_spawn_table:
         byte maggs_id, skeet_id, starglasses_id
         byte ant_id, skeet_id, ant_id, starglasses_id
         byte skeet_id, lasso_id, starglasses_id
-        byte chomps_id, skeet_id, skeet_id, starglasses_id
+        byte chomps_id, skeet_id, muya_id, starglasses_id
         byte 0
 level_3_interval_spawn_table:
 	; spawn count = 14
 	; starglasses = 2
-        byte chomps_id, maggs_id, birb_id, starglasses_id
+        byte chomps_id, muya_id, muya_id, starglasses_id
         byte lasso_id, ant_id, uzi_id, lasso_id, ant_id, uzi_id
-        byte dumbface_id, skully_id, throber_id, starglasses_id
+        byte muya_id, skully_id, throber_id, starglasses_id
         byte 0
 
 level_boss_table:

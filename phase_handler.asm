@@ -555,8 +555,10 @@ phase_interval_spawn: subroutine
         bne .no_enemy
         ; look for 10 second increments
         lda timer_seconds_1s
+        ; if seconds == 0 then starglasses possible
         cmp #char_set_offset
         beq .starglasses_possible
+        ; if seconds == 1 or 7 then spawn enemy
         cmp #char_set_offset+1
         beq .spawn_enemy
         cmp #char_set_offset+7
@@ -564,7 +566,6 @@ phase_interval_spawn: subroutine
         bne .no_enemy
 .starglasses_possible
 	lda timer_seconds_10s
-        ;and #$01
         cmp #char_set_offset+3
         beq .starglasses_happening
         cmp #char_set_offset+5

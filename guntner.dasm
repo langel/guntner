@@ -13,6 +13,9 @@ spare_stack	EQM	$194
 top_of_stack	EQM	$1e0
 end_of_ram 	EQM 	$800
 
+sprite_0_y	EQM	$b6 ; 182
+sprite_0_y_diff	EQM	$4a ; 74
+
 
 ;;;;; NES CARTRIDGE HEADER
 
@@ -39,13 +42,6 @@ cart_start:	subroutine
         
         lda #232
         sta scroll_y ; just seems right
-        ; set hud y pos
-        lda #182
-        sta sprite_0_y
-        lda #0
-        sec
-        sbc sprite_0_y
-        sta sprite_0_y_diff
         
         jsr sine_init
         
@@ -87,7 +83,7 @@ cart_start:	subroutine
         ;jsr cut_scene_outro_init
         
         ;jsr options_screen_init
-        jsr sandbox_init
+        ;jsr sandbox_init
    	;jsr sandbox2_init
         
         

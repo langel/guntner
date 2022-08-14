@@ -126,7 +126,7 @@ state_update_set_addr:
 state_sprite0_enable:
         lda #$01
         sta oam_ram_x
-        lda sprite_0_y
+        lda #sprite_0_y
 	sta oam_ram_y
         lda #$ff
         sta oam_ram_spr

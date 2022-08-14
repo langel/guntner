@@ -32,7 +32,7 @@ muya_cycle: subroutine
         lda oam_ram_y,y
         sec
         sbc temp00
-        cmp sprite_0_y
+        cmp #sprite_0_y
         bcs .reset_x_and_y_pos
         sta oam_ram_y,y
         clc

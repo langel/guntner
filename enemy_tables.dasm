@@ -1,4 +1,6 @@
-	; 27 enemy entities defined
+
+; 27 enemy entities defined
+enemy_tables:
 
 ; enemy id list: 
 null_id              EQM $00

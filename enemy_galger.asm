@@ -231,22 +231,22 @@ arc_leg: subroutine
         cmp #240
         bcc .y_under_240
         sec
-        sbc sprite_0_y_diff
+        sbc #sprite_0_y_diff
         sta oam_ram_y,y
         lda enemy_ram_y,x
         sec
-        sbc sprite_0_y_diff
+        sbc #sprite_0_y_diff
         sta enemy_ram_y,x
         bcs .y_check_done
 .y_under_240
-	cmp sprite_0_y
+	cmp #sprite_0_y
         bcc .y_check_done
         clc
-        adc sprite_0_y_diff
+        adc #sprite_0_y_diff
         sta oam_ram_y,y
         lda enemy_ram_y,x
         clc
-        adc sprite_0_y_diff
+        adc #sprite_0_y_diff
         sta enemy_ram_y,x
 .y_check_done
         
