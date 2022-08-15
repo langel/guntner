@@ -83,6 +83,12 @@ phase_next: subroutine
         sta phase_spawn_counter
         sta phase_state
 	inc phase_current
+        ; check for starfield lumen reset
+        lda phase_current
+        and #$01
+        beq .no_starfield_lumen_reset
+        jsr starfield_twinkle_reset
+.no_starfield_lumen_reset
         ; set phase level
         lda phase_current
         and #$0f
@@ -370,14 +376,12 @@ phase_boss_fight_intro:
         bne .dont_init_cinematics
 .init_cinematics
         ; brighten stars
-        ldx #$07
-.star_lumen_loop
-	lda palette_cache,x
-        clc
+        lda starfield_color0
         adc #$10
-        sta palette_cache,x
-        dex
-        bne .star_lumen_loop
+        sta starfield_color0
+        lda starfield_color1
+        adc #$10
+        sta starfield_color1
         ; play boss fight encounter jingle
         lda #song_boss_intro
         jsr song_start
@@ -489,7 +493,6 @@ phase_boss_dying: subroutine
         lda #$40
         sta phase_spawn_counter
         ; setup next scene
-        jsr phase_palette_load
         jsr sfx_enemy_death
         jsr powerup_pickup_plus_one
         ; startup in game music
@@ -518,15 +521,6 @@ phase_boss_fight_cooldown: subroutine
         lda #song_in_game
         jsr song_start
         jsr phase_next
-        ; dim stars
-        ldx #$07
-.star_lumen_loop
-	lda palette_cache,x
-        sec
-        sbc #$10
-        sta palette_cache,x
-        dex
-        bne .star_lumen_loop
 .dont_advance
 	rts
         

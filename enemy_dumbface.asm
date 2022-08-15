@@ -44,7 +44,6 @@ dumbface_cycle: subroutine
         lsr
         and #$03
         asl
-        
         clc
         adc #$c8
         jsr sprite_4_set_sprite

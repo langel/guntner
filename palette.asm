@@ -55,7 +55,7 @@ palette_table:
         hex 01 35 30
         ; #30 level 1 palettes
         hex 06 16 38
-        hex 0b 2a 39
+        hex 0b 18 39
         hex 08 32 20
         ; #39 level 2 palettes
         hex 0c 2d 32
@@ -115,7 +115,7 @@ palette_next_rainbow_color: subroutine
         lda temp00
         and #$0f
         cmp #$0d
-        beq .wrap
+        bpl .wrap
         lda temp00
         rts
 .wrap
@@ -150,10 +150,13 @@ palette_update: subroutine
         jmp palette_fade_in_update
 .dont_fade_in
 ; fade out
-	cmp state_fade_out
+	lda state_fade_out
         beq .dont_fade_out
         jmp palette_fade_out_update
 .dont_fade_out
+; XXX dooo eeeet!!!
+; fade from white
+.dont_fade_from_white
 ; bomb
         lda bomb_counter
         beq .normal_bg

@@ -223,6 +223,7 @@ starfield_scroll: subroutine
 
 
 starfield_twinkle_colors: subroutine
+	; update palettes every 8 frames
 	lda wtf
         and #$07
         bne .done
@@ -232,18 +233,18 @@ starfield_twinkle_colors: subroutine
         sta starfield_color0
         sta pal_bg_0_1
         clc
-        adc #$11
+        adc #$10
         sta pal_bg_0_2
-        adc #$0e
+        adc #$10
         sta pal_bg_0_3
         ; color 1
         lda starfield_color1
         jsr palette_next_rainbow_color
         sta starfield_color1
         sta pal_bg_1_1
-        adc #11
+        adc #$10
         sta pal_bg_1_2
-        adc #$0e
+        adc #$10
         sta pal_bg_1_3
 .done
 	rts

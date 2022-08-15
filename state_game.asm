@@ -17,6 +17,7 @@ game_init_generic: subroutine
 	jsr player_game_reset
         jsr dashboard_init
         jsr starfield_init
+        jsr starfield_twinkle_reset
  	jsr starfield_draw_dash_top_bar_nametable0
         lda #$ff
         sta dashboard_message
