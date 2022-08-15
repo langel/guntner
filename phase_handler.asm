@@ -293,8 +293,19 @@ phase_spawn_long: subroutine
         lda phase_state
         bne .phase_init_done
 .init
-	; kill count calculation
+	; oiriginal kill count calculation
 	; 1 + level + difficulty * (4 or 8)
+        ; ---------------------------------;
+        ; difficulty 	   0    1    2    3
+        ; -------------|----|----|----|----;
+        ; phase 06	   4    8   12   16
+        ; phase 0d	   8   16   24   32
+        ; phase 16	   8   12   16   20
+        ; phase 1d	  16   24   32   40
+        ; phase 26	  12   16   20   24
+        ; phase 2d	  24   32   40   48
+        ; phase 36	  16   20   24   28
+        ; phase 3d        32   40   48   56
         clc
 	lda #1
         adc phase_level

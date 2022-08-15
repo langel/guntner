@@ -4,7 +4,7 @@
 ; boss_y : y origin of sine pattern
 ; state_v0 : bottom lip position
 ; state_v1 : bottom lip animation counter
-; state_v2 : sprites y pos temp
+; state_v2 : 
 ; state_v3 : y bounce sine direction
 ; state_v4 : sprite x position
 ; state_v5 : sprite y position
@@ -37,38 +37,15 @@ boss_moufs_spawn: subroutine
         jsr enemy_spawn_delegator
 	rts
         
-sprite_3_set_sprite: subroutine
-	; a = left tile id
-        ; y = oam ram offset
-	sta oam_ram_spr,y
-        clc
-        adc #$01
-	sta oam_ram_spr+$04,y
-        adc #$01
-	sta oam_ram_spr+$08,y
-        rts
         
-sprite_3_set_x: subroutine
-	; a = x pos
-        ; y = oam ram offset
-	sta oam_ram_x,y
-	clc
-	adc #$08
-	sta oam_ram_x+$04,y
-	adc #$08
-	sta oam_ram_x+$08,y
-	adc #$08
-	sta oam_ram_x+$0c,y
-	rts
-        
-sprite_3_set_y: subroutine
-	; a = y pos
-        ; y = oam ram offset
-	sta oam_ram_y,y
-	sta oam_ram_y+$04,y
-	sta oam_ram_y+$08,y
-	rts
   
+moufs_oam_offset_table:
+	byte $b0, $c0, $e0, $d0
+moufs_sprite_offset_table:
+	byte $00, $10, $20, $30
+moufs_y_offset_table:
+	byte $00, $08, $0d, $10
+        
   
 boss_moufs_cycle: subroutine
         lda state_v4
@@ -138,6 +115,11 @@ boss_moufs_cycle: subroutine
         sta state_v5
         ldx enemy_ram_offset
         
+        ; palette
+        lda #$01
+        jsr sprite_4_set_palette
+        sta temp01
+        
         
         ; EYEBALLLZ
         lda player_y_hi
@@ -162,7 +144,10 @@ boss_moufs_cycle: subroutine
         sbc #$04
         sta oam_ram_y+$40
         sta oam_ram_y+$44
+        lda temp01
+        beq .hit
         lda #$02
+.hit
         sta oam_ram_att+$40
         sta oam_ram_att+$44
         
@@ -170,10 +155,33 @@ boss_moufs_cycle: subroutine
         
         ; LIPPPPS
         
-        lda state_v5
-        sta state_v2
-
-	; row 1
+        
+        
+        ; y row 3
+        lda state_v1
+        lsr
+        tax
+        lda sine_2bits,x
+        sta temp02
+        
+        inc state_v1
+        inc state_v1
+        inc state_v1
+        
+        ; y row 4
+        lda state_v1
+        lsr
+        tax
+        lda sine_3bits,x
+        sta state_v0
+        sta temp03
+        
+        inc state_v1
+        inc state_v1
+        inc state_v1
+        
+	; row 1 sprite
+        ldy #$b0
         lda state_v6
         beq .lip_up
 .lip_down
@@ -184,95 +192,74 @@ boss_moufs_cycle: subroutine
 	lda #$86
         sta state_v6
 .upper_lip_set_sprite
-        jsr sprite_3_set_sprite
         
-	lda state_v4
-        jsr sprite_3_set_x
-	lda state_v2
-        jsr sprite_3_set_y
-        lda #$01
-        jsr sprite_4_set_palette
         
-        ; row 2
-        ldy #$c0
         
-        lda state_v2
-        adc #$08
-        sta state_v2
-        
-	lda #$10
+        ldx #$00
+.mouf_sprites_loop
+	ldy moufs_oam_offset_table,x
+	; sprite
+	; a = left tile id
+        ; y = oam ram offset
+        cpx #$02
+        bcs .sprite_normal
+.sprite_custom
+	lda state_v6
+        bne .sprite_chosen
+.sprite_normal
+        lda #$86
+.sprite_chosen
+	clc
+        adc moufs_sprite_offset_table,x
+	sta oam_ram_spr,y
         clc
-        adc state_v6
-        jsr sprite_3_set_sprite
-	lda state_v4
-        jsr sprite_3_set_x
-	lda state_v2
-        jsr sprite_3_set_y
-        lda #$01
-        jsr sprite_4_set_palette
-        
-        ; row 3
-        ldy #$e0
-        
-        lda state_v2
-        adc #$05
-        sta state_v2
-        
-	lda #$a6
-        jsr sprite_3_set_sprite
-        ; x
-	lda state_v4
-        jsr sprite_3_set_x
+        adc #$01
+	sta oam_ram_spr+$04,y
+        adc #$01
+	sta oam_ram_spr+$08,y
+	; x
+        ; a = x pos
+        ; y = oam ram offset
+        lda state_v4
+	sta oam_ram_x,y
+	clc
+	adc #$08
+	sta oam_ram_x+$04,y
+	adc #$08
+	sta oam_ram_x+$08,y
+	adc #$08
+	sta oam_ram_x+$0c,y
         ; y
-	lda state_v2
-        lda state_v1
-        lsr
-        tax
-        lda sine_2bits,x
-        ldx enemy_ram_offset
+	; a = y pos
+        ; y = oam ram offset
+        lda state_v5
         clc
-	adc state_v2
-        jsr sprite_3_set_y
-        ; palette
-        lda #$01
-        jsr sprite_4_set_palette
+        adc moufs_y_offset_table,x
+        cpx #$02
+        bcc .no_y_adjustments
+        cpx #$03
+        beq .bottom_sprite
+.almost_bottom_sprite
+        adc temp02
+        bne .no_y_adjustments
+.bottom_sprite
+	adc temp03
+.no_y_adjustments
+	sta oam_ram_y,y
+	sta oam_ram_y+$04,y
+	sta oam_ram_y+$08,y
+        ; pal / attr
+        lda temp01
+        jsr sprite_4_set_palette_no_process
+        ; check next
+        inx
+        cpx #$04
+        bne .mouf_sprites_loop
         
         
-        inc state_v1
-        inc state_v1
-        inc state_v1
-        
-        ; row 4
-        ldy #$d0
-        
-        lda state_v2
-        adc #$04
-        sta state_v2
-        
-	lda #$b6
-        jsr sprite_3_set_sprite
-        ; x
-	lda state_v4
-        jsr sprite_3_set_x
-        ; y
-	lda state_v2
-        lda state_v1
-        lsr
-        tax
-        lda sine_3bits,x
-        sta state_v0
         ldx enemy_ram_offset
-        clc
-	adc state_v2
-        jsr sprite_3_set_y
-        ; palette
-        lda #$01
-        jsr sprite_4_set_palette
+
         
-        
-        inc state_v1
-        inc state_v1
-        inc state_v1
         
         ; fire time?
         lda state_v0

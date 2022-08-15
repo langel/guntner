@@ -1,6 +1,6 @@
 ;;;; Constants
 
-ENEMY_HIT_PALETTE_FRAMES	EQM $04
+ENEMY_HIT_PALETTE_FRAMES	EQM $05
 
 phase_spawn_table	= $0160
 
