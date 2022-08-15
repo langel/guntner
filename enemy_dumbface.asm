@@ -48,7 +48,7 @@ dumbface_cycle: subroutine
         clc
         adc #$c8
         jsr sprite_4_set_sprite
-        lda #$01
+        lda #$02
         jsr sprite_4_set_palette
 .done
 	jmp update_enemies_handler_next

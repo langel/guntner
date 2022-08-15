@@ -4,7 +4,7 @@ zigzag_dir_table:
 	byte #$03, #$09, #$0f, #$15
 zigzag_att_table:
 	;     r/u   l/u   l/d   r/d
-        byte #$81, #$c1, #$41, #$01 
+        byte #$83, #$c3, #$43, #$03
 
 
 zigzag_spawn: subroutine

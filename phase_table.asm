@@ -79,7 +79,7 @@ level_2_interval_spawn_table:
 	; spawn count = 14
 	; starglasses = 2
         byte maggs_id, skeet_id, starglasses_id
-        byte ant_id, skeet_id, ant_id, starglasses_id
+        byte ant_id, dumbface_id, ant_id, starglasses_id
         byte skeet_id, lasso_id, starglasses_id
         byte chomps_id, skeet_id, muya_id, starglasses_id
         byte 0

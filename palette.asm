@@ -54,25 +54,24 @@ palette_table:
         hex 07 17 27
         hex 01 35 30
         ; #30 level 1 palettes
-        hex 16 1a 30
         hex 06 16 38
-        hex 08 35 20
+        hex 0b 2a 39
+        hex 08 32 20
         ; #39 level 2 palettes
-        hex 13 21 30
-        hex 06 16 38
-        hex 07 17 27
+        hex 0c 2d 32
+        hex 13 25 37
+        hex 09 27 10
         ; #48 level 3 palettes
-        ; XXX filler not final
-        hex 06 16 38
-        hex 16 1a 30
-        hex 13 21 30
+        hex 2d 10 30
+        hex 12 23 37
+        hex 07 17 27
         ; #57 boss 
         ; moufs palettes
         hex 04 16 20
         hex 02 07 38
         ; #63 boss 
         ; vamp+bats palettes
-        hex 12 21 30
+        hex 12 03 30
         hex 15 2d 37
         ; #69 boss 
         ; scarab palettes
