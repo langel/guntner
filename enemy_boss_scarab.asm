@@ -17,7 +17,7 @@ boss_scarab_spawn: subroutine
 	;ldx #boss_scarab_id
         ;stx $03b8
         ; claim 4 more slots for the wings
-        lda #do_nothing_id
+        lda #boss_assist_id
         sta $03c0
         sta $03c8
         sta $03d0

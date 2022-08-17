@@ -480,7 +480,11 @@ i	ldx enemy_slot_id
         ldy enemy_slot_offset_to_oam_offset,x
         sty enemy_oam_offset
         ldx enemy_ram_offset
+        lda enemy_ram_type,x
+        cmp #$03
+        bcc .skip_crossbones_transmogrification
         jsr enemy_death_handler
+.skip_crossbones_transmogrification
 	; setup next loop
         inc enemy_slot_id
         lda #$08

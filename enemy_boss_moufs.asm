@@ -12,7 +12,7 @@
 
 
 boss_moufs_spawn: subroutine
-        lda #do_nothing_id
+        lda #boss_assist_id
         ; eyeballs
         sta $0340
         sta $0348

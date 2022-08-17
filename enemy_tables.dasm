@@ -1,12 +1,10 @@
-
-; 27 enemy entities defined
-enemy_tables:
+	; 27 enemy entities defined
 
 ; enemy id list: 
 null_id              EQM $00
-do_nothing_id        EQM $01
-crossbones_id        EQM $02
-powerups_id          EQM $03
+crossbones_id        EQM $01
+powerups_id          EQM $02
+boss_assist_id       EQM $03
 birb_id              EQM $04
 spark_id             EQM $05
 zigzag_id            EQM $06
@@ -33,9 +31,9 @@ boss_vamp_id         EQM $1a
 
 enemy_hitpoints_table:
 	byte $00 ; null
-	byte $00 ; do_nothing
 	byte $00 ; crossbones
 	byte $00 ; powerups
+	byte $00 ; boss_assist
 	byte $02 ; birb
 	byte $03 ; spark
 	byte $03 ; zigzag
@@ -62,9 +60,9 @@ enemy_hitpoints_table:
 
 enemy_player_points_table:
 	byte $00, $00, $00, $00 ; null
-	byte $00, $00, $00, $00 ; do_nothing
 	byte $00, $00, $00, $00 ; crossbones
 	byte $00, $00, $00, $00 ; powerups
+	byte $00, $00, $00, $00 ; boss_assist
 	byte $00, $00, $38, $65 ; birb
 	byte $00, $00, $80, $0b ; spark
 	byte $00, $00, $cd, $93 ; zigzag
@@ -91,9 +89,9 @@ enemy_player_points_table:
 
 enemy_size_table:
 	byte $00 ; null
-	byte $00 ; do_nothing
 	byte $00 ; crossbones
 	byte $00 ; powerups
+	byte $00 ; boss_assist
 	byte $01 ; birb
 	byte $01 ; spark
 	byte $01 ; zigzag
@@ -120,9 +118,9 @@ enemy_size_table:
 
 enemy_update_table_lo:
 	byte <enemy_do_nothing
-	byte <enemy_do_nothing
 	byte <crossbones_cycle
 	byte <powerups_cycle
+	byte <enemy_do_nothing
 	byte <birb_cycle
 	byte <spark_cycle
 	byte <zigzag_cycle
@@ -149,9 +147,9 @@ enemy_update_table_lo:
 
 enemy_update_table_hi:
 	byte >enemy_do_nothing
-	byte >enemy_do_nothing
 	byte >crossbones_cycle
 	byte >powerups_cycle
+	byte >enemy_do_nothing
 	byte >birb_cycle
 	byte >spark_cycle
 	byte >zigzag_cycle

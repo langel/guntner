@@ -17,7 +17,7 @@ sword_down_dir	EQM	23
 
 boss_swordtner_spawn: subroutine
         ; claim 4 more slots for rest of body
-        lda #do_nothing_id
+        lda #boss_assist_id
         sta $03c0
         sta $03c8
         sta $03d0
