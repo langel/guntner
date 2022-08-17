@@ -77,6 +77,10 @@ dart_direction_to_attribute_table:
         
         
 dart_cycle: subroutine
+	; check for x despawn
+        lda oam_ram_x,y
+        cmp #$04
+        bcc .despawn
 	; check for player collision
         lda #$04
         sta collision_0_w
@@ -95,21 +99,14 @@ dart_cycle: subroutine
         jsr enemy_clear
         jmp .done
 .no_collision
-
 	; handle direction movement
         lda enemy_ram_pc,x
         sta arctang_velocity_lo
 	jsr arctang_enemy_update
-
-	; check for despawn
-        lda oam_ram_x,y
-        cmp #$f9
-        bcs .despawn
+        ; check for y despawn
 	lda oam_ram_y,y
-        cmp #$05
+        cmp #$06
         bcc .despawn
-        
-        
 .done	
 	jmp update_enemies_handler_next
 	
