@@ -68,16 +68,18 @@ bullet_spawn: subroutine
         tay
         lda enemy_hitpoints_table,y
         sta enemy_ram_hp,x
+        ; load y register
+        jsr get_oam_offset_from_slot_offset
         ; x pos
         lda temp02
         clc
         adc #$0b
-        sta enemy_ram_x,x
+        sta oam_ram_x,y
         ; y pos
         lda temp03
         clc
         adc #$03
-        sta enemy_ram_y,x
+        sta oam_ram_y,y
         ; animate uzi kickback
         ldx enemy_ram_offset
         lda enemy_ram_ac,x
@@ -104,19 +106,16 @@ bullet_cycle: subroutine
         adc #$ee
         sta oam_ram_spr,y
         ; move to the right
-        lda enemy_ram_x,x
+        lda oam_ram_x,y
         adc #$03
-        sta enemy_ram_x,x
         ; despawn check
         cmp #$04
         bcs .dont_despawn
 .despawn
-	jsr enemy_death
+	jsr enemy_clear
         jmp .done
 .dont_despawn
         sta oam_ram_x,y
-        lda enemy_ram_y,x
-        sta oam_ram_y,y
 	lda #$01
         jsr enemy_set_palette
 .done

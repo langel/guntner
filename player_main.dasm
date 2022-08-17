@@ -10,6 +10,7 @@ iframe_game_length	EQM $04
 
 player_game_reset: subroutine
 	lda #$00
+        sta ftw
         sta phase_state
         sta phase_current
         sta phase_level
@@ -32,8 +33,8 @@ player_game_reset: subroutine
         ; XXX testing phase behaviours
         ;lda #3
         ;sta phase_level
-        lda #$0f
-        sta phase_current
+        ;lda #$0f
+        ;sta phase_current
         jsr phase_palette_load
         jsr timer_reset
 	lda #$d0
