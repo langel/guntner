@@ -203,8 +203,12 @@ menu_screen_tile_data:
 	hex 22d5
 	hex 036a806161646703
 	byte #$00
-	; "(C)opyright MMXXII LoBlast"
+	; "   Publisher's Line Here  "
 	hex 2303
+	hex 030303907d6b74727b716e7a9e7b038c72766e03886e7a6e0303
+	byte #$00
+	; "(C)opyright MMXXII LoBlast"
+	hex 2323
 	hex 9c849d7778817a7270717c038d8d96968989038c7783746a7b7c
 	byte #$00
 	; " Options Screen "
