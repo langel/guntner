@@ -132,15 +132,15 @@ phase_clear_1_sprite_spawns: subroutine
 	rts
 
 phase_spawn_track: subroutine
-	; a = enemy ram pos
-        ; kills x
-        sta temp00
+	; x = enemy ram pos
+        stx temp00
+        txa
         lsr
         lsr
         lsr
         tax
         inc phase_spawn_table,x
-        lda temp00
+        ldx temp00
         rts
         
 phase_palette_load: subroutine
@@ -233,9 +233,7 @@ phase_galger: subroutine
 	jsr get_enemy_slot_1_sprite
         cpx #$ff
         beq .dont_spawn
-        txa
         jsr phase_spawn_track
-        tax
         lda #galger_id
 	sta phase_spawn_type
         jsr enemy_spawn_delegator
@@ -274,9 +272,7 @@ phase_spawns: subroutine
         jsr enemy_slot_from_type
         cpx #$ff
         beq .dont_spawn
-        txa
         jsr phase_spawn_track
-        tax
 	dec phase_spawn_counter
         inc phase_kill_counter
         lda phase_spawn_type
@@ -352,9 +348,7 @@ phase_spawn_long: subroutine
         cpx #$ff
         beq .dont_spawn
 .set_and_jump
-	txa
         jsr phase_spawn_track
-        tax
         tya
         jmp enemy_spawn_delegator
 .dont_spawn
@@ -476,33 +470,28 @@ phase_boss_dying: subroutine
         jsr sfx_test_delegator
         dec state_v0
         bne .done
-        ; boss dead do stuff
-        lda #$00
-.boss_dead_kill_all
-	tax
-        lda #crossbones_id
-        sta enemy_ram_type,x
-        ldy temp00
-        txa
-	cmp #$a0
-        bcc .not_4_sprites
-        sta temp00
-        lsr
-        lsr
-        lsr
-        tax
+        
+        ; kill everything on screen
+	ldx #$00
+        stx enemy_slot_id
+        stx enemy_ram_offset
+.iteration_loop
         ldy enemy_slot_offset_to_oam_offset,x
-        ldx temp00
-        jsr sprite_4_dead_cleanup
-        lda temp00
-.not_4_sprites
+        sty enemy_oam_offset
+        jsr enemy_death_handler
+	; setup next loop
+        inc enemy_slot_id
+        lda #$08
         clc
-        adc #$08
+        adc enemy_ram_offset
+        sta enemy_ram_offset
         cmp #$e0
-        bne .boss_dead_kill_all
+        bne .iteration_loop
+        
         inc phase_kill_counter
         lda #$40
         sta phase_spawn_counter
+        
         ; setup next scene
         jsr sfx_enemy_death
         jsr powerup_pickup_plus_one

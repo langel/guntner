@@ -92,7 +92,7 @@ dart_cycle: subroutine
         beq .no_collision
         jsr enemy_gives_damage
 .despawn
-        jsr enemy_death
+        jsr enemy_clear
         jmp .done
 .no_collision
 

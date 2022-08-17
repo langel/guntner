@@ -44,7 +44,6 @@ powerup_from_starglasses:
         ; palette
 	lda #$03
         sta oam_ram_att,y
-        jmp update_enemies_handler_next
 	rts
  
  
@@ -73,7 +72,7 @@ powerups_cycle: subroutine
 .player_picksup_powerup
         ldy enemy_ram_ex,x
         jsr powerup_pickup_delegator
-        jsr enemy_death
+        jsr enemy_clear
 	jmp update_enemies_handler_next
 .reset_velocity
         lda #$01
@@ -124,7 +123,7 @@ powerups_cycle: subroutine
         cmp #$00
         bne .done
         ;; despawns to the right
-        jsr enemy_death
+        jsr enemy_clear
 .done   
 	jmp update_enemies_handler_next
         

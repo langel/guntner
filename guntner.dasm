@@ -295,7 +295,8 @@ sprite0_off:
         ;nop	; how much prg space we using?
 	include "enemy_tables.dasm"
         ;nop	; how much prg space we using?
-	
+	include "enemy_death.asm"
+
         
 	include "enemy_boss_moufs.asm"
         ;nop
