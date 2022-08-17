@@ -79,8 +79,10 @@ dart_direction_to_attribute_table:
 dart_cycle: subroutine
 	; check for x despawn
         lda oam_ram_x,y
-        cmp #$04
+        cmp #$03
         bcc .despawn
+        cmp #$fc
+        bcs .despawn
 	; check for player collision
         lda #$04
         sta collision_0_w

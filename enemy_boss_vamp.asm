@@ -25,13 +25,15 @@ boss_vamp_bat_spawn: subroutine
         
         
 boss_vamp_bat_cycle: subroutine
+	; bats visible?
+	lda state_v5
+        beq .bats_not_visible
+        ; collision detection
         lda #$08
         sta collision_0_w
         sta collision_0_h
         jsr enemy_handle_damage_and_death
         
-	lda state_v5
-        beq .bats_not_visible
         ; update x pos
         lda enemy_ram_ex,x
         sta temp01 ; position on circle
@@ -76,6 +78,9 @@ boss_vamp_bat_cycle: subroutine
 	clc
         adc #$38
         sta oam_ram_spr,y
+        ; palette
+        lda $03be ; use vamp hc
+        sta enemy_ram_hc,x
         lda #$01
         jsr enemy_set_palette
 .done
@@ -93,7 +98,7 @@ boss_vamp_bat_cycle: subroutine
         ; BLEEDS !!       
 boss_vamp_spawn: subroutine
 
-        lda #do_nothing_id
+        lda #boss_assist_id
         sta $03d8
         ; SET STUFF to #$00
         lda #$00
@@ -189,7 +194,7 @@ boss_vamp_cycle: subroutine
 
 ; STATE behavior     
         jsr boss_vamp_update_state_delegator
-        ldy enemy_oam_offset
+        ldx enemy_ram_offset
         
 	; SPRITE tiles
         lda state_v7

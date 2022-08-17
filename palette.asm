@@ -71,7 +71,7 @@ palette_table:
         hex 02 07 38
         ; #63 boss 
         ; vamp+bats palettes
-        hex 12 03 30
+        hex 02 11 30
         hex 15 2d 37
         ; #69 boss 
         ; scarab palettes
