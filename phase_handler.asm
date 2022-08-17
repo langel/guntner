@@ -476,8 +476,10 @@ phase_boss_dying: subroutine
         stx enemy_slot_id
         stx enemy_ram_offset
 .iteration_loop
+i	ldx enemy_slot_id
         ldy enemy_slot_offset_to_oam_offset,x
         sty enemy_oam_offset
+        ldx enemy_ram_offset
         jsr enemy_death_handler
 	; setup next loop
         inc enemy_slot_id
