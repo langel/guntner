@@ -14,12 +14,6 @@ sandbox_init: subroutine
         lda #7
         jsr state_update_set_addr
         
-        ; boss uses state vars
-        lda #$00
-        sta state_v0
-        sta state_v1
-        sta state_v6
-        sta state_v7
         
         lda #$01
         sta phase_current
@@ -28,22 +22,22 @@ sandbox_init: subroutine
         sta iframe_length
         
         ldx #$b8
-        ;lda #boss_swordtner_id
+        lda #boss_swordtner_id
         ;lda #boss_vamp_id
-        lda #boss_scarab_id
-        lda #boss_moufs_id
+        ;lda #boss_scarab_id
+        ;lda #boss_moufs_id
         jsr enemy_spawn_delegator
         
         ; for vamp testing
-        lda #$f0
+        lda #$90
         sta player_x_hi
         lda #$08
         sta player_y_hi
         
-        ldx #57 ; MOUFS palettes
+        ;ldx #57 ; MOUFS palettes
         ;ldx #63 ; VAMP palettes
         ;ldx #69 ; scarab palette
-        ;ldx #75 ; SWORDTNER palettes
+        ldx #75 ; SWORDTNER palettes
         ldy #15
         jsr palette_load
         jsr palette_load
@@ -60,36 +54,31 @@ sandbox_init: subroutine
         ;lda #chomps_id
         ;jsr enemy_spawn_delegator
         
-        lda #$10
-        sta dart_velocity
-.skeet_loop
-	jsr get_enemy_slot_1_sprite
-        lda #skeet_id
-        ;jsr enemy_spawn_delegator
-        dec dart_velocity
-        bpl .skeet_loop
-        
-        
-        ldx #$05
-        jsr arc_sequence_set
-	jsr get_enemy_slot_1_sprite
-        lda #galger_id
+	;jsr get_enemy_slot_1_sprite
+        ;lda #skeet_id
         ;jsr enemy_spawn_delegator
         
         
-	jsr get_enemy_slot_2_sprite
+        ;ldx #$05
+        ;jsr arc_sequence_set
+	;jsr get_enemy_slot_1_sprite
+        ;lda #galger_id
+        ;jsr enemy_spawn_delegator
+        
+        
+	;jsr get_enemy_slot_2_sprite
         ;lda #muya_id
         ;lda #chomps_id
-        jsr enemy_spawn_delegator
+        ;jsr enemy_spawn_delegator
         
         
         
         
-	jsr get_enemy_slot_4_sprite
+	;jsr get_enemy_slot_4_sprite
         ;lda #dumbface_id
-        lda #ant_id
+        ;lda #ant_id
         ;lda #skully_id
-        lda #ikes_mom_id
+        ;lda #ikes_mom_id
         ;jsr enemy_spawn_delegator
         
         

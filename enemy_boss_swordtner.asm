@@ -29,7 +29,7 @@ boss_swordtner_spawn: subroutine
         lda arctang_velocities_lo,x
         sta state_v0 ; up velocity
         sta state_v2 ; current velocity
-        ldx #$00
+        ldx #$02
         lda arctang_velocities_lo,x
         sta state_v1 ; down velocity
         ; setup initial state
@@ -90,7 +90,7 @@ boss_swordtner_cycle: subroutine
         jsr sprite_4_set_y
         
         lda state_v5
-        cmp #$10
+        cmp #$04
         bcs .check_down_dir
         lda #sword_down_dir
         sta enemy_ram_ex,x
