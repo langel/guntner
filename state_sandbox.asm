@@ -19,7 +19,7 @@ sandbox_init: subroutine
         sta phase_current
         
         lda #$03
-        sta iframe_length
+        sta state_iframe_length
         
         ldx #$b8
         ;lda #boss_swordtner_id

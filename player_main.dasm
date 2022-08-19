@@ -1,5 +1,4 @@
 
-iframe_length		EQU $018f
 oam_ram_rudy		EQU $0204
 
 ; CONST
@@ -89,7 +88,7 @@ player_take_damage: subroutine
         lda player_a
         bne .skip_iframes
 	; set iframes
-        lda iframe_length
+        lda state_iframe_length
         sta state_iframes
 .skip_iframes
 	; damage amount in player_damage
@@ -168,8 +167,9 @@ set_player_sprite: subroutine
         dec state_iframes
         ; flash rudy based on iframe counter
         lsr
+        lsr
         and #$01
-        beq .not_iframes
+        bne .not_iframes
         ; iframes
         lda #$4c
         sta oam_ram_rudy+1

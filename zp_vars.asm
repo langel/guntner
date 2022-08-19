@@ -116,8 +116,9 @@ state_v4		byte
 state_v5		byte
 state_v6		byte
 state_v7		byte
-state_sprite0	byte
-state_iframes	byte
+state_sprite0		byte
+state_iframes		byte
+state_iframe_length	byte
 
 state_render_addr	byte
 state_update_addr	byte

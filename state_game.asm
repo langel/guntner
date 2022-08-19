@@ -39,7 +39,7 @@ game_init:
         jsr render_enable
         jsr palette_fade_in_init
         lda #iframe_game_length
-        sta iframe_length
+        sta state_iframe_length
         lda #2
         jsr song_start
         lda state_v1

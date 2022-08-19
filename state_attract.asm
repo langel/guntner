@@ -16,13 +16,10 @@ attract_init:
         lda #$ff
         sta attract_true
         lda #iframe_attract_length
-        sta iframe_length
+        sta state_iframe_length
 .attract_mode_set
         jsr render_enable
         jsr palette_fade_in_init
-        ; turn on iframes
-        lda #20
-        sta state_iframes
         rts
         
         
