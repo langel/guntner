@@ -234,32 +234,18 @@ boss_vamp_cycle: subroutine
 	jsr enemy_boss_eyes
 
 	jmp update_enemies_handler_next
-        
-        
-boss_vamp_state_lo:
-	.byte <boss_vamp_state_idle_update
-        .byte <boss_vamp_state_suck_bats
-        .byte <boss_vamp_state_shake
-        .byte <boss_vamp_state_lunge
-        .byte <boss_vamp_state_retreat
-        .byte <boss_vamp_state_blow_bats
-boss_vamp_state_hi:
-	.byte >boss_vamp_state_idle_update
-        .byte >boss_vamp_state_suck_bats
-        .byte >boss_vamp_state_shake
-        .byte >boss_vamp_state_lunge
-        .byte >boss_vamp_state_retreat
-        .byte >boss_vamp_state_blow_bats
+
+
+
         
 boss_vamp_update_state_delegator:
 	lda state_v0
-        tax
-        lda boss_vamp_state_lo,x
+        clc
+        adc #boss_vamp_state_jump_table_offset
         sta temp00
-        lda boss_vamp_state_hi,x
-        sta temp01
-        ldx enemy_ram_offset
-        jmp (temp00)
+        jmp jump_to_subroutine
+        
+        
         
         
         

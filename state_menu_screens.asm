@@ -407,28 +407,10 @@ options_screen_update: subroutine
 	sta options_rudy_pos
         
 ; which option handler?
-.options_case
-        ; x = update offset
-        ldx options_rudy_pos
-        lda options_table_lo,x
-        sta temp00
-        lda options_table_hi,x
-        sta temp01
-        jmp (temp00)
-options_table_lo:
-        .byte #<options_menu_return
-	.byte #<options_screen_song_handler
-	.byte #<options_screen_sfx_handler
-        .byte #<options_screen_color1_handler
-        .byte #<options_screen_color2_handler
-        .byte #<options_screen_difficulty_handler
-options_table_hi:
-        .byte #>options_menu_return
-	.byte #>options_screen_song_handler
-	.byte #>options_screen_sfx_handler
-        .byte #>options_screen_color1_handler
-        .byte #>options_screen_color2_handler
-        .byte #>options_screen_difficulty_handler
+options_screen_handler
+        clc
+        adc #options_screen_state_jump_table_offset
+        jmp jump_to_subroutine
 
        
 options_menu_return: subroutine
@@ -505,7 +487,7 @@ options_screen_sfx_handler: subroutine
         bne .trigger_sound
 	jmp state_update_done
 .trigger_sound
-	ldx options_sound_id
+	lda options_sound_id
         jsr sfx_test_delegator
 	jmp state_update_done
         

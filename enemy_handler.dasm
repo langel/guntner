@@ -1,3 +1,5 @@
+
+
 ;;;; Constants
 
 ENEMY_HIT_PALETTE_FRAMES	EQM $05
@@ -21,17 +23,6 @@ enemy_ram_ac   = $0305
 enemy_ram_hc   = $0306
 enemy_ram_ex   = $0307
 
-;;;; enemy types
-;	0 = [nothing]
-;	1 = starglasses	2x2
-;	2 = skully	2x2
-;	3 = maggs	2x1
-;	4 = birb	1x1
-;	5 = bullet0	1x1
-
-
-	;include "enemy_birb.dasm"
-        
 
 
 enemy_spawn_delegator: subroutine
@@ -56,12 +47,10 @@ enemy_spawn_delegator: subroutine
         ; save hp result
         sta enemy_ram_hp,x 
         ; jump to enemy type spawner
-        ldy temp00 ; enemy type
-        lda enemy_spawn_table_lo,y
-        sta temp02
-        lda enemy_spawn_table_hi,y
-        sta temp03
-        jmp (temp02)
+        lda temp00 ; enemy type
+        clc
+        adc #enemy_spawn_jump_table_offset
+        jmp jump_to_subroutine
 
 
 enemy_do_nothing: subroutine
@@ -235,9 +224,9 @@ update_enemies_reset:
         ; not defined go next slot
         beq .handler_next
         tax
-        lda enemy_update_table_lo,x
+        lda enemy_update_jump_table_lo,x
         sta temp00
-        lda enemy_update_table_hi,x
+        lda enemy_update_jump_table_hi,x
         sta temp01
         ; setup collision detection enemy origin pos
 	ldx enemy_ram_offset

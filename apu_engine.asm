@@ -143,28 +143,11 @@ apu_env_run: subroutine
         ; #$04 = pu2
         ; #$07 = noise
         ; returns 4-bit volume in a
-        ldy apu_pu1_envelope,x
-        lda apu_env_table_lo,y
-        sta temp00
-        lda apu_env_table_hi,y
-        sta temp01
-        jmp (temp00)
-apu_env_table_lo:
-	.byte #<apu_env_lin_long	; 0
-	.byte #<apu_env_lin_short	; 1
-	.byte #<apu_env_lin_tiny	; 2
-        .byte #<apu_env_exp_long	; 3
-        .byte #<apu_env_exp_short	; 4
-        .byte #<apu_env_exp_tiny	; 5
-        .byte #<apu_env_exp_pico	; 6
-apu_env_table_hi:
-	.byte #>apu_env_lin_long
-	.byte #>apu_env_lin_short
-	.byte #>apu_env_lin_tiny
-        .byte #>apu_env_exp_long
-        .byte #>apu_env_exp_short
-        .byte #>apu_env_exp_tiny
-        .byte #>apu_env_exp_pico	; 6
+        lda apu_pu1_envelope,x
+        clc
+        adc #apu_env_jump_table_offset
+        jmp jump_to_subroutine
+        
 apu_env_lin_long: subroutine
 	; #$40 counter = 63 frames / 1 second
         lda apu_pu1_counter,x
@@ -222,10 +205,16 @@ apu_update: subroutine
 ; MIX and Write to APU
 
 ; SFX Update Delegator
-	ldx sfx_pu2_update_type
-	jsr sfx_update_delegator
-	ldx sfx_noi_update_type
-	jsr sfx_update_delegator
+        lda sfx_pu2_update_type
+        clc 
+        adc #sfx_update_jump_table_offset
+        jsr jump_to_subroutine
+        lda sfx_noi_update_type
+        clc 
+        adc #sfx_update_jump_table_offset
+        jsr jump_to_subroutine
+        
+
 ; Pulse Channels Counter / Envelope
 	ldx #$00
 .pulse_channels_loop

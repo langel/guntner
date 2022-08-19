@@ -466,7 +466,7 @@ phase_boss_dying: subroutine
         lda rng1
         and #$03
         tay
-        ldx phase_boss_dying_sfx_table,y
+        lda phase_boss_dying_sfx_table,y
         jsr sfx_test_delegator
         dec state_v0
         bne .done

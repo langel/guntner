@@ -184,8 +184,6 @@ palette_state_reset:
 
 
 palette_fade_in_init: subroutine
-	; a = init callback index
-        sta pal_fade_target
         ; make sure we're not already fading out
 	lda state_fade_out
         bne .init_skip
@@ -224,8 +222,11 @@ palette_fade_in_update: subroutine
 	rts
         
         
+; fade out leads to forced tansition and new state
 palette_fade_out_init: subroutine
 	; a = init callback index
+        clc
+        adc #state_init_jump_table_offset
         sta pal_fade_target
         ; make sure we're not already fading out
 	lda state_fade_out
@@ -259,8 +260,9 @@ palette_fade_out_update: subroutine
         cmp #$60
         bcc .fade_mode_not_done
         jsr palette_state_reset
+        
 	lda pal_fade_target
-        jmp state_init_call
+        jmp jump_to_subroutine
 .fade_mode_not_done
 	sta pal_fade_c
 	rts

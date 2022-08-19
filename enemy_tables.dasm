@@ -25,9 +25,9 @@ lasso_id             EQM $14
 ikes_mom_id          EQM $15
 uzi_id               EQM $16
 boss_moufs_id        EQM $17
-boss_swordtner_id    EQM $18
+boss_vamp_id         EQM $18
 boss_scarab_id       EQM $19
-boss_vamp_id         EQM $1a
+boss_swordtner_id    EQM $1a
 
 enemy_hitpoints_table:
 	byte $00 ; null
@@ -54,9 +54,9 @@ enemy_hitpoints_table:
 	byte $25 ; ikes_mom
 	byte $1d ; uzi
 	byte $3f ; boss_moufs
-	byte $3f ; boss_swordtner
-	byte $3f ; boss_scarab
 	byte $3f ; boss_vamp
+	byte $3f ; boss_scarab
+	byte $3f ; boss_swordtner
 
 enemy_player_points_table:
 	byte $00, $00, $00, $00 ; null
@@ -83,9 +83,9 @@ enemy_player_points_table:
 	byte $00, $42, $ad, $43 ; ikes_mom
 	byte $00, $00, $00, $7b ; uzi
 	byte $0b, $c6, $01, $1f ; boss_moufs
-	byte $15, $cc, $8f, $4b ; boss_swordtner
+	byte $15, $cc, $8f, $4b ; boss_vamp
 	byte $2a, $82, $21, $75 ; boss_scarab
-	byte $3b, $7b, $cf, $87 ; boss_vamp
+	byte $3b, $7b, $cf, $87 ; boss_swordtner
 
 enemy_size_table:
 	byte $00 ; null
@@ -112,122 +112,6 @@ enemy_size_table:
 	byte $04 ; ikes_mom
 	byte $04 ; uzi
 	byte $04 ; boss_moufs
-	byte $04 ; boss_swordtner
-	byte $04 ; boss_scarab
 	byte $04 ; boss_vamp
-
-enemy_update_table_lo:
-	byte <enemy_do_nothing
-	byte <crossbones_cycle
-	byte <powerups_cycle
-	byte <enemy_do_nothing
-	byte <birb_cycle
-	byte <spark_cycle
-	byte <zigzag_cycle
-	byte <skeet_cycle
-	byte <galger_cycle
-	byte <bullet_cycle
-	byte <dart_cycle
-	byte <boss_vamp_bat_cycle
-	byte <chomps_cycle
-	byte <maggs_cycle
-	byte <muya_cycle
-	byte <starglasses_cycle
-	byte <skully_cycle
-	byte <dumbface_cycle
-	byte <throber_cycle
-	byte <ant_cycle
-	byte <lasso_cycle
-	byte <ikes_mom_cycle
-	byte <uzi_cycle
-	byte <boss_moufs_cycle
-	byte <boss_swordtner_cycle
-	byte <boss_scarab_cycle
-	byte <boss_vamp_cycle
-
-enemy_update_table_hi:
-	byte >enemy_do_nothing
-	byte >crossbones_cycle
-	byte >powerups_cycle
-	byte >enemy_do_nothing
-	byte >birb_cycle
-	byte >spark_cycle
-	byte >zigzag_cycle
-	byte >skeet_cycle
-	byte >galger_cycle
-	byte >bullet_cycle
-	byte >dart_cycle
-	byte >boss_vamp_bat_cycle
-	byte >chomps_cycle
-	byte >maggs_cycle
-	byte >muya_cycle
-	byte >starglasses_cycle
-	byte >skully_cycle
-	byte >dumbface_cycle
-	byte >throber_cycle
-	byte >ant_cycle
-	byte >lasso_cycle
-	byte >ikes_mom_cycle
-	byte >uzi_cycle
-	byte >boss_moufs_cycle
-	byte >boss_swordtner_cycle
-	byte >boss_scarab_cycle
-	byte >boss_vamp_cycle
-
-enemy_spawn_table_lo:
-	byte <do_nothing
-	byte <do_nothing
-	byte <do_nothing
-	byte <do_nothing
-	byte <birb_spawn
-	byte <spark_spawn
-	byte <zigzag_spawn
-	byte <skeet_spawn
-	byte <galger_spawn
-	byte <bullet_spawn
-	byte <dart_spawn
-	byte <boss_vamp_bat_spawn
-	byte <chomps_spawn
-	byte <maggs_spawn
-	byte <muya_spawn
-	byte <starglasses_spawn
-	byte <skully_spawn
-	byte <dumbface_spawn
-	byte <throber_spawn
-	byte <ant_spawn
-	byte <lasso_spawn
-	byte <ikes_mom_spawn
-	byte <uzi_spawn
-	byte <boss_moufs_spawn
-	byte <boss_swordtner_spawn
-	byte <boss_scarab_spawn
-	byte <boss_vamp_spawn
-
-enemy_spawn_table_hi:
-	byte >do_nothing
-	byte >do_nothing
-	byte >do_nothing
-	byte >do_nothing
-	byte >birb_spawn
-	byte >spark_spawn
-	byte >zigzag_spawn
-	byte >skeet_spawn
-	byte >galger_spawn
-	byte >bullet_spawn
-	byte >dart_spawn
-	byte >boss_vamp_bat_spawn
-	byte >chomps_spawn
-	byte >maggs_spawn
-	byte >muya_spawn
-	byte >starglasses_spawn
-	byte >skully_spawn
-	byte >dumbface_spawn
-	byte >throber_spawn
-	byte >ant_spawn
-	byte >lasso_spawn
-	byte >ikes_mom_spawn
-	byte >uzi_spawn
-	byte >boss_moufs_spawn
-	byte >boss_swordtner_spawn
-	byte >boss_scarab_spawn
-	byte >boss_vamp_spawn
+	byte $04 ; boss_scarab
+	byte $04 ; boss_swordtner

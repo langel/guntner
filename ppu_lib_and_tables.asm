@@ -393,3 +393,285 @@ char_set_hash		EQM $9f
 char_set_dash		EQM $ab
 char_set_colon		EQM $ac
 char_set_space		EQM $3
+
+
+
+
+
+
+jump_to_subroutine: subroutine
+	; a = jump table offset
+        ; caches x and leaves y alone
+        stx temp03
+        tax
+        lda mega_jump_table_to_end_all_jump_tables_lo,x
+        sta temp00
+        lda mega_jump_table_to_end_all_jump_tables_hi,x
+        sta temp01
+        ldx temp03
+        jmp (temp00)
+
+
+
+	;  jump tables defined 
+enemy_update_jump_table_offset	EQM	0
+enemy_spawn_jump_table_offset	EQM	27
+boss_vamp_state_jump_table_offset	EQM	54
+options_screen_state_jump_table_offset	EQM	60
+sfx_test_jump_table_offset	EQM	66
+apu_env_jump_table_offset	EQM	86
+sfx_update_jump_table_offset	EQM	93
+song_update_jump_table_offset	EQM	100
+state_init_jump_table_offset	EQM	109
+
+
+mega_jump_table_to_end_all_jump_tables_lo:
+enemy_update_jump_table_lo:
+	byte <enemy_do_nothing
+	byte <crossbones_cycle
+	byte <powerups_cycle
+	byte <enemy_do_nothing
+	byte <birb_cycle
+	byte <spark_cycle
+	byte <zigzag_cycle
+	byte <skeet_cycle
+	byte <galger_cycle
+	byte <bullet_cycle
+	byte <dart_cycle
+	byte <boss_vamp_bat_cycle
+	byte <chomps_cycle
+	byte <maggs_cycle
+	byte <muya_cycle
+	byte <starglasses_cycle
+	byte <skully_cycle
+	byte <dumbface_cycle
+	byte <throber_cycle
+	byte <ant_cycle
+	byte <lasso_cycle
+	byte <ikes_mom_cycle
+	byte <uzi_cycle
+	byte <boss_moufs_cycle
+	byte <boss_vamp_cycle
+	byte <boss_scarab_cycle
+	byte <boss_swordtner_cycle
+enemy_spawn_jump_table_lo:
+	byte <do_nothing
+	byte <do_nothing
+	byte <do_nothing
+	byte <do_nothing
+	byte <birb_spawn
+	byte <spark_spawn
+	byte <zigzag_spawn
+	byte <skeet_spawn
+	byte <galger_spawn
+	byte <bullet_spawn
+	byte <dart_spawn
+	byte <boss_vamp_bat_spawn
+	byte <chomps_spawn
+	byte <maggs_spawn
+	byte <muya_spawn
+	byte <starglasses_spawn
+	byte <skully_spawn
+	byte <dumbface_spawn
+	byte <throber_spawn
+	byte <ant_spawn
+	byte <lasso_spawn
+	byte <ikes_mom_spawn
+	byte <uzi_spawn
+	byte <boss_moufs_spawn
+	byte <boss_vamp_spawn
+	byte <boss_scarab_spawn
+	byte <boss_swordtner_spawn
+boss_vamp_state_jump_table_lo:
+	byte <boss_vamp_state_idle_update
+	byte <boss_vamp_state_suck_bats
+	byte <boss_vamp_state_shake
+	byte <boss_vamp_state_lunge
+	byte <boss_vamp_state_retreat
+	byte <boss_vamp_state_blow_bats
+options_screen_state_jump_table_lo:
+	byte <options_menu_return
+	byte <options_screen_song_handler
+	byte <options_screen_sfx_handler
+	byte <options_screen_color1_handler
+	byte <options_screen_color2_handler
+	byte <options_screen_difficulty_handler
+sfx_test_jump_table_lo:
+	byte <sfx_pewpew
+	byte <sfx_player_damage
+	byte <sfx_player_death
+	byte <sfx_enemy_damage
+	byte <sfx_enemy_death
+	byte <sfx_powerup_hit
+	byte <sfx_powerup_bomb
+	byte <sfx_powerup_mushroom
+	byte <sfx_powerup_mask	
+	byte <sfx_powerup_1up	
+	byte <sfx_powerup_battery_25	
+	byte <sfx_powerup_battery_50	
+	byte <sfx_powerup_battery_100
+	byte <sfx_shoot_dart	
+	byte <sfx_shoot_bullet	
+	byte <sfx_rng_chord	
+	byte <sfx_phase_next	
+	byte <sfx_snare	
+	byte <sfx_hat	
+	byte <sfx_ghost_snare	
+apu_env_jump_table_lo:
+	byte <apu_env_lin_long   ; 0
+	byte <apu_env_lin_short  ; 1
+	byte <apu_env_lin_tiny	  ; 2
+	byte <apu_env_exp_long	  ; 3
+	byte <apu_env_exp_short  ; 4
+	byte <apu_env_exp_tiny	  ; 5
+	byte <apu_env_exp_pico	  ; 6
+sfx_update_jump_table_lo:
+	byte <do_nothing			; 0
+	byte <sfx_player_death_update		; 1
+	byte <sfx_enemy_death_update		; 2
+	byte <sfx_powerup_battery_update	; 3
+	byte <sfx_powerup_bomb_update		; 4
+	byte <sfx_powerup_1up_update		; 5
+	byte <sfx_phase_next_update		; 6
+song_update_jump_table_lo:
+	byte <do_nothing		; rng chord
+	byte <song_01			; sick dingle
+	byte <song_02			; in game
+	byte <song_03			; boss intro
+	byte <song_04			; boss fight
+	byte <song_05			; game over
+	byte <song_06			; end bad
+	byte <song_07			; end ok
+	byte <song_08			; end good
+state_init_jump_table_lo:
+	byte <menu_screens_init		; 0
+	byte <attract_init			; 1
+	byte <game_init			; 2
+	byte <cut_scene_intro_init		; 3
+	byte <cut_scene_outro_init		; 4
+
+
+mega_jump_table_to_end_all_jump_tables_hi:
+enemy_update_jump_table_hi:
+	byte >enemy_do_nothing
+	byte >crossbones_cycle
+	byte >powerups_cycle
+	byte >enemy_do_nothing
+	byte >birb_cycle
+	byte >spark_cycle
+	byte >zigzag_cycle
+	byte >skeet_cycle
+	byte >galger_cycle
+	byte >bullet_cycle
+	byte >dart_cycle
+	byte >boss_vamp_bat_cycle
+	byte >chomps_cycle
+	byte >maggs_cycle
+	byte >muya_cycle
+	byte >starglasses_cycle
+	byte >skully_cycle
+	byte >dumbface_cycle
+	byte >throber_cycle
+	byte >ant_cycle
+	byte >lasso_cycle
+	byte >ikes_mom_cycle
+	byte >uzi_cycle
+	byte >boss_moufs_cycle
+	byte >boss_vamp_cycle
+	byte >boss_scarab_cycle
+	byte >boss_swordtner_cycle
+enemy_spawn_jump_table_hi:
+	byte >do_nothing
+	byte >do_nothing
+	byte >do_nothing
+	byte >do_nothing
+	byte >birb_spawn
+	byte >spark_spawn
+	byte >zigzag_spawn
+	byte >skeet_spawn
+	byte >galger_spawn
+	byte >bullet_spawn
+	byte >dart_spawn
+	byte >boss_vamp_bat_spawn
+	byte >chomps_spawn
+	byte >maggs_spawn
+	byte >muya_spawn
+	byte >starglasses_spawn
+	byte >skully_spawn
+	byte >dumbface_spawn
+	byte >throber_spawn
+	byte >ant_spawn
+	byte >lasso_spawn
+	byte >ikes_mom_spawn
+	byte >uzi_spawn
+	byte >boss_moufs_spawn
+	byte >boss_vamp_spawn
+	byte >boss_scarab_spawn
+	byte >boss_swordtner_spawn
+boss_vamp_state_jump_table_hi:
+	byte >boss_vamp_state_idle_update
+	byte >boss_vamp_state_suck_bats
+	byte >boss_vamp_state_shake
+	byte >boss_vamp_state_lunge
+	byte >boss_vamp_state_retreat
+	byte >boss_vamp_state_blow_bats
+options_screen_state_jump_table_hi:
+	byte >options_menu_return
+	byte >options_screen_song_handler
+	byte >options_screen_sfx_handler
+	byte >options_screen_color1_handler
+	byte >options_screen_color2_handler
+	byte >options_screen_difficulty_handler
+sfx_test_jump_table_hi:
+	byte >sfx_pewpew
+	byte >sfx_player_damage
+	byte >sfx_player_death
+	byte >sfx_enemy_damage
+	byte >sfx_enemy_death
+	byte >sfx_powerup_hit
+	byte >sfx_powerup_bomb
+	byte >sfx_powerup_mushroom
+	byte >sfx_powerup_mask	
+	byte >sfx_powerup_1up	
+	byte >sfx_powerup_battery_25	
+	byte >sfx_powerup_battery_50	
+	byte >sfx_powerup_battery_100
+	byte >sfx_shoot_dart	
+	byte >sfx_shoot_bullet	
+	byte >sfx_rng_chord	
+	byte >sfx_phase_next	
+	byte >sfx_snare	
+	byte >sfx_hat	
+	byte >sfx_ghost_snare	
+apu_env_jump_table_hi:
+	byte >apu_env_lin_long   ; 0
+	byte >apu_env_lin_short  ; 1
+	byte >apu_env_lin_tiny	  ; 2
+	byte >apu_env_exp_long	  ; 3
+	byte >apu_env_exp_short  ; 4
+	byte >apu_env_exp_tiny	  ; 5
+	byte >apu_env_exp_pico	  ; 6
+sfx_update_jump_table_hi:
+	byte >do_nothing			; 0
+	byte >sfx_player_death_update		; 1
+	byte >sfx_enemy_death_update		; 2
+	byte >sfx_powerup_battery_update	; 3
+	byte >sfx_powerup_bomb_update		; 4
+	byte >sfx_powerup_1up_update		; 5
+	byte >sfx_phase_next_update		; 6
+song_update_jump_table_hi:
+	byte >do_nothing		; rng chord
+	byte >song_01			; sick dingle
+	byte >song_02			; in game
+	byte >song_03			; boss intro
+	byte >song_04			; boss fight
+	byte >song_05			; game over
+	byte >song_06			; end bad
+	byte >song_07			; end ok
+	byte >song_08			; end good
+state_init_jump_table_hi:
+	byte >menu_screens_init		; 0
+	byte >attract_init			; 1
+	byte >game_init			; 2
+	byte >cut_scene_intro_init		; 3
+	byte >cut_scene_outro_init		; 4

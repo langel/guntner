@@ -9,9 +9,6 @@ song_end_bad		EQM $06
 song_end_ok		EQM $07
 song_end_good		EQM $08
 
-do_nothing_id        EQM $01
-crossbones_id        EQM $02
-
 
 
 song_update: subroutine
@@ -19,32 +16,10 @@ song_update: subroutine
         bne .music_on
         rts
 .music_on
-        ldx audio_song_id
-        lda song_update_table_lo,x
-        sta temp00
-        lda song_update_table_hi,x
-        sta temp01
-        jmp (temp00)
-song_update_table_lo:
-	byte #<do_nothing		; rng chord
-        byte #<song_01			; sick dingle
-        byte #<song_02			; in game
-        byte #<song_03			; boss intro
-        byte #<song_04			; boss fight
-        byte #<song_05			; game over
-        byte #<song_06			; end bad
-        byte #<song_07			; end ok
-        byte #<song_08			; end good
-song_update_table_hi:
-	byte #>do_nothing		; rng chord
-        byte #>song_01			; sick dingle
-        byte #>song_02			; in game
-        byte #>song_03			; boss intro
-        byte #>song_04			; boss fight
-        byte #>song_05			; game over
-        byte #>song_06			; end bad
-        byte #>song_07			; end ok
-        byte #>song_08			; end good
+        lda audio_song_id
+        clc
+        adc #song_update_jump_table_offset
+        jmp jump_to_subroutine
 
         
 song_start: subroutine

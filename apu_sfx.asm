@@ -11,83 +11,16 @@ sfx_noi_update_type		EQU $155
 ; these should only use Pulse 2 and Noise channels
 ; unless its a non-music moment (like player death)
 
-
-sfx_update_delegator: subroutine
-        ; x = update offset
-        lda sfx_update_table_lo,x
-        sta temp00
-        lda sfx_update_table_hi,x
-        sta temp01
-        jmp (temp00)
-sfx_update_table_lo:
-	byte #<do_nothing			; 0
-	byte #<sfx_player_death_update		; 1
-        byte #<sfx_enemy_death_update		; 2
-        byte #<sfx_powerup_battery_update	; 3
-        byte #<sfx_powerup_bomb_update		; 4
-        byte #<sfx_powerup_1up_update		; 5
-        byte #<sfx_phase_next_update		; 6
-sfx_update_table_hi:
-	byte #>do_nothing
-	byte #>sfx_player_death_update
-        byte #>sfx_enemy_death_update
-        byte #>sfx_powerup_battery_update
-        byte #>sfx_powerup_bomb_update
-        byte #>sfx_powerup_1up_update
-        byte #>sfx_phase_next_update
         
         
         
 sfx_test_delegator: subroutine
-	; x = sound effect id
-        lda sfx_test_table_lo,x
-        sta temp00
-        lda sfx_test_table_hi,x
-        sta temp01
-        jmp (temp00)
-sfx_test_table_lo:
-	byte #<sfx_pewpew			; 00
-        byte #<sfx_player_damage		; 01
-        byte #<sfx_player_death			; 02
-        byte #<sfx_enemy_damage			; 03
-        byte #<sfx_enemy_death			; 04
-        byte #<sfx_powerup_hit			; 05
-        byte #<sfx_powerup_bomb			; 06
-        byte #<sfx_powerup_mushroom		; 07
-        byte #<sfx_powerup_mask			; 08
-        byte #<sfx_powerup_1up			; 09
-        byte #<sfx_powerup_battery_25		; 0a
-        byte #<sfx_powerup_battery_50		; 0b
-        byte #<sfx_powerup_battery_100		; 0c
-        byte #<sfx_shoot_dart			; 0d
-        byte #<sfx_shoot_bullet			; 0e
-        byte #<sfx_rng_chord			; 0f
-        byte #<sfx_phase_next			; 10
-        byte #<sfx_snare			; 11
-        byte #<sfx_hat				; 12
-        byte #<sfx_ghost_snare			; 13
-sfx_test_table_hi:
-	byte #>sfx_pewpew
-        byte #>sfx_player_damage
-        byte #>sfx_player_death
-        byte #>sfx_enemy_damage
-        byte #>sfx_enemy_death
-        byte #>sfx_powerup_hit
-        byte #>sfx_powerup_bomb
-        byte #>sfx_powerup_mushroom
-        byte #>sfx_powerup_mask
-        byte #>sfx_powerup_1up
-        byte #>sfx_powerup_battery_25
-        byte #>sfx_powerup_battery_50
-        byte #>sfx_powerup_battery_100
-        byte #>sfx_shoot_dart
-        byte #>sfx_shoot_bullet
-        byte #>sfx_rng_chord
-        byte #>sfx_phase_next
-        byte #>sfx_snare
-        byte #>sfx_hat
-        byte #>sfx_ghost_snare
-
+	; a = sound effect id
+        clc
+        adc #sfx_test_jump_table_offset
+        jmp jump_to_subroutine
+        
+        
 
 ; sound test 00
 sfx_pewpew: subroutine
