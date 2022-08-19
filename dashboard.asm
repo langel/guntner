@@ -154,7 +154,12 @@ dashboard_render: subroutine
         rts
 
 
-        
+
+dashboard_gauges_table:
+	byte phase_kill_counter
+	byte player_frag_counter
+	byte player_x_hi
+	byte player_y_hi
         
         
 ; GET DASH UPDATES READY TO RENDER
@@ -225,20 +230,31 @@ dashboard_update: subroutine
 	sta dash_cache+$29
        
        
-; SCORE
+; GAUGES
+; used to be scoreboard
+
+; phase_kill_counter
+; player_frag_counter
+; player_x_hi
+; player_y_hi
+
         ldx #$07
         ldy #$03
-.score_display_loop
-	lda score_000000xx,y
+.guages_display_loop
+	stx temp00
+	ldx dashboard_gauges_table,y
+        lda $0000,x
+        sta temp01
+        ldx temp00
         jsr get_char_lo
         sta dash_cache+$2c,x
-        lda score_000000xx,y
+	lda temp01
         jsr get_char_hi
         dex
         sta dash_cache+$2c,x
         dex
         dey
-        bpl .score_display_loop
+        bpl .guages_display_loop
         
         
 ; TIMER	

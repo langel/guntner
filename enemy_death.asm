@@ -88,21 +88,7 @@ enemy_death_handler: subroutine
 	lda enemy_ram_type,x
         beq .done
         
-	; handle point bonus
-        asl
-        asl
-        clc
-        adc #$03
-        tay ; enemy points counter
-        ldx #$03 ; score bytes counter
-        clc
-.score_loop
-        lda enemy_player_points_table,y
-        adc score_000000xx,x
-        sta score_000000xx,x
-        dey
-	dex
-	bpl .score_loop
+        inc player_frag_counter
         
 	; track deaths of phase spawns
         ldy enemy_slot_id
@@ -111,6 +97,9 @@ enemy_death_handler: subroutine
         lda #$00
         sta phase_spawn_table,y
 	dec phase_kill_counter
+        ; if less than 0 set to 0
+        bpl .not_phase_spawn
+        sta phase_kill_counter
 .not_phase_spawn
         
         ldx enemy_ram_offset

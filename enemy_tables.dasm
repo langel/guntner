@@ -58,34 +58,7 @@ enemy_hitpoints_table:
 	byte $3f ; boss_scarab
 	byte $3f ; boss_swordtner
 
-enemy_player_points_table:
-	byte $00, $00, $00, $00 ; null
-	byte $00, $00, $00, $00 ; crossbones
-	byte $00, $00, $00, $00 ; powerups
-	byte $00, $00, $00, $00 ; boss_assist
-	byte $00, $00, $38, $65 ; birb
-	byte $00, $00, $80, $0b ; spark
-	byte $00, $00, $cd, $93 ; zigzag
-	byte $00, $01, $29, $7d ; skeet
-	byte $00, $00, $39, $2f ; galger
-	byte $00, $00, $00, $00 ; bullet
-	byte $00, $00, $00, $00 ; dart
-	byte $00, $01, $5a, $d5 ; boss_vamp_bat
-	byte $00, $03, $9b, $ad ; chomps
-	byte $00, $0b, $dc, $65 ; maggs
-	byte $00, $0e, $ea, $6f ; muya
-	byte $00, $0f, $4d, $f9 ; starglasses
-	byte $00, $78, $be, $ed ; skully
-	byte $00, $1d, $cb, $4f ; dumbface
-	byte $00, $30, $c7, $f1 ; throber
-	byte $00, $3b, $ec, $fd ; ant
-	byte $00, $6b, $ef, $ab ; lasso
-	byte $00, $42, $ad, $43 ; ikes_mom
-	byte $00, $00, $00, $7b ; uzi
-	byte $0b, $c6, $01, $1f ; boss_moufs
-	byte $15, $cc, $8f, $4b ; boss_vamp
-	byte $2a, $82, $21, $75 ; boss_scarab
-	byte $3b, $7b, $cf, $87 ; boss_swordtner
+
 
 enemy_size_table:
 	byte $00 ; null

@@ -57,6 +57,7 @@ player_boundless	byte
 player_autofire_c	byte
 player_autofire_s	byte
 player_damage		byte
+player_frag_counter	byte
 
 player_death_flag	byte
 you_dead_counter	byte
@@ -99,12 +100,6 @@ collision_1_w	byte
 collision_1_h	byte
 
 dashboard_message	byte
-
-; 24 bit max value : 16777215
-score_000000xx	byte
-score_0000xx00	byte
-score_00xx0000	byte
-score_xx000000	byte
 
 timer_frames_1s		byte
 timer_frames_10s	byte

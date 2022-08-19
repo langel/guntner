@@ -26,10 +26,7 @@ player_game_reset: subroutine
         sta shroom_counter
         sta mask_shield
         sta you_dead_counter
-        sta score_xx000000
-        sta score_00xx0000
-        sta score_0000xx00
-        sta score_000000xx
+        sta player_frag_counter
         ; XXX testing phase behaviours
         ;lda #1
         ;sta phase_level
