@@ -117,8 +117,6 @@ state_v5		byte
 state_v6		byte
 state_v7		byte
 state_sprite0	byte
-state_fade_in	byte
-state_fade_out	byte
 state_iframes	byte
 
 state_render_addr	byte
@@ -172,9 +170,12 @@ temp02	byte
 temp03	byte
 
 
-pal_fade_c	byte
-pal_fade_offset	byte
-pal_fade_target	byte
+pal_fade_c		byte
+pal_fade_offset		byte
+pal_fade_target		byte
+state_fade_in		byte
+state_fade_out		byte
+state_from_white	byte
 
 pal_uni_bg	byte
 pal_bg_0_1	byte

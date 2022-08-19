@@ -154,8 +154,10 @@ palette_update: subroutine
         beq .dont_fade_out
         jmp palette_fade_out_update
 .dont_fade_out
-; XXX dooo eeeet!!!
 ; fade from white
+	lda state_from_white
+        beq .dont_fade_from_white
+        jmp palette_fade_from_white_update
 .dont_fade_from_white
 ; bomb
         lda bomb_counter
@@ -180,6 +182,7 @@ palette_state_reset:
 	lda #$00
         sta state_fade_in
         sta state_fade_out
+        sta state_from_white
         rts
 
 
@@ -266,6 +269,33 @@ palette_fade_out_update: subroutine
 .fade_mode_not_done
 	sta pal_fade_c
 	rts
+        
+        
+       
+palette_fade_from_white_update: subroutine
+	lda pal_fade_c
+        and #%11110000
+        sta pal_fade_offset
+	ldx #23
+.loop
+	lda pal_uni_bg,x
+        clc
+        adc pal_fade_offset
+        cmp #$3f
+        bcc .dont_set_white
+        lda #$30
+.dont_set_white
+	sta palette_cache,x
+        dex
+        bpl .loop
+        dec pal_fade_c
+        dec pal_fade_c
+        dec pal_fade_c
+        bpl .fade_mode_not_done
+        jsr palette_state_reset
+.fade_mode_not_done
+	rts
+        
         
 
 	; 12 + 32 x 7 = 236 cycles

@@ -419,9 +419,12 @@ phase_boss_fight_intro:
         ; play boss fight song
         lda #song_boss_fight
         jsr song_start
-        ; do a fade in
-        ; XXX a fade from white would be better!
-        jsr palette_fade_in_init
+        ; do a fade in FROM HWITE!! :U
+	lda #$37
+        sta pal_fade_c
+        sta state_from_white
+        ; sfx!
+        jsr sfx_enemy_death
         ; spawn boss
         jsr state_clear ; a = 0
 	ldx phase_level
