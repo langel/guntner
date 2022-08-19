@@ -373,6 +373,9 @@ phase_boss_fight: subroutine
 	rts
         
         
+phase_boss_assistants_table:
+	byte chomps_id, skully_id, maggs_id, muya_id
+        
 phase_boss_fight_intro:
         lda phase_spawn_counter
         bne .dont_init_cinematics
@@ -409,6 +412,8 @@ phase_boss_fight_intro:
 	inc phase_spawn_counter
         bne .done
 
+	; boss spawning this frame
+        jsr state_clear 
         inc phase_kill_counter
         lda #0
         sta ppu_mask_emph
@@ -425,8 +430,17 @@ phase_boss_fight_intro:
         sta state_from_white
         ; sfx!
         jsr sfx_enemy_death
+        ; spawn assistant enemies
+        ldx phase_level
+        lda phase_boss_assistants_table,x
+        sta temp02
+        jsr enemy_slot_from_type
+        lda temp02
+        jsr enemy_spawn_delegator
+        jsr enemy_slot_from_type
+        lda temp02
+        jsr enemy_spawn_delegator
         ; spawn boss
-        jsr state_clear ; a = 0
 	ldx phase_level
         lda level_boss_table,x
         ldx #$b8

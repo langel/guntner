@@ -81,7 +81,7 @@ boss_vamp_bat_cycle: subroutine
         ; palette
         lda $03be ; use vamp hc
         sta enemy_ram_hc,x
-        lda #$01
+        lda #$02
         jsr enemy_set_palette
 .done
 	jmp update_enemies_handler_next
@@ -212,7 +212,7 @@ boss_vamp_cycle: subroutine
         jsr sprite_4_set_sprite
         
         ; palette
-        lda #$02
+        lda #$01
         jsr sprite_4_set_palette
         bne .not_hit
         lda #$80

@@ -8,7 +8,7 @@ enemy_boss_eyes: subroutine
 	ldx #$fc
         lda #$a9
         sta oam_ram_spr,x
-        lda #$01
+        lda #$02
         sta oam_ram_att,x
         ; find x
         lda temp00

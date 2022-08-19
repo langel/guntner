@@ -29,12 +29,6 @@ boss_moufs_spawn: subroutine
         sta boss_x
         lda #$20
         sta boss_y
-        lda #chomps_id
-        ldx #$90
-        jsr enemy_spawn_delegator
-        lda #chomps_id
-        ldx #$98
-        jsr enemy_spawn_delegator
 	rts
         
         

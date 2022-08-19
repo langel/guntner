@@ -71,16 +71,16 @@ palette_table:
         hex 02 07 38
         ; #63 boss 
         ; vamp+bats palettes
-        hex 02 11 30
         hex 15 2d 37
+        hex 02 11 30
         ; #69 boss 
         ; scarab palettes
         hex 0c 27 37
         hex 03 1a 39
         ; #75 boss 
         ; swordtner palettes
-        hex 07 17 3d 
         hex 11 2d 31
+        hex 07 17 3d 
         
 palette_level_offset_table:
 	byte #21, #30, #39, #48

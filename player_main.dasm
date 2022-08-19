@@ -27,9 +27,9 @@ player_game_reset: subroutine
         sta you_dead_counter
         sta player_frag_counter
         ; XXX testing phase behaviours
-        ;lda #0
+        ;lda #1
         ;sta phase_level
-        ;lda #$0f
+        ;lda #$1f
         ;sta phase_current
         jsr phase_palette_load
         jsr timer_reset

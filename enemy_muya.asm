@@ -60,7 +60,7 @@ muya_cycle: subroutine
         sta oam_ram_spr+4,y
         
         ; palette
-        lda #$03
+        lda #$02
         jsr enemy_set_palette
         sta oam_ram_att+4,y
               

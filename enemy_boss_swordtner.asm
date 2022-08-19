@@ -135,11 +135,11 @@ boss_swordtner_cycle: subroutine
         ldy enemy_oam_offset
         
 	; palette
-	lda #$01
+	lda #$02
         jsr sprite_4_set_palette
         beq .hit
-        clc
-        adc #$01
+        sec
+        sbc #$01
 .hit
         ldy #$c0
         jsr sprite_4_set_palette_no_process
