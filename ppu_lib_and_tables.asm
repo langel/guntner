@@ -417,12 +417,15 @@ jump_to_subroutine: subroutine
 enemy_update_jump_table_offset	EQM	0
 enemy_spawn_jump_table_offset	EQM	27
 boss_vamp_state_jump_table_offset	EQM	54
-options_screen_state_jump_table_offset	EQM	60
-sfx_test_jump_table_offset	EQM	66
-apu_env_jump_table_offset	EQM	86
-sfx_update_jump_table_offset	EQM	93
-song_update_jump_table_offset	EQM	100
-state_init_jump_table_offset	EQM	109
+powerup_pickup_jump_table_offset	EQM	60
+options_screen_state_jump_table_offset	EQM	68
+sfx_test_jump_table_offset	EQM	74
+apu_env_jump_table_offset	EQM	94
+sfx_update_jump_table_offset	EQM	101
+song_update_jump_table_offset	EQM	108
+state_init_jump_table_offset	EQM	117
+state_render_jump_table_offset	EQM	122
+state_update_jump_table_offset	EQM	127
 
 
 mega_jump_table_to_end_all_jump_tables_lo:
@@ -489,6 +492,15 @@ boss_vamp_state_jump_table_lo:
 	byte <boss_vamp_state_lunge
 	byte <boss_vamp_state_retreat
 	byte <boss_vamp_state_blow_bats
+powerup_pickup_jump_table_lo:
+	byte <powerup_pickup_mask
+	byte <powerup_pickup_r_bag
+	byte <powerup_pickup_bomb
+	byte <powerup_pickup_mushroom
+	byte <powerup_pickup_plus_one
+	byte <powerup_pickup_health_25
+	byte <powerup_pickup_health_50
+	byte <powerup_pickup_health_100
 options_screen_state_jump_table_lo:
 	byte <options_menu_return
 	byte <options_screen_song_handler
@@ -549,6 +561,22 @@ state_init_jump_table_lo:
 	byte <game_init			; 2
 	byte <cut_scene_intro_init		; 3
 	byte <cut_scene_outro_init		; 4
+state_render_jump_table_lo:
+	byte <state_render_do_nothing		; 0
+	byte <menu_screens_render		; 1
+	byte <starfield_render		; 3
+	byte <state_render_do_nothing ; placeholder
+	byte <dashboard_render		; 5
+state_update_jump_table_lo:
+	byte <state_update_do_nothing		; 0
+	byte <title_screen_update		; 1
+	byte <scrollto_options_update		; 2
+	byte <options_screen_update		; 3
+	byte <scrollto_titles_update		; 4
+	byte <attract_update			; 5
+	byte <game_update			; 6
+	byte <sandbox_update			; 7
+	byte <cut_scene_update_generic	; 8
 
 
 mega_jump_table_to_end_all_jump_tables_hi:
@@ -615,6 +643,15 @@ boss_vamp_state_jump_table_hi:
 	byte >boss_vamp_state_lunge
 	byte >boss_vamp_state_retreat
 	byte >boss_vamp_state_blow_bats
+powerup_pickup_jump_table_hi:
+	byte >powerup_pickup_mask
+	byte >powerup_pickup_r_bag
+	byte >powerup_pickup_bomb
+	byte >powerup_pickup_mushroom
+	byte >powerup_pickup_plus_one
+	byte >powerup_pickup_health_25
+	byte >powerup_pickup_health_50
+	byte >powerup_pickup_health_100
 options_screen_state_jump_table_hi:
 	byte >options_menu_return
 	byte >options_screen_song_handler
@@ -675,3 +712,19 @@ state_init_jump_table_hi:
 	byte >game_init			; 2
 	byte >cut_scene_intro_init		; 3
 	byte >cut_scene_outro_init		; 4
+state_render_jump_table_hi:
+	byte >state_render_do_nothing		; 0
+	byte >menu_screens_render		; 1
+	byte >starfield_render		; 3
+	byte >state_render_do_nothing ; placeholder
+	byte >dashboard_render		; 5
+state_update_jump_table_hi:
+	byte >state_update_do_nothing		; 0
+	byte >title_screen_update		; 1
+	byte >scrollto_options_update		; 2
+	byte >options_screen_update		; 3
+	byte >scrollto_titles_update		; 4
+	byte >attract_update			; 5
+	byte >game_update			; 6
+	byte >sandbox_update			; 7
+	byte >cut_scene_update_generic	; 8

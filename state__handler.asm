@@ -46,31 +46,6 @@ state_clear:
 	rts
 
 
-	
-
-STATE_RENDER_FUNCTION_TABLE:
-	.word	state_render_do_nothing		; 0
-        .word	menu_screens_render		; 1
-        ;.word	starfield_bg_render		; 2
-        .word	starfield_render		; 3
-        .word 	state_render_do_nothing ; placeholder
-        ;.word	starfield_sprmsg_render		; 4
-        .word	dashboard_render		; 5
-
-STATE_UPDATE_FUNCTION_TABLE:
-	.word	state_update_do_nothing		; 0
-        .word	title_screen_update		; 1
-        .word	scrollto_options_update		; 2
-        .word	options_screen_update		; 3
-        .word	scrollto_titles_update		; 4
-        .word	attract_update			; 5
-        .word	game_update			; 6
-        .word	sandbox_update			; 7
-        .word	cut_scene_update_generic	; 8
-        ;.word	sandbox2_update			; 9
-        ;.word	starfield_sprmsg_update		; a
-
-
 
 state_render_do_nothing:
 	jmp state_render_done
@@ -78,29 +53,21 @@ state_render_do_nothing:
 state_update_do_nothing:
 	jmp state_update_done
         
-        
 
 state_render_set_addr:
 	; a = function table slot
-        asl
-        tax
-	lda STATE_RENDER_FUNCTION_TABLE,x
-        sta state_render_addr_lo
-        inx
-	lda STATE_RENDER_FUNCTION_TABLE,x
-        sta state_render_addr_hi
+        clc
+        adc #state_render_jump_table_offset
+        sta state_render_addr
         rts
         
 state_update_set_addr:
 	; a = function table slot
-        asl
-        tax
-	lda STATE_UPDATE_FUNCTION_TABLE,x
-        sta state_update_addr_lo
-        inx
-	lda STATE_UPDATE_FUNCTION_TABLE,x
-        sta state_update_addr_hi
+        clc
+        adc #state_update_jump_table_offset
+        sta state_update_addr
         rts
+        
 
 state_sprite0_enable:
         lda #$01

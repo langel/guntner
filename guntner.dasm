@@ -118,7 +118,8 @@ nmi_handler: subroutine
         
 ; PPU vBLANK STUFF
 	; RENDER	va cycles
-        jmp (state_render_addr_lo)
+        lda state_render_addr
+        jmp jump_to_subroutine
 state_render_done:
 	; OAM DMA	513 cycles
 	lda #$02
@@ -144,7 +145,8 @@ state_render_done:
         ; ~2250 cycles!
         
 ; main game logic
-        jmp (state_update_addr_lo)
+	lda state_update_addr
+        jmp jump_to_subroutine
 state_update_done:
 
 sprite0_wait:

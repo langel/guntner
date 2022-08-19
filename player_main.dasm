@@ -125,8 +125,8 @@ player_take_damage: subroutine
         
         
 set_player_sprite: subroutine
-	lda state_render_addr_lo
-        cmp #<menu_screens_render
+	lda state_render_addr
+        cmp #state_render_jump_table_offset+1
         bne .not_menu_screens
 .is_menu_screens
         ; sprite (menus)

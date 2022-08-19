@@ -126,10 +126,8 @@ state_fade_in	byte
 state_fade_out	byte
 state_iframes	byte
 
-state_render_addr_lo	byte
-state_render_addr_hi	byte
-state_update_addr_lo	byte
-state_update_addr_hi	byte
+state_render_addr	byte
+state_update_addr	byte
 
 
 nametable_tile_planter_addr_lo	byte
