@@ -13,9 +13,10 @@ zigzag_spawn: subroutine
         lsr
         and #$03
         sta enemy_ram_pc,x
+        stx temp00
         tax
         lda zigzag_dir_table,x
-        ldx enemy_ram_offset
+        ldx temp00
         sta enemy_ram_ex,x
         ; set position
         jmp enemy_spawn_set_x_y_rng

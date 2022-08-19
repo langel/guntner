@@ -4,7 +4,7 @@ chomps_spawn: subroutine
 	; x is set by enemy spawner
         lda #$c1
         sta enemy_ram_ac,x
-        jsr get_oam_offset_from_slot_offset
+        jsr get_oam_offset_from_ram_offset
         lda #$00
         sta oam_ram_x,y
    	rts

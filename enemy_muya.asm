@@ -2,7 +2,7 @@
 muya_spawn_y	EQM $b4
         
 muya_spawn: subroutine
-	jsr get_oam_offset_from_slot_offset
+	jsr get_oam_offset_from_ram_offset
         lda #muya_spawn_y+$10
         sta oam_ram_y,y
    	rts

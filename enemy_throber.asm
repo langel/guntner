@@ -1,7 +1,7 @@
 
 throber_spawn: subroutine
 	; x is set by enemy spawner
-        jsr get_oam_offset_from_slot_offset
+        jsr get_oam_offset_from_ram_offset
         lda #$42
         sta oam_ram_y,y   ; y pos
         lda #$00

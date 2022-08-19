@@ -69,7 +69,7 @@ bullet_spawn: subroutine
         lda enemy_hitpoints_table,y
         sta enemy_ram_hp,x
         ; load y register
-        jsr get_oam_offset_from_slot_offset
+        jsr get_oam_offset_from_ram_offset
         ; x pos
         lda temp02
         clc

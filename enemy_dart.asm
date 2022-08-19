@@ -27,7 +27,7 @@ dart_spawn: subroutine
         lda arctang_velocities_lo,y
         sta enemy_ram_pc,x
         ; get y register and set origin
-        jsr get_oam_offset_from_slot_offset
+        jsr get_oam_offset_from_ram_offset
         lda dart_x_origin
         sta oam_ram_x,y
         lda dart_y_origin

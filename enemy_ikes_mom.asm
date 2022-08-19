@@ -1,7 +1,7 @@
 
 
 ikes_mom_spawn:
-	jsr get_oam_offset_from_slot_offset
+	jsr get_oam_offset_from_ram_offset
         lda #$fa
         sta oam_ram_x,y
         lda #$80
