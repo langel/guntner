@@ -70,8 +70,10 @@ powerups_cycle: subroutine
         beq .frame
 .despawn_powerup
 .player_picksup_powerup
-        ldy enemy_ram_ex,x
-        jsr powerup_pickup_delegator
+        lda enemy_ram_ex,x
+        clc
+        adc #powerup_pickup_jump_table_offset
+        jsr jump_to_subroutine
         jsr enemy_clear
 	jmp update_enemies_handler_next
 .reset_velocity
@@ -129,32 +131,6 @@ powerups_cycle: subroutine
         
         
         
-        
-powerup_pickup_table_lo:
-	.byte #<powerup_pickup_mask
-	.byte #<powerup_pickup_mushroom
-	.byte #<powerup_pickup_plus_one
-	.byte #<powerup_pickup_bomb
-	.byte #<powerup_pickup_r_bag
-	.byte #<powerup_pickup_health_25
-	.byte #<powerup_pickup_health_50
-	.byte #<powerup_pickup_health_100
-powerup_pickup_table_hi:
-	.byte #>powerup_pickup_mask
-	.byte #>powerup_pickup_mushroom
-	.byte #>powerup_pickup_plus_one
-	.byte #>powerup_pickup_bomb
-	.byte #>powerup_pickup_r_bag
-	.byte #>powerup_pickup_health_25
-	.byte #>powerup_pickup_health_50
-	.byte #>powerup_pickup_health_100
-powerup_pickup_delegator: subroutine
-	; y = powerup type
-        lda powerup_pickup_table_lo,y
-        sta temp00
-        lda powerup_pickup_table_hi,y
-        sta temp01
-        jmp (temp00)
         
         
         

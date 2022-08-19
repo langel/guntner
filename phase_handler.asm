@@ -31,12 +31,9 @@ phase_handler: subroutine
         and #$0f
         tax
         lda phase_type_table,x
-        tax
-        lda phase_handlers_lo,x
-        sta temp00
-        lda phase_handlers_hi,x
-        sta temp01
-        jmp (temp00)
+        clc
+        adc #phase_handlers_jump_table_offset
+        jmp jump_to_subroutine
 
 
 

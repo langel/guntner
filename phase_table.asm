@@ -24,19 +24,6 @@ phase_type_table:
         byte #phase_bossfight_id	; f
         
    
-phase_handlers_lo:
-	byte #<phase_zero
-        byte #<phase_galger
-        byte #<phase_spawns
-        byte #<phase_spawn_long
-        byte #<phase_boss_fight
-phase_handlers_hi:
-	byte #>phase_zero
-        byte #>phase_galger
-        byte #>phase_spawns
-        byte #>phase_spawn_long
-        byte #>phase_boss_fight
-
 
 
 ; OLD DEMO PHASES

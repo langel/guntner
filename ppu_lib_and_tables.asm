@@ -413,19 +413,20 @@ jump_to_subroutine: subroutine
 
 
 
-	;  jump tables defined 
+		;  jump tables defined 
 enemy_update_jump_table_offset	EQM	0
 enemy_spawn_jump_table_offset	EQM	27
 boss_vamp_state_jump_table_offset	EQM	54
 powerup_pickup_jump_table_offset	EQM	60
 options_screen_state_jump_table_offset	EQM	68
-sfx_test_jump_table_offset	EQM	74
-apu_env_jump_table_offset	EQM	94
-sfx_update_jump_table_offset	EQM	101
-song_update_jump_table_offset	EQM	108
-state_init_jump_table_offset	EQM	117
-state_render_jump_table_offset	EQM	122
-state_update_jump_table_offset	EQM	127
+phase_handlers_jump_table_offset	EQM	74
+sfx_test_jump_table_offset	EQM	79
+apu_env_jump_table_offset	EQM	99
+sfx_update_jump_table_offset	EQM	106
+song_update_jump_table_offset	EQM	113
+state_init_jump_table_offset	EQM	122
+state_render_jump_table_offset	EQM	127
+state_update_jump_table_offset	EQM	132
 
 
 mega_jump_table_to_end_all_jump_tables_lo:
@@ -494,10 +495,10 @@ boss_vamp_state_jump_table_lo:
 	byte <boss_vamp_state_blow_bats
 powerup_pickup_jump_table_lo:
 	byte <powerup_pickup_mask
-	byte <powerup_pickup_r_bag
-	byte <powerup_pickup_bomb
 	byte <powerup_pickup_mushroom
 	byte <powerup_pickup_plus_one
+	byte <powerup_pickup_bomb
+	byte <powerup_pickup_r_bag
 	byte <powerup_pickup_health_25
 	byte <powerup_pickup_health_50
 	byte <powerup_pickup_health_100
@@ -508,6 +509,12 @@ options_screen_state_jump_table_lo:
 	byte <options_screen_color1_handler
 	byte <options_screen_color2_handler
 	byte <options_screen_difficulty_handler
+phase_handlers_jump_table_lo:
+	byte <phase_zero
+	byte <phase_galger
+	byte <phase_spawns
+	byte <phase_spawn_long
+	byte <phase_boss_fight
 sfx_test_jump_table_lo:
 	byte <sfx_pewpew
 	byte <sfx_player_damage
@@ -645,10 +652,10 @@ boss_vamp_state_jump_table_hi:
 	byte >boss_vamp_state_blow_bats
 powerup_pickup_jump_table_hi:
 	byte >powerup_pickup_mask
-	byte >powerup_pickup_r_bag
-	byte >powerup_pickup_bomb
 	byte >powerup_pickup_mushroom
 	byte >powerup_pickup_plus_one
+	byte >powerup_pickup_bomb
+	byte >powerup_pickup_r_bag
 	byte >powerup_pickup_health_25
 	byte >powerup_pickup_health_50
 	byte >powerup_pickup_health_100
@@ -659,6 +666,12 @@ options_screen_state_jump_table_hi:
 	byte >options_screen_color1_handler
 	byte >options_screen_color2_handler
 	byte >options_screen_difficulty_handler
+phase_handlers_jump_table_hi:
+	byte >phase_zero
+	byte >phase_galger
+	byte >phase_spawns
+	byte >phase_spawn_long
+	byte >phase_boss_fight
 sfx_test_jump_table_hi:
 	byte >sfx_pewpew
 	byte >sfx_player_damage
