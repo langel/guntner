@@ -47,7 +47,7 @@ arc_sequence_end:
 arc_sequence_lengths:
 	byte $05, $06, $04, $02, $02, $02, $05, $04, $03, $01, $01, $02, $02, $02, $02, $03
 arc_sequence_x_origin:
-	byte $00, $a0, $80, $cd, $98, $35, $be, $d8, $22, $f8, $f1, $cf, $ba, $e2, $c4, $80
+	byte $00, $a0, $80, $cd, $98, $35, $be, $d8, $22, $f8, $00, $cf, $ba, $e2, $c4, $80
 arc_sequence_y_origin:
 	byte $96, $ec, $2a, $10, $ac, $76, $9e, $a0, $a8, $5e, $32, $84, $78, $70, $8c, $34
 arc_sequences:
