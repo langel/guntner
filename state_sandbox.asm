@@ -34,6 +34,10 @@ sandbox_init: subroutine
         ;lda #$08
         ;sta player_y_hi
         
+        ; play boss fight song
+        lda #song_boss_fight
+        jsr song_start
+        
         ;ldx #57 ; MOUFS palettes
         ;ldx #63 ; VAMP palettes
         ;ldx #69 ; scarab palette

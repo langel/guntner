@@ -3,6 +3,13 @@
 ;	lda #<arctang_velocity_3.33
 ;	sta enemy_ram_pc,x
         
+; spawn settings go in:
+;   dart_velocity
+;   dart_x_origin
+;   dart_y_origin
+;   dart_dir_adjust
+;   dart_sprite
+; XXX swordtner could use dart_palette?
 
 dart_spawn: subroutine
 ; put x,y origin in:

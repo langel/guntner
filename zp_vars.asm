@@ -57,21 +57,13 @@ player_boundless	byte
 player_autofire_c	byte
 player_autofire_s	byte
 player_damage		byte
-player_frag_counter	byte
 
-player_death_flag	byte
-you_dead_counter	byte
 
 game_difficulty		byte
 
 player_bullet_collision_temp_x	byte
 
 
-bomb_counter	byte ; counts down animation frames
-r_bag_counter	byte ; counts down autoturbo fire frames
-shroom_counter	byte ; counts down animation frames
-shroom_mod	byte ; apu pitch offset
-mask_shield	byte ; 0 = no skull shield
 
 wtf		byte ; frame counter lo
 ftw		byte ; frame counter hi
@@ -137,6 +129,16 @@ phase_arctang_counter	byte
 phase_spawn_counter	byte
 phase_interval_counter	byte
 phase_end_game		byte
+
+player_frag_counter	byte
+player_death_flag	byte
+you_dead_counter	byte
+
+bomb_counter	byte ; counts down animation frames
+r_bag_counter	byte ; counts down autoturbo fire frames
+shroom_counter	byte ; counts down animation frames
+shroom_mod	byte ; apu pitch offset
+mask_shield	byte ; 0 = no skull shield
 
 dart_frame_max		byte
 dart_x_origin		byte

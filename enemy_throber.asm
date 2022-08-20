@@ -36,7 +36,6 @@ throber_cycle: subroutine
         inc enemy_ram_ac,x
 .do_movement
 	jsr arctang_enemy_update
-.dont_advance
 	lda enemy_ram_ac,x
         lsr
         lsr

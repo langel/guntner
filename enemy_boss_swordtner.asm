@@ -3,8 +3,11 @@
 ; boss_x  : x body position
 ; boss_y  :  y body position
 
+; state_v0 : current mode
+;	0 - bounce around and fire
+;	1 - lunge at player and around to box
+; state_v1 : cycle counter
 ; state_v2 : velocity
-; state_v3 : state counter
 
 ; state_v6 : alt face countdowner
 ; state_v7 : 2nd form true
@@ -60,6 +63,14 @@ swordtner_metasprite_offset:
 swordtner_metasprite_id:
 	byte 	#$82, #$a2, #$a2, #$c2
         
+swordtner_rng_bullet:
+        jsr get_next_random
+        and #$07
+        clc
+        adc #$24
+        sta dart_sprite
+        rts
+        
 boss_swordtner_cycle: subroutine
 	; shrink width of hit box
 	lda #$04
@@ -97,57 +108,42 @@ boss_swordtner_cycle: subroutine
         dec boss_dmg_handle_true
       
       
-      	; state counter range 0..99
-        ; sword moves until 60
-        ; fires at 75
-      
-      	; state counter
-      	inc state_v3
-        lda state_v3
-        cmp #100
-        bne .dont_reset_state_counter
-        lda #$00
-        sta state_v3
-.dont_reset_state_counter
-        cmp #75
-        bne .dont_fire
-.fire
-	; XXX copied from moufs
-        ; XXX should be its own function
-	; x
-        lda boss_x
-        clc
-        adc #$04
-        sta dart_x_origin
-        ; y
-        lda boss_y
-        clc
-        adc #$0c
-        sta dart_y_origin
-        ; velocity
-        lda #$01
-        sta dart_velocity
-        ; sprite
-        lda #$fe
-        ;lda #$00
-        sta dart_sprite
-        ; dir adjustor
-        lda #$00
-        sta dart_dir_adjust
-        jsr dart_spawn
-        lda #$ff
-        sta dart_dir_adjust
-        jsr dart_spawn
-        lda #$01
-        sta dart_dir_adjust
-        jsr dart_spawn
-.dont_fire
+   	; change face before firing
+        lda audio_pattern_pos
+        cmp #$09
+        bne .no_face_change
+        lda #$05
+        sta state_v6
+.no_face_change
+	lda audio_pattern_pos
+        cmp #8
+        bcc .before_snare
+        cmp #12
+        bcs .after_snare
+        jmp .movement_skip
         
-        lda state_v3
-        cmp #60
-        bcs .movement_skip
+.before_snare
+        tax
+        lda arctang_velocities_lo,x
+        sta state_v2
+        ldx enemy_ram_offset
+        bne .movement
+
+.after_snare
+	lda #<arctang_velocity_6.66
+        sta state_v2
+	
+
 
 ; MOVEMENT
+.movement
+
+; act on current mode
+	lda state_v0
+        beq .bounce_and_fire
+        bne .lunge
+        
+.bounce_and_fire
 	lda state_v2
         sta arctang_velocity_lo 
         jsr arctang_enemy_update
@@ -179,8 +175,13 @@ boss_swordtner_cycle: subroutine
         sta enemy_ram_ex,x
         ;dec enemy_ram_ex,x
 .dont_bounce_y
+	jmp .set_boss_x_y
+
+.lunge
+.lunge_done
         
 .movement_skip
+.set_boss_x_y
         ; set boxx x,y
         lda oam_ram_x,y
         sta boss_x
@@ -189,6 +190,63 @@ boss_swordtner_cycle: subroutine
         sta boss_y
         jsr sprite_4_set_y
         
+        
+
+.cycle_action
+	lda state_v1
+        cmp #$02
+        bne .fire
+        inc state_v0
+        jmp .dont_fire
+        lda audio_pattern_pos
+        bne .fire
+        ;lda #$00
+        ;sta state_v1
+        
+   
+.fire
+        ; fire on boss fight music main snare
+	lda audio_frame_counter
+        cmp #5
+        bne .dont_fire
+        lda audio_pattern_pos
+        cmp #10
+        bne .dont_fire
+        
+	; x
+        lda boss_x
+        clc
+        adc #$04
+        sta dart_x_origin
+        ; y
+        lda boss_y
+        clc
+        adc #$0c
+        sta dart_y_origin
+        ; velocity
+        lda #$03
+        sta dart_velocity
+        ; sprite
+        lda #$fe
+        ;lda #$00
+        sta dart_sprite
+        ; dir adjustor
+        lda #$00
+        sta dart_dir_adjust
+        jsr swordtner_rng_bullet
+        jsr dart_spawn
+        lda #$ff
+        sta dart_dir_adjust
+        jsr swordtner_rng_bullet
+        jsr dart_spawn
+        lda #$01
+        sta dart_dir_adjust
+        jsr swordtner_rng_bullet
+        jsr dart_spawn
+        inc state_v1
+.dont_fire
+
+
 
 ; SWORDTNER
 ; MAIN BODY

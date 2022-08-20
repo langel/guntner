@@ -261,6 +261,7 @@ sprite0_off:
 	include "state_game.asm"
         ;nop	; how much prg space we using?
 
+;sandbox_init
 ;sandbox_update
 	include "state_sandbox.asm"
         ;nop	; how much prg space we using?

@@ -10,22 +10,13 @@ iframe_game_length	EQM $04
 player_game_reset: subroutine
 	lda #$00
         sta ftw
-        sta phase_state
-        sta phase_current
-        sta phase_level
-        sta phase_kill_counter
-	sta phase_spawn_counter
-	sta phase_arctang_counter
-	sta phase_interval_counter
-        sta phase_table_ptr
-        sta phase_end_game
-        sta player_death_flag
-        sta bomb_counter
-        sta r_bag_counter
-        sta shroom_counter
-        sta mask_shield
-        sta you_dead_counter
-        sta player_frag_counter
+        ; clearing 18 bytes of game data
+        ; see zp_vars.asm for details! ;D
+        ldx #17
+.clear_loop
+	sta phase_state,x
+        dex
+        bpl .clear_loop
         ; XXX testing phase behaviours
         ;lda #1
         ;sta phase_level
