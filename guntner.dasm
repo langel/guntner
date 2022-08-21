@@ -74,14 +74,14 @@ cart_start:	subroutine
 	lda #$0f
         sta pal_uni_bg
         
-	;jsr game_init
+	jsr game_init
 	;jsr menu_screens_init
         ;jsr attract_init
         ;jsr cut_scene_intro_init
         ;jsr cut_scene_outro_init
         
         ;jsr options_screen_init
-        jsr sandbox_init
+        ;jsr sandbox_init
    	;jsr sandbox2_init
         
         
@@ -261,9 +261,9 @@ sprite0_off:
 	include "state_game.asm"
         ;nop	; how much prg space we using?
 
-;sandbox_init
-;sandbox_update
-	include "state_sandbox.asm"
+sandbox_init
+sandbox_update
+;	include "state_sandbox.asm"
         ;nop	; how much prg space we using?
 	;include "state_sandbox2.asm"
         ;nop	; how much prg space we using?

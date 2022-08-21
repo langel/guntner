@@ -114,9 +114,32 @@ boss_swordtner_cycle: subroutine
       
 ; act on current mode
 	lda state_v0
+        and #$01
         clc
         adc #boss_swordtner_state_jump_table_offset
         jsr jump_to_subroutine
+        
+        
+	; y
+	lda oam_ram_y,y
+        ; y check for poor range
+        cmp #$02
+        bcs .check_y_softer_bounce
+        lda #$04
+        sta oam_ram_y,y
+.check_y_softer_bounce
+        ; y check for bounce
+        cmp #$04
+        bcc .bounce_y
+        cmp #$88
+        bcs .bounce_y
+        bcc .dont_bounce_y
+.bounce_y
+        ldy enemy_ram_ex,x
+        lda arc_bounce_y,y
+        sta enemy_ram_ex,x
+        ldy enemy_oam_offset
+.dont_bounce_y
       
 
 .set_boss_x_y
@@ -225,6 +248,21 @@ boss_swordtner_cycle: subroutine
 
 
 
+swordtner_inside_bouncy_box_x: subroutine
+	; returns 0 in a if false
+	lda oam_ram_x,y
+        cmp #$10
+        bcc .outside_bouncy_box_x
+        cmp #$60
+        bcs .outside_bouncy_box_x
+        lda #$00
+        bcc .inside_bouncy_box_x
+.outside_bouncy_box_x
+	lda #$ff
+.inside_bouncy_box_x
+        rts
+
+
 
 
 swordtner_fire: subroutine
@@ -239,7 +277,7 @@ swordtner_fire: subroutine
         adc #$0c
         sta dart_y_origin
         ; velocity
-        lda #$03
+        lda #$02
         sta dart_velocity
         ; sprite
         lda #$fe
@@ -261,6 +299,10 @@ swordtner_fire: subroutine
         rts
 
 
+swordtner_emit_enemy: subroutine
+	lda skeet_id
+        ;jsr 
+	rts
 
 
 
@@ -302,42 +344,17 @@ boss_swordtner_mode_0: subroutine
         sta arctang_velocity_lo 
         jsr arctang_enemy_update
         ; x
-	lda oam_ram_x,y
-        cmp #$10
-        bcc .bounce_x
-        cmp #$60
-        bcs .bounce_x
-        bcc .dont_bounce_x
+        jsr swordtner_inside_bouncy_box_x
+        beq .dont_bounce_x
 .bounce_x
         ldy enemy_ram_ex,x
         lda arc_bounce_x,y
         sta enemy_ram_ex,x
         ldy enemy_oam_offset
 .dont_bounce_x
-	; y
-	lda oam_ram_y,y
-        cmp #$04
-        bcc .bounce_y
-        cmp #$88
-        bcs .bounce_y
-        bcc .dont_bounce_y
-.bounce_y
-        ldy enemy_ram_ex,x
-        lda arc_bounce_y,y
-        sta enemy_ram_ex,x
-        ldy enemy_oam_offset
-.dont_bounce_y
         
 .movement_skip
 
-.cycle_action
-;	lda state_v1
-;        cmp #$02
-;        bne .fire
-;        inc state_v0
-;        jmp .dont_fire
-;        lda audio_pattern_pos
-;        bne .fire
 
    
 .fire
@@ -378,9 +395,22 @@ boss_swordtner_mode_1: subroutine
         adc #$01
         jsr arctang_bound_dir
         sta enemy_ram_ex,x
-	lda arctang_velocities_lo+0
+	lda arctang_velocities_lo+1
         sta state_v2
 .init_done
+	lda state_v1
+	cmp #$01
+        bne .out_of_bouncy_box
+        jsr swordtner_inside_bouncy_box_x
+        beq .lunge_keep_going
+        inc state_v1
+.out_of_bouncy_box
+	jsr swordtner_inside_bouncy_box_x
+        bne .lunge_keep_going
+        inc state_v0
+        lda #$00
+        sta state_v1
+.lunge_keep_going
 	lda state_v2
         sta arctang_velocity_lo 
         jsr arctang_enemy_update
