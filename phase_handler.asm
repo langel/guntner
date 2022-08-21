@@ -277,7 +277,9 @@ phase_spawns: subroutine
 .dont_spawn
 	rts
         
-        
+
+phase_spawn_long_table:
+	byte 8, 16, 12, 24, 16, 32, 20, 40
         
 phase_spawn_long: subroutine
 	jsr phase_check_next_phase
@@ -299,29 +301,11 @@ phase_spawn_long: subroutine
         ; phase 2d	  24   32   40   48
         ; phase 36	  16   20   24   28
         ; phase 3d        32   40   48   56
-        clc
-	lda #1
-        adc phase_level
-        adc game_difficulty
-        sta temp00
-        ; store low digit of current phase
-        lda phase_current
-        and #$0f
-        sta temp01
-        ; get multiplier
-        ldx #8
-        cpx temp01
-        bcc .mult_set
-        ldx #4
-.mult_set
-	lda #0
-.kill_count_loop
-	clc
-        adc temp00
-        dex
-        bne .kill_count_loop
+        ldx phase_spawn_long_c
+        lda phase_spawn_long_table,x
    	; store kill count target and advance state
         sta phase_kill_counter
+        inc phase_spawn_long_c
         inc phase_state
 .phase_init_done
 	; make sure state is 1 or dont spawn

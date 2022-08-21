@@ -417,16 +417,17 @@ jump_to_subroutine: subroutine
 enemy_update_jump_table_offset	EQM	0
 enemy_spawn_jump_table_offset	EQM	27
 boss_vamp_state_jump_table_offset	EQM	54
-powerup_pickup_jump_table_offset	EQM	60
-options_screen_state_jump_table_offset	EQM	68
-phase_handlers_jump_table_offset	EQM	74
-sfx_test_jump_table_offset	EQM	79
-apu_env_jump_table_offset	EQM	99
-sfx_update_jump_table_offset	EQM	106
-song_update_jump_table_offset	EQM	113
-state_init_jump_table_offset	EQM	122
-state_render_jump_table_offset	EQM	127
-state_update_jump_table_offset	EQM	132
+boss_swordtner_state_jump_table_offset	EQM	60
+powerup_pickup_jump_table_offset	EQM	62
+options_screen_state_jump_table_offset	EQM	70
+phase_handlers_jump_table_offset	EQM	76
+sfx_test_jump_table_offset	EQM	81
+apu_env_jump_table_offset	EQM	101
+sfx_update_jump_table_offset	EQM	108
+song_update_jump_table_offset	EQM	115
+state_init_jump_table_offset	EQM	124
+state_render_jump_table_offset	EQM	129
+state_update_jump_table_offset	EQM	134
 
 
 mega_jump_table_to_end_all_jump_tables_lo:
@@ -493,6 +494,9 @@ boss_vamp_state_jump_table_lo:
 	byte <boss_vamp_state_lunge
 	byte <boss_vamp_state_retreat
 	byte <boss_vamp_state_blow_bats
+boss_swordtner_state_jump_table_lo:
+	byte <boss_swordtner_mode_0
+	byte <boss_swordtner_mode_1
 powerup_pickup_jump_table_lo:
 	byte <powerup_pickup_mask
 	byte <powerup_pickup_mushroom
@@ -650,6 +654,9 @@ boss_vamp_state_jump_table_hi:
 	byte >boss_vamp_state_lunge
 	byte >boss_vamp_state_retreat
 	byte >boss_vamp_state_blow_bats
+boss_swordtner_state_jump_table_hi:
+	byte >boss_swordtner_mode_0
+	byte >boss_swordtner_mode_1
 powerup_pickup_jump_table_hi:
 	byte >powerup_pickup_mask
 	byte >powerup_pickup_mushroom

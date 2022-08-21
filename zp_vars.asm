@@ -125,6 +125,7 @@ phase_level		byte
 phase_state		byte
 phase_table_ptr		byte
 phase_spawn_type	byte
+phase_spawn_long_c	byte
 phase_arctang_counter	byte
 phase_spawn_counter	byte
 phase_interval_counter	byte

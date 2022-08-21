@@ -12,7 +12,7 @@ player_game_reset: subroutine
         sta ftw
         ; clearing 18 bytes of game data
         ; see zp_vars.asm for details! ;D
-        ldx #17
+        ldx #$20
 .clear_loop
 	sta phase_state,x
         dex
