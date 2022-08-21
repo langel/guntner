@@ -22,17 +22,7 @@ muya_cycle: subroutine
       	sta oam_ram_x+4,y
         
         ; y pos
-        ; XXX could reuse crossbones movement code here
-        inc enemy_ram_ac,x
-        lda enemy_ram_ac,x
-        lsr
-        lsr
-        lsr
-        sta temp00
-        lda oam_ram_y,y
-        sec
-        sbc temp00
-        cmp #sprite_0_y
+        jsr enemy_accelerates_upwards
         bcs .reset_x_and_y_pos
         sta oam_ram_y,y
         clc

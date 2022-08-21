@@ -1,7 +1,6 @@
 
-        
-        
-crossbones_cycle: subroutine
+
+enemy_accelerates_upwards: subroutine
         inc enemy_ram_ac,x
         lda enemy_ram_ac,x
         lsr
@@ -12,6 +11,11 @@ crossbones_cycle: subroutine
         sec
         sbc enemy_ram_y,x
         cmp #sprite_0_y
+        rts
+        
+        
+crossbones_cycle: subroutine
+	jsr enemy_accelerates_upwards
         bcs .crossbones_death
         sta oam_ram_y,y
         lda #$c1
