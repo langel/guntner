@@ -8,12 +8,10 @@
 ;	1 - lunge at player and around to box
 ; state_v1 : cycle counter
 ; state_v2 : velocity
-
+; state_v5 : scratch for spawn loop
 ; state_v6 : alt face countdowner
 ; state_v7 : 2nd form true
 
-sword_up_dir	EQM	5
-sword_down_dir	EQM	23
 
 ; swordtner palette
 ; $07, $17, $3d
@@ -35,12 +33,6 @@ boss_swordtner_spawn: subroutine
         sta oam_ram_y,y
         lda #$15
         sta enemy_ram_ex,x
-        ; cache direction velocities
-        ldx #$01
-        ; XXX startup mode
-        ;stx state_v0
-        lda arctang_velocities_lo,x
-        sta state_v2 ; current velocity
 	rts
         
         ; SWORDTNER
@@ -110,6 +102,19 @@ boss_swordtner_cycle: subroutine
         sta state_v6
 .dont_change_face
         dec boss_dmg_handle_true
+        
+        
+; both modes use this
+	; x
+        lda boss_x
+        clc
+        adc #$04
+        sta dart_x_origin
+        ; y
+        lda boss_y
+        clc
+        adc #$0c
+        sta dart_y_origin
       
       
 ; act on current mode
@@ -123,13 +128,13 @@ boss_swordtner_cycle: subroutine
 	; y
 	lda oam_ram_y,y
         ; y check for poor range
-        cmp #$02
+        cmp #$03
         bcs .check_y_softer_bounce
         lda #$04
         sta oam_ram_y,y
 .check_y_softer_bounce
         ; y check for bounce
-        cmp #$04
+        cmp #$06
         bcc .bounce_y
         cmp #$88
         bcs .bounce_y
@@ -265,17 +270,33 @@ swordtner_inside_bouncy_box_x: subroutine
 
 
 
+
+swordtner_emit_enemy: subroutine
+	lda #$02
+        sta state_v5
+.spawn_loop
+        jsr get_enemy_slot_1_sprite
+        cpx #$ff
+        beq .done
+        clc
+        lda #spark_id
+        adc state_v5
+        jsr enemy_spawn_delegator
+        jsr get_oam_offset_from_ram_offset
+        lda dart_x_origin
+        sta oam_ram_x,y
+        lda dart_y_origin
+        sta oam_ram_y,y
+        dec state_v5
+        bpl .spawn_loop
+.done
+	ldx enemy_ram_offset
+        ldy enemy_oam_offset
+	rts
+
+
+
 swordtner_fire: subroutine
-	; x
-        lda boss_x
-        clc
-        adc #$04
-        sta dart_x_origin
-        ; y
-        lda boss_y
-        clc
-        adc #$0c
-        sta dart_y_origin
         ; velocity
         lda #$02
         sta dart_velocity
@@ -299,16 +320,18 @@ swordtner_fire: subroutine
         rts
 
 
-swordtner_emit_enemy: subroutine
-	lda skeet_id
-        ;jsr 
-	rts
-
-
 
 
 ; mode 0 - bounce around and fire
 boss_swordtner_mode_0: subroutine
+
+	; fix x position after player death
+	lda oam_ram_x,y
+        bne .dont_fix_x
+        lda #$20
+        sta oam_ram_x,y
+        sta oam_ram_y,y
+.dont_fix_x
 
 .bounce_and_fire
    	; change face before firing
@@ -339,8 +362,6 @@ boss_swordtner_mode_0: subroutine
 ; MOVEMENT
 .bounce_movement
         ldx enemy_ram_offset
-	; xxx state v2 redundant here?
-	lda state_v2
         sta arctang_velocity_lo 
         jsr arctang_enemy_update
         ; x
@@ -356,9 +377,8 @@ boss_swordtner_mode_0: subroutine
 .movement_skip
 
 
-   
-.fire
-        ; fire on boss fight music main snare
+
+        ; spawn/fire on boss fight music main snare
 	lda audio_frame_counter
         cmp #5
         bne .dont_fire
@@ -373,7 +393,15 @@ boss_swordtner_mode_0: subroutine
         sta state_v1
         rts
 .dont_next_state
+	lda state_v0
+        and #$03
+        bne .fire
+.spawn_enemies
+	jsr swordtner_emit_enemy
+	jmp .inc_state
+.fire
         jsr swordtner_fire
+.inc_state
         inc state_v1
 .dont_fire
 
