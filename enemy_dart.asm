@@ -9,7 +9,6 @@
 ;   dart_y_origin
 ;   dart_dir_adjust
 ;   dart_sprite
-; XXX swordtner could use dart_palette?
 
 dart_spawn: subroutine
 ; put x,y origin in:
