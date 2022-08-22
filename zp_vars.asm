@@ -57,6 +57,7 @@ player_boundless	byte
 player_autofire_c	byte
 player_autofire_s	byte
 player_damage		byte
+player_damage_flash	byte
 
 
 game_difficulty		byte

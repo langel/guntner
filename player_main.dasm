@@ -75,6 +75,9 @@ player_take_damage: subroutine
         beq .apply_damage
         rts
 .apply_damage
+	; set damage display counter
+        lda #$10
+        sta player_damage_flash
 	; check if turbo gun is enabled
         lda player_a
         bne .skip_iframes
@@ -156,17 +159,21 @@ set_player_sprite: subroutine
 	lda state_iframes
         beq .not_iframes
         dec state_iframes
+.not_iframes
+	; check and decrement iframe counter
+	lda player_damage_flash
+        beq .not_flashing
+        dec player_damage_flash
         ; flash rudy based on iframe counter
         lsr
-        lsr
         and #$01
-        bne .not_iframes
+        bne .not_flashing
         ; iframes
         lda #$4c
         sta oam_ram_rudy+1
         lda #$4d
         sta oam_ram_rudy+5
         rts
-.not_iframes
+.not_flashing
         rts
         

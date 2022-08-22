@@ -364,13 +364,6 @@ phase_boss_fight_intro:
         lda phase_spawn_counter
         bne .dont_init_cinematics
 .init_cinematics
-        ; brighten stars
-        lda starfield_color0
-        adc #$10
-        sta starfield_color0
-        lda starfield_color1
-        adc #$10
-        sta starfield_color1
         ; play boss fight encounter jingle
         lda #song_boss_intro
         jsr song_start
@@ -395,6 +388,14 @@ phase_boss_fight_intro:
 .done_messing_emph
 	inc phase_spawn_counter
         bne .done
+        
+        ; brighten stars
+        lda starfield_color0
+        adc #$10
+        sta starfield_color0
+        lda starfield_color1
+        adc #$10
+        sta starfield_color1
 
 	; boss spawning this frame
         jsr state_clear 

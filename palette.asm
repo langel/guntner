@@ -79,8 +79,8 @@ palette_table:
         hex 03 1a 39
         ; #75 boss 
         ; swordtner palettes
-        hex 11 2d 31
         hex 07 17 3d 
+        hex 11 2d 31
         
 palette_level_offset_table:
 	byte #21, #30, #39, #48
