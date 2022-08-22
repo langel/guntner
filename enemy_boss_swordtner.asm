@@ -8,6 +8,7 @@
 ;	1 - lunge at player and around to box
 ; state_v1 : cycle counter
 ; state_v2 : velocity
+
 ; state_v5 : scratch for spawn loop
 ; state_v6 : alt face countdowner
 ; state_v7 : 2nd form true
@@ -102,6 +103,19 @@ boss_swordtner_cycle: subroutine
         sta state_v6
 .dont_change_face
         dec boss_dmg_handle_true
+        
+        
+        ; check for 2nd Form
+        lda state_v7
+        bne .2nd_form_done
+        lda enemy_ram_hp,x
+        cmp #25
+        bcs .2nd_form_done
+        lda #100
+        adc enemy_ram_hp,x
+        sta enemy_ram_hp,x
+        inc state_v7
+.2nd_form_done
         
         
 ; both modes use this

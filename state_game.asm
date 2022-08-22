@@ -162,10 +162,7 @@ player_change_speed:
         sta player_speed
 .read_select_done
         
-        ;lda #$04
-        ;sta player_damage
-;; XXX FORCE QUICK DEATH
-        ;jsr player_take_damage
+        
 .done
 	jsr player_collision_update
         jsr enemies_update_all
