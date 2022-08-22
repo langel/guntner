@@ -308,7 +308,6 @@ title_screen_update: subroutine
         ora player_down_d
         ora player_left_d
         ora player_right_d
-        ora player_select_d
         cmp #$00
         beq .dont_change_pos
         inc title_rudy_pos
@@ -331,6 +330,10 @@ title_screen_update: subroutine
         cmp #$01
         beq .goto_options
 .start_game:
+	lda player_select
+        beq .not_cheater_boundless
+        inc player_boundless
+.not_cheater_boundless
 	jsr menu_start_game
         jmp .do_nothing
 .goto_options
@@ -378,6 +381,11 @@ options_screen_update: subroutine
         lda #$04 ; menu return pos
         cmp options_rudy_pos
         beq .dont_start_game
+        ; check for cheater boundless pants
+	lda player_select
+        beq .not_cheater_boundless
+        inc player_boundless
+.not_cheater_boundless
 	jsr menu_start_game
 	jmp state_update_done
         
