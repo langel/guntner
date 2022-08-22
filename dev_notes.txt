@@ -18,21 +18,65 @@ tools? #nesdev #GunTneR [ !ks for info ]\
 260.5/month
 
 
-Moufs Lipps 04 16 30
+palette 00
+	The Rudy
+palette 01
+	ant, birb, chomps, dart, galger, uzi + bullets
+	*(bosses takes over)
+palette 02
+	 dumbface, ike's mom, lasso, maggs, muya, skeet
+	*(bosses takes over)
+palette 03
+	powerups, skully, starglasses, throber, zigzag
+*(spark uses all 4)
 
 
+
+
+	
+	
+fdbe before working on crossbones/death
+fda5 before working on jump table consolidation
+fd4e after jump table work
+fcd9 after gutting score system
+
+77 bytes from sandbox but that makes testing a bit more annoying
 
 fix these:
-	vampire bats should be out for death 
-	vampire bats save code space with another frame in graphics
-	brighter bg colors during boss death and hearts
-	hearts stay bright longer
-	sprite_2's 2nd sprite not cleared on boss death
-	
+
 	swordtner sucks
-	replace score with data
+		second form
 	
-	rudy hit flash sprite not shown long enough (separate counter/rate from iframes?)
+	balance speed options
+		move default 3 to 2
+		
+	screen lag with uzi bullet collision detection
+	
+	select+start = play boundless
+	
+	postpone boss fight star brightener to death sequence
+	
+	rudy shows damage happened as long as the sound effect plays :thonk:
+		sfx length is #$10 (16 frames)
+		setting counter to 12 should be 3 flashes
+	
+	
+	ike's mom slightly earlier spawn trigger time
+	
+	tame starfield acceleration (maybe start much slower too)
+	decouple visual effects from sfx in options screen
+	
+	arctang loses x_hi with player death 
+		best we can do is mitigate outcomes
+	
+balancing bullet damage across difficulties
+4, 5, 6, 7 system = boss life/hits : 63/16, 126/26, 189/32, 252/36
+3, 5, 7, 9 system = boss life/hits : 63/21, 126/26, 189/27, 252/28
+
+ies mom 37/13 74/15 111/19 148/22
+        37/13 74/15 111/16 148/17
+throber 13/4  26/6   39/7   52/8
+		13/5  26/6   39/6   52/6
 	
 Kaytse bugs:
 	enemy spawn feels a bit cheap sometimes. i think i died a few times because of enemies hitting me at the right side of the screen (i think the stars), although they were spawning left.
@@ -41,13 +85,13 @@ Kaytse bugs:
 enemies
 	ikes mom
 		shake with sound effect
-	finger
 continues --
 	only if past first level
 	takes player back to beginning of level
 	countdown from 3 using rng chord
-	reset score
 game over glitches
+LUT for powerup order
+	
 	
 
 dart spawner
