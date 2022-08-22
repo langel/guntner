@@ -60,16 +60,7 @@ cut_scene_intro_init: subroutine
 	rts
         
         
-cut_scene_alien_attributes: subroutine
-        ldx #%01010101
-	stx PPU_DATA
-	stx PPU_DATA
-	stx PPU_DATA
-	PPU_SETADDR #$23d1
-	stx PPU_DATA
-	stx PPU_DATA
-	stx PPU_DATA
-        rts
+        
         
 cut_scene_alien_main_draw: subroutine
         lda #0

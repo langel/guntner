@@ -127,11 +127,6 @@ apu_bend_down: subroutine
         inc $146
         inc $14a
         rts
-apu_bend_up: subroutine
-	dec $142
-        dec $146
-        dec $14a
-        rts
        
    
        

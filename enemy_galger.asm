@@ -42,8 +42,6 @@ arc_leg_speed_dec	EQU	$407
 	; 16 sequences with 46 steps total
 arc_sequence_begin:
 	byte $00, $05, $0b, $0f, $11, $13, $15, $1a, $1e, $21, $22, $23, $25, $27, $29, $2b
-arc_sequence_end:
-	byte $04, $0a, $0e, $10, $12, $14, $19, $1d, $20, $21, $22, $24, $26, $28, $2a, $2d
 arc_sequence_lengths:
 	byte $05, $06, $04, $02, $02, $02, $05, $04, $03, $01, $01, $02, $02, $02, $02, $03
 arc_sequence_x_origin:

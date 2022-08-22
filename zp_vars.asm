@@ -61,8 +61,6 @@ player_damage		byte
 
 game_difficulty		byte
 
-player_bullet_collision_temp_x	byte
-
 
 
 wtf		byte ; frame counter lo
