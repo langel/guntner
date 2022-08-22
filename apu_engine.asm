@@ -84,6 +84,7 @@ majpentscale:
         byte #12,#14,#16,#19,#21
         byte #24,#26,#28,#31,#33
         byte #36,#38,#40,#43,#45
+        byte #38,#43,#19
    
 periodTableLo:
  ;     A   A#  B   C   C#  D   D#  E   F   F#  G   G#
@@ -103,6 +104,7 @@ periodTableHi:
  byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
  byte $00,$00,$00,$00,$00,$00,$00,$00
         
+        
 apu_set_pitch: subroutine
 	; x = pitch table offset
         ; y = channel low byte offset
@@ -119,6 +121,7 @@ apu_set_pitch: subroutine
         sta apu_pu2_last_hi
         rts
         
+        
 apu_bend_down: subroutine
 	inc $142
         inc $146
@@ -129,6 +132,9 @@ apu_bend_up: subroutine
         dec $146
         dec $14a
         rts
+       
+   
+       
        
 apu_env_run: subroutine
 	; x = channel counter offset
