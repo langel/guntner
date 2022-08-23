@@ -118,10 +118,10 @@ state_update_addr	byte
 nametable_tile_planter_addr_lo	byte
 nametable_tile_planter_addr_hi	byte
 
-phase_kill_counter	byte
+phase_state		byte
 phase_current		byte
 phase_level		byte
-phase_state		byte
+phase_kill_counter	byte
 phase_table_ptr		byte
 phase_spawn_type	byte
 phase_spawn_long_c	byte
@@ -133,6 +133,9 @@ phase_end_game		byte
 player_frag_counter	byte
 player_death_flag	byte
 you_dead_counter	byte
+
+powerup_counter	byte
+powerup_offset	byte
 
 bomb_counter	byte ; counts down animation frames
 r_bag_counter	byte ; counts down autoturbo fire frames

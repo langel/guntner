@@ -15,6 +15,11 @@
 ; 5 - health 25%
 ; 6 - health 50%
 ; 7 - health full
+
+powerup_drop_table:
+	hex 04 05 00 03 06 02 01 07
+        hex 00 03 06 04 01 00 07 02
+        
         
 powerup_from_starglasses:
 	ldx enemy_ram_offset
@@ -33,10 +38,21 @@ powerup_from_starglasses:
         lda #$01
         sta enemy_ram_hp,x
         ; rng powerup type
-        lda rng0
-        lsr
+        lda powerup_counter
         and #$07
+        bne .dont_reset_powerup_offset
+        jsr get_next_random
+        and #$0f
+        sta powerup_offset
+.dont_reset_powerup_offset
+	lda powerup_offset
+        and #$0f
+        tax
+        lda powerup_drop_table,x
+        ldx enemy_ram_offset
         sta enemy_ram_ex,x
+        inc powerup_offset
+        inc powerup_counter
         ; sprite
         clc
         adc #$24

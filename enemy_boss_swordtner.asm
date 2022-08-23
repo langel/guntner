@@ -304,6 +304,7 @@ swordtner_emit_enemy: subroutine
         dec state_v5
         bpl .spawn_loop
 .done
+	jsr sfx_shoot_bullet
 	ldx enemy_ram_offset
         ldy enemy_oam_offset
 	rts

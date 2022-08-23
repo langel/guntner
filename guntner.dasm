@@ -45,9 +45,10 @@ cart_start:	subroutine
         
         jsr sine_init
         
-        jsr nametables_clear
-        jsr sprite_clear
-	jsr player_game_reset
+        ; XXX don't the states take care of this stuff?
+        ;jsr nametables_clear
+        ;jsr sprite_clear
+	;jsr player_game_reset
         
         lda #>arctang_velocity_tables
         sta arctang_velocity_hi
