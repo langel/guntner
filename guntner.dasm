@@ -216,6 +216,7 @@ sprite0_off:
         
         jsr song_update
         jsr apu_update
+        
         jsr player_controls_read
         jsr powerup_bomb_update
         jsr powerup_mushroom_update

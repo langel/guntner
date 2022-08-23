@@ -164,7 +164,16 @@ player_change_speed:
         
         
 .done
-	jsr player_collision_update
+	; player collision update
+	ldx player_x_hi
+        inx
+        inx
+        stx player_coll_x
+        ldx player_y_hi
+        inx
+        inx
+        stx player_coll_y
+        
         jsr enemies_update_all
         jsr set_player_sprite
 	rts

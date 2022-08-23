@@ -419,9 +419,11 @@ phase_boss_fight_intro:
         ldx phase_level
         lda phase_boss_assistants_table,x
         sta temp02
+        tay
         jsr enemy_slot_from_type
         lda temp02
         jsr enemy_spawn_delegator
+        ldy temp02
         jsr enemy_slot_from_type
         lda temp02
         jsr enemy_spawn_delegator

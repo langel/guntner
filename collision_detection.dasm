@@ -43,16 +43,6 @@ detect_collision: subroutine
         rts
         
 
-player_collision_update: subroutine
-	ldx player_x_hi
-        inx
-        inx
-        stx player_coll_x
-        ldx player_y_hi
-        inx
-        inx
-        stx player_coll_y
-	rts
         
         
 player_collision_detect: subroutine
