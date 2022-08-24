@@ -162,6 +162,12 @@ song_02: subroutine
         beq .do_this_shit
         rts
 .do_this_shit
+	; options screen decrease player health
+        lda state_render_addr
+        cmp #state_render_jump_table_offset+1
+        bne .not_menu_screens
+        dec player_health
+.not_menu_screens
 	; triangle
         lda audio_pattern_pos
         eor rng1

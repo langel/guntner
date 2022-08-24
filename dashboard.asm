@@ -16,6 +16,9 @@ dash_top_bar_tile 	EQM $ad
 
 
 dashboard_init: subroutine
+
+	lda #$ff
+        sta dashboard_message
         
         ; fill nametable 2 with HUB bg color
 	PPU_SETADDR $27c0
