@@ -26,15 +26,13 @@ attract_init:
 
 attract_update: subroutine
         ; some buttons return to menu
-        lda player_start
-        ora player_a
-        ora player_b
-        cmp #$ff
-        bne .menu_return_buttons_not_pressed
+        lda player_controls
+        and #BUTTON_START|BUTTON_B|BUTTON_A
+        beq .buttons_for_menu_not_pressed
         lda #0
 	jsr palette_fade_out_init
 	jmp state_update_done
-.menu_return_buttons_not_pressed
+.buttons_for_menu_not_pressed
 	lda wtf
         and #$07
         bne .no_enemy_spawn

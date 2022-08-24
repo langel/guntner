@@ -7,9 +7,10 @@ player_demo_controls: subroutine
 ; PLAYER MOVEMENT
 	; clear player directions
         lda #$00
-        sta player_dir_bits
+        sta player_controls
+        sta player_controls_debounced
         ; set flags in y register
-        ldy #$00
+        tay
 ; check x coordinate
         lda player_x_hi
         cmp player_demo_x
@@ -20,9 +21,9 @@ player_demo_controls: subroutine
         cmp #$ff
         beq .player_x_equal
 	; go right
-        lda #%00000001
-        ora player_dir_bits
-        sta player_dir_bits
+        lda #BUTTON_RIGHT
+        ora player_controls
+        sta player_controls
         ;inc player_x_hi
         jmp .player_x_done
 .player_x_greater
@@ -30,9 +31,9 @@ player_demo_controls: subroutine
         cmp #$00
         beq .player_x_equal
 	; go left
-        lda #%00000010
-        ora player_dir_bits
-        sta player_dir_bits
+        lda #BUTTON_LEFT
+        ora player_controls
+        sta player_controls
 	;dec player_x_hi
         jmp .player_x_done
 .player_x_equal
@@ -48,9 +49,9 @@ player_demo_controls: subroutine
         cmp #$ff
         beq .player_y_equal
 	; go down
-        lda #%00000100
-        ora player_dir_bits
-        sta player_dir_bits
+        lda #BUTTON_DOWN
+        ora player_controls
+        sta player_controls
         ;inc player_y_hi
         jmp .player_y_done
 .player_y_greater
@@ -58,9 +59,9 @@ player_demo_controls: subroutine
         cmp #$00
         beq .player_y_equal
 	; go up
-        lda #%00001000
-        ora player_dir_bits
-        sta player_dir_bits
+        lda #BUTTON_UP
+        ora player_controls
+        sta player_controls
 	;dec player_y_hi
         jmp .player_y_done
 .player_y_equal
@@ -120,17 +121,19 @@ player_demo_controls: subroutine
         and #$47
         cmp #$40
         bne .fire_not_turbo
-        lda #$ff
-        sta player_a
+        lda #BUTTON_A
+        ora player_controls
+        sta player_controls
 .fire_not_turbo
-        lda #$ff
-        sta player_b
+        lda #BUTTON_B
+        ora player_controls
+        sta player_controls
         lda wtf
         and #$0f ; should be 7
         cmp #$00
         bne .fire_done
-        lda #$ff
-        sta player_b_d
+        lda #BUTTON_B
+        sta player_controls_debounced
 .fire_done
 	jsr player_bullets_check_controls
 

@@ -35,24 +35,10 @@ player_coll_y	byte ; player_y plus 3 because collision box
 player_gun_str	byte
 player_speed	byte ; 2 bit value 0..3 translates to 1..4
 player_paused	byte
-player_controls	byte
-player_right	byte
-player_right_d	byte
-player_left	byte
-player_left_d	byte
-player_down	byte
-player_down_d	byte
-player_up	byte
-player_up_d	byte
-player_start	byte
-player_start_d	byte
-player_select	byte
-player_select_d	byte
-player_b	byte
-player_b_d	byte
-player_a	byte
-player_a_d	byte
-player_dir_bits	byte ; matches controller
+
+player_controls			byte
+player_controls_debounced	byte
+
 player_boundless	byte
 player_autofire_c	byte
 player_autofire_s	byte

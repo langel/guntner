@@ -1,10 +1,8 @@
 
 
 cut_scene_update_generic: subroutine
-	lda player_start_d
-        ora player_b_d
-        ora player_a_d
-        cmp #$00
+	lda player_controls_debounced
+        and #BUTTON_START|BUTTON_B|BUTTON_A
         beq .do_nothing
         lda phase_end_game
         beq .start_game

@@ -9,7 +9,7 @@ player_move_position: subroutine
         ; check for boundless
         lda player_boundless
         bne .done
-        ; XXX would min() and max() functions save space?
+        
         lda player_x_hi
         cmp #18
         bcs .right_enuff
@@ -79,13 +79,13 @@ player_direction_handler: subroutine
         ; get diagonal or not
         lda #$00
         sta temp00
-        lda player_dir_bits
-        and #%0011
+        lda player_controls
+        and #BUTTON_LEFT|BUTTON_RIGHT
         beq .not_left_or_right
         inc temp00
 .not_left_or_right
-	lda player_dir_bits
-        and #%1100
+	lda player_controls
+        and #BUTTON_UP|BUTTON_DOWN
         beq .not_up_or_down
         inc temp00
 .not_up_or_down
@@ -103,9 +103,9 @@ player_direction_handler: subroutine
         tax 
         ; get add/sub for each axis
 ; LEFT
-        lda player_dir_bits
-        and #%0001
-        bne .not_left
+        lda player_controls
+        and #BUTTON_LEFT
+        beq .not_left
         lda player_x_lo
         sec
         sbc player_direction_speed_table_lo,x
@@ -115,9 +115,9 @@ player_direction_handler: subroutine
         sta player_x_hi
 .not_left
 ; RIGHT
-        lda player_dir_bits
-        and #%0010
-        bne .not_right
+        lda player_controls
+        and #BUTTON_RIGHT
+        beq .not_right
         lda player_x_lo
         clc
         adc player_direction_speed_table_lo,x
@@ -127,9 +127,9 @@ player_direction_handler: subroutine
         sta player_x_hi
 .not_right
 ; UP
-        lda player_dir_bits
-        and #%0100
-        bne .not_up
+        lda player_controls
+        and #BUTTON_UP
+        beq .not_up
         lda player_y_lo
         sec
         sbc player_direction_speed_table_lo,x
@@ -139,9 +139,9 @@ player_direction_handler: subroutine
         sta player_y_hi
 .not_up
 ; DOWN
-        lda player_dir_bits
-        and #%1000
-        bne .not_down
+        lda player_controls
+        and #BUTTON_DOWN
+        beq .not_down
         lda player_y_lo
         clc
         adc player_direction_speed_table_lo,x

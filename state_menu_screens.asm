@@ -303,12 +303,8 @@ title_screen_update: subroutine
         lda #$01
         sta state_v1
 .super_secret_code_done
-        
-	lda player_up_d
-        ora player_down_d
-        ora player_left_d
-        ora player_right_d
-        cmp #$00
+        lda #BUTTON_UP|BUTTON_DOWN|BUTTON_LEFT|BUTTON_RIGHT
+        and player_controls_debounced
         beq .dont_change_pos
         inc title_rudy_pos
         lda #%00000001
@@ -317,25 +313,21 @@ title_screen_update: subroutine
         jsr timer_reset
         bne .do_nothing
 .dont_change_pos
-	lda player_start_d
+	lda #BUTTON_START
         ldy state_v0
         cpy #$ff
         bne .button_check
-        ora player_b_d
-        ora player_a_d
+        ora #BUTTON_B|BUTTON_A
 .button_check
-        cmp #$00
+	and player_controls_debounced
         beq .do_nothing
         lda title_rudy_pos
         cmp #$01
         beq .goto_options
 .start_game:
-	lda player_select
-        beq .not_cheater_boundless
-        inc player_boundless
-.not_cheater_boundless
 	jsr menu_start_game
         jmp .do_nothing
+        
 .goto_options
         lda #state_update_jump_table_offset+2
 	sta state_update_addr
@@ -354,11 +346,15 @@ title_screen_update: subroutine
         
 
 menu_start_game: subroutine
+	lda player_controls
+        and #BUTTON_SELECT
+        beq .not_cheater_boundless
+        inc player_boundless
+.not_cheater_boundless
         ;; disable start_d so game doesn't instantly pause
         lda #$00
-        sta player_start_d
-        sta player_a_d
-        sta player_b_d
+        sta player_controls
+        sta player_controls_debounced
         ; init cut scene 00
         lda #3
         jsr palette_fade_out_init
@@ -374,31 +370,25 @@ options_screen_update: subroutine
         bne .skip_player_colors
 	jsr player_update_colors
 .skip_player_colors
-	lda player_start_d
+	lda player_controls
+        and #BUTTON_START
         beq .dont_start_game
         lda #$c0 ; set scroll to title screen
 	sta scroll_to_counter
-        lda #$04 ; menu return pos
-        cmp options_rudy_pos
-        beq .dont_start_game
-        ; check for cheater boundless pants
-	lda player_select
-        beq .not_cheater_boundless
-        inc player_boundless
-.not_cheater_boundless
+.start_game:
 	jsr menu_start_game
 	jmp state_update_done
         
 .dont_start_game
 	jsr options_screen_set_rudy_y
 ; check if option changes
-	lda player_down_d
-        cmp #$00
+	lda player_controls_debounced
+        and #BUTTON_DOWN
         beq .dont_change_option_down
         inc options_rudy_pos
 .dont_change_option_down
-	lda player_up_d
-        cmp #$00
+	lda player_controls_debounced
+        and #BUTTON_UP
         beq .dont_change_option_up
         dec options_rudy_pos
 .dont_change_option_up
@@ -422,8 +412,8 @@ options_screen_handler
 
        
 options_menu_return: subroutine
-	lda player_a_d
-        ora player_b_d
+	lda player_controls_debounced
+        and #BUTTON_B|BUTTON_A
         beq .do_nothing
         lda #state_update_jump_table_offset+4
 	sta state_update_addr
@@ -442,7 +432,8 @@ options_handle_change: subroutine
 	; a = current value
         ; y = table offset
         sta temp00
-        lda player_right_d
+        lda player_controls_debounced
+        and #BUTTON_RIGHT
         beq .dont_increase
         inc temp00
         lda options_min_max+1,y
@@ -451,7 +442,8 @@ options_handle_change: subroutine
         lda options_min_max,y
         sta temp00
 .dont_increase
-	lda player_left_d
+        lda player_controls_debounced
+        and #BUTTON_LEFT
         beq .dont_decrease
         dec temp00
         bmi .go_max
@@ -472,11 +464,13 @@ options_screen_song_handler: subroutine
         jsr options_handle_change
         sta options_song_id
 ; trigger song with button
-	lda player_b_d
+	lda player_controls_debounced
+        and #BUTTON_B
         beq .no_b
         jsr song_stop
 .no_b
-	lda player_a_d
+	lda player_controls_debounced
+        and #BUTTON_A
         beq .no_a
         lda options_song_id
         jsr song_start
@@ -490,8 +484,8 @@ options_screen_sfx_handler: subroutine
         jsr options_handle_change
         sta options_sound_id
 ; trigger sound with button
-	lda player_b_d
-        ora player_a_d
+	lda player_controls_debounced
+        and #BUTTON_B|BUTTON_A
         bne .trigger_sound
 	jmp state_update_done
 .trigger_sound

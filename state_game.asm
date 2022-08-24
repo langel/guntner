@@ -148,8 +148,8 @@ game_update_generic: subroutine
 .no_heal
 
 player_change_speed:
-	lda player_select_d
-        cmp #$00
+	lda player_controls_debounced
+        and #BUTTON_SELECT
         beq .read_select_done
         ; update speed
         inc player_speed
@@ -185,8 +185,8 @@ game_update: subroutine
 	lda phase_end_game
         cmp #$01
         beq .read_start_done
-	lda player_start_d
-        cmp #$00
+        lda player_controls_debounced
+        and #BUTTON_START
         beq .read_start_done
         lda player_paused
         cmp #$00

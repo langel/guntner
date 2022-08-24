@@ -146,9 +146,9 @@ player_bullets_check_controls: subroutine
         bne .turbo_fire
 .no_r_bag
         ; a button = turbo
-        lda player_a
-	cmp #$ff
-        bne .no_turbo
+        lda player_controls
+        and #BUTTON_A
+        beq .no_turbo
         ; damage from turbo gun
 	lda wtf
         and #$02
@@ -162,11 +162,12 @@ player_bullets_check_controls: subroutine
         sta temp00
         bne .pull_that_mfing_trigger
 .no_turbo
-	lda player_b_d
-        cmp #$ff
-        beq .normal_fire
+	lda player_controls_debounced
+        and #BUTTON_B
+        bne .normal_fire
         ; hold b button = retrigger
-        lda player_b
+        lda player_controls
+        and #BUTTON_B
         beq .no_fire
         lda player_autofire_c
         clc

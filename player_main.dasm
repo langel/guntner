@@ -20,7 +20,7 @@ player_game_reset: subroutine
         ; XXX testing phase behaviours
         ;lda #3
         ;sta phase_level
-        ;lda #$3f
+        ;lda #$30
         ;sta phase_current
         jsr phase_palette_load
         jsr timer_reset
@@ -78,8 +78,10 @@ player_take_damage: subroutine
 	; set damage display counter
         lda #$10
         sta player_damage_flash
+        ; XXX enemy hits won't trigger iframes if turbo gun?
 	; check if turbo gun is enabled
-        lda player_a
+        lda player_controls
+        and #BUTTON_A
         bne .skip_iframes
 	; set iframes
         lda state_iframe_length

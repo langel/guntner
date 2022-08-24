@@ -1,4 +1,6 @@
 
+;;;;; CONTROLLER READING
+
 
 ; reading joypad gives us a byte
 ; bit 7 a button
@@ -10,67 +12,38 @@
 ; bit 1 left
 ; bit 0 right
 
-; debouncing required for menu
-; all keys
-
-; debouncing required for game
-; select, start, a
 
 
-
+controller_poller: subroutine
+	ldx #$01
+        stx JOYPAD1
+        dex
+        stx JOYPAD1
+        ldx #$08
+.read_loop
+	lda JOYPAD1
+        lsr
+        rol temp00
+        dex
+        bne .read_loop
+        rts
+        
 
 
 player_controls_read: subroutine
 
-;;;;; CONTROLLER READING
-
-	ldy #0
-        lda #$01
-        sta JOYPAD1,y	; set strobe bit
-        lsr        	; now A is 0
-        sta JOYPAD1,y	; clear strobe bit
-        ldx #8		; read 8 bits
-.joy_read_loop:
-	pha		; save A (result)
-        lda JOYPAD1,y	; load controller state
-        lsr        	; bit 0 -> carry
-        pla		; restore A (result)
-        rol		; carry -> bit 0 of result
-        dex		; X = X - 1
-        bne .joy_read_loop	; repeat if X is 0
-        
-        sta player_controls
-        ; store directions isolated
-        and #%00001111
-        sta player_dir_bits 
-               
-        lda #$01
-        sta temp00
-        ldx #$00
-.joy_interpret_loop:
-	lda player_controls
+	jsr controller_poller
+.checksum_loop
+        ldy temp00
+        jsr controller_poller
+        cpy temp00
+        bne .checksum_loop
+        lda temp00
+        tay
+        eor player_controls
         and temp00
-        cmp temp00
-        bne .not_pressed
-.pressed
-	lda player_right,x
-        cmp #$00
-        bne .not_fresh
-        lda #$ff
-        sta player_right,x
-        sta player_right_d,x
-        jmp .button_done
-.not_fresh
-	lda #$00
-        sta player_right_d,x
-        jmp .button_done
-.not_pressed
-	lda #$00
-        sta player_right,x
-        sta player_right_d,x
-.button_done
-	inx
-        inx
-        asl temp00
-        bcc .joy_interpret_loop
+        sta player_controls_debounced
+        sty player_controls
         rts
+        
+        
