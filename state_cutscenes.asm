@@ -140,6 +140,8 @@ cut_scene_outro_init: subroutine
         
         ; allow future plays to be boundless
         inc player_boundless
+ 	
+        jmp .good 
         
         ; use timer to decide end screen
         lda timer_minutes_10s

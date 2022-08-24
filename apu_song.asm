@@ -302,16 +302,16 @@ song_03: subroutine
 	inc audio_root_tone
         lda audio_root_tone
         clc
-        adc #12
+        adc #4
         sta apu_temp
         tax
         lda octoscale,x
+        adc #12
         tax
         ldy #2
         jsr apu_set_pitch
         lda apu_temp
-        clc
-        adc #8
+        adc #15
         tax
         ldy #6
         jsr apu_set_pitch
