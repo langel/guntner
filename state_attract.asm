@@ -8,8 +8,8 @@ attract_init:
         sta scroll_speed_hi
         lda #173
         sta scroll_speed_lo
-        lda #5
-        jsr state_update_set_addr
+        lda #state_update_jump_table_offset+5
+	sta state_update_addr
         lda attract_true
         bne .attract_mode_set
         jsr clear_all_enemies

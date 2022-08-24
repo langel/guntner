@@ -19,10 +19,10 @@ menu_screens_init: subroutine
 	jsr sprite_clear
         jsr state_sprite0_disable
         
-	lda #$01
-        jsr state_render_set_addr
-	lda #$01
-        jsr state_update_set_addr
+	lda #state_render_jump_table_offset+1
+        sta state_render_addr
+        lda #state_update_jump_table_offset+1
+	sta state_update_addr
         jsr state_clear ; a = 0
         sta scroll_x_hi
         sta scroll_page
@@ -146,8 +146,8 @@ scrollto_options_update: subroutine
         cpx #$40
         bne .done
         ; setup options
-        lda #3
-        jsr state_update_set_addr
+        lda #state_update_jump_table_offset+3
+	sta state_update_addr
         lda #1
         sta scroll_page
         lda #$00
@@ -172,8 +172,8 @@ scrollto_titles_update: subroutine
         cpx #$c0
         bne .done
         ; setup options
-        lda #1
-        jsr state_update_set_addr
+        lda #state_update_jump_table_offset+1
+	sta state_update_addr
         lda #$00
         sta scroll_page
         jsr timer_reset
@@ -337,8 +337,8 @@ title_screen_update: subroutine
 	jsr menu_start_game
         jmp .do_nothing
 .goto_options
-	lda #2
-        jsr state_update_set_addr
+        lda #state_update_jump_table_offset+2
+	sta state_update_addr
 .do_nothing
 	jsr title_screen_set_rudy_y
 ; except animate that color tho
@@ -425,8 +425,8 @@ options_menu_return: subroutine
 	lda player_a_d
         ora player_b_d
         beq .do_nothing
-        lda #4
-        jsr state_update_set_addr
+        lda #state_update_jump_table_offset+4
+	sta state_update_addr
 .do_nothing
 	jmp state_update_done
         

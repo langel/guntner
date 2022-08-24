@@ -50,9 +50,10 @@ cut_scene_intro_init: subroutine
         lda #$00
         sta scroll_page
         sta scroll_x_hi
-        jsr state_render_set_addr
-        lda #$08
-        jsr state_update_set_addr
+	lda #state_render_jump_table_offset
+        sta state_render_addr
+        lda #state_update_jump_table_offset+8
+	sta state_update_addr
         jsr render_enable
         jsr palette_fade_in_init
         lda #1
@@ -140,8 +141,6 @@ cut_scene_outro_init: subroutine
         
         ; allow future plays to be boundless
         inc player_boundless
- 	
-        jmp .good 
         
         ; use timer to decide end screen
         lda timer_minutes_10s
@@ -209,10 +208,10 @@ cut_scene_outro_init: subroutine
         lda timer_frames_1s
         sta PPU_DATA
         
-        lda #$00
-        jsr state_render_set_addr
-        lda #$08
-        jsr state_update_set_addr
+	lda #state_render_jump_table_offset
+        sta state_render_addr
+        lda #state_update_jump_table_offset+8
+        sta state_update_addr
         jsr render_enable
         jsr palette_fade_in_init
 	rts

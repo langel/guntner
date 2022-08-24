@@ -54,20 +54,6 @@ state_update_do_nothing:
 	jmp state_update_done
         
 
-state_render_set_addr:
-	; a = function table slot
-        clc
-        adc #state_render_jump_table_offset
-        sta state_render_addr
-        rts
-        
-state_update_set_addr:
-	; a = function table slot
-        clc
-        adc #state_update_jump_table_offset
-        sta state_update_addr
-        rts
-        
 
 state_sprite0_enable:
         lda #$01

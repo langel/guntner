@@ -10,8 +10,8 @@ game_init_generic: subroutine
         lda #scroll_speed_hi_default
         sta scroll_speed_hi
         
-        lda #2
-        jsr state_render_set_addr
+	lda #state_render_jump_table_offset+2
+        sta state_render_addr
         
         jsr timer_reset
 	jsr player_game_reset
@@ -29,8 +29,8 @@ game_init_generic: subroutine
 
 game_init:
 	jsr game_init_generic
-        lda #6
-        jsr state_update_set_addr
+        lda #state_update_jump_table_offset+6
+	sta state_update_addr
         lda #$00
         sta attract_true
         jsr clear_all_enemies
