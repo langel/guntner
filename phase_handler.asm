@@ -477,7 +477,7 @@ phase_boss_dying: subroutine
         stx enemy_slot_id
         stx enemy_ram_offset
 .iteration_loop
-i	ldx enemy_slot_id
+	ldx enemy_slot_id
         ldy enemy_slot_offset_to_oam_offset,x
         sty enemy_oam_offset
         ldx enemy_ram_offset
@@ -494,11 +494,12 @@ i	ldx enemy_slot_id
         sta enemy_ram_offset
         cmp #$e0
         bne .iteration_loop
-        
+        ; setup starfield decceleration
         inc phase_kill_counter
         lda #$40
         sta phase_spawn_counter
-        
+        ; reset palettes
+        jsr phase_palette_load
         ; setup next scene
         jsr sfx_enemy_death
         jsr powerup_pickup_plus_one
