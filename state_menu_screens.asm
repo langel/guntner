@@ -26,6 +26,7 @@ menu_screens_init: subroutine
         jsr state_clear ; a = 0
         sta scroll_x_hi
         sta scroll_page
+        sta player_damage_flash ; no flash on fade-in
         sta ppu_mask_emph ; reset mask
         jsr timer_reset
         jsr title_screen_set_rudy_y

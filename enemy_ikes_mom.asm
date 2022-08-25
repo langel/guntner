@@ -77,6 +77,41 @@ ikes_mom_cycle:
         sta arctang_velocity_lo
 	jsr arctang_enemy_update
         
+        ; shake?
+        lda wtf
+        cmp #$c0
+        bcc .dont_banshee
+        ; x shake
+        jsr get_next_random
+        and #$07
+        sec
+        sbc #$04
+        clc
+        adc oam_ram_x,y
+        sta oam_ram_x,y
+        ; y shake
+        jsr get_next_random
+        and #$07
+        sec
+        sbc #$04
+        clc
+        adc oam_ram_y,y
+        sta oam_ram_y,y
+        ; sfx (pu1)
+        lda #$3f
+        sta APU_PULSE1_VOL
+        lda #$08
+        sta APU_PULSE1_SWEEP
+        lda wtf
+        and #$3f
+        eor #$3f
+        lsr
+        adc #$a0
+        sta APU_PULSE1_TIMER_LO
+        lda #$08
+        sta APU_PULSE1_TIMER_HI
+        inc apu_pu1_counter
+.dont_banshee
         
 	; x
 	lda oam_ram_x,y
