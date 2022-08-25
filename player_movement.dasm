@@ -156,32 +156,42 @@ player_direction_handler: subroutine
 
 
 
+; speed - straight / diag
+;speed 1  0.75 / 0.53
+;speed 2  1.00 / 0.7071
+;speed 3  1.75 / 1.2374
+;speed 4  2.50 / 1.7677
+; 1 192 - 1.75
+; 2 223 - 2.87
+; 3 128 - 3.5 / 2 121 - 2.475 
+; 4  51 - 4.2 / 2 248 - 2.97
+
+;; calc diagonal by dividing straight by 1.414
+
+	; speeds 1 .. 4
+player_direction_speed_table_hi:
+	; straight values
+        byte   #1,   #2,   #3,   #4
+        ; diagonal values
+        byte   #1,   #2,   #2,   #2
+player_direction_speed_table_lo:
+	; straight values
+        byte #192, #223, #128,  #51
+        ; diagonal values
+        byte  #61,   #8, #121, #248
+        
+        
+        
+; old version
 ;      straight/ diag
 ;speed 1  0.75 / 0.53
 ;speed 2  1.00 / 0.7071
 ;speed 3  1.75 / 1.2374
 ;speed 4  2.50 / 1.7677
 
-	; speeds 1 .. 4
-player_direction_speed_table_hi:
-	; straight values
-        byte #1, #2, #2, #3
-        ; diagonal values
-        byte #1, #1, #2, #2
-player_direction_speed_table_lo:
-	; straight values
-        byte #192, #64, #223, #128
-        ; diagonal values
-        byte #61, #151, #8, #122
-        
-        
-
-; old version
+; old old version
 ;speed 3  2.25 / 1.5909
 ;speed 4  3.50 / 2.4748
-
-; 1 / 256 = 0.00390625
-
         
         ; OG speeds
         

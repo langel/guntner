@@ -154,9 +154,7 @@ player_change_speed:
         ; update speed
         inc player_speed
         lda player_speed
-        cmp #$04
-        bne .read_select_done
-        lda #$00
+        and #$03
         sta player_speed
 .read_select_done
         
