@@ -230,8 +230,6 @@ palette_fade_in_update: subroutine
 ; fade out leads to forced tansition and new state
 palette_fade_out_init: subroutine
 	; a = init callback index
-        clc
-        adc #state_init_jump_table_offset
         sta pal_fade_target
         ; make sure we're not already fading out
 	lda state_fade_out

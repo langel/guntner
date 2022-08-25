@@ -7,10 +7,10 @@ cut_scene_update_generic: subroutine
         lda phase_end_game
         beq .start_game
         ; game complete go back to title screen
-        lda #0
+        lda #state_init_jump_table_offset+0
         beq .trigger_fadeout
 .start_game
-        lda #2
+        lda #state_init_jump_table_offset+2
 .trigger_fadeout
         jsr palette_fade_out_init
         jsr song_stop

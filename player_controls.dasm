@@ -24,8 +24,13 @@ controller_poller: subroutine
 	lda JOYPAD1
         lsr
         rol temp00
+        lsr
+        rol temp01
         dex
         bne .read_loop
+        lda temp00
+        ora temp01
+        sta temp00
         rts
         
 

@@ -202,7 +202,7 @@ phase_zero: subroutine
         lda #$00
         sta scroll_x_hi
         sta scroll_page
-	lda #$04
+	lda #state_init_jump_table_offset+4
 	jsr palette_fade_out_init
 	rts
         

@@ -29,7 +29,7 @@ attract_update: subroutine
         lda player_controls
         and #BUTTON_START|BUTTON_B|BUTTON_A
         beq .buttons_for_menu_not_pressed
-        lda #0
+        lda #state_init_jump_table_offset+0
 	jsr palette_fade_out_init
 	jmp state_update_done
 .buttons_for_menu_not_pressed

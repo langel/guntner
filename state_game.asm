@@ -111,7 +111,7 @@ game_update_generic: subroutine
 .return_to_title_screen
         ; GO BACK TO TITLE SCREEN 
         ; AFTER DEATH SEQUENCE
-	lda #0
+	lda #state_init_jump_table_offset+0
 	jsr palette_fade_out_init
         jmp .done
 .next_life

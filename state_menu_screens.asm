@@ -298,7 +298,7 @@ title_screen_update: subroutine
         ;cmp #$30
         bne .sit_and_wait
 .start_demo
-        lda #1
+        lda #state_init_jump_table_offset+1
         jsr palette_fade_out_init
 .sit_and_wait
 	; check for super secret code
@@ -377,7 +377,7 @@ menu_start_game: subroutine
         sta player_controls
         sta player_controls_debounced
         ; init cut scene 00
-        lda #3
+        lda #state_init_jump_table_offset+3
         jsr palette_fade_out_init
 	rts
   
