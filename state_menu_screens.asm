@@ -1,15 +1,15 @@
+; zp vars
 
+;title_rudy_pos		EQU $181
 
-title_rudy_pos		EQU $181
+;options_rudy_pos	EQU $182
+;options_music_on	EQU $183
+;options_song_id		EQU $184
+;options_sound_id	EQU $185
+;options_rudy_color1	EQU $186
+;options_rudy_color2	EQU $187
 
-options_rudy_pos	EQU $182
-options_music_on	EQU $183
-options_song_id		EQU $184
-options_sound_id	EQU $185
-options_rudy_color1	EQU $186
-options_rudy_color2	EQU $187
-
-scroll_to_counter	EQU $188
+;scroll_to_counter	EQU $188
 
 
 menu_screens_init: subroutine
@@ -41,6 +41,15 @@ menu_screens_init: subroutine
         jsr dashboard_init
         jsr dashboard_update
         jsr dashboard_render
+        
+; bookbinder att
+	PPU_SETADDR $23c0
+        ldx #$07
+        lda #%00001010
+.bookbinder_pal_loop
+	sta PPU_DATA
+        dex
+        bpl .bookbinder_pal_loop
         
 ; G u n T n e R
 

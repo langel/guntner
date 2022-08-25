@@ -9,9 +9,10 @@
 ; $300 entity data
 ; $400-7ff sine scale tables
 
-spare_stack	EQM	$194
-top_of_stack	EQM	$1e0
-end_of_ram 	EQM 	$800
+phase_spawn_table	= $0150
+spare_stack		= $170
+top_of_stack		= $1e0
+end_of_ram 		= $800
 
 sprite_0_y	EQM	$b6 ; 182
 sprite_0_y_diff	EQM	$4a ; 74
@@ -45,11 +46,6 @@ cart_start:	subroutine
         
         jsr sine_init
         
-        ; XXX don't the states take care of this stuff?
-        ;jsr nametables_clear
-        ;jsr sprite_clear
-	;jsr player_game_reset
-        
         lda #>arctang_velocity_tables
         sta arctang_velocity_hi
         
@@ -69,6 +65,11 @@ cart_start:	subroutine
 	lda #$37
         sta player_color2
 	jsr player_update_colors
+        
+        ; bookbinder colors
+        ldx #81
+        ldy #6
+        jsr palette_load
         
         
 ;============================== M O D E   I N I T   H E R E

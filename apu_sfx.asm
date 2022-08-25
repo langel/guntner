@@ -1,12 +1,14 @@
 
-sfx_phase_next_counter		EQU $150 
+; zp vars
+
+;sfx_phase_next_counter		
 ; counters to mask other channel audio
-sfx_pu1_counter			EQU $151
-sfx_pu2_counter			EQU $152
-sfx_noi_counter			EQU $153
+;sfx_pu1_counter	
+;sfx_pu2_counter	
+;sfx_noi_counter	
 ; table offsets for update subroutines
-sfx_pu2_update_type		EQU $154
-sfx_noi_update_type		EQU $155
+;sfx_pu2_update_type	
+;sfx_noi_update_type	
 
 ; these should only use Pulse 2 and Noise channels
 ; unless its a non-music moment (like player death)

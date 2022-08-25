@@ -56,6 +56,15 @@ rng0		byte
 rng1		byte
 rng2		byte
 
+title_rudy_pos		byte
+options_rudy_pos	byte
+options_music_on	byte
+options_song_id		byte
+options_sound_id	byte
+options_rudy_color1	byte
+options_rudy_color2	byte
+scroll_to_counter	byte
+
 starfield_state		byte
 starfield_column	byte
 starfield_page		byte
@@ -118,6 +127,7 @@ phase_end_game		byte
 
 player_frag_counter	byte
 player_death_flag	byte
+player_death_counter	byte
 you_dead_counter	byte
 
 powerup_counter	byte
@@ -216,6 +226,15 @@ apu_rng1		byte
 apu_temp		byte
 sfx_temp00		byte
 sfx_temp01		byte
+
+sfx_phase_next_counter	byte
+; counters to mask other channel audio
+sfx_pu1_counter		byte
+sfx_pu2_counter		byte
+sfx_noi_counter		byte
+; table offsets for update subroutines
+sfx_pu2_update_type	byte
+sfx_noi_update_type	byte
 
 audio_song_id		byte
 audio_frame_counter     byte

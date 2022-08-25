@@ -4,8 +4,6 @@
 
 ENEMY_HIT_PALETTE_FRAMES	EQM $05
 
-phase_spawn_table	= $0160
-
 oam_ram_x      = $0203
 oam_ram_y      = $0200
 oam_ram_spr    = $0201

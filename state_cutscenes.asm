@@ -186,6 +186,9 @@ cut_scene_outro_init: subroutine
         
 .plot_screen    
         jsr nametable_tile_planter
+        ; DEATHLESS!! display
+        ; XXX needs some work
+        lda player_death_counter
         ; final time display
         NMTP_SETADDR cut_scene_ending_time_tile_data
         jsr nametable_tile_planter

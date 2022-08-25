@@ -191,6 +191,10 @@ difficulty_messages:
 
 
 menu_screen_tile_data:
+	; "Langel Bookbinder's"
+	hex 2027
+	hex 8c6a76706e7403837777736b72766d6e7a9e7b
+	byte #$00
 	; "Please  START"
 	hex 21ea
 	hex 90746e6a7b6e03039293829193

@@ -1,5 +1,10 @@
 
 
+;phase_spawn_table	EQM $0150
+
+
+; zp vars
+
 ;phase_kill_count	byte
 ;phase_current		byte
 ;phase_state		byte
