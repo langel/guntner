@@ -82,7 +82,7 @@ palette_table:
         hex 07 17 3d 
         hex 11 2d 31
         ; #81 bookbinder
-        hex 0f 00 10
+        hex 0f 00 37
         
 palette_level_offset_table:
 	byte #21, #30, #39, #48

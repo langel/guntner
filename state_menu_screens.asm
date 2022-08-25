@@ -42,14 +42,25 @@ menu_screens_init: subroutine
         jsr dashboard_update
         jsr dashboard_render
         
-; bookbinder att
+; copylines pal att
 	PPU_SETADDR $23c0
-        ldx #$07
+        ldx #$37
+.copylines_pal_loop
+	txa
+        cmp #$30
+        bcs .bookbinder_gray
+        txa
+        and #$30
+        bne .on8
+.bookbinder_gray
         lda #%00001010
-.bookbinder_pal_loop
+        bne .plot_pal
+.on8
+	lda #$00000000
+.plot_pal
 	sta PPU_DATA
         dex
-        bpl .bookbinder_pal_loop
+        bpl .copylines_pal_loop
         
 ; G u n T n e R
 
