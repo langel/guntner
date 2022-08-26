@@ -154,6 +154,7 @@ state_update_done:
 sprite0_wait:
 	lda state_sprite0
         beq sprite0_off
+        
 	; wait for Sprite 0; SPRITE 0 WAIT TIME!!!
 .wait0	bit PPU_STATUS
         bvs .wait0

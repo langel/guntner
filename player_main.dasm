@@ -20,7 +20,7 @@ player_game_reset: subroutine
         ; XXX testing phase behaviours
         ;lda #3
         ;sta phase_level
-        ;lda #$30
+        ;lda #$36
         ;sta phase_current
         jsr phase_palette_load
         jsr timer_reset

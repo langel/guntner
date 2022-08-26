@@ -45,13 +45,34 @@ player_bullet_collision_handler: subroutine
         ldy #$0c
 .bullet_loop
         lda oam_ram_x,y
-        cmp #$00
         beq .skip_bullet
         sta collision_1_x
         lda oam_ram_y,y
         sta collision_1_y
-        jsr detect_collision
-        beq .skip_bullet
+        
+        ; collision detection
+	clc
+        lda collision_0_x
+        adc collision_0_w
+        bcs .no_collision ; make sure x+w is not less than x
+        cmp collision_1_x
+        bcc .no_collision
+        clc
+        lda collision_1_x
+        adc collision_1_w
+        cmp collision_0_x
+        bcc .no_collision
+        clc
+        lda collision_0_y
+        adc collision_0_h
+        cmp collision_1_y
+        bcc .no_collision
+        clc 
+        lda collision_1_y
+        adc collision_1_h
+        cmp collision_0_y
+        bcc .no_collision
+        
         clc
         lda enemy_dmg_accumulator
         adc player_gun_str
@@ -61,6 +82,7 @@ player_bullet_collision_handler: subroutine
         sta oam_ram_x,y
         lda #$ff
         sta oam_ram_y,y
+.no_collision
 .skip_bullet
 	iny
         iny

@@ -14,34 +14,8 @@
 ;
 ;	returns ff (true) or 00 (false) in accumulator
 
-detect_collision: subroutine
-	clc
-        lda collision_0_x
-        adc collision_0_w
-        bcs .no_collision ; make sure x+w is not less than x
-        cmp collision_1_x
-        bcc .no_collision
-        clc
-        lda collision_1_x
-        adc collision_1_w
-        cmp collision_0_x
-        bcc .no_collision
-        clc
-        lda collision_0_y
-        adc collision_0_h
-        cmp collision_1_y
-        bcc .no_collision
-        clc 
-        lda collision_1_y
-        adc collision_1_h
-        cmp collision_0_y
-        bcc .no_collision
-        lda #$ff
-        rts
-.no_collision
-	lda #$00
-        rts
-        
+; the detect_collision subroutine was moved to player_bullets.asm
+; saving over 12 cycles per usage
 
         
         
