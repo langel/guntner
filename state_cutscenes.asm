@@ -8,7 +8,7 @@ cut_scene_update_generic: subroutine
         beq .start_game
         ; game complete go back to title screen
         lda #state_init_jump_table_offset+0
-        beq .trigger_fadeout
+        bne .trigger_fadeout
 .start_game
         lda #state_init_jump_table_offset+2
 .trigger_fadeout
