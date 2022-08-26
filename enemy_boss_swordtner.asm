@@ -285,7 +285,7 @@ swordtner_inside_bouncy_box_x: subroutine
 
 
 
-swordtner_emit_enemy: subroutine
+swordtner_emit_enemies: subroutine
 	lda #$02
         sta state_v5
 .spawn_loop
@@ -311,7 +311,7 @@ swordtner_emit_enemy: subroutine
 
 
 
-swordtner_fire: subroutine
+swordtner_emit_projectiles: subroutine
         ; velocity
         lda #$02
         sta dart_velocity
@@ -396,10 +396,10 @@ boss_swordtner_mode_0: subroutine
         ; spawn/fire on boss fight music main snare
 	lda audio_frame_counter
         cmp #5
-        bne .dont_fire
+        bne .dont_emit
         lda audio_pattern_pos
         cmp #10
-        bne .dont_fire
+        bne .dont_emit
         lda state_v1
         cmp #$02
         bne .dont_next_state
@@ -410,15 +410,15 @@ boss_swordtner_mode_0: subroutine
 .dont_next_state
 	lda state_v0
         and #$03
-        bne .fire
-.spawn_enemies
-	jsr swordtner_emit_enemy
+        bne .emit_enemies
+.emit_projectiles
+	jsr swordtner_emit_projectiles
 	jmp .inc_state
-.fire
-        jsr swordtner_fire
+.emit_enemies
+        jsr swordtner_emit_enemies
 .inc_state
         inc state_v1
-.dont_fire
+.dont_emit
 
 	rts
         

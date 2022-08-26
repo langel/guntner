@@ -294,8 +294,6 @@ title_screen_update: subroutine
 	lda timer_seconds_1s
         ; add #$30 because timer based on numerical tiles
         cmp #char_set_0+3
-        ;cmp #$a3
-        ;cmp #$30
         bne .sit_and_wait
 .start_demo
         lda #state_init_jump_table_offset+1
