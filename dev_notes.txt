@@ -42,26 +42,12 @@ fcd9 after gutting score system
 
 77 bytes from sandbox but that makes testing a bit more annoying
 
-fix these:
 
-	swordtner sucks
-		second form
+fix these:
 	
-	balance speed options
-		move default 3 to 2
-		
-	screen lag with uzi bullet collision detection
+	change speed with select during attract mode borked
 	
-	select+start = play boundless
-	
-	postpone boss fight star brightener to death sequence
-	
-	rudy shows damage happened as long as the sound effect plays :thonk:
-		sfx length is #$10 (16 frames)
-		setting counter to 12 should be 3 flashes
-	
-	
-	ike's mom slightly earlier spawn trigger time
+	DEATHLESS!!
 	
 	tame starfield acceleration (maybe start much slower too)
 	decouple visual effects from sfx in options screen
@@ -82,15 +68,85 @@ Kaytse bugs:
 	enemy spawn feels a bit cheap sometimes. i think i died a few times because of enemies hitting me at the right side of the screen (i think the stars), although they were spawning left.
 	after playing the death music (song 5), the palette will turn into the one after going game over
 
-enemies
-	ikes mom
-		shake with sound effect
+
 continues --
 	only if past first level
 	takes player back to beginning of level
 	countdown from 3 using rng chord
 game over glitches
-LUT for powerup order
+	
+	
+other 24kb games
+	10 yard flight (j)
+	antarctic adventure
+	balloon fight
+	baseball
+	battle city
+	binary land
+	bird week
+	bomberman (j)
+	brush roller
+	burgertime (j)
+	chack n' pop
+	championship lode runner (cnrom)
+	circus charlie (cnrom)
+	city connection (j)
+	defender 2
+	devil world
+	dig dug
+	donkey kong
+	donkey kong jr
+	donkey kong 3
+	donkey kong jr math
+	door door
+	duck hunt
+	excitebike
+	f1 race
+	field combat
+	formation z
+	front line
+	galaga (j)
+	galaxian
+	game genie lol
+	golf
+	gomoku narabe
+	hogan's alley
+	hyper olympic
+	hyper sports
+	ice climber
+	ikki
+	jewelry
+	joust
+	karateka
+	kinniku man
+	lode runner (j)
+	lunar ball (pool?)
+	macross
+	mappy
+	mario bros
+	millipede
+	naitou 9 dan shogi hiden
+	ninja kun
+	nuts and milk
+	pac-man
+	pinball
+	poo-yam
+	popeye
+	popeye eigo asobi
+	raid on bungling bay
+	road fighter
+	sky destroyer
+	space invaders
+	star force (j)
+	star gate
+	super arabian
+	tennis
+	urban champion
+	warpman
+	wild gunman
+	yie-ar kung-fu
+	yo nin uti majyan
+	zippy race
 	
 	
 
