@@ -82,19 +82,11 @@ ikes_mom_cycle:
         cmp #$c0
         bcc .dont_banshee
         ; x shake
-        jsr get_next_random
-        and #$07
-        sec
-        sbc #$04
-        clc
+        jsr shake_8
         adc oam_ram_x,y
         sta oam_ram_x,y
         ; y shake
-        jsr get_next_random
-        and #$07
-        sec
-        sbc #$04
-        clc
+        jsr shake_8
         adc oam_ram_y,y
         sta oam_ram_y,y
         ; sfx (pu1)

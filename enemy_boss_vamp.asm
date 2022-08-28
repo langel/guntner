@@ -111,6 +111,9 @@ boss_vamp_spawn: subroutine
         ; temps
         sta temp01
         sta temp02
+        ; set eye color
+        lda #$02
+        sta boss_eyes_pal
         ; set spawn x
         lda #$a0
         sta state_v2
@@ -358,12 +361,8 @@ boss_vamp_state_suck_bats: subroutine
         sta state_v4
         dec state_v5 ; hide bats
         lda oam_ram_x,y
-        sec
-        sbc #$04
         sta boss_x
         lda oam_ram_y,y
-        sec
-        sbc #$04
         sta boss_y
 .done
 	rts
@@ -374,15 +373,11 @@ boss_vamp_state_shake: subroutine
         lda #$00
         sta enemy_ram_pc,x
 	; x shake
-	lda rng0
-        and #%00000111
-        clc
+        jsr shake_8
         adc boss_x
         jsr sprite_4_set_x
         ; y shake
-	lda rng1
-        and #%00000111
-        clc
+        jsr shake_8
         adc boss_y
         jsr sprite_4_set_y
         ; counter

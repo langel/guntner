@@ -156,6 +156,7 @@ boss_death_happening	byte
 boss_heart_stars	byte
 boss_x		byte
 boss_y		byte
+boss_eyes_pal	byte
 
 arc_sequence_id		byte
 arc_sequence_lo		byte

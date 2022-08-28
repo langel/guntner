@@ -6,9 +6,10 @@
 ; state_v0 : current mode
 ;	0 - bounce around and fire
 ;	1 - lunge at player and around to box
+;	2 - aim and shake
 ; state_v1 : cycle counter
 ; state_v2 : velocity
-
+; state_v4 : emiter type
 ; state_v5 : scratch for spawn loop
 ; state_v6 : alt face countdowner
 ; state_v7 : 2nd form true
@@ -34,6 +35,12 @@ boss_swordtner_spawn: subroutine
         sta oam_ram_y,y
         lda #$15
         sta enemy_ram_ex,x
+        ; set eye color
+        lda #$01
+        sta boss_eyes_pal
+        ; offset song position
+        lda #$0e
+        sta audio_pattern_pos
 	rts
         
         ; SWORDTNER
@@ -42,16 +49,16 @@ boss_swordtner_spawn: subroutine
         
 arc_bounce_x:
 	; if ex < $0c then ex = $0c - ex
-	hex 0c 0b 0a 09 08 07 06 05 04 03 02 01
+	hex 0b 0b 0a 09 08 07 05 05 04 03 02 01
         ; if ex == $0c then ex = 0
         ; if ex > $0c then ex = $17 - (ex - $0d)
-        hex 00 17 16 15 14 13 12 11 10 0f 0e 0d
+        hex 01 17 16 15 14 13 13 11 10 0f 0e 0d
 arc_bounce_y:
         ; if ex == $00 then ex = 0
         ; if ex < $0c then ex = $18 - ex
-        hex 00 17 16 15 14 13 12 11 10 0f 0e 0d
+        hex 01 17 16 15 14 13 13 11 10 0f 0e 0d
         ; if ex > $0c then ex = $24 - ex
-	hex 0c 0b 0a 09 08 07 06 05 04 03 02 01
+	hex 0b 0b 0a 09 08 07 05 05 04 03 02 01
         
 swordtner_metasprite_offset:
 	byte	#$10, #$20, #$30, #$40
@@ -80,10 +87,10 @@ boss_swordtner_cycle: subroutine
         jsr player_collision_detect
         beq .no_collision
         jsr enemy_gives_damage
-        ldy enemy_oam_offset
-        lda #$b0
-        adc oam_ram_x,y
-        sta oam_ram_x,y
+        lda #$00
+        sta state_v1
+        lda #$01
+        sta state_v0
         ; change facial experession
         lda #$20
         sta state_v6
@@ -91,8 +98,9 @@ boss_swordtner_cycle: subroutine
 
 
 	; hitbox is face of swordtner
-        lda #$10
+        lda #$0f
         sta collision_0_h
+        lda #$12
         adc collision_0_y
         sta collision_0_y
         inc boss_dmg_handle_true
@@ -133,7 +141,6 @@ boss_swordtner_cycle: subroutine
       
 ; act on current mode
 	lda state_v0
-        and #$01
         clc
         adc #boss_swordtner_state_jump_table_offset
         jsr jump_to_subroutine
@@ -408,8 +415,8 @@ boss_swordtner_mode_0: subroutine
         sta state_v1
         rts
 .dont_next_state
-	lda state_v0
-        and #$03
+	lda state_v4
+        and #$01
         bne .emit_enemies
 .emit_projectiles
 	jsr swordtner_emit_projectiles
@@ -423,12 +430,9 @@ boss_swordtner_mode_0: subroutine
 	rts
         
         
-        
-        
-        
 
-; mode 1 - lunges at player
-boss_swordtner_mode_1: subroutine
+; mode 1 - aim for player and warn of attack
+boss_swordtner_mode_shake: subroutine
 	lda state_v1
         bne .init_done
 .init
@@ -441,17 +445,38 @@ boss_swordtner_mode_1: subroutine
 	lda arctang_velocities_lo+1
         sta state_v2
 .init_done
-	lda state_v1
-	cmp #$01
-        bne .out_of_bouncy_box
-        jsr swordtner_inside_bouncy_box_x
-        beq .lunge_keep_going
+	; x shake
+        jsr shake_8
+        adc boss_x
+        jsr sprite_4_set_x
+        ; y shake
+        jsr shake_8
+        adc boss_y
+        jsr sprite_4_set_y
+        ; check if done
         inc state_v1
-.out_of_bouncy_box
-	jsr swordtner_inside_bouncy_box_x
+        lda state_v1
+        cmp #$10
+        bne .done
+        lda #$02
+        sta state_v0
+.done
+	rts
+        
+        
+
+; mode 2 - lunges at player
+boss_swordtner_mode_2: subroutine
+        inc state_v1
+	lda state_v1
+	cmp #$40
+        bcc .lunge_keep_going
+        jsr swordtner_inside_bouncy_box_x
         bne .lunge_keep_going
-        inc state_v0
+        ; next state
+        inc state_v4
         lda #$00
+        sta state_v0
         sta state_v1
 .lunge_keep_going
 	lda state_v2

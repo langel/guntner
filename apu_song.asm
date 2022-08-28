@@ -383,7 +383,7 @@ song_04: subroutine
         ; TENSION ANTI_MELODY (pulse 1)
         lda sfx_pu1_counter
         bne .no_melody
-	lda #6
+	lda #5
         sta apu_pu1_envelope
 	lda #$05
         sta apu_pu1_counter

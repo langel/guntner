@@ -66,6 +66,18 @@ PrevRandom subroutine
         eor #$a9
 .NoEor:
         rts
+        
+       
+shake_8: subroutine
+	; returns rng in -4..3 range ready for addition
+	jsr get_next_random
+        lsr
+        and #$07
+        sec
+        sbc #$04
+        clc
+	rts
+        
 
 
 tile_empty 		EQM $03
@@ -417,16 +429,16 @@ jump_to_subroutine: subroutine
 
 
 
-		;  jump tables defined 
+	;  jump tables defined 
 enemy_update_jump_table_offset	EQM	0
 enemy_spawn_jump_table_offset	EQM	27
 boss_vamp_state_jump_table_offset	EQM	54
 boss_swordtner_state_jump_table_offset	EQM	60
-powerup_pickup_jump_table_offset	EQM	62
-options_screen_state_jump_table_offset	EQM	70
-phase_handlers_jump_table_offset	EQM	76
-sfx_test_jump_table_offset	EQM	81
-apu_env_jump_table_offset	EQM	101
+powerup_pickup_jump_table_offset	EQM	63
+options_screen_state_jump_table_offset	EQM	71
+phase_handlers_jump_table_offset	EQM	77
+sfx_test_jump_table_offset	EQM	82
+apu_env_jump_table_offset	EQM	102
 sfx_update_jump_table_offset	EQM	108
 song_update_jump_table_offset	EQM	115
 state_init_jump_table_offset	EQM	124
@@ -500,7 +512,8 @@ boss_vamp_state_jump_table_lo:
 	byte <boss_vamp_state_blow_bats
 boss_swordtner_state_jump_table_lo:
 	byte <boss_swordtner_mode_0
-	byte <boss_swordtner_mode_1
+	byte <boss_swordtner_mode_shake
+	byte <boss_swordtner_mode_2
 powerup_pickup_jump_table_lo:
 	byte <powerup_pickup_mask
 	byte <powerup_pickup_mushroom
@@ -546,7 +559,6 @@ sfx_test_jump_table_lo:
 	byte <sfx_ghost_snare	
 apu_env_jump_table_lo:
 	byte <apu_env_lin_long   ; 0
-	byte <apu_env_lin_short  ; 1
 	byte <apu_env_lin_tiny	  ; 2
 	byte <apu_env_exp_long	  ; 3
 	byte <apu_env_exp_short  ; 4
@@ -660,7 +672,8 @@ boss_vamp_state_jump_table_hi:
 	byte >boss_vamp_state_blow_bats
 boss_swordtner_state_jump_table_hi:
 	byte >boss_swordtner_mode_0
-	byte >boss_swordtner_mode_1
+	byte >boss_swordtner_mode_shake
+	byte >boss_swordtner_mode_2
 powerup_pickup_jump_table_hi:
 	byte >powerup_pickup_mask
 	byte >powerup_pickup_mushroom
@@ -706,7 +719,6 @@ sfx_test_jump_table_hi:
 	byte >sfx_ghost_snare	
 apu_env_jump_table_hi:
 	byte >apu_env_lin_long   ; 0
-	byte >apu_env_lin_short  ; 1
 	byte >apu_env_lin_tiny	  ; 2
 	byte >apu_env_exp_long	  ; 3
 	byte >apu_env_exp_short  ; 4

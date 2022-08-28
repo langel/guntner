@@ -18,9 +18,9 @@ player_game_reset: subroutine
         dex
         bpl .clear_loop
         ; XXX testing phase behaviours
-        ;lda #3
+        ;lda #1
         ;sta phase_level
-        ;lda #$36
+        ;lda #$1f
         ;sta phase_current
         jsr phase_palette_load
         jsr timer_reset

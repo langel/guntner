@@ -54,7 +54,7 @@ sfx_player_damage: subroutine
         sta apu_cache+$e
         lda #$10
         sta apu_noi_counter
-        lda #$02
+        lda #$01
         sta apu_noi_envelope
         lda #$10
         sta sfx_noi_counter
@@ -146,8 +146,9 @@ sfx_enemy_death: subroutine
         sta apu_cache+$c
         lda #$0f
         sta apu_cache+$e
-	lda #$02
+	lda #$01
         sta apu_noi_envelope
+        lda #$02
         sta sfx_noi_update_type
         lda #$10
         sta apu_noi_counter
@@ -177,7 +178,7 @@ sfx_powerup_hit: subroutine
         sta apu_cache+$e
         lda #$20
         sta apu_noi_counter
-        lda #$04
+        lda #$03
         sta apu_noi_envelope
         lda #$16
         sta sfx_noi_counter
@@ -372,7 +373,7 @@ sfx_shoot_bullet: subroutine
         clc
         adc #$09
         sta apu_cache+$e
-	lda #$04
+	lda #$03
         sta apu_noi_envelope
         lda #$20
         sta apu_noi_counter
@@ -440,7 +441,7 @@ sfx_phase_next_update: subroutine
         sta apu_pu2_counter
         lda #$20
         sta sfx_pu2_counter
-        lda #3
+        lda #2
         sta apu_pu2_envelope
 	lda audio_root_tone
         clc
@@ -455,7 +456,7 @@ sfx_phase_next_update: subroutine
         sta apu_pu2_counter
         lda #$20
         sta sfx_pu2_counter
-        lda #3
+        lda #2
         sta apu_pu1_envelope
         sta apu_pu2_envelope
 	lda audio_root_tone
@@ -483,7 +484,7 @@ sfx_snare: subroutine
         sta apu_cache+$e
         lda #$06
         sta apu_noi_counter
-        lda #$06
+        lda #$05
         sta apu_noi_envelope
         rts
         
@@ -496,7 +497,7 @@ sfx_hat: subroutine
         sta apu_cache+$e
         lda #$e
         sta apu_noi_counter
-        lda #$05
+        lda #$04
         sta apu_noi_envelope
 .no
         rts
@@ -510,6 +511,6 @@ sfx_ghost_snare: subroutine
         sta apu_cache+$e
         lda #$04
         sta apu_noi_counter
-        lda #$06
+        lda #$05
         sta apu_noi_envelope
         rts

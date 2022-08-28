@@ -150,12 +150,12 @@ apu_env_lin_long: subroutine
         lsr
         and #%00001111
 	rts
-apu_env_lin_short: subroutine
+;apu_env_lin_short: subroutine
 	; #$20 counter = 31 frames / 0.5 second
-        lda apu_pu1_counter,x
-        lsr
-        and #%00001111
-	rts
+        ;lda apu_pu1_counter,x
+        ;lsr
+        ;and #%00001111
+	;rts
 apu_env_lin_tiny: subroutine
 	; #$10 counter = 15 frames / 0.25 second
         lda apu_pu1_counter,x
