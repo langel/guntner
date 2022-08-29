@@ -33,7 +33,6 @@ player_bullet_collision_handler: subroutine
         lda collision_0_x
         adc collision_0_w
         bcc .in_bounds; make sure x+w is not less than x
-        lda #$00
         rts
 .in_bounds        
         ; bullet dimensions don't change
@@ -217,7 +216,7 @@ player_bullets_update: subroutine
 	; handle mask shield
         cpx #$00
         bne .mask_check_done
-        lda mask_shield
+        lda orbit_shield_speed
         beq .mask_check_done
         jmp player_bullets_update_mask_shield
 .mask_check_done
@@ -257,20 +256,20 @@ player_bullets_update_next:
 .done
 	rts
 
+
 player_bullets_update_mask_shield: subroutine
-	sty temp00
-        ldy mask_shield
-.mask_shield_velocity_loop
-        inc bullet_x_vel,x
-        dey
-        bne .mask_shield_velocity_loop
-        ldy temp00
+	; x = bullet pos offset
+        ; y = bullet oam offset
+        lda orbit_shield_pos
+        clc
+        adc orbit_shield_speed
+        sta orbit_shield_pos
         ; calc x
         lda player_x_hi
         sec
         sbc #$1c
         sta temp00
-        lda bullet_x_vel,x
+        lda orbit_shield_pos
         lsr
         tax
         lda sine_6bits,x
@@ -283,7 +282,7 @@ player_bullets_update_mask_shield: subroutine
         sec
         sbc #16
         sta temp00
-        lda bullet_x_vel,x
+        lda orbit_shield_pos
         clc
         adc #$40
         lsr

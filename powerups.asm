@@ -151,9 +151,9 @@ powerups_cycle: subroutine
         
         
 powerup_pickup_mask: subroutine
-        inc mask_shield
-        inc mask_shield
-        inc mask_shield
+        inc orbit_shield_speed
+        inc orbit_shield_speed
+        inc orbit_shield_speed
         jsr sfx_powerup_mask
 	rts
         

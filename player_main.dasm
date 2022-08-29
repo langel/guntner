@@ -97,12 +97,18 @@ player_take_damage: subroutine
         rts
 .player_dead
 	; player can be saved by mask shield!
-        lda mask_shield
+        lda orbit_shield_speed
         beq .player_really_dead
+        ; disable shield
         lda #$00
-        sta mask_shield
+        sta orbit_shield_speed
+        ; drift off screen to the right
         lda #1
         sta bullet_x_vel
+        ; x
+        lda player_x_hi
+        adc #$
+        ; y
         lda #$ff
         sta player_health
         rts

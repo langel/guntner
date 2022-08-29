@@ -137,7 +137,8 @@ bomb_counter	byte ; counts down animation frames
 r_bag_counter	byte ; counts down autoturbo fire frames
 shroom_counter	byte ; counts down animation frames
 shroom_mod	byte ; apu pitch offset
-mask_shield	byte ; 0 = no skull shield
+orbit_shield_speed	byte ; 0 = no skull shield
+orbit_shield_pos	byte
 
 dart_frame_max		byte
 dart_x_origin		byte
