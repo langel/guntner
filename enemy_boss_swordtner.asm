@@ -297,8 +297,7 @@ swordtner_emit_enemies: subroutine
         sta state_v5
 .spawn_loop
         jsr get_enemy_slot_1_sprite
-        cpx #$ff
-        beq .done
+        bcs .done
         clc
         lda #spark_id
         adc state_v5

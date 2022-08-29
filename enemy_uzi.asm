@@ -60,8 +60,7 @@ bullet_spawn: subroutine
         lda oam_ram_y,y
         sta temp03
         jsr get_enemy_slot_next
-        cpx #$ff
-        beq .done
+        bcc .done
         ; sprite
 	lda #bullet_id
         sta enemy_ram_type,x

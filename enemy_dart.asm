@@ -20,8 +20,7 @@ dart_spawn: subroutine
         beq .done
         dec dart_frame_max
         jsr get_enemy_slot_next
-        cpx #$ff
-        beq .done
+        bcc .done
 .spawn
 	lda #dart_id
         sta enemy_ram_type,x

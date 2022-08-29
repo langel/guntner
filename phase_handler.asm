@@ -233,8 +233,7 @@ phase_galger: subroutine
         beq .dont_spawn
 .do_a_spawn
 	jsr get_enemy_slot_1_sprite
-        cpx #$ff
-        beq .dont_spawn
+        bcs .dont_spawn
         jsr phase_spawn_track
         lda #galger_id
 	sta phase_spawn_type
@@ -272,8 +271,7 @@ phase_spawns: subroutine
 .do_spawn
         ldy phase_spawn_type
         jsr enemy_slot_from_type
-        cpx #$ff
-        beq .dont_spawn
+        bcs .dont_spawn
         jsr phase_spawn_track
 	dec phase_spawn_counter
         inc phase_kill_counter
@@ -331,8 +329,7 @@ phase_spawn_long: subroutine
         adc #spark_id
         tay
 	jsr get_enemy_slot_1_sprite
-        cpx #$ff
-        beq .dont_spawn
+        bcs .dont_spawn
 .set_and_jump
         jsr phase_spawn_track
         tya
@@ -595,8 +592,7 @@ phase_interval_spawn: subroutine
 .dont_reset_counter	
 	tay
         jsr enemy_slot_from_type
-        cpx #$ff
-        beq .no_enemy
+        bcs .no_enemy
 	inc phase_interval_counter
         tya
         jsr enemy_spawn_delegator
@@ -605,8 +601,7 @@ phase_interval_spawn: subroutine
         
 phase_interval_spawn_special_4_sprite: subroutine
 	jsr get_enemy_slot_4_sprite
-        cpx #$ff
-        beq .nope
+        bcs .nope
         tya
         jsr enemy_spawn_delegator
 .nope

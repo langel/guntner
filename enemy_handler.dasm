@@ -420,17 +420,17 @@ get_enemy_slot_next: subroutine
 	; returns enemy_ram_offset in x
         ; works from the top down
         lda #$d8
+        sec
 .slot_loop
 	tax
         stx temp00
         lda $0300,x
         beq .slot_found
         lda temp00
-        sec
         sbc #$08
         bcs .slot_loop
 .no_slot
-	ldx #$ff
+	clc
 .slot_found
 	rts
         
@@ -452,54 +452,56 @@ enemy_slot_from_type: subroutine
 
 get_enemy_slot_1_sprite: subroutine
 	; returns enemy_ram offset in x
+        ; carry cleared if found
+        ; carry set if unfound
         lda #$00
+        clc
 .slot_loop
 	tax
         stx temp00
         lda $0300,x
         beq .slot_found
         lda #$08
-        clc
         adc temp00
         cmp #$80
         bne .slot_loop
 .no_available_slot
-        ldx #$ff 
+        sec 
 .slot_found
 	rts
         
 get_enemy_slot_2_sprite: subroutine
 	; returns enemy_ram offset in x
         lda #$80
+        clc
 .slot_loop
 	tax
         stx temp00
         lda $0300,x
         beq .slot_found
         lda #$08
-        clc
         adc temp00
         cmp #$a0
         bne .slot_loop
 .no_available_slot
-        ldx #$ff 
+        sec 
 .slot_found
 	rts
         
 get_enemy_slot_4_sprite: subroutine
 	; returns enemy_ram offset in x
         lda #$a0
+        clc
 .slot_loop
 	tax
         stx temp00
         lda $0300,x
         beq .slot_found
         lda #$08
-        clc
         adc temp00
         cmp #$e0
         bne .slot_loop
 .no_available_slot
-        ldx #$ff 
+        sec
 .slot_found
 	rts
