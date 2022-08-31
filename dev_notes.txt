@@ -34,7 +34,6 @@ palette 03
 
 
 	
-	
 fdbe before working on crossbones/death
 fda5 before working on jump table consolidation
 fd4e after jump table work
@@ -44,6 +43,13 @@ fcd9 after gutting score system
 
 
 fix these:
+
+	enemy darts sit dormant when vampboss spawns
+	turbo button shouldn't hurt during r.bags?
+	increase max autofire speed
+	reset orbit shield on new?
+	no interval spawns after final boss
+	ikes mom banshee wail shriek should be in options sfx
 	
 	change speed with select during attract mode borked
 	
