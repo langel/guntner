@@ -97,9 +97,9 @@ boss_vamp_bat_cycle: subroutine
         ; SUCK YOUR
         ; BLEEDS !!       
 boss_vamp_spawn: subroutine
-
+	; claim eyeball slot
         lda #boss_assist_id
-        sta $03d8
+        sta $0340
         ; set eye color
         lda #$02
         sta boss_eyes_pal
