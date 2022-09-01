@@ -99,7 +99,11 @@ boss_vamp_bat_cycle: subroutine
 boss_vamp_spawn: subroutine
 	; claim eyeball slot
         lda #boss_assist_id
-        sta $0340
+        sta $03d8
+        ; clear eyeball slot sprites
+        lda #$ff
+        ldy #$f0
+        jsr sprite_4_set_y
         ; set eye color
         lda #$02
         sta boss_eyes_pal

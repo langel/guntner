@@ -12,6 +12,8 @@ spark_spawn: subroutine
         sta enemy_ram_x,x
 	lda #4
         sta enemy_ram_y,x
+        lda #0
+        sta enemy_ram_ex,x
         rts
 
 spark_cycle: subroutine
