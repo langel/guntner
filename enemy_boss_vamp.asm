@@ -100,17 +100,6 @@ boss_vamp_spawn: subroutine
 
         lda #boss_assist_id
         sta $03d8
-        ; SET STUFF to #$00
-        lda #$00
-        ; set spawn x
-        sta state_v1
-        ; set mouth closed
-        sta state_v7
-        ;related but unecessary
-        ;sta enemy_ram_x,x
-        ; temps
-        sta temp01
-        sta temp02
         ; set eye color
         lda #$02
         sta boss_eyes_pal
@@ -133,11 +122,15 @@ boss_vamp_spawn: subroutine
         ; #$0d = 13 but we `bpl loopin`
         ldy #$0c
         sta temp00 
+        ; set temp counters to 0
+        lda #$00
+        sta temp01
+        sta temp02
 .bat_spawn_loop
 	; a = animation counter / v1
 	; x = slot in enemy ram 
-        ldx temp02
         lda temp01
+        ldx temp02
         sta enemy_ram_ex,x
         clc
         adc #$14
