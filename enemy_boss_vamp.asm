@@ -101,8 +101,8 @@ boss_vamp_spawn: subroutine
         lda #boss_assist_id
         sta $03d8
         ; clear eyeball slot sprites
-        lda #$ff
-        ldy #$f0
+        lda #$f0	; y pos of metasprite
+        tay		; happens to match oam offset
         jsr sprite_4_set_y
         ; set eye color
         lda #$02
