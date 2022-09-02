@@ -22,8 +22,6 @@ powerup_drop_table:
         
         
 powerup_from_starglasses:
-	ldx enemy_ram_offset
-        ldy enemy_oam_offset
 	lda #powerups_id
         sta enemy_ram_type,x
         lda oam_ram_x,y
@@ -31,7 +29,6 @@ powerup_from_starglasses:
         adc #$04
         sta enemy_ram_x,x
         lda oam_ram_y,y
-        adc #$04
         sta enemy_ram_y,x
 	lda #$40
         sta enemy_ram_pc,x
@@ -53,24 +50,16 @@ powerup_from_starglasses:
         sta enemy_ram_ex,x
         inc powerup_offset
         inc powerup_counter
-        ; sprite
-        clc
-        adc #$24
-        sta oam_ram_spr,y
-        ; palette
-	lda #$03
-        sta oam_ram_att,y
 	rts
  
  
 powerups_cycle: subroutine
 .process_this_frame
-	ldx enemy_ram_offset
-        ldy enemy_oam_offset
         lda oam_ram_x,y
         sbc #3
         sta collision_0_x
-        lda oam_ram_y,y
+        lda enemy_ram_y,x
+        sta oam_ram_y,y
         sbc #3
         sta collision_0_y
         lda #$0d
@@ -82,7 +71,6 @@ powerups_cycle: subroutine
         lda enemy_dmg_accumulator
         bne .reset_velocity
         jsr player_collision_detect
-        cmp #$00
         beq .frame
 .despawn_powerup
 .player_picksup_powerup
@@ -99,6 +87,9 @@ powerups_cycle: subroutine
         sta enemy_ram_x,x
         ; will wrap to the left so add hp
         inc enemy_ram_hp,x
+        bpl .dont_max_hp
+        dec enemy_ram_hp,x
+.dont_max_hp
         ; give it sfx
         jsr sfx_powerup_hit
 .frame
@@ -136,6 +127,14 @@ powerups_cycle: subroutine
         ; will fall off the right so minus hp
         dec enemy_ram_hp,x
 .move_done
+        ; sprite
+        lda enemy_ram_ex,x
+        clc
+        adc #$24
+        sta oam_ram_spr,y
+        ; palette
+	lda #$03
+        sta oam_ram_att,y
 .despawn_check
 	lda enemy_ram_hp,x
         cmp #$00
