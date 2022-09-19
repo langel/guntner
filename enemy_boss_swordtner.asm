@@ -149,19 +149,19 @@ boss_swordtner_cycle: subroutine
 	; y
 	lda oam_ram_y,y
         ; y check for poor range
-.check_y_more_than_3
-        cmp #$03
-        bcs .check_y_less_than_178
-        lda #$04
+.check_too_low
+	cmp #$88
+        bcc .check_too_high
+        lda #$8a
         sta oam_ram_y,y
-.check_y_less_than_178
-	cmp #sprite_0_y-3
-        bcc .check_y_softer_bounce
-        lda #sprite_0_y-4
+.check_too_high
+        cmp #$08
+        bcs .check_y_softer_bounce
+        lda #$06
         sta oam_ram_y,y
 .check_y_softer_bounce
         ; y check for bounce
-        cmp #$06
+        cmp #$08
         bcc .bounce_y
         cmp #$88
         bcs .bounce_y
