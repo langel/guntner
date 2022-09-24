@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name nes)(type Legacy)(uri ${KIPRJMOD}/nes.lib)(options "")(descr ""))
+)

@@ -44,10 +44,13 @@ fcd9 after gutting score system
 
 fix these:
 
-	enemy darts sit dormant when vampboss spawns
+	change player bullet image position in sprite
+		update collision hit box
+		helps to center hit box of orbit skull shield thing
+	birbs spawn closer to x pos 0
+	tame starfield acceleration (maybe start much slower too)
 	turbo button shouldn't hurt during r.bags?
 	increase max autofire speed
-	reset orbit shield on new?
 	no interval spawns after final boss
 	ikes mom banshee wail shriek should be in options sfx
 	
@@ -55,7 +58,6 @@ fix these:
 	
 	DEATHLESS!!
 	
-	tame starfield acceleration (maybe start much slower too)
 	decouple visual effects from sfx in options screen
 	
 	arctang loses x_hi with player death 
@@ -65,10 +67,10 @@ balancing bullet damage across difficulties
 4, 5, 6, 7 system = boss life/hits : 63/16, 126/26, 189/32, 252/36
 3, 5, 7, 9 system = boss life/hits : 63/21, 126/26, 189/27, 252/28
 
-ies mom 37/13 74/15 111/19 148/22
-        37/13 74/15 111/16 148/17
-throber 13/4  26/6   39/7   52/8
-		13/5  26/6   39/6   52/6
+ikes mom 37/13 74/15 111/19 148/22
+         37/13 74/15 111/16 148/17
+throber  13/4  26/6   39/7   52/8
+		 13/5  26/6   39/6   52/6
 	
 Kaytse bugs:
 	enemy spawn feels a bit cheap sometimes. i think i died a few times because of enemies hitting me at the right side of the screen (i think the stars), although they were spawning left.
@@ -347,6 +349,21 @@ rol a      ; R:0000 000R
 rol a      ; 0:0000 00RR
 
 
+; detect pixel inside rectangle
+  LDA rect.right
+  SBC point.x
+  BMI NoHit
+  SBC rect.width
+  BPL NoHit
+  LDA rect.top
+  SBC point.y
+  BMI NoHit
+  SBC rect.height
+  BPL NoHit
+  ;BANG!
+NoHit
+
+
 
 Kickstarter 100 / January 2022
 
@@ -568,16 +585,17 @@ so get the 16 range
 
 8bit Workship IDE problems
 
-ctrl-r refreshed but could be Redo (after ctrl-z undo)
 new file placeholder text doesn't go away
 various forms: enter does not submit
 file order is what? (think we know now)
+collapsible directories
 const values label overwrites var name in memory browser
 main dropdown doesn't close after clicking dropdown item
 tab makes indent -- shift-tab does not deindent
 search all code for string (undefined labels are easy to find)
 git status / diff
 git pull changes maybe overwritten by current open file?
+	refreshing browser fixes this
 nesdefs.dasm
 	MASK_BG_CLIP should be MASK_BG_ENABLE
 	MASK_SPR_CLIP should be MASK_SPR_ENABLE
