@@ -18,9 +18,9 @@ player_game_reset: subroutine
         dex
         bpl .clear_loop
         ; XXX testing phase behaviours
-        ;lda #1
+        ;lda #3
         ;sta phase_level
-        ;lda #$1f
+        ;lda #$3f
         ;sta phase_current
         jsr phase_palette_load
         jsr timer_reset
@@ -105,10 +105,6 @@ player_take_damage: subroutine
         ; drift off screen to the right
         lda #1
         sta bullet_x_vel
-        ; x
-        lda player_x_hi
-        adc #$
-        ; y
         lda #$ff
         sta player_health
         rts
