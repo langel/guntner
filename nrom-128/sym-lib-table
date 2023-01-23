@@ -1,4 +1,5 @@
 (sym_lib_table
-  (lib (name nes)(type Legacy)(uri ${KIPRJMOD}/nes.lib)(options "")(descr ""))
-  (lib (name nrom-256-rescue)(type Legacy)(uri ${KIPRJMOD}/nrom-256-rescue.lib)(options "")(descr ""))
+  (lib (name "nes")(type "Legacy")(uri "${KIPRJMOD}/nes.lib")(options "")(descr ""))
+  (lib (name "nrom-256-rescue")(type "Legacy")(uri "${KIPRJMOD}/nrom-256-rescue.lib")(options "")(descr "")(disabled))
+  (lib (name "nrom-128-rescue")(type "Legacy")(uri "${KIPRJMOD}/nrom-128-rescue.lib")(options "")(descr "")(disabled))
 )
