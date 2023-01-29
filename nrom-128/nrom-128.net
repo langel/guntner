@@ -1,7 +1,7 @@
 (export (version "E")
   (design
     (source "C:\\Users\\puke7\\source\\repos\\guntner\\nrom-128\\nrom-128.kicad_sch")
-    (date "1/23/2023 1:46:51 AM")
+    (date "1/24/2023 7:18:49 PM")
     (tool "Eeschema (6.0.8)")
     (sheet (number "1") (name "/") (tstamps "/")
       (title_block
@@ -22,7 +22,7 @@
   (components
     (comp (ref "C1")
       (value "100nF")
-      (footprint "SamacSys_Parts:104MSR400K")
+      (footprint "Library:film-cap")
       (datasheet "https://www.illinoiscapacitor.com/pdf/seriesDocuments/MSR%20series.pdf")
       (fields
         (field (name "Arrow Part Number") "104MSR630K")

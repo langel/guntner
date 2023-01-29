@@ -3001,7 +3001,7 @@
     (property "Value" "100nF" (id 1) (at 238.76 119.3799 90)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "SamacSys_Parts:104MSR400K" (id 2) (at 236.22 120.65 0)
+    (property "Footprint" "Library:film-cap" (id 2) (at 236.22 120.65 0)
       (effects (font (size 1.27 1.27)) (justify left) hide)
     )
     (property "Datasheet" "https://www.illinoiscapacitor.com/pdf/seriesDocuments/MSR%20series.pdf" (id 3) (at 233.68 120.65 0)
@@ -3098,7 +3098,7 @@
       (reference "#PWR0115") (unit 1) (value "VCC") (footprint "")
     )
     (path "/e89ce05c-67ba-427f-8e6b-c188ac5f7391"
-      (reference "C1") (unit 1) (value "100nF") (footprint "SamacSys_Parts:104MSR400K")
+      (reference "C1") (unit 1) (value "100nF") (footprint "Library:film-cap")
     )
     (path "/00000000-0000-0000-0000-0000632ebbec"
       (reference "J1") (unit 1) (value "NES_Cart_Edge") (footprint "nes edge conector:NES_Cart_edge")
