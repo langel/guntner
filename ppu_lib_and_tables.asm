@@ -219,9 +219,9 @@ menu_screen_tile_data:
 	hex 22d5
 	hex 036a806161646703
 	byte #$00
-	; "   Publisher's Line Here  "
-	hex 2303
-	hex 030303907d6b74727b716e7a9e7b038c72766e03886e7a6e0303
+	; "     Publisher's Line Here     "
+	hex 2301
+	hex 0303030303907d6b74727b716e7a9e7b038c72766e03886e7a6e0303030303
 	byte #$00
 	; "(C)opyright MMXXII LoBlast"
 	hex 2323
@@ -287,9 +287,9 @@ cut_scene_intro_tile_data:
 
 
 cut_scene_ending_bad_tile_data:
-	; "Why did you bring me "
+	; "Why did you bring me"
 	hex 21c2
-	hex 957181036d726d0381777d036b7a72767003756e03
+	hex 957181036d726d0381777d036b7a72767003756e
 	byte #$00
 	; "a dead dingle?"
 	hex 2210
