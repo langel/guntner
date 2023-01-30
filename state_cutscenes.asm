@@ -1,15 +1,18 @@
 
 
 cut_scene_update_generic: subroutine
-	lda player_controls_debounced
-        and #BUTTON_START|BUTTON_B|BUTTON_A
-        beq .do_nothing
         lda phase_end_game
         beq .start_game
+	lda player_controls_debounced
+        and #BUTTON_START|#BUTTON_SELECT
+        beq .do_nothing
         ; game complete go back to title screen
         lda #state_init_jump_table_offset+0
         bne .trigger_fadeout
 .start_game
+	lda player_controls_debounced
+        and #BUTTON_START|BUTTON_B|BUTTON_A
+        beq .do_nothing
         lda #state_init_jump_table_offset+2
 .trigger_fadeout
         jsr palette_fade_out_init
