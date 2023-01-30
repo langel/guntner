@@ -167,6 +167,10 @@ player_bullets_check_controls: subroutine
         bne .turbo_fire
 .no_r_bag
         ; a button = turbo
+        ; no turbo on phase 0
+        lda phase_current
+        beq .no_turbo
+        ; check turbo button
         lda player_controls
         and #BUTTON_A
         beq .no_turbo
