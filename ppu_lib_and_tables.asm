@@ -219,8 +219,20 @@ menu_screen_tile_data:
 	hex 22d5
 	hex 036a806161646703
 	byte #$00
-	; "     Publisher's Line Here     "
+        ; PUBLISHER BYLINE
 	hex 2301
+        ; MEGA CAT byline
+	; " Published by MEGA CAT Studios "
+	;hex 03907d6b74727b716e6d036b81038d8687820384829303927c7d6d72777b03
+	; " Published by MEGA CAT STVDIOS "
+	;hex 03907d6b74727b716e6d036b81038d868782038482930392939485898f9203
+	; " Published by Mega Cat Studios "
+	;hex 03907d6b74727b716e6d036b81038d6e706a03846a7c03927c7d6d72777b03
+        ; RETROSTAGE byline
+	; "    PCB Mfr. by RetroStage   "
+        ; default byline
+	;hex 03030303908483038d6f7a99036b8103916e7c7a77927c6a706e030303
+	; "     Publisher's Line Here     "
 	hex 0303030303907d6b74727b716e7a9e7b038c72766e03886e7a6e0303030303
 	byte #$00
 	; "(C)opyright MMXXII LoBlast"

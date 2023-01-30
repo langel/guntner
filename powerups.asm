@@ -218,7 +218,7 @@ powerup_pickup_r_bag: subroutine
         lda #$05
         adc player_autofire_s
         sta player_autofire_s
-        lda #$20
+        lda #$27
         cmp player_autofire_s
         bcc .not_maxed_out
         lda player_autofire_s
