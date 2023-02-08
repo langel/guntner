@@ -27,7 +27,7 @@ player_demo_lr	byte
 player_demo_ud	byte
 
 player_x_hi	byte
-player_x_lo	byte
+player_x_lo	byte	
 player_y_hi	byte
 player_y_lo	byte
 player_coll_x	byte ; player_x plus 2 because collision box

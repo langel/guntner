@@ -374,7 +374,7 @@ sandbox_update
 	include "apu_song.asm"
         nop	; how much prg space we using?
 
-;fd13 - boss has 2 spawn assistants
+;fd13 - bosses have 2 spawn assistants
 ;fd0c - boss spawn fade from white
 ;fcd9 - removed score system
 ;fd4e - conglomerated all jump tables

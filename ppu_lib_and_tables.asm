@@ -215,6 +215,15 @@ menu_screen_tile_data:
 	hex 222a
 	hex 8d7d6c7103038f787c7277767b
 	byte #$00
+	; numbered version
+	hex 22c3
+        ; " #00 "
+	;hex 039f606003
+        ; dashes for fun
+	;hex 03ababab03
+        ; normal pin line
+        hex b1b1b1b1b1
+	byte #$00
 	; " ax1147 "
 	hex 22d5
 	hex 036a806161646703
@@ -224,14 +233,16 @@ menu_screen_tile_data:
         ; MEGA CAT byline
 	; " Published by MEGA CAT Studios "
 	;hex 03907d6b74727b716e6d036b81038d8687820384829303927c7d6d72777b03
-	; " Published by MEGA CAT STVDIOS "
+	; " Licensed by MEGA CAT STVDIOS "
 	;hex 03907d6b74727b716e6d036b81038d868782038482930392939485898f9203
 	; " Published by Mega Cat Studios "
 	;hex 03907d6b74727b716e6d036b81038d6e706a03846a7c03927c7d6d72777b03
         ; RETROSTAGE byline
 	; "    PCB Mfr. by RetroStage   "
-        ; default byline
 	;hex 03030303908483038d6f7a99036b8103916e7c7a77927c6a706e030303
+	; "Hand Soldered Proto Board Edtn."
+	;hex 886a766d039277746d6e7a6e6d03907a777c770383776a7a6d03866d7c7699
+        ; default byline
 	; "     Publisher's Line Here     "
 	hex 0303030303907d6b74727b716e7a9e7b038c72766e03886e7a6e0303030303
 	byte #$00
