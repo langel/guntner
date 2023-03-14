@@ -244,6 +244,8 @@ menu_screen_tile_data:
 	;hex 03030303908483038d6f7a99036b8103916e7c7a77927c6a706e030303
 	; "Hand Soldered Proto Board Edtn."
 	;hex 886a766d039277746d6e7a6e6d03907a777c770383776a7a6d03866d7c7699
+	; "   Manually Soldered Edition   "
+	;hex 0303038d6a767d6a747481039277746d6e7a6e6d03866d727c727776030303
         ; default byline
 	; "     Publisher's Line Here     "
 	hex 0303030303907d6b74727b716e7a9e7b038c72766e03886e7a6e0303030303
