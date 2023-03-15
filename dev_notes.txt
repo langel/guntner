@@ -18,6 +18,16 @@ tools? #nesdev #GunTneR [ !ks for info ]\
 260.5/month
 
 
+
+manually soldered edition numbering notes
+char ranges is 60-6f
+02b4 02b5 <-- primary address
+42b4 42b5
+82b4 82b5
+c2b4 c2b5
+
+
+
 palette 00
 	The Rudy
 palette 01
