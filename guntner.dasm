@@ -365,12 +365,12 @@ sandbox_update
 	include "player_movement.dasm"
         ;nop	; how much prg space we using?
 	include "player_demo.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
         
 	include "apu_engine.asm"
         ;nop	; how much prg space we using?    
 	include "apu_sfx.asm"
-        nop	; how much prg space we using?
+        ;nop	; how much prg space we using?
 	include "apu_song.asm"
         ;nop	; how much prg space we using?
 

@@ -238,7 +238,7 @@ menu_screen_tile_data:
 	; " Published by Mega Cat Studios "
 	;hex 03907d6b74727b716e6d036b81038d6e706a03846a7c03927c7d6d72777b03
 	; " Midwest Gaming Classic  #MCS  "
-	hex 038d726d7f6e7b7c03876a757276700384746a7b7b726c03039f8d84920303
+	;hex 038d726d7f6e7b7c03876a757276700384746a7b7b726c03039f8d84920303
         ; RETROSTAGE byline
 	; "     PCB Mfr. by RetroStage    "
 	;hex 0303030303908483038d6f7a99036b8103916e7c7a77927c6a706e03030303
@@ -248,7 +248,7 @@ menu_screen_tile_data:
 	;hex 0303038d6a767d6a747481039277746d6e7a6e6d03866d727c727776030303
         ; default byline
 	; "     Publisher's Line Here     "
-	;hex 0303030303907d6b74727b716e7a9e7b038c72766e03886e7a6e0303030303
+	hex 0303030303907d6b74727b716e7a9e7b038c72766e03886e7a6e0303030303
 	byte #$00
 	; "(C)opyright MMXXII LoBlast"
 	hex 2323
