@@ -30,7 +30,7 @@ cart_start:	subroutine
         
 ; CLEAR CPU RAM
         jsr ClearRAM	; clear RAM
-        jsr apu_init
+        jsr WHOOPS
 
 ; MY SETUP
      	; setup rng
@@ -365,14 +365,14 @@ sandbox_update
 	include "player_movement.dasm"
         ;nop	; how much prg space we using?
 	include "player_demo.asm"
-        ;nop	; how much prg space we using?
+        nop	; how much prg space we using?
         
 	include "apu_engine.asm"
         ;nop	; how much prg space we using?    
 	include "apu_sfx.asm"
-        ;nop	; how much prg space we using?
-	include "apu_song.asm"
         nop	; how much prg space we using?
+	include "apu_song.asm"
+        ;nop	; how much prg space we using?
 
 ;fd13 - bosses have 2 spawn assistants
 ;fd0c - boss spawn fade from white

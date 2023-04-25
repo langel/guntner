@@ -501,3 +501,11 @@ song_08: subroutine
 	inc apu_temp
         jsr song_01
 	rts
+        
+        
+       
+        
+WHOOPS:
+	jsr WaitSync
+	jsr WaitSync
+        jmp apu_init
