@@ -11,6 +11,45 @@ NES Label
 roughly 54.8 x 96.7mm
 
 
+
+.reset_done
+.dont_reset_dir
+        ; apply direction
+        ldy enemy_ram_ex,x
+        lda spark_dir_x_table,y
+        sta temp00
+        lda spark_dir_y_table,y
+        sta temp01
+        ldy enemy_oam_offset
+        lda enemy_ram_x,x
+        clc
+        adc temp00
+        sta enemy_ram_x,x
+        sta oam_ram_x,y
+        lda enemy_ram_y,x
+        clc
+        adc temp01
+        jsr enemy_fix_y_visible
+        sta enemy_ram_y,x
+        sta oam_ram_y,y
+	; attributes
+        jsr get_next_random
+        ;lda rng0
+        and #%11100011
+        sta oam_ram_att,y
+        ; sprite
+        ;jsr get_next_random
+        lda rng0 ;new
+        and #$03 ;new
+        clc
+        adc #$6c
+        sta oam_ram_spr,y
+        ;nop
+.done
+	; EFE3
+	jmp update_enemies_handler_next
+
+
 0x7f Everlast007 Eric Missimer (backer #88)
 0x69 Savestate
 0x64 defmech
