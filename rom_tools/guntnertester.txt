@@ -1,0 +1,5 @@
+Usage is "guntnerTester gamename.nes -v" for verify only or  "guntnerTester gamename.nes -w" to write it (which will also verify after the write is done).
+Make sure your ROM has the PRG expanded to 32KB.
+
+USE THIS:
+guntnerTester.exe guntner40k.nes -w
