@@ -1,0 +1,76 @@
+      
+                    ; === STATE MACHINE ===
+      
+      
+      
+                    ; nmi order of operations :
+      
+                    ; jmp() to state renderer
+                    ; most likely starfield mode
+                    ; jmp to dashboard
+                    ; jmp back
+                    ; OAM DMA
+                    ; palette transfer
+                    ; set scroll pos
+      
+                    ; jmp() to state logic
+                    ; jmp back
+      
+                    ; check flag sprite0 and if set :
+                    ; wait for sprite 0
+                    ; set scroll pos
+                    ; (palette hackery?)
+      
+                    ; apu manage
+                    ; starfield manage jmp()?
+                    ; palette manage
+      
+      
+      
+                    ; init functions order of operations :
+      
+                    ; disable rendering and nmi
+                    ; (halt audio?)
+                    ; update vram
+                    ; wait for vsync/vblank
+                    ; reenable rendering and nmi
+      
+      
+                state_clear:
+c621  a2 07         ldx #$07
+c623  a9 00         lda #$00
+                .loop
+c625  95 4a         sta state_v0,x
+c627  ca            dex
+c628  10 fb         bpl .loop
+c62a  60            rts
+      
+      
+      
+                state_render_do_nothing:
+c62b  4c 7d c0      jmp state_render_done
+      
+                state_update_do_nothing:
+c62e  4c a7 c0      jmp state_update_done
+      
+      
+      
+                state_sprite0_enable:
+c631  a9 01         lda #$01
+c633  8d 03 02      sta oam_ram_x
+c636  a9 b6         lda #sprite_0_y
+c638  8d 00 02      sta oam_ram_y
+c63b  a9 ff         lda #$ff
+c63d  8d 01 02      sta oam_ram_spr
+c640  a9 20         lda #$20
+c642  8d 02 02      sta oam_ram_att
+c645  a9 ff         lda #$ff
+c647  85 52         sta state_sprite0
+c649  60            rts
+      
+                state_sprite0_disable:
+c64a  a9 ff         lda #$ff
+c64c  8d 00 02      sta oam_ram_y
+c64f  a9 00         lda #$00
+c651  85 52         sta state_sprite0
+c653  60            rts

@@ -1,0 +1,268 @@
+      
+                    STARFIELD_MASK		EQM %00111111 ; star probability
+                    STARFIELD_COL0_START	EQM $00
+                    STARFIELD_COL1_START	EQM $07
+      
+                    starfield_sprite	EQM $6b
+                    star_pattern		EQM $a0
+      
+      03 e0         starfield_msg_cache	= $03e0	; 32 bytes for string data
+      
+      00 d0         star_cache		= $d0
+                    star_oam_start		EQM $40
+                    star_oam_end		EQM <(star_oam_start+$80)
+      
+                    scroll_speed_lo_default	EQM #179
+                    scroll_speed_hi_default	EQM #2
+      
+      
+      
+                    starfield_twinkle_reset: subroutine
+d4ea  a9 00         lda #STARFIELD_COL0_START
+d4ec  85 34         sta starfield_color0
+d4ee  a9 07         lda #STARFIELD_COL1_START
+d4f0  85 35         sta starfield_color1
+d4f2  60            rts
+      
+      
+                starfield_speed_increase
+                    ; increase star speed
+d4f3  a9 39         lda #57
+d4f5  18            clc
+d4f6  65 05         adc scroll_speed_lo
+d4f8  85 05         sta scroll_speed_lo
+d4fa  90 02         bcc .scroll_hi_done
+d4fc  e6 06         inc scroll_speed_hi
+                .scroll_hi_done
+d4fe  60            rts
+      
+      
+                starfield_init: subroutine
+                    ; set starfield state
+d4ff  a9 00         lda #$00
+d501  85 31         sta starfield_state
+                    ; set bg tile palette attributes / colors
+                    ; $23c0 and $27c0
+                    ; page 1 attributes
+                    PPU_SETADDR $23c0
+d503  a9 23         lda #>$23c0
+d505  8d 06 20      sta PPU_ADDR
+d508  a9 c0         lda #<$23c0
+d50a  8d 06 20      sta PPU_ADDR
+d50d  a9 14         lda #%00010100
+d50f  a2 d8         ldx #$d8
+                .23c0_loop
+d511  8d 07 20      sta PPU_DATA
+d514  e8            inx
+d515  d0 fa         bne .23c0_loop
+                    ; COLOR SPLIT
+                    ; set split color attr for top row
+                    PPU_SETADDR $23e8
+d517  a9 23         lda #>$23e8
+d519  8d 06 20      sta PPU_ADDR
+d51c  a9 e8         lda #<$23e8
+d51e  8d 06 20      sta PPU_ADDR
+d521  a9 f1         lda #%11110001
+d523  a2 f8         ldx #$f8
+                .27e8_loop
+d525  8d 07 20      sta PPU_DATA
+d528  e8            inx
+d529  d0 fa         bne .27e8_loop
+                    ; page 2 attributes
+                    PPU_SETADDR $27c0
+d52b  a9 27         lda #>$27c0
+d52d  8d 06 20      sta PPU_ADDR
+d530  a9 c0         lda #<$27c0
+d532  8d 06 20      sta PPU_ADDR
+d535  a9 14         lda #%00010100
+d537  a2 d8         ldx #$d8
+                .27c0_loop
+d539  8d 07 20      sta PPU_DATA
+d53c  e8            inx
+d53d  d0 fa         bne .27c0_loop
+                    ; make sure sprite0 has something to collide with
+d53f  20 dd d5      jsr starfield_draw_dash_top_bar_nametable0
+                    ; draw stars on nametable 1
+d542  a9 04         lda #CTRL_INC_32
+d544  8d 00 20      sta PPU_CTRL
+                    ;stx starfield_page
+d547  a2 00         ldx #$00
+                .draw_stars_loop
+d549  86 32         stx starfield_column
+d54b  20 52 c1      jsr get_next_random
+d54e  20 9c d5      jsr starfield_cache_next_col
+d551  a9 20         lda #$20
+d553  8d 06 20      sta PPU_ADDR
+d556  a5 32         lda starfield_column
+d558  8d 06 20      sta PPU_ADDR
+d55b  a0 15         ldy #$15
+                .transfer_loop
+d55d  b9 d0 00      lda star_cache,y
+d560  8d 07 20      sta PPU_DATA
+d563  88            dey
+d564  d0 f7         bne .transfer_loop
+d566  e8            inx
+d567  e0 20         cpx #$20
+d569  d0 de         bne .draw_stars_loop
+d56b  a9 00         lda #0
+d56d  8d 00 20      sta PPU_CTRL
+d570  60            rts
+      
+      
+      
+                starfield_render: subroutine
+                    ; copy tiles to PPU VRAM during vblank
+                    ;update_starfield_column
+d571  a9 04         lda #CTRL_INC_32
+d573  8d 00 20      sta PPU_CTRL
+                    ; set base PPU address
+d576  a5 33         lda starfield_page
+d578  8d 06 20      sta PPU_ADDR
+d57b  a5 32         lda starfield_column
+d57d  8d 06 20      sta PPU_ADDR
+                    ; rip from cache to PPU
+d580  a0 15         ldy #$15
+                .col_loop
+d582  b9 d0 00      lda star_cache,y
+d585  8d 07 20      sta PPU_DATA
+d588  88            dey
+d589  d0 f7         bne .col_loop
+                    ; put that shit back to sequential order
+d58b  a9 00         lda #0
+d58d  8d 00 20      sta PPU_CTRL
+d590  20 75 d0      jsr dashboard_render
+d593  4c 7d c0      jmp state_render_done
+      
+      
+                starfield_update: subroutine
+                    ; will not work with scroll speeds above 8
+                    ; precalculate all starfield things post sprite
+d596  20 f2 d5      jsr starfield_scroll
+                    ; twinkle them stars with palette stuff
+d599  20 1a d6      jsr starfield_twinkle_colors
+                starfield_cache_next_col:
+                    ; setup rng for star probability
+d59c  a5 26         lda rng0
+d59e  4a            lsr
+d59f  29 3f         and #STARFIELD_MASK
+d5a1  85 86         sta temp00
+d5a3  a0 00         ldy #$00
+                .col_assign_tile_loop
+d5a5  c4 86         cpy temp00
+d5a7  d0 11         bne .empty_tile
+                .star_tile
+d5a9  a5 7c         lda boss_heart_stars
+d5ab  f0 04         beq .normal_stars
+                .heart_stars
+d5ad  a9 ff         lda #$ff
+d5af  d0 0b         bne .cache_tile
+                .normal_stars
+d5b1  a5 32         lda starfield_column
+d5b3  29 03         and #$03
+d5b5  18            clc
+d5b6  69 a0         adc #star_pattern
+d5b8  d0 02         bne .cache_tile
+                .empty_tile
+d5ba  a9 03         lda #tile_empty
+                .cache_tile
+d5bc  99 d0 00      sta star_cache,y
+d5bf  c8            iny
+d5c0  c0 16         cpy #$16
+d5c2  d0 e1         bne .col_assign_tile_loop
+d5c4  60            rts
+      
+      
+                death_scroll_speed: subroutine
+d5c5  a5 06         lda scroll_speed_hi
+d5c7  f0 13         beq .scroll_slow_done
+d5c9  a5 05         lda scroll_speed_lo
+d5cb  38            sec
+d5cc  e9 0d         sbc #13
+d5ce  85 05         sta scroll_speed_lo
+d5d0  b0 0a         bcs .scroll_slow_done
+d5d2  c6 06         dec scroll_speed_hi
+d5d4  a5 06         lda scroll_speed_hi
+d5d6  d0 04         bne .scroll_slow_done
+d5d8  a9 00         lda #0
+d5da  85 05         sta scroll_speed_lo
+                .scroll_slow_done
+d5dc  60            rts
+      
+      
+                starfield_draw_dash_top_bar_nametable0: subroutine
+                    ; fill page 1 bar for sprite 0 collisions
+                    PPU_SETADDR dash_page1_top_bar
+d5dd  a9 22         lda #>dash_page1_top_bar
+d5df  8d 06 20      sta PPU_ADDR
+d5e2  a9 c0         lda #<dash_page1_top_bar
+d5e4  8d 06 20      sta PPU_ADDR
+d5e7  a9 ad         lda #dash_top_bar_tile
+d5e9  a0 1f         ldy #$1f
+                .tile_dash_set_page1
+d5eb  8d 07 20      sta PPU_DATA
+d5ee  88            dey
+d5ef  10 fa         bpl .tile_dash_set_page1
+d5f1  60            rts
+      
+      
+      
+                starfield_scroll: subroutine
+                    ; update scroll pos
+d5f2  a5 02         lda scroll_x_lo
+d5f4  38            sec
+d5f5  e5 05         sbc scroll_speed_lo
+d5f7  85 02         sta scroll_x_lo
+d5f9  a5 01         lda scroll_x_hi
+d5fb  e5 06         sbc scroll_speed_hi
+d5fd  85 01         sta scroll_x_hi
+d5ff  b0 02         bcs .samepage
+d601  e6 04         inc scroll_page
+                .samepage
+                    ; find starfield column for updating
+d603  4a            lsr
+d604  4a            lsr
+d605  4a            lsr
+d606  85 32         sta starfield_column
+                    ; set nametable for column updating
+d608  a5 04         lda scroll_page
+d60a  29 01         and #$01
+d60c  d0 07         bne .scroll_page
+d60e  a9 20         lda #$20
+d610  85 33         sta starfield_page
+d612  4c 19 d6      jmp .scroll_page_done
+                .scroll_page
+d615  a9 24         lda #$24
+d617  85 33         sta starfield_page
+                .scroll_page_done
+d619  60            rts
+      
+      
+      
+                starfield_twinkle_colors: subroutine
+                    ; update palettes every 8 frames
+d61a  a5 24         lda wtf
+d61c  29 07         and #$07
+d61e  d0 23         bne .done
+                    ; color 0
+d620  a5 34         lda starfield_color0
+d622  20 e0 d1      jsr palette_next_rainbow_color
+d625  85 34         sta starfield_color0
+d627  85 91         sta pal_bg_0_1
+d629  18            clc
+d62a  69 10         adc #$10
+d62c  85 92         sta pal_bg_0_2
+d62e  69 10         adc #$10
+d630  85 93         sta pal_bg_0_3
+                    ; color 1
+d632  a5 35         lda starfield_color1
+d634  20 e0 d1      jsr palette_next_rainbow_color
+d637  85 35         sta starfield_color1
+d639  85 94         sta pal_bg_1_1
+d63b  69 10         adc #$10
+d63d  85 95         sta pal_bg_1_2
+d63f  69 10         adc #$10
+d641  85 96         sta pal_bg_1_3
+                .done
+d643  60            rts
+      
+      

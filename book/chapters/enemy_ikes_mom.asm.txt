@@ -1,0 +1,130 @@
+      
+      
+                ikes_mom_spawn:
+ec34  20 52 dc      jsr get_oam_offset_from_ram_offset
+ec37  a9 fa         lda #$fa
+ec39  99 03 02      sta oam_ram_x,y
+ec3c  a9 80         lda #$80
+ec3e  99 00 02      sta oam_ram_y,y
+ec41  a9 05         lda #$05
+ec43  9d 07 03      sta enemy_ram_ex,x
+                    ; reset spawn counter
+ec46  a9 00         lda #$00
+ec48  85 25         sta ftw
+ec4a  60            rts
+      
+      
+                ikes_mom_cycle:
+ec4b  a9 10         lda #$10
+ec4d  85 3d         sta collision_0_w
+ec4f  85 3e         sta collision_0_h
+ec51  20 eb db      jsr enemy_handle_damage_and_death
+      
+ec54  a5 24         lda wtf
+ec56  29 0f         and #$0f
+ec58  d0 47         bne .dir_update_done
+                    ; next direction
+ec5a  20 12 ce      jsr enemy_get_direction_of_player
+ec5d  85 86         sta temp00
+                    ; current direction
+ec5f  bd 07 03      lda enemy_ram_ex,x
+ec62  85 87         sta temp01
+      
+                    ; diff 1
+ec64  38            sec
+ec65  e5 86         sbc temp00
+ec67  10 03         bpl .diff_1_set
+ec69  18            clc
+ec6a  69 18         adc #24
+                .diff_1_set
+ec6c  85 88         sta temp02
+                    ; diff 2
+ec6e  a5 86         lda temp00
+ec70  38            sec
+ec71  e5 87         sbc temp01
+ec73  10 03         bpl .diff_2_set
+ec75  18            clc
+ec76  69 18         adc #24
+                .diff_2_set
+ec78  85 89         sta temp03
+                    ; which dir faster
+ec7a  c5 88         cmp temp02
+ec7c  f0 0e         beq .dir_set
+ec7e  b0 07         bcs .counterclockwise
+                .clockwise
+ec80  a9 01         lda #$01
+ec82  9d 04 03      sta enemy_ram_pc,x
+ec85  d0 05         bne .dir_set
+                .counterclockwise
+ec87  a9 ff         lda #$ff
+ec89  9d 04 03      sta enemy_ram_pc,x
+                .dir_set
+ec8c  bd 07 03      lda enemy_ram_ex,x
+ec8f  18            clc
+ec90  7d 04 03      adc enemy_ram_pc,x
+ec93  10 03         bpl .skip_neg_fix
+ec95  18            clc
+ec96  69 18         adc #24
+                .skip_neg_fix
+ec98  c9 18         cmp #24
+ec9a  d0 02         bne .skip_over_fix
+ec9c  a9 00         lda #0
+                .skip_over_fix
+ec9e  9d 07 03      sta enemy_ram_ex,x
+                .dir_update_done
+      
+eca1  ad f2 ff      lda arctang_velocities_lo+2
+eca4  85 84         sta arctang_velocity_lo
+eca6  20 f6 ce      jsr arctang_enemy_update
+      
+                    ; shake?
+eca9  a5 24         lda wtf
+ecab  c9 c0         cmp #$c0
+ecad  90 2f         bcc .dont_banshee
+                    ; x shake
+ecaf  20 66 c1      jsr shake_8
+ecb2  79 03 02      adc oam_ram_x,y
+ecb5  99 03 02      sta oam_ram_x,y
+                    ; y shake
+ecb8  20 66 c1      jsr shake_8
+ecbb  79 00 02      adc oam_ram_y,y
+ecbe  99 00 02      sta oam_ram_y,y
+                    ; sfx (pu1)
+ecc1  a9 3f         lda #$3f
+ecc3  8d 00 40      sta APU_PULSE1_VOL
+ecc6  a9 08         lda #$08
+ecc8  8d 01 40      sta APU_PULSE1_SWEEP
+eccb  a5 24         lda wtf
+eccd  29 3f         and #$3f
+eccf  49 3f         eor #$3f
+ecd1  4a            lsr
+ecd2  69 a0         adc #$a0
+ecd4  8d 02 40      sta APU_PULSE1_TIMER_LO
+ecd7  a9 08         lda #$08
+ecd9  8d 03 40      sta APU_PULSE1_TIMER_HI
+ecdc  e6 ac         inc apu_pu1_counter
+                .dont_banshee
+      
+                    ; x
+ecde  b9 03 02      lda oam_ram_x,y
+ece1  20 df da      jsr sprite_4_set_x
+                    ; y
+ece4  b9 00 02      lda oam_ram_y,y
+ece7  20 ef da      jsr sprite_4_set_y
+                    ; sprite
+ecea  a5 13         lda player_x_hi
+ecec  e9 07         sbc #$07
+ecee  d9 03 02      cmp oam_ram_x,y
+ecf1  90 04         bcc .face_left
+                .face_right
+ecf3  a9 22         lda #$22
+ecf5  d0 02         bne .set_face
+                .face_left
+ecf7  a9 20         lda #$20
+                .set_face
+ecf9  20 b7 da      jsr sprite_4_set_sprite
+                    ; palette
+ecfc  a9 02         lda #$02
+ecfe  20 9d da      jsr sprite_4_set_palette
+      
+ed01  4c 92 db      jmp update_enemies_handler_next

@@ -1,0 +1,507 @@
+      
+      
+                    ;;;; Constants
+      
+                    ENEMY_HIT_PALETTE_FRAMES	EQM $05
+      
+      02 03         oam_ram_x      = $0203
+      02 00         oam_ram_y      = $0200
+      02 01         oam_ram_spr    = $0201
+      02 02         oam_ram_att    = $0202
+      
+      02 20         oam_enemy_sprites = $0220
+      
+      
+      03 00         enemy_ram_type = $0300
+      03 01         enemy_ram_hp   = $0301
+      03 02         enemy_ram_x    = $0302
+      03 03         enemy_ram_y    = $0303
+      03 04         enemy_ram_pc   = $0304
+      03 05         enemy_ram_ac   = $0305
+      03 06         enemy_ram_hc   = $0306
+      03 07         enemy_ram_ex   = $0307
+      
+      
+      
+                enemy_spawn_delegator: subroutine
+                    ; a = enemy type id
+                    ; x = enemy ram offset
+da77  9d 00 03      sta enemy_ram_type,x
+da7a  a8            tay
+da7b  84 86         sty temp00 ; enemy type
+                    ; do hit point maths
+                    ; hp * (game difficulty + 1)
+da7d  b9 c5 dc      lda enemy_hitpoints_table,y
+da80  85 87         sta temp01 ; enemy hp
+da82  a9 01         lda #$01
+da84  18            clc
+da85  65 23         adc game_difficulty
+da87  a8            tay
+da88  a9 00         lda #$00
+                .enemy_hp_loop
+da8a  65 87         adc temp01
+da8c  88            dey
+da8d  d0 fb         bne .enemy_hp_loop
+                    ; save hp result
+da8f  9d 01 03      sta enemy_ram_hp,x
+                    ; jump to enemy type spawner
+da92  a5 86         lda temp00 ; enemy type
+da94  18            clc
+da95  69 1b         adc #enemy_spawn_jump_table_offset
+da97  4c f1 c4      jmp jump_to_subroutine
+      
+      
+                enemy_do_nothing: subroutine
+da9a  4c 92 db      jmp update_enemies_handler_next
+      
+      
+                sprite_4_set_palette: subroutine
+                    ; a = palette id
+                    ; x = enemy ram offset
+                    ; y = oam ram offset
+da9d  20 39 dc      jsr enemy_set_palette
+daa0  99 06 02      sta oam_ram_att+$04,y
+daa3  99 0a 02      sta oam_ram_att+$08,y
+daa6  99 0e 02      sta oam_ram_att+$0c,y
+daa9  60            rts
+      
+                sprite_4_set_palette_no_process: subroutine
+                    ; a = palette id
+                    ; y = oam ram offset
+daaa  99 02 02      sta oam_ram_att+$00,y
+daad  99 06 02      sta oam_ram_att+$04,y
+dab0  99 0a 02      sta oam_ram_att+$08,y
+dab3  99 0e 02      sta oam_ram_att+$0c,y
+dab6  60            rts
+      
+                sprite_4_set_sprite: subroutine
+                    ; a = top left tile id
+                    ; y = oam ram offset
+dab7  99 01 02      sta oam_ram_spr,y
+daba  18            clc
+dabb  69 01         adc #$01
+dabd  99 05 02      sta oam_ram_spr+$04,y
+dac0  69 0f         adc #$0f
+dac2  99 09 02      sta oam_ram_spr+$08,y
+dac5  69 01         adc #$01
+dac7  99 0d 02      sta oam_ram_spr+$0c,y
+daca  60            rts
+      
+                sprite_4_set_sprite_flip: subroutine
+                    ; a = top left tile id
+                    ; y = oam ram offset
+dacb  99 09 02      sta oam_ram_spr+$08,y
+dace  18            clc
+dacf  69 01         adc #$01
+dad1  99 0d 02      sta oam_ram_spr+$0c,y
+dad4  69 0f         adc #$0f
+dad6  99 01 02      sta oam_ram_spr,y
+dad9  69 01         adc #$01
+dadb  99 05 02      sta oam_ram_spr+$04,y
+dade  60            rts
+      
+                sprite_4_set_x: subroutine
+                    ; a = x pos
+                    ; y = oam ram offset
+dadf  99 03 02      sta oam_ram_x,y
+dae2  99 0b 02      sta oam_ram_x+$08,y
+dae5  18            clc
+dae6  69 08         adc #$08
+dae8  99 07 02      sta oam_ram_x+$04,y
+daeb  99 0f 02      sta oam_ram_x+$0c,y
+daee  60            rts
+      
+                sprite_4_set_y: subroutine
+                    ; a = y pos
+                    ; y = oam ram offset
+daef  99 00 02      sta oam_ram_y,y
+daf2  99 04 02      sta oam_ram_y+$04,y
+daf5  18            clc
+daf6  69 08         adc #$08
+daf8  99 08 02      sta oam_ram_y+$08,y
+dafb  99 0c 02      sta oam_ram_y+$0c,y
+dafe  60            rts
+      
+      
+      
+                enemy_fix_y_visible: subroutine
+                    ; a = y position to check
+                    ; returns new y position in a
+daff  c9 f7         cmp #255-8
+db01  90 0f         bcc .not_wrapped_from_top
+db03  85 86         sta temp00
+db05  a9 ff         lda #255
+db07  38            sec
+db08  e9 b6         sbc #sprite_0_y
+db0a  85 87         sta temp01
+db0c  a5 86         lda temp00
+db0e  38            sec
+db0f  e5 87         sbc temp01
+db11  60            rts
+                .not_wrapped_from_top
+db12  c9 b6         cmp #sprite_0_y
+db14  90 03         bcc .not_wrapped_from_bottom
+db16  38            sec
+db17  e9 b6         sbc #sprite_0_y
+                .not_wrapped_from_bottom
+db19  60            rts
+      
+      
+                enemy_spawn_set_x_y_rng: subroutine
+                    ; x = enemy_ram_offset
+db1a  20 52 dc      jsr get_oam_offset_from_ram_offset
+db1d  20 52 c1      jsr get_next_random
+db20  30 0b         bmi .rng_y
+                .rng_x
+db22  a5 27         lda rng1
+db24  99 03 02      sta oam_ram_x,y
+db27  a9 00         lda #$00
+db29  99 00 02      sta oam_ram_y,y
+db2c  60            rts
+                .rng_y
+db2d  a9 00         lda #$00
+db2f  99 03 02      sta oam_ram_x,y
+db32  20 d1 db      jsr enemy_spawn_random_y_pos
+db35  99 00 02      sta oam_ram_y,y
+db38  60            rts
+      
+      
+      
+      
+                enemy_slot_offset_to_oam_offset:
+                    ; slots leftshift 3 times to get enemy_ram_offset
+                    ; 1 sprite slots : start at $300
+                    ; 16 slots using 1 sprite
+db39  byte          $20,$24,$28,$2c,$30,$34,$38,$3c
+db41  byte          $40,$44,$48,$4c,$50,$54,$58,$5c
+                    ; 2 sprite slots : start at $380
+                    ; 4 slots using 2 sprites
+db49  byte          $60,$68,$70,$78
+                    ; 4 sprite slots : start at $3a0
+                    ; 8 slots using 4 sprites
+db4d  byte          $80,$90,$a0,$b0,$c0,$d0,$e0,$f0
+                    ; null terminater
+db55  byte          $00
+      
+      
+      
+      
+                enemies_update_all: subroutine
+db56  a5 7b         lda boss_death_happening
+db58  d0 4a         bne .done
+                    ; set max darts launched per frame
+db5a  a9 03         lda #$03
+db5c  85 70         sta dart_frame_max
+                    ; if player is dead despawn
+db5e  a5 0b         lda player_health
+db60  d0 02         bne .player_alive
+db62  f0 41         beq player_dead_enemies_despawn
+                .player_alive
+                update_enemies_reset:
+                    ; set vars for processing
+db64  a2 00         ldx #$00
+db66  86 78         stx enemy_slot_id
+db68  86 76         stx enemy_ram_offset
+db6a  bc 39 db      ldy enemy_slot_offset_to_oam_offset,x
+db6d  84 77         sty enemy_oam_offset
+                    ; cycle through all the slots
+                .handler_loop
+db6f  a6 76         ldx enemy_ram_offset
+                    ; get enemy type
+db71  bd 00 03      lda enemy_ram_type,x
+                    ; not defined go next slot
+db74  f0 1c         beq .handler_next
+db76  aa            tax
+db77  bd 03 c5      lda enemy_update_jump_table_lo,x
+db7a  85 86         sta temp00
+db7c  bd 92 c5      lda enemy_update_jump_table_hi,x
+db7f  85 87         sta temp01
+                    ; setup collision detection enemy origin pos
+db81  a6 76         ldx enemy_ram_offset
+db83  a4 77         ldy enemy_oam_offset
+db85  b9 03 02      lda oam_ram_x,y
+db88  85 3b         sta collision_0_x
+db8a  b9 00 02      lda oam_ram_y,y
+db8d  85 3c         sta collision_0_y
+db8f  6c 86 00      jmp (temp00)
+                update_enemies_handler_next:
+                .handler_next
+                    ; go to next enemy slot
+db92  e6 78         inc enemy_slot_id
+db94  a5 78         lda enemy_slot_id
+db96  0a            asl
+db97  0a            asl
+db98  0a            asl
+db99  85 76         sta enemy_ram_offset
+db9b  a6 78         ldx enemy_slot_id
+db9d  bc 39 db      ldy enemy_slot_offset_to_oam_offset,x
+dba0  84 77         sty enemy_oam_offset
+dba2  d0 cb         bne .handler_loop
+                .done
+dba4  60            rts
+      
+      
+      
+      
+                player_dead_enemies_despawn: subroutine
+                    ; enemies slide off left side of screen
+                    ; after player dies
+dba5  a2 df         ldx #$df
+                .loop
+dba7  bd 20 02      lda oam_enemy_sprites,x
+dbaa  f0 14         beq .next
+dbac  38            sec
+dbad  e5 65         sbc player_death_flag
+dbaf  9d 20 02      sta oam_enemy_sprites,x
+dbb2  c9 f0         cmp #$f0
+dbb4  90 0a         bcc .next
+                .despawn
+dbb6  a9 00         lda #$00
+dbb8  9d 20 02      sta oam_enemy_sprites,x
+dbbb  a9 ff         lda #$ff
+dbbd  9d 1d 02      sta oam_enemy_sprites-3,x
+                .next
+dbc0  ca            dex
+dbc1  ca            dex
+dbc2  ca            dex
+dbc3  ca            dex
+dbc4  e0 ff         cpx #$ff
+dbc6  d0 df         bne .loop
+dbc8  a5 24         lda wtf
+dbca  29 01         and #$01
+dbcc  d0 02         bne .dont_increase_velocity
+dbce  e6 65         inc player_death_flag
+                .dont_increase_velocity
+dbd0  60            rts
+      
+      
+      
+                enemy_spawn_random_y_pos: subroutine
+dbd1  20 52 c1      jsr get_next_random
+dbd4  4a            lsr
+dbd5  18            clc
+dbd6  69 10         adc #$10
+dbd8  60            rts
+      
+      
+      
+      
+      
+      
+                game_difficulty_damage_table:
+                    ;hits to die  17   10    7   6
+dbd9  byte          #15, #26, #37, #48
+                    ;hits to die  13   10    7   5
+                    ;byte  #20, #26, #37, #58
+                    ;hits to die  23   17   11   5
+                    ;byte  #11, #15, #25, #58
+                    ;hits to die 5    4    3  2
+                    ;byte  #58, #77, #109, #191
+      
+                enemy_gives_damage: subroutine
+dbdd  a4 23         ldy game_difficulty
+dbdf  b9 d9 db      lda game_difficulty_damage_table,y
+dbe2  85 21         sta player_damage
+dbe4  20 5e f2      jsr player_take_damage
+dbe7  20 6f f8      jsr sfx_player_damage
+dbea  60            rts
+      
+                enemy_handle_damage_and_death: subroutine
+                    ; x = enemy ram offset
+                    ; y = oam ram offset
+dbeb  a9 00         lda #$00
+dbed  85 79         sta enemy_dmg_accumulator
+                    ; handle bullet collisions
+dbef  20 04 f3      jsr player_bullet_collision_handler
+dbf2  20 35 cf      jsr player_collision_detect
+dbf5  f0 0a         beq .no_collision
+                    ; handle player collision
+                    ; player damage
+dbf7  20 dd db      jsr enemy_gives_damage
+                    ; enemy damage
+dbfa  a5 79         lda enemy_dmg_accumulator
+dbfc  18            clc
+dbfd  69 02         adc #$02
+dbff  85 79         sta enemy_dmg_accumulator
+                .no_collision
+                    ; handle bomb explosion
+dc01  a5 6a         lda bomb_counter
+dc03  f0 08         beq .no_bomb_damage
+dc05  a5 24         lda wtf
+dc07  29 01         and #1
+dc09  f0 02         beq .no_bomb_damage
+dc0b  e6 79         inc enemy_dmg_accumulator
+                .no_bomb_damage
+                    ; fix y register
+dc0d  a4 77         ldy enemy_oam_offset
+                    ; handle damage accumulated
+dc0f  a5 79         lda enemy_dmg_accumulator
+dc11  d0 01         bne .hit
+dc13  60            rts
+                .hit
+dc14  bd 01 03      lda enemy_ram_hp,x
+dc17  38            sec
+dc18  e5 79         sbc enemy_dmg_accumulator
+dc1a  9d 01 03      sta enemy_ram_hp,x
+dc1d  90 09         bcc .dead
+      
+dc1f  a9 05         lda #ENEMY_HIT_PALETTE_FRAMES
+dc21  9d 06 03      sta enemy_ram_hc,x
+dc24  20 e3 f8      jsr sfx_enemy_damage
+dc27  60            rts
+                .dead
+                    ; boss death check
+dc28  a5 7a         lda boss_dmg_handle_true
+dc2a  f0 05         beq .not_boss_death
+dc2c  e6 7b         inc boss_death_happening
+dc2e  e6 7c         inc boss_heart_stars
+dc30  60            rts
+                .not_boss_death
+dc31  20 62 dd      jsr enemy_death_handler
+                    ; return to enemy handler not cycle
+dc34  68            pla
+dc35  68            pla
+dc36  4c 92 db      jmp update_enemies_handler_next
+      
+      
+      
+                enemy_set_palette: subroutine
+                    ; checks/handles hit palette counter
+                    ; a = enemy normal palette
+                    ; x = enemy ram offset
+                    ; y = oam ram offset
+                    ; leaves correct palette id in a
+                    ; can be applied to extra sprites of larger enemy
+dc39  18            clc ; set carry for branching on return
+dc3a  85 86         sta temp00
+dc3c  bd 06 03      lda enemy_ram_hc,x
+dc3f  f0 0b         beq .use_enemy_palette
+                .use_hit_palette
+dc41  de 06 03      dec enemy_ram_hc,x
+dc44  a5 86         lda temp00
+dc46  29 fc         and #%11111100
+dc48  99 02 02      sta oam_ram_att,y
+dc4b  60            rts
+                .use_enemy_palette
+dc4c  a5 86         lda temp00
+dc4e  99 02 02      sta oam_ram_att,y
+dc51  60            rts
+      
+      
+      
+      
+      
+                    ; 16 1 sprite enemies
+                    ; 4  2 sprite enemies
+                    ; 8  4 sprite enemies
+                    ; 28 total on screen enemies / entities
+                    ; 1 sprite can occupy all slots
+                    ; 2 sprite can occupy 12 slots
+                    ; 4 sprite restricted to their 8 slots
+      
+      
+                    get_oam_offset_from_ram_offset: subroutine
+                    ; x = slot offset
+                    ; returns oam offset in y
+dc52  86 86         stx temp00
+dc54  8a            txa
+dc55  4a            lsr
+dc56  4a            lsr
+dc57  4a            lsr
+dc58  aa            tax
+dc59  bc 39 db      ldy enemy_slot_offset_to_oam_offset,x
+dc5c  a6 86         ldx temp00
+dc5e  60            rts
+      
+      
+      
+      
+                get_enemy_slot_next: subroutine
+                    ; returns enemy_ram_offset in x
+                    ; works from the top down
+dc5f  a9 d8         lda #$d8
+dc61  38            sec
+                .slot_loop
+dc62  aa            tax
+dc63  86 86         stx temp00
+dc65  bd 00 03      lda $0300,x
+dc68  f0 07         beq .slot_found
+dc6a  a5 86         lda temp00
+dc6c  e9 08         sbc #$08
+dc6e  b0 f2         bcs .slot_loop
+                .no_slot
+dc70  18            clc
+                .slot_found
+dc71  60            rts
+      
+      
+                enemy_slot_from_type: subroutine
+                    ; y = enemy type id
+                    ; returns slot offset in x
+dc72  be e0 dc      ldx enemy_size_table,y
+dc75  e0 01         cpx #1
+dc77  d0 03         bne .not_size_1
+dc79  4c 86 dc      jmp get_enemy_slot_1_sprite
+                .not_size_1
+dc7c  e0 02         cpx #2
+dc7e  d0 03         bne .not_size_2
+dc80  4c 9b dc      jmp get_enemy_slot_2_sprite
+                .not_size_2
+dc83  4c b0 dc      jmp get_enemy_slot_4_sprite
+      
+      
+                get_enemy_slot_1_sprite: subroutine
+                    ; returns enemy_ram offset in x
+                    ; carry cleared if found
+                    ; carry set if unfound
+dc86  a9 00         lda #$00
+dc88  18            clc
+                .slot_loop
+dc89  aa            tax
+dc8a  86 86         stx temp00
+dc8c  bd 00 03      lda $0300,x
+dc8f  f0 09         beq .slot_found
+dc91  a9 08         lda #$08
+dc93  65 86         adc temp00
+dc95  c9 80         cmp #$80
+dc97  d0 f0         bne .slot_loop
+                .no_available_slot
+dc99  38            sec
+                .slot_found
+dc9a  60            rts
+      
+                get_enemy_slot_2_sprite: subroutine
+                    ; returns enemy_ram offset in x
+dc9b  a9 80         lda #$80
+dc9d  18            clc
+                .slot_loop
+dc9e  aa            tax
+dc9f  86 86         stx temp00
+dca1  bd 00 03      lda $0300,x
+dca4  f0 09         beq .slot_found
+dca6  a9 08         lda #$08
+dca8  65 86         adc temp00
+dcaa  c9 a0         cmp #$a0
+dcac  d0 f0         bne .slot_loop
+                .no_available_slot
+dcae  38            sec
+                .slot_found
+dcaf  60            rts
+      
+                get_enemy_slot_4_sprite: subroutine
+                    ; returns enemy_ram offset in x
+dcb0  a9 a0         lda #$a0
+dcb2  18            clc
+                .slot_loop
+dcb3  aa            tax
+dcb4  86 86         stx temp00
+dcb6  bd 00 03      lda $0300,x
+dcb9  f0 09         beq .slot_found
+dcbb  a9 08         lda #$08
+dcbd  65 86         adc temp00
+dcbf  c9 e0         cmp #$e0
+dcc1  d0 f0         bne .slot_loop
+                .no_available_slot
+dcc3  38            sec
+                .slot_found
+dcc4  60            rts

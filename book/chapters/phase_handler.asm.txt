@@ -1,0 +1,612 @@
+      
+      
+                    ;phase_spawn_table EQM $0150
+      
+      
+                    ; zp vars
+      
+                    ;phase_kill_count byte
+                    ;phase_current  byte
+                    ;phase_state  byte
+                    ;phase_table_ptr byte
+                    ;phase_spawn_type byte
+                    ;phase_arctang_counter byte
+                    ;phase_spawn_counter byte
+                    ;phase_interval_counter byte
+                    ;phase_end_game  byte
+      
+      
+                    ; phase_state : 0 = still spawning
+      
+                phase_handling_stuff
+      
+      
+      
+      
+                phase_handler: subroutine
+                    ; only advance phase activity if player is alive
+d6a4  a5 65         lda player_death_flag
+d6a6  f0 01         beq .player_not_dead
+d6a8  60            rts
+                .player_not_dead
+                    ; always check if its time for an interval spawn
+d6a9  20 6c d9      jsr phase_interval_spawn
+                    ; call the appropriate phase handler
+d6ac  a5 5a         lda phase_current
+d6ae  29 0f         and #$0f
+d6b0  aa            tax
+d6b1  bd d1 d9      lda phase_type_table,x
+d6b4  18            clc
+d6b5  69 4d         adc #phase_handlers_jump_table_offset
+d6b7  4c f1 c4      jmp jump_to_subroutine
+      
+      
+      
+                    ; PHASE UTILITIES
+      
+                phase_check_next_phase: subroutine
+                    ; if phase_state == 0 then
+                    ; we don't know the kill count yet
+d6ba  a5 59         lda phase_state
+d6bc  f0 06         beq .not_next_phase
+                    ; kill_counter > 0 means we need more killing
+d6be  a5 5c         lda phase_kill_counter
+d6c0  30 03         bmi .end_of_current_phase
+d6c2  f0 01         beq .end_of_current_phase
+                .not_next_phase
+d6c4  60            rts
+                .end_of_current_phase
+                    ; use phase_state as a timer
+d6c5  e6 59         inc phase_state
+                    ; transition time
+d6c7  a5 59         lda phase_state
+d6c9  c9 20         cmp #$20
+d6cb  d0 06         bne .dont_crossbones
+d6cd  20 10 d7      jsr phase_clear_1_sprite_spawns
+d6d0  20 04 f9      jsr sfx_enemy_death
+                .dont_crossbones
+d6d3  a5 59         lda phase_state
+                    ; wait ~60 frames before trigger next phase sfx
+d6d5  c9 40         cmp #$40
+d6d7  d0 03         bne .dont_trigger_sfx
+d6d9  20 ae fa      jsr sfx_phase_next
+                .dont_trigger_sfx
+d6dc  a5 59         lda phase_state
+                    ; wait ~64 frames before starting next phase
+                    ; this should be synced with sfx 2nd chime
+d6de  c9 44         cmp #$44
+d6e0  d0 e2         bne .not_next_phase
+                    ; next phase process
+      
+                phase_next: subroutine
+                    ; reset phase vars
+d6e2  a9 00         lda #$00
+d6e4  85 5c         sta phase_kill_counter
+d6e6  85 61         sta phase_spawn_counter
+d6e8  85 59         sta phase_state
+d6ea  e6 5a         inc phase_current
+                    ; check for starfield lumen reset
+d6ec  a5 5a         lda phase_current
+d6ee  29 01         and #$01
+d6f0  f0 03         beq .no_starfield_lumen_reset
+d6f2  20 ea d4      jsr starfield_twinkle_reset
+                .no_starfield_lumen_reset
+                    ; set phase level
+d6f5  a5 5a         lda phase_current
+d6f7  29 0f         and #$0f
+d6f9  d0 02         bne .not_next_level
+d6fb  e6 5b         inc phase_level
+                .not_next_level
+d6fd  20 f3 d4      jsr starfield_speed_increase
+d700  20 39 d7      jsr phase_palette_load
+d703  68            pla
+d704  68            pla
+d705  60            rts
+      
+                phase_check_spawn_frame: subroutine
+d706  a5 24         lda wtf
+d708  29 07         and #$07
+d70a  f0 03         beq .spawn_frame_go
+d70c  68            pla
+d70d  68            pla
+d70e  60            rts
+                .spawn_frame_go
+d70f  60            rts
+      
+                phase_clear_1_sprite_spawns: subroutine
+                    ; all small enemies spawned by phase become crossbones
+d710  38            sec
+d711  a0 0f         ldy #$0f
+d713  a2 78         ldx #$78
+                .clear_spawn_loop
+d715  b9 50 01      lda phase_spawn_table,y
+d718  f0 0a         beq .prep_next_loop
+d71a  a9 00         lda #0
+d71c  99 50 01      sta phase_spawn_table,y
+d71f  a9 01         lda #crossbones_id
+d721  9d 00 03      sta enemy_ram_type,x
+                .prep_next_loop
+d724  8a            txa
+d725  e9 08         sbc #$08
+d727  aa            tax
+d728  88            dey
+d729  10 ea         bpl .clear_spawn_loop
+d72b  60            rts
+      
+                phase_spawn_track: subroutine
+                    ; x = enemy ram pos
+d72c  86 86         stx temp00
+d72e  8a            txa
+d72f  4a            lsr
+d730  4a            lsr
+d731  4a            lsr
+d732  aa            tax
+d733  fe 50 01      inc phase_spawn_table,x
+d736  a6 86         ldx temp00
+d738  60            rts
+      
+                phase_palette_load: subroutine
+                    ; each level has its own palette
+d739  a4 5b         ldy phase_level
+d73b  be c7 d1      ldx palette_level_offset_table,y
+d73e  a0 0f         ldy #15
+d740  20 cf d1      jsr palette_load
+d743  20 cf d1      jsr palette_load
+d746  20 cf d1      jsr palette_load
+                    ; boss phases have palettes too!
+d749  a5 5a         lda phase_current
+d74b  29 0f         and #$0f
+d74d  c9 0f         cmp #$0f
+d74f  d0 0e         bne .done
+d751  a6 5b         ldx phase_level
+d753  bd cb d1      lda palette_boss_offset_table,x
+d756  aa            tax
+d757  a0 0f         ldy #15
+d759  20 cf d1      jsr palette_load
+d75c  20 cf d1      jsr palette_load
+                .done
+d75f  60            rts
+      
+      
+      
+      
+                    ; PHASE TYPES
+      
+                phase_zero: subroutine
+d760  20 ba d6      jsr phase_check_next_phase
+d763  a5 59         lda phase_state
+d765  d0 20         bne .done
+d767  a5 5a         lda phase_current
+d769  d0 04         bne .congration
+d76b  a9 40         lda #$40
+d76d  d0 02         bne .continue
+                .congration
+d76f  a9 20         lda #$20
+                .continue
+d771  85 43         sta dashboard_message
+d773  e6 61         inc phase_spawn_counter
+d775  a9 64         lda #100
+d777  c5 61         cmp phase_spawn_counter
+d779  d0 0c         bne .stay_zero
+d77b  a9 ff         lda #$ff
+d77d  85 43         sta dashboard_message
+d77f  a5 5a         lda phase_current
+                    ; phase #$40 == game done/end
+d781  c9 40         cmp #$40
+d783  f0 03         beq .end_game
+d785  e6 59         inc phase_state
+                .stay_zero
+                .done
+d787  60            rts
+                .end_game
+d788  a9 00         lda #$00
+d78a  85 01         sta scroll_x_hi
+d78c  85 04         sta scroll_page
+d78e  a9 80         lda #state_init_jump_table_offset+4
+d790  20 82 d2      jsr palette_fade_out_init
+d793  60            rts
+      
+      
+                phase_galger: subroutine
+d794  20 ba d6      jsr phase_check_next_phase
+d797  20 06 d7      jsr phase_check_spawn_frame
+                    ; phase state > 0 == done initializing phase
+d79a  a5 59         lda phase_state
+d79c  d0 16         bne .phase_init_done
+                    ; set kill counter
+d79e  a5 5b         lda phase_level
+d7a0  0a            asl
+d7a1  18            clc
+d7a2  69 06         adc #$06
+d7a4  85 5c         sta phase_kill_counter
+d7a6  85 61         sta phase_spawn_counter
+                    ; set arctang sequence and advance
+d7a8  a5 60         lda phase_arctang_counter
+d7aa  29 0f         and #$0f
+d7ac  aa            tax
+d7ad  20 89 ea      jsr arc_sequence_set
+d7b0  e6 60         inc phase_arctang_counter
+                    ; set phase_state to init done
+d7b2  e6 59         inc phase_state
+                .phase_init_done
+d7b4  a5 61         lda phase_spawn_counter
+d7b6  f0 11         beq .dont_spawn
+                .do_a_spawn
+d7b8  20 86 dc      jsr get_enemy_slot_1_sprite
+d7bb  b0 0c         bcs .dont_spawn
+d7bd  20 2c d7      jsr phase_spawn_track
+d7c0  a9 08         lda #galger_id
+d7c2  85 5e         sta phase_spawn_type
+d7c4  20 77 da      jsr enemy_spawn_delegator
+d7c7  c6 61         dec phase_spawn_counter
+                .dont_spawn
+d7c9  60            rts
+      
+      
+                phase_spawns: subroutine
+d7ca  20 ba d6      jsr phase_check_next_phase
+d7cd  20 06 d7      jsr phase_check_spawn_frame
+                    ; phase state > 0 == done spawning
+d7d0  a5 59         lda phase_state
+d7d2  d0 2f         bne .dont_spawn
+                    ; if downcounter > 0 then spawn
+d7d4  a5 61         lda phase_spawn_counter
+d7d6  d0 18         bne .do_spawn
+                    ; check for next spawn type
+d7d8  a4 5d         ldy phase_table_ptr
+d7da  e6 5d         inc phase_table_ptr
+d7dc  b9 19 da      lda phase_enemy_table,y
+                    ; if type == 0 then stop spawning
+d7df  d0 04         bne .next_spawn_type
+d7e1  e6 59         inc phase_state
+                    ; phase_state should be 1 now
+d7e3  d0 1e         bne .dont_spawn
+                .next_spawn_type
+d7e5  85 5e         sta phase_spawn_type
+                    ; load number to spawn
+d7e7  a4 5d         ldy phase_table_ptr
+d7e9  e6 5d         inc phase_table_ptr
+d7eb  b9 19 da      lda phase_enemy_table,y
+d7ee  85 61         sta phase_spawn_counter
+                .do_spawn
+d7f0  a4 5e         ldy phase_spawn_type
+d7f2  20 72 dc      jsr enemy_slot_from_type
+d7f5  b0 0c         bcs .dont_spawn
+d7f7  20 2c d7      jsr phase_spawn_track
+d7fa  c6 61         dec phase_spawn_counter
+d7fc  e6 5c         inc phase_kill_counter
+d7fe  a5 5e         lda phase_spawn_type
+d800  20 77 da      jsr enemy_spawn_delegator
+                .dont_spawn
+d803  60            rts
+      
+      
+                phase_spawn_long_table:
+d804  byte          8, 16, 12, 24, 16, 32, 20, 40
+      
+                phase_spawn_long: subroutine
+d80c  20 ba d6      jsr phase_check_next_phase
+d80f  20 06 d7      jsr phase_check_spawn_frame
+                    ; phase state > 0 == done spawning
+d812  a5 59         lda phase_state
+d814  d0 0b         bne .phase_init_done
+                .init
+                    ; oiriginal kill count calculation
+                    ; 1 + level + difficulty * (4 or 8)
+                    ; ---------------------------------;
+                    ; difficulty    0  1    2    3
+                    ; -------------|----|----|----|----;
+                    ; phase 06    4  8   12   16
+                    ; phase 0d    8 16   24   32
+                    ; phase 16    8 12   16   20
+                    ; phase 1d   16 24   32   40
+                    ; phase 26   12 16   20   24
+                    ; phase 2d   24 32   40   48
+                    ; phase 36   16 20   24   28
+                    ; phase 3d    32 40   48   56
+d816  a6 5f         ldx phase_spawn_long_c
+d818  bd 04 d8      lda phase_spawn_long_table,x
+                    ; store kill count target and advance state
+d81b  85 5c         sta phase_kill_counter
+d81d  e6 5f         inc phase_spawn_long_c
+d81f  e6 59         inc phase_state
+                .phase_init_done
+                    ; make sure state is 1 or dont spawn
+d821  c9 01         cmp #$01
+d823  d0 21         bne .dont_spawn
+d825  a5 5b         lda phase_level
+d827  c9 03         cmp #$03
+d829  d0 0b         bne .not_final_level
+                .final_level_spawn_rng
+d82b  20 52 c1      jsr get_next_random
+d82e  4a            lsr
+d82f  29 03         and #$03
+d831  f0 f8         beq .final_level_spawn_rng
+d833  38            sec
+d834  e9 01         sbc #$01
+                .not_final_level
+d836  18            clc
+d837  69 05         adc #spark_id
+d839  a8            tay
+d83a  20 86 dc      jsr get_enemy_slot_1_sprite
+d83d  b0 07         bcs .dont_spawn
+                .set_and_jump
+d83f  20 2c d7      jsr phase_spawn_track
+d842  98            tya
+d843  4c 77 da      jmp enemy_spawn_delegator
+                .dont_spawn
+d846  60            rts
+      
+      
+      
+      
+                phase_boss_fight: subroutine
+                    ; handle boss intro/outro cinematics here
+                    ; phase_spawn_counter = scene timer
+                    ; phase_kill_counter = which scene
+d847  a5 5c         lda phase_kill_counter
+d849  d0 03         bne .not_intro
+d84b  4c 61 d8      jmp phase_boss_fight_intro
+                .not_intro
+d84e  c9 02         cmp #$02
+d850  d0 03         bne .not_cooldown
+d852  4c 4d d9      jmp phase_boss_fight_cooldown
+                .not_cooldown
+d855  a5 7b         lda boss_death_happening
+d857  f0 03         beq .not_death
+d859  4c db d8      jmp phase_boss_dying
+                .not_death
+d85c  60            rts
+      
+      
+                phase_boss_assistants_table:
+d85d  byte          chomps_id, skully_id, maggs_id, muya_id
+      
+                phase_boss_fight_intro:
+d861  a5 61         lda phase_spawn_counter
+d863  d0 0f         bne .dont_init_cinematics
+                .init_cinematics
+                    ; play boss fight encounter jingle
+d865  a9 03         lda #song_boss_intro
+d867  20 4b fb      jsr song_start
+                    ; increase scroll speed
+d86a  e6 06         inc scroll_speed_hi
+d86c  e6 06         inc scroll_speed_hi
+d86e  e6 06         inc scroll_speed_hi
+                    ; set spawn_counter timing
+d870  a9 a0         lda #$a0
+d872  85 61         sta phase_spawn_counter
+                .dont_init_cinematics
+                    ; WHOOOOOSH!!~
+d874  e6 13         inc player_x_hi
+d876  e6 13         inc player_x_hi
+d878  a5 13         lda player_x_hi
+d87a  c9 e8         cmp #232
+d87c  90 04         bcc .right_max
+d87e  a9 e6         lda #230
+d880  85 13         sta player_x_hi
+                .right_max
+d882  20 bc c1      jsr ppu_mess_emph
+                .done_messing_emph
+d885  e6 61         inc phase_spawn_counter
+d887  d0 4d         bne .done
+      
+                    ; brighten stars
+d889  a5 34         lda starfield_color0
+d88b  69 10         adc #$10
+d88d  85 34         sta starfield_color0
+d88f  a5 35         lda starfield_color1
+d891  69 10         adc #$10
+d893  85 35         sta starfield_color1
+      
+                    ; boss spawning this frame
+d895  20 21 c6      jsr state_clear
+d898  e6 5c         inc phase_kill_counter
+d89a  a9 00         lda #0
+d89c  85 09         sta ppu_mask_emph
+d89e  85 61         sta phase_spawn_counter
+      
+d8a0  c6 06         dec scroll_speed_hi
+d8a2  c6 06         dec scroll_speed_hi
+                    ; play boss fight song
+d8a4  a9 04         lda #song_boss_fight
+d8a6  20 4b fb      jsr song_start
+                    ; do a fade in FROM HWITE!! :U
+d8a9  a9 37         lda #$37
+d8ab  85 8a         sta pal_fade_c
+d8ad  85 8f         sta state_from_white
+                    ; sfx!
+d8af  20 04 f9      jsr sfx_enemy_death
+                    ; spawn assistant enemies
+d8b2  a6 5b         ldx phase_level
+d8b4  bd 5d d8      lda phase_boss_assistants_table,x
+d8b7  85 88         sta temp02
+d8b9  a8            tay
+d8ba  20 72 dc      jsr enemy_slot_from_type
+d8bd  a5 88         lda temp02
+d8bf  20 77 da      jsr enemy_spawn_delegator
+d8c2  a4 88         ldy temp02
+d8c4  20 72 dc      jsr enemy_slot_from_type
+d8c7  a5 88         lda temp02
+d8c9  20 77 da      jsr enemy_spawn_delegator
+                    ; spawn boss
+d8cc  a6 5b         ldx phase_level
+d8ce  bd 15 da      lda level_boss_table,x
+d8d1  a2 b8         ldx #$b8
+d8d3  4c 77 da      jmp enemy_spawn_delegator
+                .done
+d8d6  60            rts
+      
+      
+                phase_boss_dying_sfx_table:
+d8d7  hex           03 06 0d 11
+      
+                phase_boss_dying: subroutine
+d8db  a5 61         lda phase_spawn_counter
+d8dd  d0 0f         bne .dont_init
+                    ; stop music
+d8df  20 7c fb      jsr song_stop
+                    ; calculate length of boss death
+                    ; 8 frame increments
+d8e2  a5 5b         lda phase_level
+d8e4  18            clc
+d8e5  69 02         adc #$02
+d8e7  0a            asl ; ( phase level + 2 ) * 2 = 4, 6, 8, 10
+d8e8  69 08         adc #$08 ; + 8 = 12, 14, 16, 18
+d8ea  85 4a         sta state_v0
+d8ec  e6 61         inc phase_spawn_counter
+                .dont_init
+d8ee  a0 08         ldy #8
+                .rng_pal_loop
+d8f0  20 52 c1      jsr get_next_random
+d8f3  4a            lsr
+d8f4  29 3c         and #%00111100
+d8f6  99 a0 00      sta pal_spr_1_1,y
+d8f9  88            dey
+d8fa  10 f4         bpl .rng_pal_loop
+                    ; spawn a sfx every 8th frame
+d8fc  20 06 d7      jsr phase_check_spawn_frame
+d8ff  a5 27         lda rng1
+d901  29 03         and #$03
+d903  a8            tay
+d904  b9 d7 d8      lda phase_boss_dying_sfx_table,y
+d907  20 46 f8      jsr sfx_test_delegator
+d90a  c6 4a         dec state_v0
+d90c  d0 3e         bne .done
+      
+                    ; kill everything on screen
+d90e  a2 00         ldx #$00
+d910  86 78         stx enemy_slot_id
+d912  86 76         stx enemy_ram_offset
+                .iteration_loop
+d914  a6 78         ldx enemy_slot_id
+d916  bc 39 db      ldy enemy_slot_offset_to_oam_offset,x
+d919  84 77         sty enemy_oam_offset
+d91b  a6 76         ldx enemy_ram_offset
+d91d  bd 00 03      lda enemy_ram_type,x
+d920  c9 03         cmp #$03
+d922  90 03         bcc .skip_crossbones_transmogrification
+d924  20 62 dd      jsr enemy_death_handler
+                .skip_crossbones_transmogrification
+                    ; setup next loop
+d927  e6 78         inc enemy_slot_id
+d929  a9 08         lda #$08
+d92b  18            clc
+d92c  65 76         adc enemy_ram_offset
+d92e  85 76         sta enemy_ram_offset
+d930  c9 e0         cmp #$e0
+d932  d0 e0         bne .iteration_loop
+                    ; setup starfield decceleration
+d934  e6 5c         inc phase_kill_counter
+d936  a9 40         lda #$40
+d938  85 61         sta phase_spawn_counter
+                    ; reset palettes
+d93a  20 39 d7      jsr phase_palette_load
+                    ; setup next scene
+d93d  20 04 f9      jsr sfx_enemy_death
+d940  20 33 d4      jsr powerup_pickup_plus_one
+                    ; startup in game music
+d943  a9 02         lda #song_in_game
+d945  20 4b fb      jsr song_start
+                    ; let crossbones animate
+d948  a9 00         lda #$00
+d94a  85 7b         sta boss_death_happening
+                .done
+d94c  60            rts
+      
+      
+                phase_boss_fight_cooldown: subroutine
+d94d  a5 61         lda phase_spawn_counter
+d94f  29 0f         and #$0f
+d951  d0 02         bne .dont_slow_stars
+d953  c6 06         dec scroll_speed_hi
+                .dont_slow_stars
+d955  c6 61         dec phase_spawn_counter
+d957  d0 12         bne .dont_advance
+d959  a9 00         lda #$00
+d95b  85 7b         sta boss_death_happening
+d95d  85 7c         sta boss_heart_stars
+d95f  85 7a         sta boss_dmg_handle_true
+d961  85 5c         sta phase_kill_counter
+d963  a9 02         lda #song_in_game
+d965  20 4b fb      jsr song_start
+d968  20 e2 d6      jsr phase_next
+                .dont_advance
+d96b  60            rts
+      
+      
+      
+      
+      
+                phase_interval_spawn: subroutine
+                    ; dont spawn if boss is dying
+d96c  a5 7b         lda boss_death_happening
+d96e  d0 56         bne .no_enemy
+                    ; check for ike's mom spawn
+d970  a5 25         lda ftw
+                    ;cmp #84 ; about 6 minutes
+d972  c9 2a         cmp #42 ; about 3 minutes
+d974  90 04         bcc .no_ikes_mom
+d976  a0 15         ldy #ikes_mom_id
+d978  d0 4d         bne phase_interval_spawn_special_4_sprite
+                .no_ikes_mom
+                    ; interval enemy spawn?
+d97a  a5 44         lda timer_frames_1s
+d97c  c9 60         cmp #char_set_offset
+d97e  d0 46         bne .no_enemy
+d980  a5 45         lda timer_frames_10s
+d982  c9 60         cmp #char_set_offset
+d984  d0 40         bne .no_enemy
+                    ; look for 10 second increments
+d986  a5 46         lda timer_seconds_1s
+                    ; if seconds == 0 then starglasses possible
+d988  c9 60         cmp #char_set_offset
+d98a  f0 0a         beq .starglasses_possible
+                    ; if seconds == 1 or 7 then spawn enemy
+d98c  c9 61         cmp #char_set_offset+1
+d98e  f0 14         beq .spawn_enemy
+d990  c9 67         cmp #char_set_offset+7
+d992  f0 10         beq .spawn_enemy
+d994  d0 30         bne .no_enemy
+                .starglasses_possible
+d996  a5 47         lda timer_seconds_10s
+d998  c9 63         cmp #char_set_offset+3
+d99a  f0 04         beq .starglasses_happening
+d99c  c9 65         cmp #char_set_offset+5
+d99e  d0 26         bne .no_enemy
+                .starglasses_happening
+d9a0  a0 0f         ldy #starglasses_id
+d9a2  d0 23         bne phase_interval_spawn_special_4_sprite
+                .spawn_enemy
+d9a4  a4 5b         ldy phase_level
+d9a6  b9 e1 d9      lda level_intervals_lo,y
+d9a9  85 88         sta temp02
+d9ab  b9 e5 d9      lda level_intervals_hi,y
+d9ae  85 89         sta temp03
+d9b0  a4 62         ldy phase_interval_counter
+d9b2  b1 88         lda (temp02),y
+d9b4  d0 04         bne .dont_reset_counter
+                .reset_counter
+d9b6  85 62         sta phase_interval_counter
+d9b8  b1 88         lda (temp02),y
+                .dont_reset_counter
+d9ba  a8            tay
+d9bb  20 72 dc      jsr enemy_slot_from_type
+d9be  b0 06         bcs .no_enemy
+d9c0  e6 62         inc phase_interval_counter
+d9c2  98            tya
+d9c3  20 77 da      jsr enemy_spawn_delegator
+                .no_enemy
+d9c6  60            rts
+      
+                phase_interval_spawn_special_4_sprite: subroutine
+d9c7  20 b0 dc      jsr get_enemy_slot_4_sprite
+d9ca  b0 04         bcs .nope
+d9cc  98            tya
+d9cd  20 77 da      jsr enemy_spawn_delegator
+                .nope
+d9d0  60            rts
+      
+      
+      
+      

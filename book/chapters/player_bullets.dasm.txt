@@ -1,0 +1,305 @@
+      
+                    ;;;;;; Constants
+      
+      
+                    ; oam ram
+                    bullet0		EQM $020c
+                    bullet1		EQM $0210
+                    bullet2		EQM $0214
+                    bullet3		EQM $0218
+                    bullet4_or_opt	EQM $021c
+      
+                    player_bullet_sprite EQM $79
+      
+      
+                player_gun_strength_per_difficulty:
+f2f9  byte          #4, #5, #6, #7
+      
+      
+                player_bullet_next: subroutine
+                    ; increase bullet data offset
+f2fd  e8            inx
+f2fe  e8            inx
+                    ; increase bullet oam offset
+f2ff  c8            iny
+f300  c8            iny
+f301  c8            iny
+f302  c8            iny
+f303  60            rts
+      
+      
+                player_bullet_collision_handler: subroutine
+f304  18            clc
+f305  a5 3b         lda collision_0_x
+f307  65 3d         adc collision_0_w
+f309  90 01         bcc .in_bounds ; make sure x+w is not less than x
+f30b  60            rts
+                .in_bounds
+                    ; bullet dimensions don't change
+f30c  a9 04         lda #$04
+f30e  85 41         sta collision_1_w
+f310  85 42         sta collision_1_h
+      
+f312  84 86         sty temp00
+f314  a0 0c         ldy #$0c
+                .bullet_loop
+f316  b9 03 02      lda oam_ram_x,y
+f319  f0 3e         beq .skip_bullet
+f31b  85 3f         sta collision_1_x
+f31d  b9 00 02      lda oam_ram_y,y
+f320  85 40         sta collision_1_y
+      
+                    ; collision detection
+f322  18            clc
+f323  a5 3b         lda collision_0_x
+f325  65 3d         adc collision_0_w
+f327  b0 30         bcs .no_collision ; make sure x+w is not less than x
+f329  c5 3f         cmp collision_1_x
+f32b  90 2c         bcc .no_collision
+f32d  18            clc
+f32e  a5 3f         lda collision_1_x
+f330  65 41         adc collision_1_w
+f332  c5 3b         cmp collision_0_x
+f334  90 23         bcc .no_collision
+f336  18            clc
+f337  a5 3c         lda collision_0_y
+f339  65 3e         adc collision_0_h
+f33b  c5 40         cmp collision_1_y
+f33d  90 1a         bcc .no_collision
+f33f  18            clc
+f340  a5 40         lda collision_1_y
+f342  65 42         adc collision_1_h
+f344  c5 3c         cmp collision_0_y
+f346  90 11         bcc .no_collision
+      
+f348  18            clc
+f349  a5 79         lda enemy_dmg_accumulator
+f34b  65 19         adc player_gun_str
+f34d  85 79         sta enemy_dmg_accumulator
+                    ; despawn bullet
+f34f  a9 00         lda #$00
+f351  99 03 02      sta oam_ram_x,y
+f354  a9 ff         lda #$ff
+f356  99 00 02      sta oam_ram_y,y
+                .no_collision
+                .skip_bullet
+f359  c8            iny
+f35a  c8            iny
+f35b  c8            iny
+f35c  c8            iny
+f35d  c0 20         cpy #$20
+f35f  d0 b5         bne .bullet_loop
+f361  a4 86         ldy temp00
+f363  60            rts
+      
+      
+      
+      
+                    ; bullets are sprites #$03 - #$07
+                    ;;; bullet directions, sprite base address
+                    ; 03 9 o'clock -7,  0, $020c
+                    ; 04  10 o'clock -6, -3, $0210
+                    ; 05 8 o'clock -6. +3, $0214
+                    ; 06  11 o'clock -3, -6, $0218
+                    ; 07 7 o'clock -3, +6, $021c
+      
+                player_gun_bullet_dir_table:
+f364  byte          #248, #0
+f366  byte          #249, #252
+f368  byte          #252, #6
+f36a  byte          #249, #3
+f36c  byte          #252, #249
+      
+                player_gun_fire: subroutine
+                    ; temp00 holds five_directions == true
+f36e  a2 00         ldx #$00
+f370  a0 0c         ldy #$0c
+                .bullet_loop
+f372  b9 00 02      lda oam_ram_y,y
+                    ; check if bullet is spawned
+f375  c9 ff         cmp #$ff
+f377  d0 37         bne .next
+                    ; trigger pewpew
+f379  20 4c f8      jsr sfx_pewpew
+f37c  a5 13         lda player_x_hi
+f37e  99 03 02      sta oam_ram_x,y
+f381  a5 15         lda player_y_hi
+f383  18            clc
+f384  69 04         adc #$04
+f386  99 00 02      sta oam_ram_y,y
+                    ; direction
+f389  a5 86         lda temp00
+f38b  f0 0c         beq .one_direction
+                .five_directions
+f38d  bd 64 f3      lda player_gun_bullet_dir_table,x
+f390  95 c6         sta bullet_x_vel,x
+f392  bd 65 f3      lda player_gun_bullet_dir_table+1,x
+f395  95 c7         sta bullet_y_vel,x
+f397  d0 0a         bne .dir_done
+                .one_direction
+f399  ad 64 f3      lda player_gun_bullet_dir_table
+f39c  95 c6         sta bullet_x_vel,x
+f39e  ad 65 f3      lda player_gun_bullet_dir_table+1
+f3a1  95 c7         sta bullet_y_vel,x
+                .dir_done
+                    ; sprite
+f3a3  a9 79         lda #$79
+f3a5  99 01 02      sta oam_ram_spr,y
+                    ; palette
+f3a8  a9 00         lda #$00
+f3aa  99 02 02      sta oam_ram_att,y
+f3ad  4c b7 f3      jmp .done
+                .next
+f3b0  20 fd f2      jsr player_bullet_next
+f3b3  c0 20         cpy #$20
+f3b5  d0 bb         bne .bullet_loop
+                .done
+f3b7  60            rts
+      
+      
+      
+                player_bullets_check_controls: subroutine
+      
+                    ; check for r bag powerup running
+f3b8  a5 6b         lda r_bag_counter
+f3ba  f0 04         beq .no_r_bag
+f3bc  c6 6b         dec r_bag_counter
+f3be  d0 19         bne .turbo_fire
+                .no_r_bag
+                    ; a button = turbo
+                    ; no turbo on phase 0
+f3c0  a5 5a         lda phase_current
+f3c2  f0 1b         beq .no_turbo
+                    ; check turbo button
+f3c4  a5 1c         lda player_controls
+f3c6  29 80         and #BUTTON_A
+f3c8  f0 15         beq .no_turbo
+                    ; damage from turbo gun
+f3ca  a5 24         lda wtf
+f3cc  29 02         and #$02
+f3ce  c9 02         cmp #$02
+f3d0  d0 07         bne .turbo_fire
+f3d2  a9 03         lda #$03
+f3d4  85 21         sta player_damage
+f3d6  20 5e f2      jsr player_take_damage
+                .turbo_fire
+f3d9  a9 01         lda #$01
+f3db  85 86         sta temp00
+f3dd  d0 19         bne .pull_that_mfing_trigger
+                .no_turbo
+f3df  a5 1d         lda player_controls_debounced
+f3e1  29 40         and #BUTTON_B
+f3e3  d0 0f         bne .normal_fire
+                    ; hold b button = retrigger
+f3e5  a5 1c         lda player_controls
+f3e7  29 40         and #BUTTON_B
+f3e9  f0 10         beq .no_fire
+f3eb  a5 1f         lda player_autofire_c
+f3ed  18            clc
+f3ee  65 20         adc player_autofire_s
+f3f0  85 1f         sta player_autofire_c
+f3f2  90 07         bcc .no_fire
+                .normal_fire
+f3f4  a9 00         lda #$00
+f3f6  85 86         sta temp00
+                .pull_that_mfing_trigger
+f3f8  20 6e f3      jsr player_gun_fire
+                .no_fire
+f3fb  60            rts
+      
+      
+      
+      
+      
+      
+      
+                player_bullets_update: subroutine
+f3fc  a2 00         ldx #$00
+f3fe  a0 0c         ldy #$0c
+                .bullet_loop
+                    ; handle mask shield
+f400  e0 00         cpx #$00
+f402  d0 07         bne .mask_check_done
+f404  a5 6e         lda orbit_shield_speed
+f406  f0 03         beq .mask_check_done
+f408  4c 45 f4      jmp player_bullets_update_mask_shield
+                .mask_check_done
+                    ; check if spawned
+f40b  b9 00 02      lda oam_ram_y,y
+f40e  c9 ff         cmp #$ff
+f410  f0 2b         beq .next
+                    ; check for despawn
+                    ; is x < 8
+f412  b9 03 02      lda oam_ram_x,y
+f415  c9 08         cmp #$08
+f417  90 1c         bcc .despawn
+                    ; is y > 180
+f419  b9 00 02      lda oam_ram_y,y
+f41c  c9 b4         cmp #180
+f41e  b0 15         bcs .despawn
+                    ; move x
+f420  b9 03 02      lda oam_ram_x,y
+f423  18            clc
+f424  75 c6         adc bullet_x_vel,x
+f426  99 03 02      sta oam_ram_x,y
+                    ; move y
+f429  b9 00 02      lda oam_ram_y,y
+f42c  18            clc
+f42d  75 c7         adc bullet_y_vel,x
+f42f  99 00 02      sta oam_ram_y,y
+f432  4c 3d f4      jmp .next
+                .despawn
+f435  a9 ff         lda #$ff
+f437  99 03 02      sta oam_ram_x,y
+f43a  99 00 02      sta oam_ram_y,y
+                player_bullets_update_next:
+                .next
+f43d  20 fd f2      jsr player_bullet_next
+f440  c0 20         cpy #$20
+f442  d0 bc         bne .bullet_loop
+                .done
+f444  60            rts
+      
+      
+                player_bullets_update_mask_shield: subroutine
+                    ; x = bullet pos offset
+                    ; y = bullet oam offset
+f445  a5 6f         lda orbit_shield_pos
+f447  18            clc
+f448  65 6e         adc orbit_shield_speed
+f44a  85 6f         sta orbit_shield_pos
+                    ; calc x
+f44c  a5 13         lda player_x_hi
+f44e  38            sec
+f44f  e9 1c         sbc #$1c
+f451  85 86         sta temp00
+f453  a5 6f         lda orbit_shield_pos
+f455  4a            lsr
+f456  aa            tax
+f457  bd 00 05      lda sine_6bits,x
+f45a  18            clc
+f45b  65 86         adc temp00
+f45d  99 03 02      sta oam_ram_x,y
+                    ; calc y
+f460  a2 00         ldx #$00
+f462  a5 15         lda player_y_hi
+f464  38            sec
+f465  e9 10         sbc #16
+f467  85 86         sta temp00
+f469  a5 6f         lda orbit_shield_pos
+f46b  18            clc
+f46c  69 40         adc #$40
+f46e  4a            lsr
+f46f  aa            tax
+f470  bd 80 05      lda sine_5bits,x
+f473  18            clc
+f474  65 86         adc temp00
+f476  99 00 02      sta oam_ram_y,y
+                    ; set attributes
+f479  a9 03         lda #$03
+f47b  99 02 02      sta oam_ram_att,y
+                    ; set sprites
+f47e  a9 24         lda #$24
+f480  99 01 02      sta oam_ram_spr,y
+f483  a2 00         ldx #$00
+f485  4c 3d f4      jmp player_bullets_update_next

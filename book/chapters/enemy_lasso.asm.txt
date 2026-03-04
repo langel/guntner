@@ -1,0 +1,81 @@
+      
+                lasso_spawn: subroutine
+                    ; x is set by enemy spawner
+ed04  20 52 dc      jsr get_oam_offset_from_ram_offset
+ed07  a9 00         lda #$00
+ed09  99 03 02      sta oam_ram_x,y
+ed0c  60            rts
+      
+                lariat_sine_table:
+ed0d  byte          #16, #35, #55, #73, #93, #113, #129, #148
+      
+                    ;;;; HANDLING maggs
+                lasso_cycle: subroutine
+      
+                    ; x pos
+ed15  a5 24         lda wtf
+ed17  29 01         and #$01
+ed19  d0 12         bne .dont_advance
+ed1b  b9 03 02      lda oam_ram_x,y
+ed1e  18            clc
+ed1f  69 01         adc #$01
+ed21  99 03 02      sta oam_ram_x,y
+ed24  99 07 02      sta oam_ram_x+4,y
+ed27  99 0b 02      sta oam_ram_x+8,y
+ed2a  99 0f 02      sta oam_ram_x+$c,y
+                .dont_advance
+      
+                    ; y pos
+ed2d  fe 04 03      inc enemy_ram_pc,x
+ed30  bd 04 03      lda enemy_ram_pc,x
+ed33  85 87         sta temp01
+ed35  aa            tax
+ed36  a9 9f         lda #159
+ed38  20 ad d4      jsr sine_of_scale
+ed3b  99 00 02      sta oam_ram_y,y
+ed3e  18            clc
+ed3f  69 08         adc #$08
+ed41  99 04 02      sta oam_ram_y+4,y
+ed44  85 3e         sta collision_0_h
+                    ; middle sprite
+                    ;lda #105
+ed46  a5 24         lda wtf
+ed48  29 07         and #$07
+ed4a  aa            tax
+ed4b  bd 0d ed      lda lariat_sine_table,x
+ed4e  a6 87         ldx temp01
+ed50  20 ad d4      jsr sine_of_scale
+ed53  29 fe         and #$fe
+ed55  85 88         sta temp02
+ed57  38            sec
+ed58  e9 08         sbc #$08
+ed5a  99 08 02      sta oam_ram_y+8,y
+                    ; top sprite
+ed5d  a5 88         lda temp02
+ed5f  99 0c 02      sta oam_ram_y+$c,y
+ed62  a6 76         ldx enemy_ram_offset
+      
+                    ; collision
+ed64  a9 00         lda #$00
+ed66  85 3c         sta collision_0_y
+ed68  a9 07         lda #$07
+ed6a  85 3d         sta collision_0_w
+ed6c  20 eb db      jsr enemy_handle_damage_and_death
+      
+                    ; sprites
+ed6f  a9 59         lda #$59
+ed71  99 01 02      sta oam_ram_spr,y
+ed74  a9 69         lda #$69
+ed76  99 05 02      sta oam_ram_spr+4,y
+ed79  a9 6a         lda #$6a
+ed7b  99 09 02      sta oam_ram_spr+8,y
+ed7e  99 0d 02      sta oam_ram_spr+$c,y
+      
+                    ; palette & attributes
+ed81  a9 02         lda #$02
+ed83  20 9d da      jsr sprite_4_set_palette
+      
+                .done
+ed86  4c 92 db      jmp update_enemies_handler_next
+      
+      

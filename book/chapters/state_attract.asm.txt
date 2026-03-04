@@ -1,0 +1,81 @@
+      
+      
+      
+                attract_init:
+                    ; SCROLL SPEED
+cc4c  20 c4 cc      jsr game_init_generic
+cc4f  a9 03         lda #03
+cc51  85 06         sta scroll_speed_hi
+cc53  a9 ad         lda #173
+cc55  85 05         sta scroll_speed_lo
+cc57  a9 8b         lda #state_update_jump_table_offset+5
+cc59  85 56         sta state_update_addr
+cc5b  a5 0e         lda attract_true
+cc5d  d0 0b         bne .attract_mode_set
+cc5f  20 32 dd      jsr clear_all_enemies
+cc62  a9 ff         lda #$ff
+cc64  85 0e         sta attract_true
+cc66  a9 08         lda #iframe_attract_length
+cc68  85 54         sta state_iframe_length
+                .attract_mode_set
+cc6a  20 38 c1      jsr render_enable
+cc6d  20 4e d2      jsr palette_fade_in_init
+cc70  60            rts
+      
+      
+      
+                attract_update: subroutine
+                    ; some buttons return to menu
+cc71  a5 1c         lda player_controls
+cc73  29 d0         and #BUTTON_START|BUTTON_B|BUTTON_A
+cc75  f0 08         beq .buttons_for_menu_not_pressed
+cc77  a9 7c         lda #state_init_jump_table_offset+0
+cc79  20 82 d2      jsr palette_fade_out_init
+cc7c  4c a7 c0      jmp state_update_done
+                .buttons_for_menu_not_pressed
+cc7f  a5 24         lda wtf
+cc81  29 07         and #$07
+cc83  d0 03         bne .no_enemy_spawn
+cc85  20 9a cc      jsr attract_spawn_enemy
+                .no_enemy_spawn
+cc88  a5 0b         lda player_health
+cc8a  c9 00         cmp #$00
+cc8c  f0 06         beq .done
+cc8e  20 a0 f5      jsr player_demo_controls
+cc91  20 b8 f3      jsr player_bullets_check_controls
+                .done
+cc94  20 18 cd      jsr game_update_generic
+cc97  4c a7 c0      jmp state_update_done
+      
+      
+      
+                attract_spawn_enemy: subroutine
+                    ; starglasses
+cc9a  ad a0 03      lda $03a0
+cc9d  d0 06         bne .no_starglasses
+cc9f  a2 a0         ldx #$a0
+cca1  a9 0f         lda #starglasses_id
+cca3  d0 1c         bne .delegate
+                .no_starglasses
+                    ; birb
+cca5  20 86 dc      jsr get_enemy_slot_1_sprite
+cca8  b0 04         bcs .no_birb
+ccaa  a9 04         lda #birb_id
+ccac  d0 13         bne .delegate
+                .no_birb
+                    ; maggs
+ccae  20 9b dc      jsr get_enemy_slot_2_sprite
+ccb1  b0 04         bcs .no_maggs
+ccb3  a9 0d         lda #maggs_id
+ccb5  d0 0a         bne .delegate
+                .no_maggs
+                    ; skully
+ccb7  20 b0 dc      jsr get_enemy_slot_4_sprite
+ccba  a9 10         lda #skully_id
+ccbc  e0 c0         cpx #$c0
+ccbe  90 01         bcc .delegate
+ccc0  60            rts
+                .delegate
+ccc1  4c 77 da      jmp enemy_spawn_delegator
+      
+      

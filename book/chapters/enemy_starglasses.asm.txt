@@ -1,0 +1,79 @@
+      
+      
+                starglasses_spawn: subroutine
+                    ; x is set by enemy spawner
+efe6  20 52 c1      jsr get_next_random
+efe9  9d 05 03      sta enemy_ram_ac,x ; animation counter
+efec  a9 c0         lda #$c0
+efee  9d 04 03      sta enemy_ram_pc,x ; pattern counter
+eff1  a9 f8         lda #$f8
+eff3  9d 02 03      sta enemy_ram_x,x ; x pos
+eff6  20 52 c1      jsr get_next_random
+eff9  4a            lsr
+effa  4a            lsr
+effb  18            clc
+effc  69 18         adc #$18
+effe  9d 03 03      sta enemy_ram_y,x ; y pos
+f001  60            rts
+      
+      
+      
+                    ;;; HANDLING STARGLASSES
+                starglasses_cycle: subroutine
+f002  a9 10         lda #$10
+f004  85 3d         sta collision_0_w
+f006  85 3e         sta collision_0_h
+f008  20 eb db      jsr enemy_handle_damage_and_death
+      
+                .x_decide_action
+                    ; calc x
+f00b  bd 02 03      lda enemy_ram_x,x
+f00e  c9 10         cmp #$10
+f010  f0 0c         beq .x_sine_pattern
+f012  fe 02 03      inc enemy_ram_x,x
+f015  bd 02 03      lda enemy_ram_x,x
+f018  20 df da      jsr sprite_4_set_x
+f01b  4c 33 f0      jmp .y_calc_pos
+                .x_sine_pattern
+                    ; using pattern_counter for x sin
+f01e  fe 04 03      inc enemy_ram_pc,x
+f021  bd 04 03      lda enemy_ram_pc,x
+f024  aa            tax
+f025  bd 00 fe      lda sine_table,x
+f028  4a            lsr
+f029  4a            lsr
+f02a  a6 76         ldx enemy_ram_offset
+f02c  18            clc
+f02d  7d 02 03      adc enemy_ram_x,x
+f030  20 df da      jsr sprite_4_set_x
+                .y_calc_pos
+                    ; using anim_counter for y sin
+f033  fe 05 03      inc enemy_ram_ac,x
+f036  fe 05 03      inc enemy_ram_ac,x
+                    ; calc y
+f039  a6 76         ldx enemy_ram_offset
+f03b  bd 05 03      lda enemy_ram_ac,x
+f03e  aa            tax
+f03f  bd 00 fe      lda sine_table,x
+f042  4a            lsr
+f043  4a            lsr
+f044  18            clc
+f045  a6 76         ldx enemy_ram_offset
+f047  7d 03 03      adc enemy_ram_y,x
+f04a  20 ef da      jsr sprite_4_set_y
+                    ; tiles
+f04d  a6 76         ldx enemy_ram_offset
+f04f  bd 05 03      lda enemy_ram_ac,x
+f052  29 40         and #$40
+f054  f0 04         beq .frame1
+                .frame0
+f056  a9 7a         lda #$7a
+f058  d0 02         bne .frame_done
+                .frame1
+f05a  a9 7c         lda #$7c
+                .frame_done
+f05c  20 b7 da      jsr sprite_4_set_sprite
+f05f  a9 03         lda #$03
+f061  20 9d da      jsr sprite_4_set_palette
+                .done
+f064  4c 92 db      jmp update_enemies_handler_next

@@ -1,0 +1,495 @@
+      
+                    ; things the bat entities need to know
+                    ; boss_x  : x body position
+                    ; boss_y  :  y body position
+      
+                    ; state_v0 : current mode
+                    ; 0 - bounce around and fire
+                    ; 1 - lunge at player and around to box
+                    ; 2 - aim and shake
+                    ; state_v1 : cycle counter
+                    ; state_v2 : velocity
+                    ; state_v4 : emiter type
+                    ; state_v5 : scratch for spawn loop
+                    ; state_v6 : alt face countdowner
+                    ; state_v7 : 2nd form true
+      
+      
+                    ; swordtner palette
+                    ; $07, $17, $3d
+                    ; $0c, $2d, $31
+      
+                boss_swordtner_spawn: subroutine
+                    ; claim 4 more slots for rest of body
+e302  a9 03         lda #boss_assist_id
+e304  8d c0 03      sta $03c0
+e307  8d c8 03      sta $03c8
+e30a  8d d0 03      sta $03d0
+e30d  8d d8 03      sta $03d8
+                    ; claim 1 more slot for eyeballs
+e310  8d 40 03      sta $0340
+                    ; setup initial state
+e313  20 52 dc      jsr get_oam_offset_from_ram_offset
+e316  a9 20         lda #$20
+e318  99 03 02      sta oam_ram_x,y
+e31b  99 00 02      sta oam_ram_y,y
+e31e  a9 15         lda #$15
+e320  9d 07 03      sta enemy_ram_ex,x
+                    ; set eye color
+e323  a9 01         lda #$01
+e325  85 7f         sta boss_eyes_pal
+                    ; offset song position
+e327  a9 0e         lda #$0e
+e329  85 c3         sta audio_pattern_pos
+e32b  60            rts
+      
+                    ; SWORDTNER
+                    ; PROVERB
+                    ; HERE
+      
+                arc_bounce_x:
+                    ; if ex < $0c then ex = $0c - ex
+e32c  hex           0b 0b 0a 09 08 07 05 05 04 03 02 01
+                    ; if ex == $0c then ex = 0
+                    ; if ex > $0c then ex = $17 - (ex - $0d)
+e338  hex           01 17 16 15 14 13 13 11 10 0f 0e 0d
+                arc_bounce_y:
+                    ; if ex == $00 then ex = 0
+                    ; if ex < $0c then ex = $18 - ex
+e344  hex           01 17 16 15 14 13 13 11 10 0f 0e 0d
+                    ; if ex > $0c then ex = $24 - ex
+e350  hex           0b 0b 0a 09 08 07 05 05 04 03 02 01
+      
+                swordtner_metasprite_offset:
+e35c  byte          #$10, #$20, #$30, #$40
+                swordtner_metasprite_id:
+e360  byte          #$82, #$a2, #$a2, #$c2
+      
+                swordtner_rng_bullet:
+e364  20 52 c1      jsr get_next_random
+e367  29 07         and #$07
+e369  18            clc
+e36a  69 24         adc #$24
+e36c  85 74         sta dart_sprite
+e36e  60            rts
+      
+      
+      
+                boss_swordtner_cycle: subroutine
+                    ; shrink width of hit box
+e36f  a9 04         lda #$04
+e371  85 3d         sta collision_0_w
+e373  65 3b         adc collision_0_x
+e375  85 3b         sta collision_0_x
+                    ; check for player collision with blade
+e377  a9 50         lda #$50
+e379  85 3e         sta collision_0_h
+e37b  20 35 cf      jsr player_collision_detect
+e37e  f0 0f         beq .no_collision
+e380  20 dd db      jsr enemy_gives_damage
+e383  a9 00         lda #$00
+e385  85 4b         sta state_v1
+e387  a9 01         lda #$01
+e389  85 4a         sta state_v0
+                    ; change facial experession
+e38b  a9 20         lda #$20
+e38d  85 50         sta state_v6
+                .no_collision
+      
+      
+                    ; hitbox is face of swordtner
+e38f  a9 0f         lda #$0f
+e391  85 3e         sta collision_0_h
+e393  a9 12         lda #$12
+e395  65 3c         adc collision_0_y
+e397  85 3c         sta collision_0_y
+e399  e6 7a         inc boss_dmg_handle_true
+e39b  20 eb db      jsr enemy_handle_damage_and_death
+e39e  c9 00         cmp #$00
+e3a0  f0 04         beq .dont_change_face
+e3a2  a9 10         lda #$10
+e3a4  85 50         sta state_v6
+                .dont_change_face
+e3a6  c6 7a         dec boss_dmg_handle_true
+      
+      
+                    ; check for 2nd Form
+e3a8  a5 51         lda state_v7
+e3aa  d0 11         bne .2nd_form_done
+e3ac  bd 01 03      lda enemy_ram_hp,x
+e3af  c9 19         cmp #25
+e3b1  b0 0a         bcs .2nd_form_done
+e3b3  a9 64         lda #100
+e3b5  7d 01 03      adc enemy_ram_hp,x
+e3b8  9d 01 03      sta enemy_ram_hp,x
+e3bb  e6 51         inc state_v7
+                .2nd_form_done
+      
+      
+                    ; both modes use this
+                    ; x
+e3bd  a5 7d         lda boss_x
+e3bf  18            clc
+e3c0  69 04         adc #$04
+e3c2  85 71         sta dart_x_origin
+                    ; y
+e3c4  a5 7e         lda boss_y
+e3c6  18            clc
+e3c7  69 0c         adc #$0c
+e3c9  85 72         sta dart_y_origin
+      
+      
+                    ; act on current mode
+e3cb  a5 4a         lda state_v0
+e3cd  18            clc
+e3ce  69 3c         adc #boss_swordtner_state_jump_table_offset
+e3d0  20 f1 c4      jsr jump_to_subroutine
+      
+      
+                    ; y
+e3d3  b9 00 02      lda oam_ram_y,y
+                    ; y check for poor range
+                .check_too_low
+e3d6  c9 88         cmp #$88
+e3d8  90 05         bcc .check_too_high
+e3da  a9 8a         lda #$8a
+e3dc  99 00 02      sta oam_ram_y,y
+                .check_too_high
+e3df  c9 08         cmp #$08
+e3e1  b0 05         bcs .check_y_softer_bounce
+e3e3  a9 06         lda #$06
+e3e5  99 00 02      sta oam_ram_y,y
+                .check_y_softer_bounce
+                    ; y check for bounce
+e3e8  c9 08         cmp #$08
+e3ea  90 06         bcc .bounce_y
+e3ec  c9 88         cmp #$88
+e3ee  b0 02         bcs .bounce_y
+e3f0  90 0b         bcc .dont_bounce_y
+                .bounce_y
+e3f2  bc 07 03      ldy enemy_ram_ex,x
+e3f5  b9 44 e3      lda arc_bounce_y,y
+e3f8  9d 07 03      sta enemy_ram_ex,x
+e3fb  a4 77         ldy enemy_oam_offset
+                .dont_bounce_y
+      
+      
+                .set_boss_x_y
+                    ; set boxx x,y
+e3fd  b9 03 02      lda oam_ram_x,y
+e400  85 7d         sta boss_x
+e402  20 df da      jsr sprite_4_set_x
+e405  b9 00 02      lda oam_ram_y,y
+e408  85 7e         sta boss_y
+e40a  20 ef da      jsr sprite_4_set_y
+      
+      
+      
+      
+                    ; SWORDTNER
+                    ; MAIN BODY
+      
+                    ; handle sprite
+e40d  a9 62         lda #$62
+e40f  20 b7 da      jsr sprite_4_set_sprite
+      
+      
+e412  a2 03         ldx #$03
+                .next_meta_sprite
+e414  bd 5c e3      lda swordtner_metasprite_offset,x
+e417  18            clc
+e418  65 77         adc enemy_oam_offset
+e41a  a8            tay
+e41b  a5 7d         lda boss_x
+e41d  20 df da      jsr sprite_4_set_x
+e420  a5 7e         lda boss_y
+e422  7d 5c e3      adc swordtner_metasprite_offset,x
+e425  20 ef da      jsr sprite_4_set_y
+                    ; check for face animation
+e428  e0 00         cpx #$00
+e42a  d0 0a         bne .not_face_sprite
+e42c  a5 50         lda state_v6
+e42e  f0 12         beq .normal_sprite
+e430  c6 50         dec state_v6
+e432  a9 84         lda #$84
+e434  d0 0f         bne .plot_sprite
+                .not_face_sprite
+                    ; check for 2nd form
+e436  a5 51         lda state_v7
+e438  f0 08         beq .normal_sprite
+e43a  bd 60 e3      lda swordtner_metasprite_id,x
+e43d  18            clc
+e43e  69 02         adc #$02
+e440  d0 03         bne .plot_sprite
+                .normal_sprite
+e442  bd 60 e3      lda swordtner_metasprite_id,x
+                .plot_sprite
+e445  20 b7 da      jsr sprite_4_set_sprite
+e448  ca            dex
+e449  10 c9         bpl .next_meta_sprite
+      
+e44b  a6 76         ldx enemy_ram_offset
+e44d  a4 77         ldy enemy_oam_offset
+      
+                    ; palette
+e44f  a9 01         lda #$01
+e451  20 9d da      jsr sprite_4_set_palette
+e454  f0 03         beq .hit
+e456  18            clc
+e457  69 01         adc #$01
+                .hit
+e459  a0 c0         ldy #$c0
+e45b  20 aa da      jsr sprite_4_set_palette_no_process
+e45e  a0 d0         ldy #$d0
+e460  20 aa da      jsr sprite_4_set_palette_no_process
+e463  a0 e0         ldy #$e0
+e465  20 aa da      jsr sprite_4_set_palette_no_process
+e468  a0 f0         ldy #$f0
+e46a  20 aa da      jsr sprite_4_set_palette_no_process
+      
+      
+                    ; move last sprite to higher spot
+                    ; make room for eyeballs
+e46d  a2 03         ldx #$03
+                .migrate_sprite_loop
+e46f  bd fc 02      lda $02fc,x
+e472  9d 40 02      sta $0240,x
+e475  ca            dex
+e476  10 f7         bpl .migrate_sprite_loop
+      
+                    ;ldx enemy_ram_offset
+                    ;ldy enemy_oam_offset
+      
+                    ; eyeballs setup
+e478  a4 77         ldy enemy_oam_offset
+e47a  b9 03 02      lda oam_ram_x,y
+e47d  18            clc
+e47e  69 04         adc #$04
+e480  85 86         sta temp00
+e482  b9 00 02      lda oam_ram_y,y
+e485  18            clc
+e486  69 10         adc #$10
+e488  85 87         sta temp01
+e48a  20 b6 e5      jsr enemy_boss_eyes
+      
+      
+                .done
+e48d  4c 92 db      jmp update_enemies_handler_next
+      
+      
+      
+      
+      
+                swordtner_inside_bouncy_box_x: subroutine
+                    ; returns 0 in a if false
+e490  b9 03 02      lda oam_ram_x,y
+e493  c9 10         cmp #$10
+e495  90 08         bcc .outside_bouncy_box_x
+e497  c9 60         cmp #$60
+e499  b0 04         bcs .outside_bouncy_box_x
+e49b  a9 00         lda #$00
+e49d  90 02         bcc .inside_bouncy_box_x
+                .outside_bouncy_box_x
+e49f  a9 ff         lda #$ff
+                .inside_bouncy_box_x
+e4a1  60            rts
+      
+      
+      
+      
+      
+                swordtner_emit_enemies: subroutine
+e4a2  a9 02         lda #$02
+e4a4  85 4f         sta state_v5
+                .spawn_loop
+e4a6  20 86 dc      jsr get_enemy_slot_1_sprite
+e4a9  b0 19         bcs .done
+e4ab  18            clc
+e4ac  a9 05         lda #spark_id
+e4ae  65 4f         adc state_v5
+e4b0  20 77 da      jsr enemy_spawn_delegator
+e4b3  20 52 dc      jsr get_oam_offset_from_ram_offset
+e4b6  a5 71         lda dart_x_origin
+e4b8  99 03 02      sta oam_ram_x,y
+e4bb  a5 72         lda dart_y_origin
+e4bd  99 00 02      sta oam_ram_y,y
+e4c0  c6 4f         dec state_v5
+e4c2  10 e2         bpl .spawn_loop
+                .done
+e4c4  20 5e fa      jsr sfx_shoot_bullet
+e4c7  a6 76         ldx enemy_ram_offset
+e4c9  a4 77         ldy enemy_oam_offset
+e4cb  60            rts
+      
+      
+      
+                swordtner_emit_projectiles: subroutine
+                    ; velocity
+e4cc  a9 02         lda #$02
+e4ce  85 73         sta dart_velocity
+                    ; sprite
+e4d0  a9 fe         lda #$fe
+                    ;lda #$00
+e4d2  85 74         sta dart_sprite
+                    ; dir adjustor
+e4d4  a9 00         lda #$00
+e4d6  85 75         sta dart_dir_adjust
+e4d8  20 64 e3      jsr swordtner_rng_bullet
+e4db  20 a8 e7      jsr dart_spawn
+e4de  a9 ff         lda #$ff
+e4e0  85 75         sta dart_dir_adjust
+e4e2  20 64 e3      jsr swordtner_rng_bullet
+e4e5  20 a8 e7      jsr dart_spawn
+e4e8  a9 01         lda #$01
+e4ea  85 75         sta dart_dir_adjust
+e4ec  20 64 e3      jsr swordtner_rng_bullet
+e4ef  20 a8 e7      jsr dart_spawn
+e4f2  60            rts
+      
+      
+      
+      
+                    ; mode 0 - bounce around and fire
+                boss_swordtner_mode_0: subroutine
+      
+                    ; fix x position after player death
+e4f3  b9 03 02      lda oam_ram_x,y
+e4f6  d0 08         bne .dont_fix_x
+e4f8  a9 20         lda #$20
+e4fa  99 03 02      sta oam_ram_x,y
+e4fd  99 00 02      sta oam_ram_y,y
+                .dont_fix_x
+      
+                .bounce_and_fire
+                    ; change face before firing
+e500  a5 c3         lda audio_pattern_pos
+e502  c9 09         cmp #$09
+e504  d0 04         bne .no_face_change
+e506  a9 05         lda #$05
+e508  85 50         sta state_v6
+                .no_face_change
+e50a  a5 c3         lda audio_pattern_pos
+e50c  c9 08         cmp #8
+e50e  90 07         bcc .before_snare
+e510  c9 0c         cmp #12
+e512  b0 0b         bcs .after_snare
+e514  4c 3a e5      jmp .movement_skip
+      
+                .before_snare
+e517  aa            tax
+e518  bd f0 ff      lda arctang_velocities_lo,x
+e51b  85 4c         sta state_v2
+e51d  d0 04         bne .bounce_movement
+      
+                .after_snare
+e51f  a9 80         lda #<arctang_velocity_6.66
+e521  85 4c         sta state_v2
+      
+      
+                    ; MOVEMENT
+                .bounce_movement
+e523  a6 76         ldx enemy_ram_offset
+e525  85 84         sta arctang_velocity_lo
+e527  20 f6 ce      jsr arctang_enemy_update
+                    ; x
+e52a  20 90 e4      jsr swordtner_inside_bouncy_box_x
+e52d  f0 0b         beq .dont_bounce_x
+                .bounce_x
+e52f  bc 07 03      ldy enemy_ram_ex,x
+e532  b9 2c e3      lda arc_bounce_x,y
+e535  9d 07 03      sta enemy_ram_ex,x
+e538  a4 77         ldy enemy_oam_offset
+                .dont_bounce_x
+      
+                .movement_skip
+      
+      
+      
+                    ; spawn/fire on boss fight music main snare
+e53a  a5 c1         lda audio_frame_counter
+e53c  c9 05         cmp #5
+e53e  d0 24         bne .dont_emit
+e540  a5 c3         lda audio_pattern_pos
+e542  c9 0a         cmp #10
+e544  d0 1e         bne .dont_emit
+e546  a5 4b         lda state_v1
+e548  c9 02         cmp #$02
+e54a  d0 07         bne .dont_next_state
+e54c  e6 4a         inc state_v0
+e54e  a9 00         lda #$00
+e550  85 4b         sta state_v1
+e552  60            rts
+                .dont_next_state
+e553  a5 4e         lda state_v4
+e555  29 01         and #$01
+e557  d0 06         bne .emit_enemies
+                .emit_projectiles
+e559  20 cc e4      jsr swordtner_emit_projectiles
+e55c  4c 62 e5      jmp .inc_state
+                .emit_enemies
+e55f  20 a2 e4      jsr swordtner_emit_enemies
+                .inc_state
+e562  e6 4b         inc state_v1
+                .dont_emit
+      
+e564  60            rts
+      
+      
+      
+                    ; mode 1 - aim for player and warn of attack
+                boss_swordtner_mode_shake: subroutine
+e565  a5 4b         lda state_v1
+e567  d0 13         bne .init_done
+                .init
+e569  e6 4b         inc state_v1
+e56b  20 12 ce      jsr enemy_get_direction_of_player
+e56e  18            clc
+e56f  69 01         adc #$01
+e571  20 ae ce      jsr arctang_bound_dir
+e574  9d 07 03      sta enemy_ram_ex,x
+e577  ad f1 ff      lda arctang_velocities_lo+1
+e57a  85 4c         sta state_v2
+                .init_done
+                    ; x shake
+e57c  20 66 c1      jsr shake_8
+e57f  65 7d         adc boss_x
+e581  20 df da      jsr sprite_4_set_x
+                    ; y shake
+e584  20 66 c1      jsr shake_8
+e587  65 7e         adc boss_y
+e589  20 ef da      jsr sprite_4_set_y
+                    ; check if done
+e58c  e6 4b         inc state_v1
+e58e  a5 4b         lda state_v1
+e590  c9 10         cmp #$10
+e592  d0 04         bne .done
+e594  a9 02         lda #$02
+e596  85 4a         sta state_v0
+                .done
+e598  60            rts
+      
+      
+      
+                    ; mode 2 - lunges at player
+                boss_swordtner_mode_2: subroutine
+e599  e6 4b         inc state_v1
+e59b  a5 4b         lda state_v1
+e59d  c9 40         cmp #$40
+e59f  90 0d         bcc .lunge_keep_going
+e5a1  20 90 e4      jsr swordtner_inside_bouncy_box_x
+e5a4  d0 08         bne .lunge_keep_going
+                    ; next state
+e5a6  e6 4e         inc state_v4
+e5a8  a9 00         lda #$00
+e5aa  85 4a         sta state_v0
+e5ac  85 4b         sta state_v1
+                .lunge_keep_going
+e5ae  a5 4c         lda state_v2
+e5b0  85 84         sta arctang_velocity_lo
+e5b2  20 f6 ce      jsr arctang_enemy_update
+                .lunge_done
+e5b5  60            rts
+      
+      
+      
+      

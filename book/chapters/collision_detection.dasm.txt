@@ -1,0 +1,52 @@
+      
+                    ;;;; COLLISION DETECTOR
+                    ;
+                    ; works by putting object data into the following 0 page variables
+                    ;
+                    ; collision_0_x byte
+                    ; collision_0_y byte
+                    ; collision_0_w byte
+                    ; collision_0_h byte
+                    ; collision_1_x byte
+                    ; collision_1_y byte
+                    ; collision_1_w byte
+                    ; collision_1_h byte
+                    ;
+                    ; returns ff (true) or 00 (false) in accumulator
+      
+                    ; the detect_collision subroutine was moved to player_bullets.asm
+                    ; saving over 12 cycles per usage
+      
+      
+      
+                player_collision_detect: subroutine
+                    ; returns true/false in a
+cf35  a5 53         lda state_iframes
+cf37  d0 29         bne .no_collision
+cf39  18            clc
+cf3a  a5 3b         lda collision_0_x
+cf3c  65 3d         adc collision_0_w
+cf3e  b0 22         bcs .no_collision ; make sure x+w is not less than x
+cf40  c5 13         cmp player_x_hi
+cf42  90 1e         bcc .no_collision
+cf44  18            clc
+cf45  a5 17         lda player_coll_x
+cf47  69 0b         adc #$0b ; player width
+cf49  c5 3b         cmp collision_0_x
+cf4b  90 15         bcc .no_collision
+cf4d  18            clc
+cf4e  a5 3c         lda collision_0_y
+cf50  65 3e         adc collision_0_h
+cf52  c5 18         cmp player_coll_y
+cf54  90 0c         bcc .no_collision
+cf56  18            clc
+cf57  a5 18         lda player_coll_y
+cf59  69 03         adc #$03 ; player height
+cf5b  c5 3c         cmp collision_0_y
+cf5d  90 03         bcc .no_collision
+                .collision
+cf5f  a9 ff         lda #$ff
+cf61  60            rts
+                .no_collision
+cf62  a9 00         lda #$00
+cf64  60            rts

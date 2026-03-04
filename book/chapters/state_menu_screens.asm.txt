@@ -1,0 +1,569 @@
+                    ; zp vars
+      
+                    ;title_rudy_pos  EQU $181
+      
+                    ;options_rudy_pos EQU $182
+                    ;options_music_on EQU $183
+                    ;options_song_id  EQU $184
+                    ;options_sound_id EQU $185
+                    ;options_rudy_color1 EQU $186
+                    ;options_rudy_color2 EQU $187
+      
+                    ;scroll_to_counter EQU $188
+      
+      
+                menu_screens_init: subroutine
+      
+c654  20 43 c1      jsr render_disable
+c657  20 71 c1      jsr nametables_clear
+c65a  20 b1 c1      jsr sprite_clear
+c65d  20 4a c6      jsr state_sprite0_disable
+      
+c660  a9 82         lda #state_render_jump_table_offset+1
+c662  85 55         sta state_render_addr
+c664  a9 87         lda #state_update_jump_table_offset+1
+c666  85 56         sta state_update_addr
+c668  20 21 c6      jsr state_clear ; a = 0
+c66b  85 01         sta scroll_x_hi
+c66d  85 04         sta scroll_page
+c66f  85 22         sta player_damage_flash ; no flash on fade-in
+c671  85 09         sta ppu_mask_emph ; reset mask
+c673  20 95 d6      jsr timer_reset
+c676  20 d5 c7      jsr title_screen_set_rudy_y
+                    ; setup colors
+c679  a2 12         ldx #18
+c67b  a0 00         ldy #0
+c67d  20 cf d1      jsr palette_load
+c680  a9 0f         lda #$0f
+c682  85 90         sta pal_uni_bg
+                    ; setup everything else
+c684  20 17 f2      jsr player_game_reset
+c687  20 7c fb      jsr song_stop
+c68a  20 65 cf      jsr dashboard_init
+c68d  20 c2 d0      jsr dashboard_update
+c690  20 75 d0      jsr dashboard_render
+      
+                    ; copylines pal att
+                    PPU_SETADDR $23c0
+c693  a9 23         lda #>$23c0
+c695  8d 06 20      sta PPU_ADDR
+c698  a9 c0         lda #<$23c0
+c69a  8d 06 20      sta PPU_ADDR
+c69d  a2 37         ldx #$37
+                .copylines_pal_loop
+c69f  8a            txa
+c6a0  c9 30         cmp #$30
+c6a2  b0 05         bcs .bookbinder_gray
+c6a4  8a            txa
+c6a5  29 30         and #$30
+c6a7  d0 04         bne .on8
+                .bookbinder_gray
+c6a9  a9 0a         lda #%00001010
+c6ab  d0 02         bne .plot_pal
+                .on8
+c6ad  a9 00         lda #$00000000
+                .plot_pal
+c6af  8d 07 20      sta PPU_DATA
+c6b2  ca            dex
+c6b3  10 ea         bpl .copylines_pal_loop
+      
+                    ; G u n T n e R
+      
+                    ; BIG TITLE
+                    PPU_SETADDR $2060
+c6b5  a9 20         lda #>$2060
+c6b7  8d 06 20      sta PPU_ADDR
+c6ba  a9 60         lda #<$2060
+c6bc  8d 06 20      sta PPU_ADDR
+c6bf  a0 00         ldy #$00
+                big_title_loop:
+c6c1  b9 f1 c7      lda guntner_title_name_table,y
+c6c4  8d 07 20      sta PPU_DATA
+c6c7  c8            iny
+c6c8  d0 f7         bne big_title_loop
+      
+                    ; pinline on title screen
+                    PPU_SETADDR $22c0
+c6ca  a9 22         lda #>$22c0
+c6cc  8d 06 20      sta PPU_ADDR
+c6cf  a9 c0         lda #<$22c0
+c6d1  8d 06 20      sta PPU_ADDR
+c6d4  a9 b1         lda #$b1
+c6d6  a0 20         ldy #$20
+                .pinline_footer
+c6d8  8d 07 20      sta PPU_DATA
+c6db  88            dey
+c6dc  d0 fa         bne .pinline_footer
+      
+                    ; pinline on options screen
+                    PPU_SETADDR $2420
+c6de  a9 24         lda #>$2420
+c6e0  8d 06 20      sta PPU_ADDR
+c6e3  a9 20         lda #<$2420
+c6e5  8d 06 20      sta PPU_ADDR
+c6e8  a9 b1         lda #$b1
+c6ea  a0 20         ldy #$20
+                .pinline_header
+c6ec  8d 07 20      sta PPU_DATA
+c6ef  88            dey
+c6f0  d0 fa         bne .pinline_header
+      
+                    ; various stuff on screen
+                    NMTP_SETADDR menu_screen_tile_data
+c6f2  a9 c2         lda #>menu_screen_tile_data
+c6f4  85 58         sta nametable_tile_planter_addr_hi
+c6f6  a9 7a         lda #<menu_screen_tile_data
+c6f8  85 57         sta nametable_tile_planter_addr_lo
+c6fa  20 d1 c1      jsr nametable_tile_planter
+      
+                    ; set rudy stuff
+c6fd  20 af c7      ` jsr menus_position_rudy
+c700  20 98 f2      jsr set_player_sprite
+      
+c703  20 4e d2      jsr palette_fade_in_init
+c706  20 76 fa      jsr sfx_rng_chord
+      
+                    ; turn ppu back on
+c709  20 38 c1      jsr render_enable
+c70c  60            rts
+      
+      
+      
+                    ; vBLANK RENDER HANDLER
+      
+                menu_screens_render:
+                    ; pretty much just for options screen
+                    ; show song id
+                    PPU_SETADDR $2514
+c70d  a9 25         lda #>$2514
+c70f  8d 06 20      sta PPU_ADDR
+c712  a9 14         lda #<$2514
+c714  8d 06 20      sta PPU_ADDR
+c717  a9 60         lda #char_set_offset
+c719  8d 07 20      sta PPU_DATA
+c71c  a5 2c         lda options_song_id
+c71e  20 cb c1      jsr get_char_lo
+c721  8d 07 20      sta PPU_DATA
+                    ; show sound id
+                    PPU_SETADDR $2554
+c724  a9 25         lda #>$2554
+c726  8d 06 20      sta PPU_ADDR
+c729  a9 54         lda #<$2554
+c72b  8d 06 20      sta PPU_ADDR
+c72e  a5 2d         lda options_sound_id
+c730  20 c3 c1      jsr get_char_hi
+c733  8d 07 20      sta PPU_DATA
+c736  a5 2d         lda options_sound_id
+c738  20 cb c1      jsr get_char_lo
+c73b  8d 07 20      sta PPU_DATA
+                    ; show difficulty
+                    PPU_SETADDR $2649
+c73e  a9 26         lda #>$2649
+c740  8d 06 20      sta PPU_ADDR
+c743  a9 49         lda #<$2649
+c745  8d 06 20      sta PPU_ADDR
+c748  a9 00         lda #0
+c74a  18            clc
+c74b  a4 23         ldy game_difficulty
+c74d  f0 05         beq .diff_offset_found
+                .diff_offset_finder
+c74f  69 0e         adc #14
+c751  88            dey
+c752  d0 fb         bne .diff_offset_finder
+                .diff_offset_found
+c754  a8            tay
+c755  a2 00         ldx #0
+                .diff_place_loop
+c757  b9 42 c2      lda difficulty_messages,y
+c75a  8d 07 20      sta PPU_DATA
+c75d  e8            inx
+c75e  c8            iny
+c75f  e0 0e         cpx #14
+c761  d0 f4         bne .diff_place_loop
+c763  4c 7d c0      jmp state_render_done
+      
+      
+      
+      
+      
+                    ; SCROLL HANDLERS
+      
+                scrollto_options_update: subroutine
+c766  a5 30         lda scroll_to_counter
+c768  18            clc
+c769  69 04         adc #$04
+c76b  85 30         sta scroll_to_counter
+c76d  aa            tax
+c76e  bd 00 fe      lda sine_table,x
+c771  85 01         sta scroll_x_hi
+c773  e0 40         cpx #$40
+c775  d0 0c         bne .done
+                    ; setup options
+c777  a9 89         lda #state_update_jump_table_offset+3
+c779  85 56         sta state_update_addr
+c77b  a9 01         lda #1
+c77d  85 04         sta scroll_page
+c77f  a9 00         lda #$00
+c781  85 01         sta scroll_x_hi
+                    ;jmp options_screen_init
+                .done
+c783  20 af c7      jsr menus_position_rudy
+c786  4c a7 c0      jmp state_update_done
+      
+      
+      
+                scrollto_titles_update: subroutine
+c789  a9 00         lda #$00
+c78b  85 04         sta scroll_page
+c78d  a5 30         lda scroll_to_counter
+c78f  38            sec
+c790  e9 04         sbc #$04
+c792  85 30         sta scroll_to_counter
+c794  aa            tax
+c795  bd 00 fe      lda sine_table,x
+c798  85 01         sta scroll_x_hi
+c79a  e0 c0         cpx #$c0
+c79c  d0 0b         bne .done
+                    ; setup options
+c79e  a9 87         lda #state_update_jump_table_offset+1
+c7a0  85 56         sta state_update_addr
+c7a2  a9 00         lda #$00
+c7a4  85 04         sta scroll_page
+c7a6  20 95 d6      jsr timer_reset
+                .done
+c7a9  20 af c7      jsr menus_position_rudy
+c7ac  4c a7 c0      jmp state_update_done
+      
+      
+      
+                menus_position_rudy: subroutine
+c7af  a5 01         lda scroll_x_hi
+c7b1  d0 01         bne .do_eeet
+c7b3  60            rts
+                .do_eeet
+c7b4  c9 48         cmp #$48
+c7b6  b0 0b         bcs .coming_from_right
+                .going_to_the_left
+c7b8  20 d5 c7      jsr title_screen_set_rudy_y
+c7bb  a9 3a         lda #$3a
+c7bd  38            sec
+c7be  e5 01         sbc scroll_x_hi
+c7c0  4c cb c7      jmp .plot_tiles
+                .coming_from_right
+c7c3  20 e3 c7      jsr options_screen_set_rudy_y
+c7c6  a9 38         lda #$38
+c7c8  38            sec
+c7c9  e5 01         sbc scroll_x_hi
+                .plot_tiles
+c7cb  8d 07 02      sta oam_ram_rudy+3
+c7ce  18            clc
+c7cf  69 08         adc #$08
+c7d1  8d 0b 02      sta oam_ram_rudy+7
+c7d4  60            rts
+      
+      
+                title_screen_set_rudy_y: subroutine
+c7d5  a5 29         lda title_rudy_pos
+c7d7  0a            asl
+c7d8  0a            asl
+c7d9  0a            asl
+c7da  0a            asl
+c7db  18            clc
+c7dc  69 7f         adc #$7f
+c7de  85 15         sta player_y_hi
+c7e0  4c 98 f2      jmp set_player_sprite
+      
+      
+                options_screen_set_rudy_y: subroutine
+c7e3  a5 2a         lda options_rudy_pos
+c7e5  0a            asl
+c7e6  0a            asl
+c7e7  0a            asl
+c7e8  0a            asl
+c7e9  18            clc
+c7ea  69 37         adc #$37
+c7ec  85 15         sta player_y_hi
+c7ee  4c 98 f2      jmp set_player_sprite
+      
+      
+      
+      
+                    ; STRINGS AND NAMETABLES
+      
+      
+      
+                    guntner_title_name_table ; 256 bytes
+c7f1  byte          $03,$03,$03,$c1,$c2,$c3,$c4,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2
+c801  byte          $c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c2,$c5,$03,$03,$03
+c811  byte          $03,$03,$03,$c6,$c7,$c8,$c9,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$cb
+c821  byte          $cc,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$ca,$cb,$cc,$cd,$ce,$03,$03,$03
+c831  byte          $03,$03,$03,$cf,$d0,$03,$d1,$d2,$d3,$d4,$d5,$d6,$d7,$d8,$d9,$d2
+c841  byte          $d3,$d6,$d7,$d8,$d9,$da,$db,$dc,$dd,$d2,$d3,$de,$cf,$03,$03,$03
+c851  byte          $03,$03,$03,$cf,$df,$e0,$e1,$d2,$d3,$e2,$d5,$e3,$e4,$e5,$d5,$d2
+c861  byte          $d3,$e3,$e4,$e5,$d5,$d2,$e6,$e7,$d5,$d2,$e8,$e9,$ea,$03,$03,$03
+c871  byte          $03,$03,$03,$cf,$d0,$e3,$d5,$d2,$d3,$e2,$d5,$e3,$d5,$e2,$d5,$d2
+c881  byte          $d3,$e3,$d5,$e2,$d5,$d2,$eb,$ec,$ed,$d2,$d3,$e2,$ee,$03,$03,$03
+c891  byte          $03,$03,$03,$cf,$d0,$e3,$d5,$ef,$f0,$f1,$f2,$f3,$ce,$f4,$d5,$d2
+c8a1  byte          $d3,$f3,$ce,$f4,$d5,$ef,$f0,$f1,$f2,$d2,$f5,$f6,$cf,$03,$03,$03
+c8b1  byte          $03,$03,$03,$cf,$f7,$f8,$d5,$03,$03,$03,$03,$03,$03,$03,$03,$d2
+c8c1  byte          $d3,$03,$03,$03,$03,$03,$03,$03,$03,$03,$03,$e2,$cf,$03,$03,$03
+c8d1  byte          $03,$03,$03,$f9,$fa,$fa,$fb,$03,$03,$03,$03,$03,$03,$03,$fc,$fa
+c8e1  byte          $fa,$fd,$03,$03,$03,$03,$03,$03,$03,$03,$03,$fe,$fa,$fd,$03,$03
+      
+      
+                title_screen_super_secret_code:
+c8f1  byte          $08,$08,$04,$04,$02,$01,$02,$01,$40,$80
+      
+      
+                    ; TITLE SCREEN UPDATES
+      
+                title_screen_update: subroutine
+                    ; set rudy x
+c8fb  a9 38         lda #$38
+c8fd  85 13         sta player_x_hi
+      
+                    ; number of seconds before demo
+c8ff  a5 46         lda timer_seconds_1s
+                    ; add #$30 because timer based on numerical tiles
+c901  c9 63         cmp #char_set_0+3
+c903  d0 05         bne .sit_and_wait
+                .start_demo
+c905  a9 7d         lda #state_init_jump_table_offset+1
+c907  20 82 d2      jsr palette_fade_out_init
+                .sit_and_wait
+                    ; check for super secret code
+c90a  a4 4a         ldy state_v0
+c90c  30 24         bmi .super_secret_code_done
+c90e  a5 1c         lda player_controls
+c910  29 cf         and #$cf
+c912  c5 4c         cmp state_v2
+c914  f0 1c         beq .super_secret_code_done
+c916  85 4c         sta state_v2
+c918  c9 00         cmp #$00
+c91a  f0 16         beq .super_secret_code_done
+c91c  d9 f1 c8      cmp title_screen_super_secret_code,y
+c91f  f0 06         beq .super_secret_code_next
+c921  a9 ff         lda #$ff
+c923  85 4a         sta state_v0
+c925  30 0b         bmi .super_secret_code_done
+                .super_secret_code_next
+c927  c8            iny
+c928  84 4a         sty state_v0
+c92a  c0 0a         cpy #$0a
+c92c  90 04         bcc .super_secret_code_done
+c92e  a9 01         lda #$01
+c930  85 4b         sta state_v1
+                .super_secret_code_done
+c932  a9 0f         lda #BUTTON_UP|BUTTON_DOWN|BUTTON_LEFT|BUTTON_RIGHT
+c934  25 1d         and player_controls_debounced
+c936  f0 0d         beq .dont_change_pos
+c938  e6 29         inc title_rudy_pos
+c93a  a9 01         lda #%00000001
+c93c  25 29         and title_rudy_pos
+c93e  85 29         sta title_rudy_pos
+c940  20 95 d6      jsr timer_reset
+c943  d0 1e         bne .do_nothing
+                .dont_change_pos
+c945  a9 10         lda #BUTTON_START
+c947  a4 4a         ldy state_v0
+c949  c0 ff         cpy #$ff
+c94b  d0 02         bne .button_check
+c94d  09 c0         ora #BUTTON_B|BUTTON_A
+                .button_check
+c94f  25 1d         and player_controls_debounced
+c951  f0 10         beq .do_nothing
+c953  a5 29         lda title_rudy_pos
+c955  c9 01         cmp #$01
+c957  f0 06         beq .goto_options
+                .start_game:
+c959  20 76 c9      jsr menu_start_game
+c95c  4c 63 c9      jmp .do_nothing
+      
+                .goto_options
+c95f  a9 88         lda #state_update_jump_table_offset+2
+c961  85 56         sta state_update_addr
+                .do_nothing
+c963  20 d5 c7      jsr title_screen_set_rudy_y
+                    ; except animate that color tho
+                    ; increase color
+c966  a5 24         lda wtf
+c968  29 0f         and #$f
+c96a  d0 07         bne .dont_next_title_color
+c96c  a5 91         lda pal_bg_0_1
+c96e  20 e0 d1      jsr palette_next_rainbow_color
+c971  85 91         sta pal_bg_0_1
+                .dont_next_title_color
+c973  4c a7 c0      jmp state_update_done
+      
+      
+                menu_start_game: subroutine
+c976  a5 1c         lda player_controls
+c978  29 20         and #BUTTON_SELECT
+c97a  f0 02         beq .not_cheater_boundless
+c97c  e6 1e         inc player_boundless
+                .not_cheater_boundless
+                    ;; disable start_d so game doesn't instantly pause
+c97e  a9 00         lda #$00
+c980  85 1c         sta player_controls
+c982  85 1d         sta player_controls_debounced
+                    ; init cut scene 00
+c984  a9 7f         lda #state_init_jump_table_offset+3
+c986  20 82 d2      jsr palette_fade_out_init
+c989  60            rts
+      
+      
+      
+      
+                    ; OPTION SCREEN UPDATES
+      
+                options_screen_update: subroutine
+c98a  a5 6c         lda shroom_counter
+c98c  d0 03         bne .skip_player_colors
+c98e  20 48 f2      jsr player_update_colors
+                .skip_player_colors
+c991  a5 1c         lda player_controls
+c993  29 10         and #BUTTON_START
+c995  f0 0a         beq .dont_start_game
+c997  a9 c0         lda #$c0 ; set scroll to title screen
+c999  85 30         sta scroll_to_counter
+                .start_game:
+c99b  20 76 c9      jsr menu_start_game
+c99e  4c a7 c0      jmp state_update_done
+      
+                .dont_start_game
+c9a1  20 e3 c7      jsr options_screen_set_rudy_y
+                    ; check if option changes
+c9a4  a5 1d         lda player_controls_debounced
+c9a6  29 04         and #BUTTON_DOWN
+c9a8  f0 02         beq .dont_change_option_down
+c9aa  e6 2a         inc options_rudy_pos
+                .dont_change_option_down
+c9ac  a5 1d         lda player_controls_debounced
+c9ae  29 08         and #BUTTON_UP
+c9b0  f0 02         beq .dont_change_option_up
+c9b2  c6 2a         dec options_rudy_pos
+                .dont_change_option_up
+                    ; check option pos is in range
+c9b4  a5 2a         lda options_rudy_pos
+c9b6  c9 ff         cmp #$ff ; min value - 1
+c9b8  d0 02         bne .dont_wrap_up
+c9ba  a9 05         lda #$05
+                .dont_wrap_up
+c9bc  c9 06         cmp #$06 ; max value + 1
+c9be  d0 02         bne .dont_wrap_down
+c9c0  a9 00         lda #$00
+                .dont_wrap_down
+c9c2  85 2a         sta options_rudy_pos
+      
+                    ; which option handler?
+                options_screen_handler
+c9c4  18            clc
+c9c5  69 47         adc #options_screen_state_jump_table_offset
+c9c7  4c f1 c4      jmp jump_to_subroutine
+      
+      
+                options_menu_return: subroutine
+c9ca  a5 1d         lda player_controls_debounced
+c9cc  29 c0         and #BUTTON_B|BUTTON_A
+c9ce  f0 04         beq .do_nothing
+c9d0  a9 8a         lda #state_update_jump_table_offset+4
+c9d2  85 56         sta state_update_addr
+                .do_nothing
+c9d4  4c a7 c0      jmp state_update_done
+      
+      
+                options_min_max:
+c9d7  byte          $00, $08 ; song
+c9d9  byte          $00, $13 ; sfx
+c9db  byte          $10, $1c ; color1
+c9dd  byte          $20, $2c ; color2
+c9df  byte          $00, $03 ; difficulty
+      
+                options_handle_change: subroutine
+                    ; a = current value
+                    ; y = table offset
+c9e1  85 86         sta temp00
+c9e3  a5 1d         lda player_controls_debounced
+c9e5  29 01         and #BUTTON_RIGHT
+c9e7  f0 0e         beq .dont_increase
+c9e9  e6 86         inc temp00
+c9eb  b9 d8 c9      lda options_min_max+1,y
+c9ee  c5 86         cmp temp00
+c9f0  b0 1b         bcs .done
+c9f2  b9 d7 c9      lda options_min_max,y
+c9f5  85 86         sta temp00
+                .dont_increase
+c9f7  a5 1d         lda player_controls_debounced
+c9f9  29 02         and #BUTTON_LEFT
+c9fb  f0 10         beq .dont_decrease
+c9fd  c6 86         dec temp00
+c9ff  30 07         bmi .go_max
+ca01  a5 86         lda temp00
+ca03  d9 d7 c9      cmp options_min_max,y
+ca06  b0 05         bcs .done
+                .go_max
+ca08  b9 d8 c9      lda options_min_max+1,y
+ca0b  85 86         sta temp00
+                .dont_decrease
+                .done
+ca0d  a5 86         lda temp00
+ca0f  60            rts
+      
+                options_screen_song_handler: subroutine
+ca10  a5 2c         lda options_song_id
+ca12  a0 00         ldy #0
+ca14  20 e1 c9      jsr options_handle_change
+ca17  85 2c         sta options_song_id
+                    ; trigger song with button
+ca19  a5 1d         lda player_controls_debounced
+ca1b  29 40         and #BUTTON_B
+ca1d  f0 03         beq .no_b
+ca1f  20 7c fb      jsr song_stop
+                .no_b
+ca22  a5 1d         lda player_controls_debounced
+ca24  29 80         and #BUTTON_A
+ca26  f0 05         beq .no_a
+ca28  a5 2c         lda options_song_id
+ca2a  20 4b fb      jsr song_start
+                .no_a
+ca2d  4c a7 c0      jmp state_update_done
+      
+      
+                options_screen_sfx_handler: subroutine
+ca30  a5 2d         lda options_sound_id
+ca32  a0 02         ldy #2
+ca34  20 e1 c9      jsr options_handle_change
+ca37  85 2d         sta options_sound_id
+                    ; trigger sound with button
+ca39  a5 1d         lda player_controls_debounced
+ca3b  29 c0         and #BUTTON_B|BUTTON_A
+ca3d  d0 03         bne .trigger_sound
+ca3f  4c a7 c0      jmp state_update_done
+                .trigger_sound
+ca42  a5 2d         lda options_sound_id
+ca44  20 46 f8      jsr sfx_test_delegator
+ca47  4c a7 c0      jmp state_update_done
+      
+      
+                options_screen_color1_handler: subroutine
+ca4a  a5 a9         lda player_color0
+ca4c  a0 04         ldy #4
+ca4e  20 e1 c9      jsr options_handle_change
+ca51  85 a9         sta player_color0
+ca53  4c a7 c0      jmp state_update_done
+      
+      
+                options_screen_color2_handler: subroutine
+ca56  a5 aa         lda player_color1
+ca58  a0 06         ldy #6
+ca5a  20 e1 c9      jsr options_handle_change
+ca5d  85 aa         sta player_color1
+ca5f  4c a7 c0      jmp state_update_done
+      
+      
+                options_screen_difficulty_handler: subroutine
+ca62  a5 23         lda game_difficulty
+ca64  a0 08         ldy #8
+ca66  20 e1 c9      jsr options_handle_change
+ca69  85 23         sta game_difficulty
+ca6b  4c a7 c0      jmp state_update_done

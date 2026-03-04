@@ -1,0 +1,145 @@
+      
+      
+      
+                    ; controls player in demo mode
+                player_demo_controls: subroutine
+      
+                    ; PLAYER MOVEMENT
+                    ; clear player directions
+f5a0  a9 00         lda #$00
+f5a2  85 1c         sta player_controls
+f5a4  85 1d         sta player_controls_debounced
+                    ; set flags in y register
+f5a6  a8            tay
+                    ; check x coordinate
+f5a7  a5 13         lda player_x_hi
+f5a9  c5 0f         cmp player_demo_x
+f5ab  f0 20         beq .player_x_equal
+f5ad  b0 0f         bcs .player_x_greater
+                .player_x_lesser
+f5af  a5 11         lda player_demo_lr
+f5b1  c9 ff         cmp #$ff
+f5b3  f0 18         beq .player_x_equal
+                    ; go right
+f5b5  a9 01         lda #BUTTON_RIGHT
+f5b7  05 1c         ora player_controls
+f5b9  85 1c         sta player_controls
+                    ;inc player_x_hi
+f5bb  4c ce f5      jmp .player_x_done
+                .player_x_greater
+f5be  a5 11         lda player_demo_lr
+f5c0  c9 00         cmp #$00
+f5c2  f0 09         beq .player_x_equal
+                    ; go left
+f5c4  a9 02         lda #BUTTON_LEFT
+f5c6  05 1c         ora player_controls
+f5c8  85 1c         sta player_controls
+                    ;dec player_x_hi
+f5ca  4c ce f5      jmp .player_x_done
+                .player_x_equal
+f5cd  c8            iny
+                .player_x_done
+                    ; check y coordinate
+f5ce  a5 15         lda player_y_hi
+f5d0  c5 10         cmp player_demo_y
+f5d2  f0 20         beq .player_y_equal
+f5d4  b0 0f         bcs .player_y_greater
+                .player_y_lesser
+f5d6  a5 12         lda player_demo_ud
+f5d8  c9 ff         cmp #$ff
+f5da  f0 18         beq .player_y_equal
+                    ; go down
+f5dc  a9 04         lda #BUTTON_DOWN
+f5de  05 1c         ora player_controls
+f5e0  85 1c         sta player_controls
+                    ;inc player_y_hi
+f5e2  4c f5 f5      jmp .player_y_done
+                .player_y_greater
+f5e5  a5 12         lda player_demo_ud
+f5e7  c9 00         cmp #$00
+f5e9  f0 09         beq .player_y_equal
+                    ; go up
+f5eb  a9 08         lda #BUTTON_UP
+f5ed  05 1c         ora player_controls
+f5ef  85 1c         sta player_controls
+                    ;dec player_y_hi
+f5f1  4c f5 f5      jmp .player_y_done
+                .player_y_equal
+f5f4  c8            iny
+                .player_y_done
+                    ; check if both coordinates are met
+f5f5  c0 02         cpy #$02
+f5f7  f0 03         beq .set_demo_new_target
+f5f9  4c 34 f6      jmp .done
+                .set_demo_new_target
+      
+                    ; set x target
+f5fc  a5 26         lda rng0
+f5fe  20 5a c1      jsr NextRandom
+f601  85 26         sta rng0
+f603  4a            lsr
+f604  18            clc
+f605  69 5e         adc #$5e
+f607  85 0f         sta player_demo_x
+f609  c5 13         cmp player_x_hi
+f60b  b0 07         bcs .player_going_left
+                .player_going_right
+f60d  a9 ff         lda #$ff
+f60f  85 11         sta player_demo_lr
+f611  4c 18 f6      jmp .player_x_dir_done
+                .player_going_left
+f614  a9 00         lda #$00
+f616  85 11         sta player_demo_lr
+                .player_x_dir_done
+      
+                    ; set y target
+f618  a5 26         lda rng0
+f61a  20 5a c1      jsr NextRandom
+f61d  85 26         sta rng0
+f61f  4a            lsr
+f620  18            clc
+f621  69 10         adc #$10
+f623  85 10         sta player_demo_y
+f625  c5 15         cmp player_y_hi
+f627  b0 07         bcs .player_going_up
+                .player_going_down
+f629  a9 ff         lda #$ff
+f62b  85 12         sta player_demo_ud
+f62d  4c 34 f6      jmp .player_y_dir_done
+                .player_going_up
+f630  a9 00         lda #$00
+f632  85 12         sta player_demo_ud
+                .player_y_dir_done
+      
+                .done
+f634  20 be f4      jsr player_move_position
+      
+                    ; PLAYER GUN
+      
+      
+f637  a5 24         lda wtf
+f639  29 47         and #$47
+f63b  c9 40         cmp #$40
+f63d  d0 06         bne .fire_not_turbo
+f63f  a9 80         lda #BUTTON_A
+f641  05 1c         ora player_controls
+f643  85 1c         sta player_controls
+                .fire_not_turbo
+f645  a9 40         lda #BUTTON_B
+f647  05 1c         ora player_controls
+f649  85 1c         sta player_controls
+f64b  a5 24         lda wtf
+f64d  29 0f         and #$0f ; should be 7
+f64f  c9 00         cmp #$00
+f651  d0 04         bne .fire_done
+f653  a9 40         lda #BUTTON_B
+f655  85 1d         sta player_controls_debounced
+                .fire_done
+f657  20 b8 f3      jsr player_bullets_check_controls
+      
+f65a  60            rts
+      
+      
+      
+      
+      

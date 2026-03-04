@@ -1,0 +1,807 @@
+      
+                    ;;;;; SUBROUTINES
+      
+                ClearRAM: subroutine
+c115  a9 00         lda #0 ; A = 0
+c117  aa            tax ; X = 0
+                .clearRAM
+c118  95 00         sta $0,x ; clear $0-$ff
+c11a  e0 fe         cpx #$fe ; last 2 bytes of stack?
+c11c  b0 03         bcs .skipStack ; don't clear it
+c11e  9d 00 01      sta $100,x ; clear $100-$1fd
+                .skipStack
+c121  9d 00 02      sta $200,x ; clear $200-$2ff
+c124  9d 00 03      sta $300,x ; clear $300-$3ff
+c127  9d 00 04      sta $400,x ; clear $400-$4ff
+c12a  9d 00 05      sta $500,x ; clear $500-$5ff
+c12d  9d 00 06      sta $600,x ; clear $600-$6ff
+c130  9d 00 07      sta $700,x ; clear $700-$7ff
+c133  e8            inx ; X = X + 1
+c134  d0 e2         bne .clearRAM ; loop 256 times
+c136  60            rts
+      
+      
+                do_nothing: subroutine
+c137  60            rts
+      
+                    ; disable PPU drawing and NMI
+                render_enable:
+c138  a9 18         lda #MASK_BG|MASK_SPR
+c13a  8d 01 20      sta PPU_MASK
+c13d  a9 90         lda #CTRL_NMI|CTRL_BG_1000
+c13f  8d 00 20      sta PPU_CTRL
+c142  60            rts
+      
+                render_disable:
+c143  a9 00         lda #$00
+c145  8d 01 20      sta PPU_MASK
+c148  8d 00 20      sta PPU_CTRL
+c14b  60            rts
+      
+                    ; wait for VSYNC to start
+                WaitSync:
+c14c  2c 02 20      bit PPU_STATUS
+c14f  10 fb         bpl WaitSync
+c151  60            rts
+      
+      
+                    ;;;;; RANDOM NUMBERS
+      
+                get_next_random: subroutine
+c152  a5 26         lda rng0
+c154  20 5a c1      jsr NextRandom
+c157  85 26         sta rng0
+c159  60            rts
+      
+                NextRandom subroutine
+c15a  4a            lsr
+c15b  90 02         bcc .NoEor
+c15d  49 d4         eor #$d4
+                .NoEor:
+c15f  60            rts
+                    ; Get previous random value
+                PrevRandom subroutine
+c160  0a            asl
+c161  90 02         bcc .NoEor
+c163  49 a9         eor #$a9
+                .NoEor:
+c165  60            rts
+      
+      
+                shake_8: subroutine
+                    ; returns rng in -4..3 range ready for addition
+c166  20 52 c1      jsr get_next_random
+c169  4a            lsr
+c16a  29 07         and #$07
+c16c  38            sec
+c16d  e9 04         sbc #$04
+c16f  18            clc
+c170  60            rts
+      
+      
+      
+                    tile_empty 		EQM $03
+      
+                nametables_clear:
+                    ; tiles
+c171  a2 07         ldx #$07
+c173  a0 00         ldy #$00
+                    PPU_SETADDR $2000
+c175  a9 20         lda #>$2000
+c177  8d 06 20      sta PPU_ADDR
+c17a  a9 00         lda #<$2000
+c17c  8d 06 20      sta PPU_ADDR
+c17f  a9 03         lda #tile_empty
+                .page_loop
+                .byte_loop
+c181  8d 07 20      sta PPU_DATA
+c184  c8            iny
+c185  d0 fa         bne .byte_loop
+c187  ca            dex
+c188  10 f7         bpl .page_loop
+                    ; attributes
+c18a  a0 00         ldy #0
+                    PPU_SETADDR $23c0
+c18c  a9 23         lda #>$23c0
+c18e  8d 06 20      sta PPU_ADDR
+c191  a9 c0         lda #<$23c0
+c193  8d 06 20      sta PPU_ADDR
+c196  a2 c0         ldx #$c0
+                .nm1_attr_loop
+c198  8c 07 20      sty PPU_DATA
+c19b  e8            inx
+c19c  d0 fa         bne .nm1_attr_loop
+                    PPU_SETADDR $27c0
+c19e  a9 27         lda #>$27c0
+c1a0  8d 06 20      sta PPU_ADDR
+c1a3  a9 c0         lda #<$27c0
+c1a5  8d 06 20      sta PPU_ADDR
+c1a8  a2 c0         ldx #$c0
+                .nm2_attr_loop
+c1aa  8c 07 20      sty PPU_DATA
+c1ad  e8            inx
+c1ae  d0 fa         bne .nm2_attr_loop
+c1b0  60            rts
+      
+      
+                sprite_clear:
+c1b1  a9 ff         lda #$ff
+c1b3  a2 00         ldx #$00
+                .clear_sprite_ram
+c1b5  9d 00 02      sta oam_ram_y,x ; PPU OAM sprite data
+c1b8  e8            inx
+c1b9  d0 fa         bne .clear_sprite_ram
+c1bb  60            rts
+      
+                ppu_mess_emph: subroutine
+c1bc  a5 28         lda rng2
+c1be  29 e0         and #%11100000
+c1c0  85 09         sta ppu_mask_emph
+c1c2  60            rts
+      
+                    ; HEX views
+                get_char_hi: subroutine
+                    ; a = value in / hex char out
+c1c3  4a            lsr
+c1c4  4a            lsr
+c1c5  4a            lsr
+c1c6  4a            lsr
+c1c7  18            clc
+c1c8  69 60         adc #char_set_offset
+c1ca  60            rts
+                get_char_lo: subroutine
+                    ; a = value in / hex char out
+c1cb  29 0f         and #$0f
+c1cd  18            clc
+c1ce  69 60         adc #char_set_offset
+c1d0  60            rts
+      
+      
+                    ;;;;; namtetable_tile_planter
+                    ;;;;; data set address <address> - set 16-bit PPU address
+      
+                    MAC nmtp_setaddr
+                    lda #>{1} ; upper byte
+                    sta nametable_tile_planter_addr_hi
+                    lda #<{1} ; lower byte
+                    sta nametable_tile_planter_addr_lo
+                ENDM
+      
+                nametable_tile_planter:
+c1d1  a0 00         ldy #$00
+c1d3  b1 57         lda (nametable_tile_planter_addr_lo),y ; upper byte
+                .tileset_loop
+c1d5  8d 06 20      sta PPU_ADDR
+c1d8  c8            iny
+c1d9  b1 57         lda (nametable_tile_planter_addr_lo),y ; lower byte
+c1db  8d 06 20      sta PPU_ADDR
+c1de  c8            iny
+                .string_loop
+c1df  b1 57         lda (nametable_tile_planter_addr_lo),y ; read string
+c1e1  c8            iny
+c1e2  c9 00         cmp #$00
+c1e4  f0 05         beq .terminate_string
+c1e6  8d 07 20      sta PPU_DATA
+c1e9  d0 f4         bne .string_loop
+                .terminate_string
+c1eb  b1 57         lda (nametable_tile_planter_addr_lo),y ; look for ff
+c1ed  c9 ff         cmp #$ff
+c1ef  d0 e4         bne .tileset_loop
+c1f1  60            rts
+      
+      
+      
+                dashboard_messages:
+                    ;" Y 0 u  D 3 A D "
+c1f2  hex           03970360037d03038503630382038503
+                    ;" G A M E O V Er "
+c202  hex           03870382038d0386038f039403867a03
+                    ;"gg ConGraTiON gg"
+c212  hex           707003847776877a6a93728f8e037070
+                    ;" please unpause "
+c222  hex           0378746e6a7b6e037d76786a7d7b6e03
+                    ;"GooDlucK Hav3fuN"
+c232  hex           87777785747d6c8b03886a7e636f7d8e
+      
+                difficulty_messages:
+                    ;" Weiner Burgh "
+c242  hex           03956e72766e7a03837d7a707103
+                    ;" Kids' Gloves "
+c250  hex           038b726d7b9e038774777e6e7b03
+                    ;"Mega Gooderest"
+c25e  hex           8d6e706a038777776d6e7a6e7b7c
+                    ;"A-OK #1 Expert"
+c26c  hex           82ab8f8b039f61038680786e7a7c
+      
+      
+                menu_screen_tile_data:
+                    ; "Langel Bookbinder's"
+c27a  hex           2027
+c27c  hex           8c6a76706e7403837777736b72766d6e7a9e7b
+c28f  byte          #$00
+                    ; "Please  START"
+c290  hex           21ea
+c292  hex           90746e6a7b6e03039293829193
+c29f  byte          #$00
+                    ; "Much  Options"
+c2a0  hex           222a
+c2a2  hex           8d7d6c7103038f787c7277767b
+c2af  byte          #$00
+                    ; numbered version
+c2b0  hex           22c3
+                    ; " #00 "
+                    ;hex 039f606003
+                    ; dashes for fun
+                    ;hex 03ababab03
+                    ; normal pin line
+c2b2  hex           b1b1b1b1b1
+c2b7  byte          #$00
+                    ; " ax1147 "
+c2b8  hex           22d5
+c2ba  hex           036a806161646703
+c2c2  byte          #$00
+                    ; PUBLISHER BYLINE
+c2c3  hex           2301
+                    ; MEGA CAT byline
+                    ; " Published by MEGA CAT Studios "
+                    ;hex 03907d6b74727b716e6d036b81038d8687820384829303927c7d6d72777b03
+                    ; " Licensed by MEGA CAT STVDIOS "
+                    ;hex 03907d6b74727b716e6d036b81038d868782038482930392939485898f9203
+                    ; " Published by Mega Cat Studios "
+                    ;hex 03907d6b74727b716e6d036b81038d6e706a03846a7c03927c7d6d72777b03
+                    ; " Midwest Gaming Classic  #MCS  "
+                    ;hex 038d726d7f6e7b7c03876a757276700384746a7b7b726c03039f8d84920303
+                    ; RETROSTAGE byline
+                    ; "  PCB Mfr. by RetroStage    "
+                    ;hex 0303030303908483038d6f7a99036b8103916e7c7a77927c6a706e03030303
+                    ; "Hand Soldered Proto Board Edtn."
+                    ;hex 886a766d039277746d6e7a6e6d03907a777c770383776a7a6d03866d7c7699
+                    ; "   Manually Soldered Edition   "
+                    ;hex 0303038d6a767d6a747481039277746d6e7a6e6d03866d727c727776030303
+                    ; "   Scrimp Error Box Edition   "
+                    ;hex 030303926c7a72757803867a7a777a0383778003866d727c72777603030303
+                    ; default byline
+                    ; "  Publisher's Line Here    "
+c2c5  hex           0303030303907d6b74727b716e7a9e7b038c72766e03886e7a6e0303030303
+c2e4  byte          #$00
+                    ; "(C)opyright MMXXII LoBlast"
+c2e5  hex           2323
+c2e7  hex           9c849d7778817a7270717c038d8d96968989038c7783746a7b7c
+c301  byte          #$00
+                    ; " Options Screen "
+c302  hex           2423
+c304  hex           038f787c7277767b03926c7a6e6e7603
+c314  byte          #$00
+                    ; "Menu  Return"
+c315  hex           24ca
+c317  hex           8d6e767d0303916e7c7d7a76
+c323  byte          #$00
+                    ; "Song"
+c324  hex           250a
+c326  hex           92777670
+c32a  byte          #$00
+                    ; "Sound"
+c32b  hex           254a
+c32d  hex           92777d766d
+c332  byte          #$00
+                    ; "Color 1   " + cfcf
+c333  hex           258a
+c335  hex           847774777a0361030303cfcf
+c341  byte          #$00
+                    ; "Color 2   " + c0c0
+c342  hex           25ca
+c344  hex           847774777a0362030303c0c0
+c350  byte          #$00
+                    ; "Difficulties"
+c351  hex           260a
+c353  hex           85726f6f726c7d747c726e7b
+c35f  byte          #$00
+c360  byte          #$ff
+      
+      
+                cut_scene_intro_tile_data:
+                    ; "MY DINGLE"
+c361  hex           2171
+c363  hex           8d970385898e878c86
+c36c  byte          #$00
+                    ; "is very sick and there are"
+c36d  hex           21a3
+c36f  hex           727b037e6e7a81037b726c73036a766d037c716e7a6e036a7a6e
+c389  byte          #$00
+                    ; "life saving drugs very far"
+c38a  hex           21e3
+c38c  hex           74726f6e037b6a7e727670036d7a7d707b037e6e7a81036f6a7a
+c3a6  byte          #$00
+                    ; "away. Please drive through"
+c3a7  hex           2223
+c3a9  hex           6a7f6a81990390746e6a7b6e036d7a727e6e037c717a777d7071
+c3c3  byte          #$00
+                    ; "the 13th dimension quickly"
+c3c4  hex           2263
+c3c6  hex           7c716e0361637c71036d72756e767b72777603797d726c737481
+c3e0  byte          #$00
+                    ; "so my dingle is saved!"
+c3e1  hex           22a3
+c3e3  hex           7b77037581036d727670746e03727b037b6a7e6e6d9b
+c3f9  byte          #$00
+c3fa  byte          #$ff
+      
+      
+                cut_scene_ending_bad_tile_data:
+                    ; "Why did you bring me"
+c3fb  hex           21c2
+c3fd  hex           957181036d726d0381777d036b7a72767003756e
+c411  byte          #$00
+                    ; "a dead dingle?"
+c412  hex           2210
+c414  hex           6a036d6e6a6d036d727670746e9a
+c422  byte          #$00
+                    ; "You took too long!"
+c423  hex           2287
+c425  hex           97777d037c777773037c777703747776709b
+c437  byte          #$00
+c438  byte          #$ff
+      
+      
+                cut_scene_ending_ok_tile_data:
+                    ; "The dingle is now in a coma."
+c439  hex           21c2
+c43b  hex           93716e036d727670746e03727b0376777f037276036a036c77756a99
+c457  byte          #$00
+                    ; "It may recover."
+c458  hex           2229
+c45a  hex           897c03756a81037a6e6c777e6e7a99
+c469  byte          #$00
+                    ; "You could have been faster."
+c46a  hex           2283
+c46c  hex           97777d036c777d746d03716a7e6e036b6e6e76036f6a7b7c6e7a99
+c487  byte          #$00
+c488  byte          #$ff
+      
+      
+                cut_scene_ending_good_tile_data:
+                    ; "What a happy,healthy DINGLE!"
+c489  hex           21c2
+c48b  hex           95716a7c036a03716a78788198716e6a747c71810385898e878c869b
+c4a7  byte          #$00
+                    ; "J O O D    J O R B!!"
+c4a8  hex           2226
+c4aa  hex           8a038f038f0385030303038a038f039103839b9b
+c4be  byte          #$00
+                    ; "You seem to be so expedient!"
+c4bf  hex           2282
+c4c1  hex           97777d037b6e6e75037c77036b6e037b77036e80786e6d726e767c9b
+c4dd  byte          #$00
+c4de  byte          #$ff
+      
+      
+                cut_scene_ending_time_tile_data:
+                    ; "Your Time was "
+c4df  hex           2305
+c4e1  hex           97777d7a039372756e037f6a7b03
+c4ef  byte          #$00
+c4f0  byte          #$ff
+      
+                    char_set_offset		EQM $60
+                    char_set_0		EQM $60
+                    char_set_1		EQM $61
+                    char_set_2		EQM $62
+                    char_set_3		EQM $63
+                    char_set_4		EQM $64
+                    char_set_5		EQM $65
+                    char_set_6		EQM $66
+                    char_set_7		EQM $67
+                    char_set_8		EQM $68
+                    char_set_9		EQM $69
+                    char_set_a		EQM $6a
+                    char_set_b		EQM $6b
+                    char_set_c		EQM $6c
+                    char_set_d		EQM $6d
+                    char_set_e		EQM $6e
+                    char_set_f		EQM $6f
+                    char_set_g		EQM $70
+                    char_set_h		EQM $71
+                    char_set_i		EQM $72
+                    char_set_k		EQM $73
+                    char_set_l		EQM $74
+                    char_set_m		EQM $75
+                    char_set_n		EQM $76
+                    char_set_o		EQM $77
+                    char_set_p		EQM $78
+                    char_set_q		EQM $79
+                    char_set_r		EQM $7a
+                    char_set_s		EQM $7b
+                    char_set_t		EQM $7c
+                    char_set_u		EQM $7d
+                    char_set_v		EQM $7e
+                    char_set_w		EQM $7f
+                    char_set_x		EQM $80
+                    char_set_y		EQM $81
+                    char_set_a		EQM $6a
+                    char_set_b		EQM $6b
+                    char_set_c		EQM $6c
+                    char_set_d		EQM $6d
+                    char_set_e		EQM $6e
+                    char_set_g		EQM $70
+                    char_set_h		EQM $71
+                    char_set_i		EQM $72
+                    char_set_J		EQM $8a
+                    char_set_k		EQM $73
+                    char_set_l		EQM $74
+                    char_set_m		EQM $75
+                    char_set_n		EQM $76
+                    char_set_o		EQM $77
+                    char_set_p		EQM $78
+                    char_set_r		EQM $7a
+                    char_set_s		EQM $7b
+                    char_set_t		EQM $7c
+                    char_set_v		EQM $7e
+                    char_set_w		EQM $7f
+                    char_set_x		EQM $80
+                    char_set_y		EQM $81
+                    char_set_comma		EQM $98
+                    char_set_period		EQM $99
+                    char_set_question		EQM $9a
+                    char_set_bang		EQM $9b
+                    char_set_paren_open		EQM $9c
+                    char_set_paren_close		EQM $9d
+                    char_set_apostrophe		EQM $9e
+                    char_set_hash		EQM $9f
+                    char_set_dash		EQM $ab
+                    char_set_colon		EQM $ac
+                    char_set_space		EQM $3
+      
+      
+      
+      
+      
+      
+                jump_to_subroutine: subroutine
+                    ; a = jump table offset
+                    ; caches x and leaves y alone
+c4f1  86 89         stx temp03
+c4f3  aa            tax
+c4f4  bd 03 c5      lda mega_jump_table_to_end_all_jump_tables_lo,x
+c4f7  85 86         sta temp00
+c4f9  bd 92 c5      lda mega_jump_table_to_end_all_jump_tables_hi,x
+c4fc  85 87         sta temp01
+c4fe  a6 89         ldx temp03
+c500  6c 86 00      jmp (temp00)
+      
+      
+      
+                    ;  jump tables defined
+                    enemy_update_jump_table_offset	EQM	0
+                    enemy_spawn_jump_table_offset	EQM	27
+                    boss_vamp_state_jump_table_offset	EQM	54
+                    boss_swordtner_state_jump_table_offset	EQM	60
+                    powerup_pickup_jump_table_offset	EQM	63
+                    options_screen_state_jump_table_offset	EQM	71
+                    phase_handlers_jump_table_offset	EQM	77
+                    sfx_test_jump_table_offset	EQM	82
+                    apu_env_jump_table_offset	EQM	102
+                    sfx_update_jump_table_offset	EQM	108
+                    song_update_jump_table_offset	EQM	115
+                    state_init_jump_table_offset	EQM	124
+                    state_render_jump_table_offset	EQM	129
+                    state_update_jump_table_offset	EQM	134
+      
+      
+                mega_jump_table_to_end_all_jump_tables_lo:
+                enemy_update_jump_table_lo:
+c503  byte          <enemy_do_nothing
+c504  byte          <crossbones_cycle
+c505  byte          <powerups_cycle
+c506  byte          <enemy_do_nothing
+c507  byte          <birb_cycle
+c508  byte          <spark_cycle
+c509  byte          <zigzag_cycle
+c50a  byte          <skeet_cycle
+c50b  byte          <galger_cycle
+c50c  byte          <bullet_cycle
+c50d  byte          <dart_cycle
+c50e  byte          <boss_vamp_bat_cycle
+c50f  byte          <chomps_cycle
+c510  byte          <maggs_cycle
+c511  byte          <muya_cycle
+c512  byte          <starglasses_cycle
+c513  byte          <skully_cycle
+c514  byte          <dumbface_cycle
+c515  byte          <throber_cycle
+c516  byte          <ant_cycle
+c517  byte          <lasso_cycle
+c518  byte          <ikes_mom_cycle
+c519  byte          <uzi_cycle
+c51a  byte          <boss_moufs_cycle
+c51b  byte          <boss_vamp_cycle
+c51c  byte          <boss_scarab_cycle
+c51d  byte          <boss_swordtner_cycle
+                enemy_spawn_jump_table_lo:
+c51e  byte          <do_nothing
+c51f  byte          <do_nothing
+c520  byte          <do_nothing
+c521  byte          <do_nothing
+c522  byte          <birb_spawn
+c523  byte          <spark_spawn
+c524  byte          <zigzag_spawn
+c525  byte          <skeet_spawn
+c526  byte          <galger_spawn
+c527  byte          <bullet_spawn
+c528  byte          <dart_spawn
+c529  byte          <boss_vamp_bat_spawn
+c52a  byte          <chomps_spawn
+c52b  byte          <maggs_spawn
+c52c  byte          <muya_spawn
+c52d  byte          <starglasses_spawn
+c52e  byte          <skully_spawn
+c52f  byte          <dumbface_spawn
+c530  byte          <throber_spawn
+c531  byte          <ant_spawn
+c532  byte          <lasso_spawn
+c533  byte          <ikes_mom_spawn
+c534  byte          <uzi_spawn
+c535  byte          <boss_moufs_spawn
+c536  byte          <boss_vamp_spawn
+c537  byte          <boss_scarab_spawn
+c538  byte          <boss_swordtner_spawn
+                boss_vamp_state_jump_table_lo:
+c539  byte          <boss_vamp_state_idle_update
+c53a  byte          <boss_vamp_state_suck_bats
+c53b  byte          <boss_vamp_state_shake
+c53c  byte          <boss_vamp_state_lunge
+c53d  byte          <boss_vamp_state_retreat
+c53e  byte          <boss_vamp_state_blow_bats
+                boss_swordtner_state_jump_table_lo:
+c53f  byte          <boss_swordtner_mode_0
+c540  byte          <boss_swordtner_mode_shake
+c541  byte          <boss_swordtner_mode_2
+                powerup_pickup_jump_table_lo:
+c542  byte          <powerup_pickup_mask
+c543  byte          <powerup_pickup_mushroom
+c544  byte          <powerup_pickup_plus_one
+c545  byte          <powerup_pickup_bomb
+c546  byte          <powerup_pickup_r_bag
+c547  byte          <powerup_pickup_health_25
+c548  byte          <powerup_pickup_health_50
+c549  byte          <powerup_pickup_health_100
+                options_screen_state_jump_table_lo:
+c54a  byte          <options_menu_return
+c54b  byte          <options_screen_song_handler
+c54c  byte          <options_screen_sfx_handler
+c54d  byte          <options_screen_color1_handler
+c54e  byte          <options_screen_color2_handler
+c54f  byte          <options_screen_difficulty_handler
+                phase_handlers_jump_table_lo:
+c550  byte          <phase_zero
+c551  byte          <phase_galger
+c552  byte          <phase_spawns
+c553  byte          <phase_spawn_long
+c554  byte          <phase_boss_fight
+                sfx_test_jump_table_lo:
+c555  byte          <sfx_pewpew
+c556  byte          <sfx_player_damage
+c557  byte          <sfx_player_death
+c558  byte          <sfx_enemy_damage
+c559  byte          <sfx_enemy_death
+c55a  byte          <sfx_powerup_hit
+c55b  byte          <sfx_powerup_bomb
+c55c  byte          <sfx_powerup_mushroom
+c55d  byte          <sfx_powerup_mask
+c55e  byte          <sfx_powerup_1up
+c55f  byte          <sfx_powerup_battery_25
+c560  byte          <sfx_powerup_battery_50
+c561  byte          <sfx_powerup_battery_100
+c562  byte          <sfx_shoot_dart
+c563  byte          <sfx_shoot_bullet
+c564  byte          <sfx_rng_chord
+c565  byte          <sfx_phase_next
+c566  byte          <sfx_snare
+c567  byte          <sfx_hat
+c568  byte          <sfx_ghost_snare
+                apu_env_jump_table_lo:
+c569  byte          <apu_env_lin_long ; 0
+c56a  byte          <apu_env_lin_tiny ; 2
+c56b  byte          <apu_env_exp_long ; 3
+c56c  byte          <apu_env_exp_short ; 4
+c56d  byte          <apu_env_exp_tiny ; 5
+c56e  byte          <apu_env_exp_pico ; 6
+                sfx_update_jump_table_lo:
+c56f  byte          <do_nothing ; 0
+c570  byte          <sfx_player_death_update ; 1
+c571  byte          <sfx_enemy_death_update ; 2
+c572  byte          <sfx_powerup_battery_update ; 3
+c573  byte          <sfx_powerup_bomb_update ; 4
+c574  byte          <sfx_powerup_1up_update ; 5
+c575  byte          <sfx_phase_next_update ; 6
+                song_update_jump_table_lo:
+c576  byte          <do_nothing ; rng chord
+c577  byte          <song_01 ; sick dingle
+c578  byte          <song_02 ; in game
+c579  byte          <song_03 ; boss intro
+c57a  byte          <song_04 ; boss fight
+c57b  byte          <song_05 ; game over
+c57c  byte          <song_06 ; end bad
+c57d  byte          <song_07 ; end ok
+c57e  byte          <song_08 ; end good
+                state_init_jump_table_lo:
+c57f  byte          <menu_screens_init ; 0
+c580  byte          <attract_init ; 1
+c581  byte          <game_init ; 2
+c582  byte          <cut_scene_intro_init ; 3
+c583  byte          <cut_scene_outro_init ; 4
+                state_render_jump_table_lo:
+c584  byte          <state_render_do_nothing ; 0
+c585  byte          <menu_screens_render ; 1
+c586  byte          <starfield_render ; 3
+c587  byte          <state_render_do_nothing ; placeholder
+c588  byte          <dashboard_render ; 5
+                state_update_jump_table_lo:
+c589  byte          <state_update_do_nothing ; 0
+c58a  byte          <title_screen_update ; 1
+c58b  byte          <scrollto_options_update ; 2
+c58c  byte          <options_screen_update ; 3
+c58d  byte          <scrollto_titles_update ; 4
+c58e  byte          <attract_update ; 5
+c58f  byte          <game_update ; 6
+c590  byte          <sandbox_update ; 7
+c591  byte          <cut_scene_update_generic ; 8
+      
+      
+                mega_jump_table_to_end_all_jump_tables_hi:
+                enemy_update_jump_table_hi:
+c592  byte          >enemy_do_nothing
+c593  byte          >crossbones_cycle
+c594  byte          >powerups_cycle
+c595  byte          >enemy_do_nothing
+c596  byte          >birb_cycle
+c597  byte          >spark_cycle
+c598  byte          >zigzag_cycle
+c599  byte          >skeet_cycle
+c59a  byte          >galger_cycle
+c59b  byte          >bullet_cycle
+c59c  byte          >dart_cycle
+c59d  byte          >boss_vamp_bat_cycle
+c59e  byte          >chomps_cycle
+c59f  byte          >maggs_cycle
+c5a0  byte          >muya_cycle
+c5a1  byte          >starglasses_cycle
+c5a2  byte          >skully_cycle
+c5a3  byte          >dumbface_cycle
+c5a4  byte          >throber_cycle
+c5a5  byte          >ant_cycle
+c5a6  byte          >lasso_cycle
+c5a7  byte          >ikes_mom_cycle
+c5a8  byte          >uzi_cycle
+c5a9  byte          >boss_moufs_cycle
+c5aa  byte          >boss_vamp_cycle
+c5ab  byte          >boss_scarab_cycle
+c5ac  byte          >boss_swordtner_cycle
+                enemy_spawn_jump_table_hi:
+c5ad  byte          >do_nothing
+c5ae  byte          >do_nothing
+c5af  byte          >do_nothing
+c5b0  byte          >do_nothing
+c5b1  byte          >birb_spawn
+c5b2  byte          >spark_spawn
+c5b3  byte          >zigzag_spawn
+c5b4  byte          >skeet_spawn
+c5b5  byte          >galger_spawn
+c5b6  byte          >bullet_spawn
+c5b7  byte          >dart_spawn
+c5b8  byte          >boss_vamp_bat_spawn
+c5b9  byte          >chomps_spawn
+c5ba  byte          >maggs_spawn
+c5bb  byte          >muya_spawn
+c5bc  byte          >starglasses_spawn
+c5bd  byte          >skully_spawn
+c5be  byte          >dumbface_spawn
+c5bf  byte          >throber_spawn
+c5c0  byte          >ant_spawn
+c5c1  byte          >lasso_spawn
+c5c2  byte          >ikes_mom_spawn
+c5c3  byte          >uzi_spawn
+c5c4  byte          >boss_moufs_spawn
+c5c5  byte          >boss_vamp_spawn
+c5c6  byte          >boss_scarab_spawn
+c5c7  byte          >boss_swordtner_spawn
+                boss_vamp_state_jump_table_hi:
+c5c8  byte          >boss_vamp_state_idle_update
+c5c9  byte          >boss_vamp_state_suck_bats
+c5ca  byte          >boss_vamp_state_shake
+c5cb  byte          >boss_vamp_state_lunge
+c5cc  byte          >boss_vamp_state_retreat
+c5cd  byte          >boss_vamp_state_blow_bats
+                boss_swordtner_state_jump_table_hi:
+c5ce  byte          >boss_swordtner_mode_0
+c5cf  byte          >boss_swordtner_mode_shake
+c5d0  byte          >boss_swordtner_mode_2
+                powerup_pickup_jump_table_hi:
+c5d1  byte          >powerup_pickup_mask
+c5d2  byte          >powerup_pickup_mushroom
+c5d3  byte          >powerup_pickup_plus_one
+c5d4  byte          >powerup_pickup_bomb
+c5d5  byte          >powerup_pickup_r_bag
+c5d6  byte          >powerup_pickup_health_25
+c5d7  byte          >powerup_pickup_health_50
+c5d8  byte          >powerup_pickup_health_100
+                options_screen_state_jump_table_hi:
+c5d9  byte          >options_menu_return
+c5da  byte          >options_screen_song_handler
+c5db  byte          >options_screen_sfx_handler
+c5dc  byte          >options_screen_color1_handler
+c5dd  byte          >options_screen_color2_handler
+c5de  byte          >options_screen_difficulty_handler
+                phase_handlers_jump_table_hi:
+c5df  byte          >phase_zero
+c5e0  byte          >phase_galger
+c5e1  byte          >phase_spawns
+c5e2  byte          >phase_spawn_long
+c5e3  byte          >phase_boss_fight
+                sfx_test_jump_table_hi:
+c5e4  byte          >sfx_pewpew
+c5e5  byte          >sfx_player_damage
+c5e6  byte          >sfx_player_death
+c5e7  byte          >sfx_enemy_damage
+c5e8  byte          >sfx_enemy_death
+c5e9  byte          >sfx_powerup_hit
+c5ea  byte          >sfx_powerup_bomb
+c5eb  byte          >sfx_powerup_mushroom
+c5ec  byte          >sfx_powerup_mask
+c5ed  byte          >sfx_powerup_1up
+c5ee  byte          >sfx_powerup_battery_25
+c5ef  byte          >sfx_powerup_battery_50
+c5f0  byte          >sfx_powerup_battery_100
+c5f1  byte          >sfx_shoot_dart
+c5f2  byte          >sfx_shoot_bullet
+c5f3  byte          >sfx_rng_chord
+c5f4  byte          >sfx_phase_next
+c5f5  byte          >sfx_snare
+c5f6  byte          >sfx_hat
+c5f7  byte          >sfx_ghost_snare
+                apu_env_jump_table_hi:
+c5f8  byte          >apu_env_lin_long ; 0
+c5f9  byte          >apu_env_lin_tiny ; 2
+c5fa  byte          >apu_env_exp_long ; 3
+c5fb  byte          >apu_env_exp_short ; 4
+c5fc  byte          >apu_env_exp_tiny ; 5
+c5fd  byte          >apu_env_exp_pico ; 6
+                sfx_update_jump_table_hi:
+c5fe  byte          >do_nothing ; 0
+c5ff  byte          >sfx_player_death_update ; 1
+c600  byte          >sfx_enemy_death_update ; 2
+c601  byte          >sfx_powerup_battery_update ; 3
+c602  byte          >sfx_powerup_bomb_update ; 4
+c603  byte          >sfx_powerup_1up_update ; 5
+c604  byte          >sfx_phase_next_update ; 6
+                song_update_jump_table_hi:
+c605  byte          >do_nothing ; rng chord
+c606  byte          >song_01 ; sick dingle
+c607  byte          >song_02 ; in game
+c608  byte          >song_03 ; boss intro
+c609  byte          >song_04 ; boss fight
+c60a  byte          >song_05 ; game over
+c60b  byte          >song_06 ; end bad
+c60c  byte          >song_07 ; end ok
+c60d  byte          >song_08 ; end good
+                state_init_jump_table_hi:
+c60e  byte          >menu_screens_init ; 0
+c60f  byte          >attract_init ; 1
+c610  byte          >game_init ; 2
+c611  byte          >cut_scene_intro_init ; 3
+c612  byte          >cut_scene_outro_init ; 4
+                state_render_jump_table_hi:
+c613  byte          >state_render_do_nothing ; 0
+c614  byte          >menu_screens_render ; 1
+c615  byte          >starfield_render ; 3
+c616  byte          >state_render_do_nothing ; placeholder
+c617  byte          >dashboard_render ; 5
+                state_update_jump_table_hi:
+c618  byte          >state_update_do_nothing ; 0
+c619  byte          >title_screen_update ; 1
+c61a  byte          >scrollto_options_update ; 2
+c61b  byte          >options_screen_update ; 3
+c61c  byte          >scrollto_titles_update ; 4
+c61d  byte          >attract_update ; 5
+c61e  byte          >game_update ; 6
+c61f  byte          >sandbox_update ; 7
+c620  byte          >cut_scene_update_generic ; 8

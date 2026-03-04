@@ -1,0 +1,90 @@
+                    ; 27 enemy entities defined
+      
+                    ; enemy id list:
+                    null_id              EQM $00
+                    crossbones_id        EQM $01
+                    powerups_id          EQM $02
+                    boss_assist_id       EQM $03
+                    birb_id              EQM $04
+                    spark_id             EQM $05
+                    zigzag_id            EQM $06
+                    skeet_id             EQM $07
+                    galger_id            EQM $08
+                    bullet_id            EQM $09
+                    dart_id              EQM $0a
+                    boss_vamp_bat_id     EQM $0b
+                    chomps_id            EQM $0c
+                    maggs_id             EQM $0d
+                    muya_id              EQM $0e
+                    starglasses_id       EQM $0f
+                    skully_id            EQM $10
+                    dumbface_id          EQM $11
+                    throber_id           EQM $12
+                    ant_id               EQM $13
+                    lasso_id             EQM $14
+                    ikes_mom_id          EQM $15
+                    uzi_id               EQM $16
+                    boss_moufs_id        EQM $17
+                    boss_vamp_id         EQM $18
+                    boss_scarab_id       EQM $19
+                    boss_swordtner_id    EQM $1a
+      
+                enemy_hitpoints_table:
+dcc5  byte          $00 ; null
+dcc6  byte          $00 ; crossbones
+dcc7  byte          $00 ; powerups
+dcc8  byte          $00 ; boss_assist
+dcc9  byte          $02 ; birb
+dcca  byte          $03 ; spark
+dccb  byte          $03 ; zigzag
+dccc  byte          $03 ; skeet
+dccd  byte          $02 ; galger
+dcce  byte          $01 ; bullet
+dccf  byte          $01 ; dart
+dcd0  byte          $0a ; boss_vamp_bat
+dcd1  byte          $07 ; chomps
+dcd2  byte          $09 ; maggs
+dcd3  byte          $0d ; muya
+dcd4  byte          $05 ; starglasses
+dcd5  byte          $1f ; skully
+dcd6  byte          $0b ; dumbface
+dcd7  byte          $0d ; throber
+dcd8  byte          $11 ; ant
+dcd9  byte          $35 ; lasso
+dcda  byte          $25 ; ikes_mom
+dcdb  byte          $1d ; uzi
+dcdc  byte          $3f ; boss_moufs
+dcdd  byte          $3f ; boss_vamp
+dcde  byte          $3f ; boss_scarab
+dcdf  byte          $3f ; boss_swordtner
+      
+      
+      
+                enemy_size_table:
+dce0  byte          $00 ; null
+dce1  byte          $00 ; crossbones
+dce2  byte          $00 ; powerups
+dce3  byte          $00 ; boss_assist
+dce4  byte          $01 ; birb
+dce5  byte          $01 ; spark
+dce6  byte          $01 ; zigzag
+dce7  byte          $01 ; skeet
+dce8  byte          $01 ; galger
+dce9  byte          $01 ; bullet
+dcea  byte          $01 ; dart
+dceb  byte          $01 ; boss_vamp_bat
+dcec  byte          $02 ; chomps
+dced  byte          $02 ; maggs
+dcee  byte          $02 ; muya
+dcef  byte          $04 ; starglasses
+dcf0  byte          $04 ; skully
+dcf1  byte          $04 ; dumbface
+dcf2  byte          $04 ; throber
+dcf3  byte          $04 ; ant
+dcf4  byte          $04 ; lasso
+dcf5  byte          $04 ; ikes_mom
+dcf6  byte          $04 ; uzi
+dcf7  byte          $04 ; boss_moufs
+dcf8  byte          $04 ; boss_vamp
+dcf9  byte          $04 ; boss_scarab
+dcfa  byte          $04 ; boss_swordtner

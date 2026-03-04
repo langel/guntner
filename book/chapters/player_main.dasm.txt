@@ -1,0 +1,183 @@
+      
+      02 04         oam_ram_rudy EQU $0204
+      
+                    ; CONST
+                    player_dead_tile	EQM $c0
+                    iframe_attract_length	EQM $08
+                    iframe_game_length	EQM $04
+      
+      
+                    player_game_reset: subroutine
+f217  a9 00         lda #$00
+f219  85 25         sta ftw
+                    ; clearing 18 bytes of game data
+                    ; see zp_vars.asm for details! ;D
+f21b  a2 20         ldx #$20
+                .clear_loop
+f21d  95 59         sta phase_state,x
+f21f  ca            dex
+f220  10 fb         bpl .clear_loop
+                    ; XXX testing phase behaviours
+                    ;lda #3
+                    ;sta phase_level
+                    ;lda #$3f
+                    ;sta phase_current
+f222  20 39 d7      jsr phase_palette_load
+f225  20 95 d6      jsr timer_reset
+f228  a9 d0         lda #$d0
+f22a  85 13         sta player_x_hi
+f22c  85 0f         sta player_demo_x
+f22e  a9 70         lda #$70
+f230  85 15         sta player_y_hi
+f232  85 10         sta player_demo_y
+f234  a9 ff         lda #$ff
+f236  85 0b         sta player_health
+                    ; set player stats
+f238  a9 03         lda #$03
+f23a  85 0c         sta player_lives
+f23c  a6 23         ldx game_difficulty
+f23e  bd f9 f2      lda player_gun_strength_per_difficulty,x
+f241  85 19         sta player_gun_str
+f243  a9 0f         lda #$0f
+f245  85 20         sta player_autofire_s
+f247  60            rts
+      
+      
+      
+      
+                player_update_colors: subroutine
+                    ; dashboard is bg_3
+                    ; player is spr_0
+f248  a5 a9         lda player_color0
+f24a  85 9f         sta pal_spr_0_3
+                    ; darken dash bg color
+f24c  38            sec
+f24d  e9 10         sbc #$10
+f24f  85 9a         sta pal_bg_3_1
+                    ; do the rest of player colours
+f251  a5 aa         lda player_color1
+f253  85 9b         sta pal_bg_3_2
+f255  85 9e         sta pal_spr_0_2
+f257  a5 ab         lda player_color2
+f259  85 9c         sta pal_bg_3_3
+f25b  85 9d         sta pal_spr_0_1
+f25d  60            rts
+      
+      
+      
+                player_take_damage: subroutine
+                    ; make sure iframes are not enable
+f25e  a5 53         lda state_iframes
+f260  f0 01         beq .not_iframes
+f262  60            rts
+                .not_iframes
+f263  a5 6c         lda shroom_counter
+f265  f0 01         beq .apply_damage
+f267  60            rts
+                .apply_damage
+                    ; set damage display counter
+f268  a9 10         lda #$10
+f26a  85 22         sta player_damage_flash
+                    ; XXX enemy hits won't trigger iframes if turbo gun?
+                    ; check if turbo gun is enabled
+f26c  a5 1c         lda player_controls
+f26e  29 80         and #BUTTON_A
+f270  d0 04         bne .skip_iframes
+                    ; set iframes
+f272  a5 54         lda state_iframe_length
+f274  85 53         sta state_iframes
+                .skip_iframes
+                    ; damage amount in player_damage
+f276  a5 0b         lda player_health
+f278  38            sec
+f279  e5 21         sbc player_damage
+f27b  90 05         bcc .player_dead
+f27d  f0 03         beq .player_dead
+f27f  85 0b         sta player_health
+f281  60            rts
+                .player_dead
+                    ; player can be saved by mask shield!
+f282  a5 6e         lda orbit_shield_speed
+f284  f0 0d         beq .player_really_dead
+                    ; disable shield
+f286  a9 00         lda #$00
+f288  85 6e         sta orbit_shield_speed
+                    ; drift off screen to the right
+f28a  a9 01         lda #1
+f28c  85 c6         sta bullet_x_vel
+f28e  a9 ff         lda #$ff
+f290  85 0b         sta player_health
+f292  60            rts
+                .player_really_dead
+                    ; player_health 00 means DEATH
+f293  a9 00         lda #$00
+f295  85 0b         sta player_health
+f297  60            rts
+      
+      
+      
+      
+      
+                set_player_sprite: subroutine
+f298  a5 55         lda state_render_addr
+f29a  c9 82         cmp #state_render_jump_table_offset+1
+f29c  d0 0c         bne .not_menu_screens
+                .is_menu_screens
+                    ; sprite (menus)
+f29e  a9 8e         lda #$8e
+f2a0  8d 05 02      sta oam_ram_rudy+1
+f2a3  a9 8f         lda #$8f
+f2a5  8d 09 02      sta oam_ram_rudy+5
+f2a8  d0 0a         bne .sprite_set
+                .not_menu_screens
+                    ; sprite (game)
+f2aa  a9 4a         lda #$4a
+f2ac  8d 05 02      sta oam_ram_rudy+1
+f2af  a9 4b         lda #$4b
+f2b1  8d 09 02      sta oam_ram_rudy+5
+                .sprite_set
+                    ; x pos
+f2b4  a5 13         lda player_x_hi
+f2b6  8d 07 02      sta $207
+f2b9  18            clc
+f2ba  69 08         adc #$08
+f2bc  8d 0b 02      sta $20b
+                    ; y pos
+f2bf  a5 15         lda player_y_hi
+f2c1  8d 04 02      sta $204
+f2c4  8d 08 02      sta $208
+                    ; attributes
+f2c7  a9 00         lda #$00
+f2c9  8d 06 02      sta $206
+f2cc  8d 0a 02      sta $20a
+      
+f2cf  a5 0b         lda player_health
+f2d1  d0 09         bne .not_dead
+                .is_dead
+f2d3  a9 c0         lda #player_dead_tile
+f2d5  8d 09 02      sta oam_ram_rudy+5
+f2d8  8d 05 02      sta oam_ram_rudy+1
+f2db  60            rts
+                .not_dead
+                    ; check and decrement iframe counter
+f2dc  a5 53         lda state_iframes
+f2de  f0 02         beq .not_iframes
+f2e0  c6 53         dec state_iframes
+                .not_iframes
+                    ; check and decrement iframe counter
+f2e2  a5 22         lda player_damage_flash
+f2e4  f0 12         beq .not_flashing
+f2e6  c6 22         dec player_damage_flash
+                    ; flash rudy based on iframe counter
+f2e8  4a            lsr
+f2e9  29 01         and #$01
+f2eb  d0 0b         bne .not_flashing
+                    ; iframes
+f2ed  a9 4c         lda #$4c
+f2ef  8d 05 02      sta oam_ram_rudy+1
+f2f2  a9 4d         lda #$4d
+f2f4  8d 09 02      sta oam_ram_rudy+5
+f2f7  60            rts
+                .not_flashing
+f2f8  60            rts
+      

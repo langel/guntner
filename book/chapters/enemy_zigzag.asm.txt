@@ -1,0 +1,84 @@
+                    ; pattern counter holds direction index 0..3
+                zigzag_dir_table:
+                    ;     r/u   l/u   l/d  r/d
+f191  byte          #$03, #$09, #$0f, #$15
+                zigzag_att_table:
+                    ;     r/u   l/u   l/d  r/d
+f195  byte          #$83, #$c3, #$43, #$03
+      
+      
+                zigzag_spawn: subroutine
+                    ; set direction
+f199  20 52 c1      jsr get_next_random
+f19c  4a            lsr
+f19d  29 03         and #$03
+f19f  9d 04 03      sta enemy_ram_pc,x
+f1a2  86 86         stx temp00
+f1a4  aa            tax
+f1a5  bd 91 f1      lda zigzag_dir_table,x
+f1a8  a6 86         ldx temp00
+f1aa  9d 07 03      sta enemy_ram_ex,x
+                    ; set position
+f1ad  4c 1a db      jmp enemy_spawn_set_x_y_rng
+      
+      
+                zigzag_cycle: subroutine
+f1b0  a9 08         lda #$08
+f1b2  85 3d         sta collision_0_w
+f1b4  85 3e         sta collision_0_h
+f1b6  20 eb db      jsr enemy_handle_damage_and_death
+f1b9  a5 24         lda wtf
+f1bb  29 03         and #$03
+f1bd  d0 37         bne .dont_reset_ac
+                    ; animation
+f1bf  de 05 03      dec enemy_ram_ac,x
+f1c2  10 32         bpl .dont_reset_ac
+                    ; reset ac and pick new direction
+f1c4  a9 05         lda #$05
+f1c6  9d 05 03      sta enemy_ram_ac,x
+                    ; get range 0..2 from 8bit value
+f1c9  20 52 c1      jsr get_next_random
+f1cc  4a            lsr
+f1cd  18            clc
+f1ce  65 26         adc rng0
+f1d0  29 80         and #$80
+f1d2  2a            rol
+f1d3  2a            rol ; should have a value between 0 and 2 here
+f1d4  c9 02         cmp #$02
+f1d6  f0 0d         beq .dir_sub
+f1d8  c9 01         cmp #$01
+f1da  f0 03         beq .dir_add
+                .dir_same
+f1dc  4c e8 f1      jmp .ac_reset_done
+                .dir_add
+f1df  fe 04 03      inc enemy_ram_pc,x
+f1e2  4c e8 f1      jmp .ac_reset_done
+                .dir_sub
+f1e5  de 04 03      dec enemy_ram_pc,x
+                .ac_reset_done
+f1e8  bd 04 03      lda enemy_ram_pc,x
+f1eb  29 03         and #$03
+f1ed  a8            tay
+f1ee  b9 91 f1      lda zigzag_dir_table,y
+f1f1  9d 07 03      sta enemy_ram_ex,x
+f1f4  a4 77         ldy enemy_oam_offset
+                .dont_reset_ac
+                    ; set sprite
+f1f6  bd 05 03      lda enemy_ram_ac,x
+f1f9  18            clc
+f1fa  69 5a         adc #$5a ; base sprite tile
+f1fc  99 01 02      sta oam_ram_spr,y
+      
+                    ; work out the direction
+f1ff  a9 c6         lda #<arctang_velocity_1.25
+f201  85 84         sta arctang_velocity_lo
+f203  20 f6 ce      jsr arctang_enemy_update
+      
+f206  bd 04 03      lda enemy_ram_pc,x
+f209  29 03         and #$03
+f20b  a8            tay
+f20c  b9 95 f1      lda zigzag_att_table,y
+f20f  a4 77         ldy enemy_oam_offset
+f211  20 39 dc      jsr enemy_set_palette
+      
+f214  4c 92 db      jmp update_enemies_handler_next

@@ -1,0 +1,260 @@
+                    ; quadrants
+                    ;
+                    ;  0 | 1
+                    ;  --+--
+                    ;  2 | 3
+      
+                    ; 24 angular regions total (0-23)
+                    ; 6 regions per quadrant
+                    ;  direction
+                    ; 12 o'clock  6
+                    ;  3 o'clock  0
+                    ;  6 o'clock  18
+                    ;  9 o'clock  12
+      
+                enemy_get_direction_of_player:
+                    ; references these zp vars
+                    ; collision_0_x
+                    ; collision_0_y
+                    ; player_x_hi
+                    ; player_y_hi
+                    ; uses these zp vars
+                    ; collision_0_w = x delta
+                    ; collision_0_h = y delta
+                    ; collision_1_x = "small"
+                    ; collision_1_y = "large"
+                    ; collision_1_h = "half"
+                    ; temp00   = quadrant
+                    ; temp01   = region
+                    ; temp02  = x register stash
+                    ; temp03  = y register stash
+                    ; returns a = direction (or region)
+ce12  86 88         stx temp02
+ce14  84 89         sty temp03
+                    ; find quadrant
+ce16  a9 00         lda #0
+ce18  85 86         sta temp00
+                    ; y quadrants
+ce1a  a5 15         lda player_y_hi
+ce1c  38            sec
+ce1d  e5 3c         sbc collision_0_y
+ce1f  90 07         bcc .top_quadrant
+                .bottom_quadrant
+ce21  e6 86         inc temp00
+ce23  e6 86         inc temp00
+ce25  4c 2d ce      jmp .y_quadrant_done
+                .top_quadrant
+ce28  a5 3c         lda collision_0_y
+ce2a  38            sec
+ce2b  e5 15         sbc player_y_hi
+                .y_quadrant_done
+ce2d  85 3e         sta collision_0_h
+ce2f  a8            tay
+                    ; x quadrants
+ce30  a5 13         lda player_x_hi
+ce32  38            sec
+ce33  e5 3b         sbc collision_0_x
+ce35  90 05         bcc .left_quadrant
+                .right_quadrant
+ce37  e6 86         inc temp00
+ce39  4c 41 ce      jmp .x_quadrant_done
+                .left_quadrant
+ce3c  a5 3b         lda collision_0_x
+ce3e  38            sec
+ce3f  e5 13         sbc player_x_hi
+                .x_quadrant_done
+ce41  85 3d         sta collision_0_w
+ce43  aa            tax
+                    ; quadrant is now in temp00
+                    ; start finding that region
+ce44  e4 3e         cpx collision_0_h
+ce46  b0 0a         bcs .x_greater_or_equal_y
+                .x_less_than_y
+ce48  a9 10         lda #16
+ce4a  85 87         sta temp01
+ce4c  86 3f         stx collision_1_x
+ce4e  84 40         sty collision_1_y
+ce50  d0 08         bne .determine_region
+                .x_greater_or_equal_y
+ce52  a9 00         lda #0
+ce54  85 87         sta temp01
+ce56  86 40         stx collision_1_y
+ce58  84 3f         sty collision_1_x
+                .determine_region
+ce5a  a5 3f         lda collision_1_x
+ce5c  4a            lsr
+ce5d  85 42         sta collision_1_h
+ce5f  a5 3f         lda collision_1_x
+ce61  0a            asl
+ce62  b0 09         bcs .q_smaller
+ce64  18            clc
+ce65  65 42         adc collision_1_h
+ce67  b0 04         bcs .q_smaller
+ce69  c5 40         cmp collision_1_y
+ce6b  90 0d         bcc .q_larger
+                .q_smaller ; S * 2.5 > L
+ce6d  46 42         lsr collision_1_h
+ce6f  a5 3f         lda collision_1_x
+ce71  18            clc
+ce72  65 42         adc collision_1_h
+ce74  c5 40         cmp collision_1_y
+ce76  90 18         bcc .region1
+ce78  b0 11         bcs .region0
+                .q_larger ; S * 2.5 < L
+ce7a  a5 3f         lda collision_1_x
+ce7c  0a            asl
+ce7d  0a            asl
+ce7e  0a            asl
+ce7f  b0 16         bcs .region2
+ce81  38            sec
+ce82  e5 42         sbc collision_1_h
+ce84  c5 40         cmp collision_1_y
+ce86  90 16         bcc .region3
+ce88  4c 97 ce      jmp .region2
+                .region0 ; L / S < 1.25 ; d = 3,9,15,21
+ce8b  a5 87         lda temp01
+ce8d  18            clc
+ce8e  30 13         bmi .result_lookup
+                .region1 ; 1.25 < L / S < 2.5 ; d = 2,4,8,10,14,16,20,22
+ce90  a5 87         lda temp01
+ce92  18            clc
+ce93  69 04         adc #4
+ce95  10 0c         bpl .result_lookup
+                .region2 ; 2.5 < L / S < 7.5 ; d = 1,5,7,11,13,17,19,23
+ce97  a5 87         lda temp01
+ce99  18            clc
+ce9a  69 08         adc #8
+ce9c  10 05         bpl .result_lookup
+                .region3 ; 7.5 < L / S ; d = 0,6,12,18
+ce9e  a5 87         lda temp01
+cea0  18            clc
+cea1  69 0c         adc #12
+                .result_lookup
+                    ; temp01 should be ready in the accumulator
+cea3  65 86         adc temp00
+cea5  aa            tax
+cea6  bd 00 ff      lda ARCTANG_TRANSLATION_LOOKUP_TABLE,x
+                    ; restore enemy_ram_offset
+cea9  a6 88         ldx temp02
+ceab  a4 89         ldy temp03
+cead  60            rts
+      
+      
+      
+      
+                arctang_bound_dir: subroutine
+                    ; a = value to be bounded
+                    ; returns value 0..23 in a
+ceae  10 04         bpl .check_above_24
+                .below_0
+ceb0  18            clc
+ceb1  69 18         adc #24
+ceb3  60            rts
+                .check_above_24
+ceb4  c9 18         cmp #24
+ceb6  90 03         bcc .bounded
+ceb8  38            sec
+ceb9  e9 18         sbc #24
+                .bounded
+cebb  60            rts
+      
+      
+      
+      
+                    ; arctang movement is 16-bit
+                    ; oam ram x,y = high byte
+                    ; enemy ram x,y = low byte
+      
+                arctang_update_x: subroutine
+                    ; temp00 = hi
+                    ; temp01 = lo
+                    ; temp02 = region
+cebc  a6 88         ldx temp02
+cebe  bd 20 ff      lda ARCTANG_REGION_TO_X_VELOCITY_TABLE,x
+cec1  0a            asl
+cec2  a8            tay
+cec3  bd 50 ff      lda ARCTANG_REGION_X_PLUS_OR_MINUS_TABLE,x
+cec6  10 0c         bpl arctang_16bit_maths
+      
+                arctang_update_y: subroutine
+                    ; temp00 = hi
+                    ; temp01 = lo
+                    ; temp02 = region
+cec8  a6 88         ldx temp02
+ceca  bd 38 ff      lda ARCTANG_REGION_TO_Y_VELOCITY_TABLE,x
+cecd  0a            asl
+cece  a8            tay
+cecf  bd 68 ff      lda ARCTANG_REGION_Y_PLUS_OR_MINUS_TABLE,x
+ced2  10 00         bpl arctang_16bit_maths
+      
+                arctang_16bit_maths: subroutine
+                    ; a = plus or minus
+                    ; y = velocity table offset
+ced4  d0 11         bne .velocity_add
+                .velocity_sub
+                    ; lo byte
+ced6  a5 87         lda temp01
+ced8  38            sec
+ced9  f1 84         sbc (arctang_velocity_lo),y
+cedb  85 87         sta temp01
+                    ; hi byte
+cedd  a5 86         lda temp00
+cedf  c8            iny
+cee0  f1 84         sbc (arctang_velocity_lo),y
+cee2  85 86         sta temp00
+cee4  4c f5 ce      jmp .done_x
+                .velocity_add
+                    ; lo byte
+cee7  a5 87         lda temp01
+cee9  18            clc
+ceea  71 84         adc (arctang_velocity_lo),y
+ceec  85 87         sta temp01
+                    ; hi byte
+ceee  a5 86         lda temp00
+cef0  c8            iny
+cef1  71 84         adc (arctang_velocity_lo),y
+cef3  85 86         sta temp00
+                .done_x
+cef5  60            rts
+      
+      
+      
+      
+                arctang_enemy_update:
+                    ; updates both x and y position given:
+                    ; - enemy_ram_ex holds region/direction
+                    ; - enemy_ram_x/y holds lo bytes
+                    ; - oam_ram_x/y holds hi bytes
+      
+                    ; set region for arctang
+cef6  bd 07 03      lda enemy_ram_ex,x
+cef9  85 88         sta temp02 ; region
+      
+                    ; set x byte for arctang
+cefb  b9 03 02      lda oam_ram_x,y
+cefe  85 86         sta temp00 ; hi byte
+cf00  bd 02 03      lda enemy_ram_x,x
+cf03  85 87         sta temp01 ; lo byte
+cf05  20 bc ce      jsr arctang_update_x
+cf08  a4 77         ldy enemy_oam_offset
+cf0a  a5 86         lda temp00
+cf0c  99 03 02      sta oam_ram_x,y
+cf0f  a6 76         ldx enemy_ram_offset
+cf11  a5 87         lda temp01
+cf13  9d 02 03      sta enemy_ram_x,x
+      
+                    ; set y byte for arctang
+cf16  b9 00 02      lda oam_ram_y,y
+cf19  85 86         sta temp00 ; hi byte
+cf1b  bd 03 03      lda enemy_ram_y,x
+cf1e  85 87         sta temp01 ; lo byte
+cf20  20 c8 ce      jsr arctang_update_y
+cf23  a4 77         ldy enemy_oam_offset
+cf25  a5 86         lda temp00
+cf27  20 ff da      jsr enemy_fix_y_visible
+cf2a  99 00 02      sta oam_ram_y,y
+cf2d  a6 76         ldx enemy_ram_offset
+cf2f  a5 87         lda temp01
+cf31  9d 03 03      sta enemy_ram_y,x
+      
+cf34  60            rts

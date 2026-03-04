@@ -1,0 +1,250 @@
+      
+      
+                    ;;;;; VARIABLES
+      
+                    seg.u ZEROPAGE
+                    org $0
+      
+0000            nmi_lockout	byte
+      
+0001            scroll_x_hi	byte
+0002            scroll_x_lo	byte
+0003            scroll_y	byte
+0004            scroll_page	byte
+0005            scroll_speed_lo	byte
+0006            scroll_speed_hi	byte
+0007            scroll_cache_lo	byte
+0008            scroll_cache_hi	byte
+0009            ppu_mask_emph	byte
+000a            bg_tile_default	byte
+000b            player_health	byte
+000c            player_lives	byte
+000d            player_heal_c	byte
+000e            attract_true	byte ; if set game in demo mode
+000f            player_demo_x	byte ; dest x for demo cornputer controlls
+0010            player_demo_y	byte ; dest y for same
+0011            player_demo_lr	byte
+0012            player_demo_ud	byte
+      
+0013            player_x_hi	byte
+0014            player_x_lo	byte	
+0015            player_y_hi	byte
+0016            player_y_lo	byte
+0017            player_coll_x	byte ; player_x plus 2 because collision box
+0018            player_coll_y	byte ; player_y plus 3 because collision box
+0019            player_gun_str	byte
+001a            player_speed	byte ; 2 bit value 0..3 translates to 1..4
+001b            player_paused	byte
+      
+001c            player_controls			byte
+001d            player_controls_debounced	byte
+      
+001e            player_boundless	byte
+001f            player_autofire_c	byte
+0020            player_autofire_s	byte
+0021            player_damage		byte
+0022            player_damage_flash	byte
+      
+      
+0023            game_difficulty		byte
+      
+      
+      
+0024            wtf		byte ; frame counter lo
+0025            ftw		byte ; frame counter hi
+0026            rng0		byte
+0027            rng1		byte
+0028            rng2		byte
+      
+0029            title_rudy_pos		byte
+002a            options_rudy_pos	byte
+002b            options_music_on	byte
+002c            options_song_id		byte
+002d            options_sound_id	byte
+002e            options_rudy_color1	byte
+002f            options_rudy_color2	byte
+0030            scroll_to_counter	byte
+      
+0031            starfield_state		byte
+0032            starfield_column	byte
+0033            starfield_page		byte
+0034            starfield_color0	byte
+0035            starfield_color1	byte
+0036            starfield_trans_frame	byte
+0037            starfield_msg_pos_lo	byte
+0038            starfield_msg_pos_hi	byte
+0039            starfield_msg_return_lo	byte
+003a            starfield_msg_return_hi byte
+      
+003b            collision_0_x	byte
+003c            collision_0_y	byte
+003d            collision_0_w	byte
+003e            collision_0_h	byte
+003f            collision_1_x	byte
+0040            collision_1_y	byte
+0041            collision_1_w	byte
+0042            collision_1_h	byte
+      
+0043            dashboard_message	byte
+      
+0044            timer_frames_1s		byte
+0045            timer_frames_10s	byte
+0046            timer_seconds_1s	byte
+0047            timer_seconds_10s	byte
+0048            timer_minutes_1s	byte
+0049            timer_minutes_10s	byte
+      
+004a            state_v0		byte
+004b            state_v1		byte
+004c            state_v2		byte
+004d            state_v3		byte
+004e            state_v4		byte
+004f            state_v5		byte
+0050            state_v6		byte
+0051            state_v7		byte
+0052            state_sprite0		byte
+0053            state_iframes		byte
+0054            state_iframe_length	byte
+      
+0055            state_render_addr	byte
+0056            state_update_addr	byte
+      
+      
+0057            nametable_tile_planter_addr_lo	byte
+0058            nametable_tile_planter_addr_hi	byte
+      
+0059            phase_state		byte
+005a            phase_current		byte
+005b            phase_level		byte
+005c            phase_kill_counter	byte
+005d            phase_table_ptr		byte
+005e            phase_spawn_type	byte
+005f            phase_spawn_long_c	byte
+0060            phase_arctang_counter	byte
+0061            phase_spawn_counter	byte
+0062            phase_interval_counter	byte
+0063            phase_end_game		byte
+      
+0064            player_frag_counter	byte
+0065            player_death_flag	byte
+0066            player_death_counter	byte
+0067            you_dead_counter	byte
+      
+0068            powerup_counter	byte
+0069  00            powerup_offset	byte
+      
+006a            bomb_counter	byte ; counts down animation frames
+006b            r_bag_counter	byte ; counts down autoturbo fire frames
+006c            shroom_counter	byte ; counts down animation frames
+006d            shroom_mod	byte ; apu pitch offset
+006e            orbit_shield_speed	byte ; 0 = no skull shield
+006f            orbit_shield_pos	byte
+      
+0070            dart_frame_max		byte
+0071            dart_x_origin		byte
+0072            dart_y_origin		byte
+0073            dart_velocity		byte
+0074            dart_sprite		byte
+0075            dart_dir_adjust		byte
+      
+      
+0076  00            enemy_ram_offset	byte
+0077  00            enemy_oam_offset	byte
+0078            enemy_slot_id		byte
+0079            enemy_dmg_accumulator	byte
+007a            boss_dmg_handle_true	byte
+007b            boss_death_happening	byte
+007c            boss_heart_stars	byte
+007d            boss_x		byte
+007e            boss_y		byte
+007f            boss_eyes_pal	byte
+      
+0080            arc_sequence_id		byte
+0081            arc_sequence_lo		byte
+0082            arc_sequence_hi		byte
+0083            arc_sequence_length	byte
+      
+0084            arctang_velocity_lo	byte
+0085            arctang_velocity_hi	byte
+      
+      
+0086            temp00	byte
+0087            temp01	byte
+0088            temp02	byte
+0089            temp03	byte
+      
+      
+008a            pal_fade_c		byte
+008b  00            pal_fade_offset		byte
+008c            pal_fade_target		byte
+008d            state_fade_in		byte
+008e            state_fade_out		byte
+008f            state_from_white	byte
+      
+0090            pal_uni_bg	byte
+0091            pal_bg_0_1	byte
+0092            pal_bg_0_2	byte
+0093            pal_bg_0_3	byte
+0094            pal_bg_1_1	byte
+0095            pal_bg_1_2	byte
+0096            pal_bg_1_3	byte
+0097            pal_bg_2_1	byte
+0098            pal_bg_2_2	byte
+0099            pal_bg_2_3	byte
+009a            pal_bg_3_1	byte
+009b            pal_bg_3_2	byte
+009c            pal_bg_3_3	byte
+009d            pal_spr_0_1	byte
+009e            pal_spr_0_2	byte
+009f            pal_spr_0_3	byte
+00a0            pal_spr_1_1	byte
+00a1            pal_spr_1_2	byte
+00a2            pal_spr_1_3	byte
+00a3            pal_spr_2_1	byte
+00a4            pal_spr_2_2	byte
+00a5            pal_spr_2_3	byte
+00a6            pal_spr_3_1	byte
+00a7            pal_spr_3_2	byte
+00a8            pal_spr_3_3	byte
+      
+00a9            player_color0	byte
+00aa            player_color1	byte
+00ab            player_color2	byte
+      
+      
+00ac            apu_pu1_counter		byte
+00ad            apu_pu1_envelope	byte
+00ae            apu_pu1_last_hi		byte
+00af            apu_tri_counter		byte ; !!! this order for x offset
+00b0            apu_pu2_counter		byte
+00b1            apu_pu2_envelope	byte
+00b2            apu_pu2_last_hi		byte
+00b3            apu_noi_counter		byte ; !!! must update apu_env_run if moved
+00b4            apu_noi_envelope	byte
+      
+                    ; apu variables
+00b5            apu_rng0		byte
+00b6            apu_rng1		byte
+00b7            apu_temp		byte
+00b8            sfx_temp00		byte
+00b9            sfx_temp01		byte
+      
+00ba            sfx_phase_next_counter	byte
+                    ; counters to mask other channel audio
+00bb            sfx_pu1_counter		byte
+00bc            sfx_pu2_counter		byte
+00bd            sfx_noi_counter		byte
+                    ; table offsets for update subroutines
+00be            sfx_pu2_update_type	byte
+00bf            sfx_noi_update_type	byte
+      
+00c0            audio_song_id		byte
+00c1            audio_frame_counter     byte
+00c2            audio_root_tone         byte
+00c3            audio_pattern_pos	byte
+00c4            audio_pattern_num       byte
+      
+      
+      
+      00 c6         bullet_x_vel	= $c6
+00c5  00 c7         bullet_y_vel	= $c7

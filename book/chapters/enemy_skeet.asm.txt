@@ -1,0 +1,95 @@
+      
+                    ; skeet is a buggar that moves in curves
+                    ;
+                    ; ac used for both tiles and cycle counter
+                    ; pc 2bits x velocity / 2bits y velocity
+                    ; ex holds 4-way direction
+      
+                skeet_att_table:
+                    ;     r/u   l/u   l/d  r/d
+ee4d  byte          #$a2, #$d2, #$62, #$22
+                skeet_vel_table:
+ee51  byte          #0, #5, #6, #1, #6, #5
+      
+                skeet_spawn: subroutine
+                    ; set direction
+ee57  a5 27         lda rng1
+ee59  29 02         and #$02
+ee5b  d0 04         bne .downward
+                .upward
+ee5d  a9 06         lda #$06
+ee5f  d0 02         bne .set_updown
+                .downward
+ee61  a9 12         lda #18
+                .set_updown
+ee63  9d 07 03      sta enemy_ram_ex,x
+                    ; set position
+ee66  4c 1a db      jmp enemy_spawn_set_x_y_rng
+      
+      
+                skeet_cycle: subroutine
+ee69  a9 08         lda #$08
+ee6b  85 3d         sta collision_0_w
+ee6d  85 3e         sta collision_0_h
+ee6f  20 eb db      jsr enemy_handle_damage_and_death
+      
+                    ; reset direction?
+ee72  bd 05 03      lda enemy_ram_ac,x
+ee75  d0 16         bne .skip_reset
+ee77  a9 40         lda #$40
+ee79  9d 05 03      sta enemy_ram_ac,x
+ee7c  20 52 c1      jsr get_next_random
+ee7f  10 07         bpl .dir_inc
+                .dir_dec
+ee81  a9 ff         lda #$ff
+ee83  9d 04 03      sta enemy_ram_pc,x
+ee86  d0 05         bne .skip_reset
+                .dir_inc
+ee88  a9 01         lda #$01
+ee8a  9d 04 03      sta enemy_ram_pc,x
+                .skip_reset
+ee8d  de 05 03      dec enemy_ram_ac,x
+ee90  bd 05 03      lda enemy_ram_ac,x
+ee93  29 03         and #$03
+ee95  d0 0d         bne .skip_dir_change
+ee97  bd 07 03      lda enemy_ram_ex,x
+ee9a  18            clc
+ee9b  7d 04 03      adc enemy_ram_pc,x
+ee9e  20 ae ce      jsr arctang_bound_dir
+eea1  9d 07 03      sta enemy_ram_ex,x
+                .skip_dir_change
+                    ; velocity
+eea4  bd 07 03      lda enemy_ram_ex,x
+eea7  4a            lsr
+eea8  4a            lsr
+eea9  aa            tax
+eeaa  bd 51 ee      lda skeet_vel_table,x
+eead  aa            tax
+eeae  bd f0 ff      lda arctang_velocities_lo,x
+eeb1  85 84         sta arctang_velocity_lo
+eeb3  a6 76         ldx enemy_ram_offset
+eeb5  20 f6 ce      jsr arctang_enemy_update
+                    ; sprite
+eeb8  bd 05 03      lda enemy_ram_ac,x
+eebb  4a            lsr
+eebc  aa            tax
+eebd  bd 00 fe      lda sine_table,x
+eec0  29 01         and #1
+eec2  18            clc
+eec3  69 4e         adc #$4e ; base sprite tile
+eec5  a6 76         ldx enemy_ram_offset
+eec7  99 01 02      sta oam_ram_spr,y
+                    ; attr
+eeca  bd 07 03      lda enemy_ram_ex,x
+eecd  69 04         adc #$04
+eecf  4a            lsr
+eed0  4a            lsr
+eed1  4a            lsr
+eed2  aa            tax
+eed3  bd 4d ee      lda skeet_att_table,x
+eed6  a6 76         ldx enemy_ram_offset
+eed8  20 39 dc      jsr enemy_set_palette
+      
+eedb  4c 92 db      jmp update_enemies_handler_next
+      
+      

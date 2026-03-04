@@ -1,0 +1,51 @@
+      
+                    ; temp00 = eye sprite x origin
+                    ; temp01 = eye sprite y origin
+      
+                enemy_boss_eyes: subroutine
+                    ; EYE SPRITE
+                .now_lets_add_eyes
+e5b6  a2 fc         ldx #$fc
+e5b8  a9 a9         lda #$a9
+e5ba  9d 01 02      sta oam_ram_spr,x
+e5bd  a5 7f         lda boss_eyes_pal
+e5bf  9d 02 02      sta oam_ram_att,x
+                    ; find x
+e5c2  a5 86         lda temp00
+e5c4  9d 03 02      sta oam_ram_x,x
+                    ; check if rudy is left of vampire
+e5c7  c5 13         cmp player_x_hi
+e5c9  90 05         bcc .looking_right
+                .looking_left
+e5cb  a9 99         lda #$99
+e5cd  9d 01 02      sta oam_ram_spr,x
+                    ;inc oam_ram_x,x
+                .looking_right
+                    ; find y
+e5d0  a4 87         ldy temp01
+e5d2  c8            iny
+e5d3  98            tya
+e5d4  a4 77         ldy enemy_oam_offset
+e5d6  9d 00 02      sta oam_ram_y,x
+e5d9  18            clc
+e5da  69 1c         adc #$1c
+e5dc  38            sec
+e5dd  e5 15         sbc player_y_hi
+e5df  90 14         bcc .looking_down
+e5e1  18            clc
+e5e2  69 cc         adc #$cc
+e5e4  b0 0b         bcs .looking_up
+                .looking_across
+e5e6  bd 01 02      lda oam_ram_spr,x
+e5e9  c9 99         cmp #$99
+e5eb  f0 03         beq .adjust_for_left_looking
+e5ed  4c f8 e5      jmp .done
+                .adjust_for_left_looking
+e5f0  60            rts
+                .looking_up
+e5f1  de 00 02      dec oam_ram_y,x
+e5f4  60            rts
+                .looking_down
+e5f5  fe 00 02      inc oam_ram_y,x
+                .done
+e5f8  60            rts

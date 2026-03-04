@@ -1,0 +1,152 @@
+      
+      
+                enemy_accelerates_upwards: subroutine
+dcfb  fe 05 03      inc enemy_ram_ac,x
+dcfe  bd 05 03      lda enemy_ram_ac,x
+dd01  4a            lsr
+dd02  4a            lsr
+dd03  4a            lsr
+dd04  9d 03 03      sta enemy_ram_y,x
+dd07  b9 00 02      lda oam_ram_y,y
+dd0a  38            sec
+dd0b  fd 03 03      sbc enemy_ram_y,x
+dd0e  c9 b6         cmp #sprite_0_y
+dd10  60            rts
+      
+      
+                crossbones_cycle: subroutine
+dd11  20 fb dc      jsr enemy_accelerates_upwards
+dd14  b0 0f         bcs .crossbones_death
+dd16  99 00 02      sta oam_ram_y,y
+dd19  a9 c1         lda #$c1
+dd1b  99 01 02      sta oam_ram_spr,y
+dd1e  a9 03         lda #$03
+dd20  99 02 02      sta oam_ram_att,y
+dd23  d0 0a         bne .crossbones_done
+                .crossbones_death
+dd25  a5 bd         lda sfx_noi_counter
+dd27  d0 03         bne .die_already
+dd29  20 2c fb      jsr sfx_ghost_snare
+                .die_already
+dd2c  20 47 dd      jsr enemy_clear
+                .crossbones_done
+dd2f  4c 92 db      jmp update_enemies_handler_next
+      
+      
+      
+      
+      
+      
+      
+                clear_all_enemies: subroutine
+                    ; clears all enemy ram
+dd32  a2 f0         ldx #$f0
+dd34  a9 00         lda #$00
+                .enemy_loop
+dd36  ca            dex
+dd37  9d 00 03      sta enemy_ram_type,x
+dd3a  d0 fa         bne .enemy_loop
+                    ; clears all enemy sprites
+dd3c  a9 ff         lda #$ff
+dd3e  a2 20         ldx #$20
+                .sprite_loop
+dd40  9d 00 02      sta $0200,x
+dd43  e8            inx
+dd44  d0 fa         bne .sprite_loop
+dd46  60            rts
+      
+      
+      
+                enemy_clear: subroutine
+                    ; clear OAM data
+dd47  a4 77         ldy enemy_oam_offset
+dd49  a9 ff         lda #$ff
+dd4b  a2 03         ldx #$03
+                .enemy_oam_loop
+dd4d  99 00 02      sta oam_ram_y,y
+dd50  c8            iny
+dd51  ca            dex
+dd52  d0 f9         bne .enemy_oam_loop
+                    ; clear enemy data
+dd54  a6 76         ldx enemy_ram_offset
+dd56  a9 00         lda #$00
+dd58  a0 06         ldy #$06 ; 7 would clear _ex
+                .enemy_ram_loop
+dd5a  9d 00 03      sta enemy_ram_type,x
+dd5d  e8            inx
+dd5e  88            dey
+dd5f  d0 f9         bne .enemy_ram_loop
+                    ; enemy_ram_ex is allowed to carry over
+                    ; entities using _ex should set it on spawn
+dd61  60            rts
+      
+      
+      
+                enemy_death_handler: subroutine
+                    ; requires
+                    ; enemy_ram_offset
+                    ; enemy_oam_offset
+      
+                    ; don't handle a non entity
+dd62  a6 76         ldx enemy_ram_offset
+dd64  bd 00 03      lda enemy_ram_type,x
+dd67  f0 59         beq .done
+      
+dd69  e6 64         inc player_frag_counter
+      
+                    ; track deaths of phase spawns
+dd6b  a4 78         ldy enemy_slot_id
+dd6d  b9 50 01      lda phase_spawn_table,y
+dd70  f0 0b         beq .not_phase_spawn
+dd72  a9 00         lda #$00
+dd74  99 50 01      sta phase_spawn_table,y
+dd77  c6 5c         dec phase_kill_counter
+                    ; if less than 0 set to 0
+dd79  10 02         bpl .not_phase_spawn
+dd7b  85 5c         sta phase_kill_counter
+                .not_phase_spawn
+      
+dd7d  a6 76         ldx enemy_ram_offset
+dd7f  a4 77         ldy enemy_oam_offset
+                    ; 4 sprite cleanup
+dd81  e0 a0         cpx #$a0
+dd83  90 1f         bcc .dont_cleanup_4_sprite
+dd85  a9 04         lda #$04 ; move first sprite over 4 pixels
+dd87  18            clc
+dd88  79 03 02      adc oam_ram_x,y
+dd8b  99 03 02      sta oam_ram_x,y
+dd8e  a9 04         lda #$04 ; move first sprite down 4 pixels
+dd90  18            clc
+dd91  79 00 02      adc oam_ram_y,y
+dd94  99 00 02      sta oam_ram_y,y
+                    ; move other sprites off screen
+dd97  a9 ff         lda #$ff
+dd99  99 04 02      sta oam_ram_y+4,y
+dd9c  99 08 02      sta oam_ram_y+8,y
+dd9f  99 0c 02      sta oam_ram_y+12,y
+dda2  d0 09         bne .check_for_powerup_drop
+                .dont_cleanup_4_sprite
+      
+                    ; 2 sprite cleanup
+dda4  e0 80         cpx #$80
+dda6  90 05         bcc .dont_cleanup_2_sprite
+dda8  a9 ff         lda #$ff
+ddaa  99 04 02      sta oam_ram_y+4,y
+                .dont_cleanup_2_sprite
+      
+                .check_for_powerup_drop
+                    ; starglasses
+ddad  bd 00 03      lda enemy_ram_type,x
+ddb0  c9 0f         cmp #starglasses_id
+ddb2  d0 03         bne .not_starglasses
+                    ; spawn powerup
+ddb4  4c 18 d3      jmp powerup_from_starglasses
+                .not_starglasses
+      
+ddb7  20 04 f9      jsr sfx_enemy_death
+                    ; change it into crossbones!
+ddba  a9 01         lda #crossbones_id
+ddbc  9d 00 03      sta enemy_ram_type,x
+ddbf  9d 05 03      sta enemy_ram_ac,x
+                .done
+ddc2  60            rts

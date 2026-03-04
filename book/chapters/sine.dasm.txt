@@ -1,0 +1,85 @@
+      
+      
+      04 80         sine_7bits equ $0480
+      05 00         sine_6bits equ $0500
+      05 80         sine_5bits equ $0580
+      06 00         sine_4bits equ $0600
+      06 80         sine_3bits equ $0680
+      07 00         sine_2bits equ $0700
+      07 80         sine_1bits equ $0780
+      
+      
+      
+      
+                    ; 40 bytes
+                sine_init: subroutine
+d484  a2 00         ldx #$00
+d486  a0 00         ldy #$00
+                .loop
+d488  b9 00 fe      lda sine_table,y
+d48b  4a            lsr
+d48c  9d 80 04      sta sine_7bits,x
+d48f  4a            lsr
+d490  9d 00 05      sta sine_6bits,x
+d493  4a            lsr
+d494  9d 80 05      sta sine_5bits,x
+d497  4a            lsr
+d498  9d 00 06      sta sine_4bits,x
+d49b  4a            lsr
+d49c  9d 80 06      sta sine_3bits,x
+d49f  4a            lsr
+d4a0  9d 00 07      sta sine_2bits,x
+d4a3  4a            lsr
+d4a4  9d 80 07      sta sine_1bits,x
+d4a7  e8            inx
+d4a8  c8            iny
+d4a9  c8            iny
+d4aa  d0 dc         bne .loop
+d4ac  60            rts
+      
+      
+                    ; 61 bytes
+                sine_of_scale: subroutine
+                    ; returns scaled value of sine table
+                    ; a = sine max
+                    ; x = sine pos
+d4ad  49 ff         eor #$ff
+d4af  85 86         sta temp00
+                    ; half x for lookup table
+d4b1  8a            txa
+d4b2  4a            lsr
+d4b3  aa            tax
+d4b4  a9 00         lda #$00
+d4b6  46 86         lsr temp00
+d4b8  46 86         lsr temp00
+d4ba  b0 03         bcs .not_1bits
+d4bc  7d 80 07      adc sine_1bits,x
+                .not_1bits
+d4bf  46 86         lsr temp00
+d4c1  b0 03         bcs .not_2bits
+d4c3  7d 00 07      adc sine_2bits,x
+                .not_2bits
+d4c6  46 86         lsr temp00
+d4c8  b0 03         bcs .not_3bits
+d4ca  7d 80 06      adc sine_3bits,x
+                .not_3bits
+d4cd  46 86         lsr temp00
+d4cf  b0 03         bcs .not_4bits
+d4d1  7d 00 06      adc sine_4bits,x
+                .not_4bits
+d4d4  46 86         lsr temp00
+d4d6  b0 03         bcs .not_5bits
+d4d8  7d 80 05      adc sine_5bits,x
+                .not_5bits
+d4db  46 86         lsr temp00
+d4dd  b0 03         bcs .not_6bits
+d4df  7d 00 05      adc sine_6bits,x
+                .not_6bits
+d4e2  46 86         lsr temp00
+d4e4  b0 03         bcs .not_7bits
+d4e6  7d 80 04      adc sine_7bits,x
+                .not_7bits
+d4e9  60            rts
+      
+      
+      

@@ -1,0 +1,303 @@
+      
+      
+                    ; boss_x : x origin of sine pattern
+                    ; boss_y : y origin of sine pattern
+                    ; state_v0 : bottom lip position
+                    ; state_v1 : bottom lip animation counter
+                    ; state_v2 :
+                    ; state_v3 : y bounce sine direction
+                    ; state_v4 : sprite x position
+                    ; state_v5 : sprite y position
+                    ; state_v6 : upper lip up sprite offset
+      
+      
+                boss_moufs_spawn: subroutine
+ddc3  a9 03         lda #boss_assist_id
+                    ; eyeballs
+ddc5  8d 40 03      sta $0340
+ddc8  8d 48 03      sta $0348
+                    ; lip rows
+ddcb  8d c0 03      sta $03c0
+ddce  8d c8 03      sta $03c8
+ddd1  8d d0 03      sta $03d0
+ddd4  a9 40         lda #$40
+ddd6  9d 02 03      sta enemy_ram_x,x
+ddd9  85 4e         sta state_v4
+dddb  9d 03 03      sta enemy_ram_y,x
+ddde  85 4f         sta state_v5
+dde0  a9 08         lda #$08
+dde2  85 7d         sta boss_x
+dde4  a9 20         lda #$20
+dde6  85 7e         sta boss_y
+dde8  60            rts
+      
+      
+      
+                moufs_oam_offset_table:
+dde9  byte          $b0, $c0, $e0, $d0
+                moufs_sprite_offset_table:
+dded  byte          $00, $10, $20, $30
+                moufs_y_offset_table:
+ddf1  byte          $00, $08, $0d, $10
+      
+      
+                boss_moufs_cycle: subroutine
+ddf5  a5 4e         lda state_v4
+ddf7  85 3b         sta collision_0_x
+ddf9  a5 4f         lda state_v5
+ddfb  85 3c         sta collision_0_y
+ddfd  a9 14         lda #$14
+ddff  85 3d         sta collision_0_w
+de01  a9 20         lda #$20
+de03  85 3e         sta collision_0_h
+      
+de05  e6 7a         inc boss_dmg_handle_true
+de07  20 eb db      jsr enemy_handle_damage_and_death
+de0a  c6 7a         dec boss_dmg_handle_true
+      
+                    ; set upper lip default sprite
+de0c  a9 00         lda #$00
+de0e  85 50         sta state_v6
+      
+                    ; sine bounce movement
+                    ; ac does x axis
+de10  fe 05 03      inc enemy_ram_ac,x
+                    ; pc does y axis
+de13  a5 4d         lda state_v3
+de15  29 01         and #$01
+de17  d0 0f         bne .y_increase
+                .y_decrease
+                    ; arc backwards
+de19  de 04 03      dec enemy_ram_pc,x
+de1c  bd 04 03      lda enemy_ram_pc,x
+de1f  c9 b3         cmp #$b3
+de21  b0 11         bcs .y_change_done
+de23  e6 50         inc state_v6
+de25  4c 34 de      jmp .y_change_done
+                .y_increase
+                    ; arc forwards
+de28  fe 04 03      inc enemy_ram_pc,x
+de2b  bd 04 03      lda enemy_ram_pc,x
+de2e  c9 ce         cmp #$ce
+de30  90 02         bcc .y_change_done
+de32  e6 50         inc state_v6
+                .y_change_done
+de34  bc 04 03      ldy enemy_ram_pc,x
+de37  b9 00 fe      lda sine_table,y
+de3a  a4 77         ldy enemy_oam_offset
+de3c  c9 80         cmp #$80
+de3e  d0 02         bne .dont_change_dir
+de40  e6 4d         inc state_v3
+                .dont_change_dir
+                    ; x
+de42  bd 05 03      lda enemy_ram_ac,x
+de45  18            clc
+de46  69 40         adc #$40
+de48  4a            lsr
+de49  aa            tax
+de4a  bd 00 05      lda sine_6bits,x
+de4d  18            clc
+de4e  65 7d         adc boss_x
+de50  85 4e         sta state_v4
+de52  a6 76         ldx enemy_ram_offset
+                    ; y
+de54  bd 04 03      lda enemy_ram_pc,x
+de57  aa            tax
+de58  bd 00 fe      lda sine_table,x
+de5b  18            clc
+de5c  65 7e         adc boss_y
+de5e  85 4f         sta state_v5
+de60  a6 76         ldx enemy_ram_offset
+      
+                    ; palette
+de62  a9 01         lda #$01
+de64  20 9d da      jsr sprite_4_set_palette
+de67  85 87         sta temp01
+      
+      
+                    ; EYEBALLLZ
+de69  a5 15         lda player_y_hi
+de6b  c5 4f         cmp state_v5
+de6d  b0 04         bcs .look_down
+                .look_up
+de6f  a9 c6         lda #$c6
+de71  d0 02         bne .look_set_sprites
+                .look_down
+de73  a9 d6         lda #$d6
+                .look_set_sprites
+de75  8d 41 02      sta oam_ram_spr+$40
+de78  8d 45 02      sta oam_ram_spr+$44
+de7b  ee 45 02      inc oam_ram_spr+$44
+      
+de7e  a5 4e         lda state_v4
+de80  8d 43 02      sta oam_ram_x+$40
+de83  18            clc
+de84  69 11         adc #$11
+de86  8d 47 02      sta oam_ram_x+$44
+de89  a5 4f         lda state_v5
+de8b  e9 04         sbc #$04
+de8d  8d 40 02      sta oam_ram_y+$40
+de90  8d 44 02      sta oam_ram_y+$44
+de93  a5 87         lda temp01
+de95  f0 02         beq .hit
+de97  a9 02         lda #$02
+                .hit
+de99  8d 42 02      sta oam_ram_att+$40
+de9c  8d 46 02      sta oam_ram_att+$44
+      
+      
+      
+                    ; LIPPPPS
+      
+      
+      
+                    ; y row 3
+de9f  a5 4b         lda state_v1
+dea1  4a            lsr
+dea2  aa            tax
+dea3  bd 00 07      lda sine_2bits,x
+dea6  85 88         sta temp02
+      
+dea8  e6 4b         inc state_v1
+deaa  e6 4b         inc state_v1
+deac  e6 4b         inc state_v1
+      
+                    ; y row 4
+deae  a5 4b         lda state_v1
+deb0  4a            lsr
+deb1  aa            tax
+deb2  bd 80 06      lda sine_3bits,x
+deb5  85 4a         sta state_v0
+deb7  85 89         sta temp03
+      
+deb9  e6 4b         inc state_v1
+debb  e6 4b         inc state_v1
+debd  e6 4b         inc state_v1
+      
+                    ; row 1 sprite
+debf  a0 b0         ldy #$b0
+dec1  a5 50         lda state_v6
+dec3  f0 06         beq .lip_up
+                .lip_down
+dec5  a9 65         lda #$65
+dec7  85 50         sta state_v6
+dec9  d0 04         bne .upper_lip_set_sprite
+                .lip_up
+decb  a9 86         lda #$86
+decd  85 50         sta state_v6
+                .upper_lip_set_sprite
+      
+      
+      
+decf  a2 00         ldx #$00
+                .mouf_sprites_loop
+ded1  bc e9 dd      ldy moufs_oam_offset_table,x
+                    ; sprite
+                    ; a = left tile id
+                    ; y = oam ram offset
+ded4  e0 02         cpx #$02
+ded6  b0 04         bcs .sprite_normal
+                .sprite_custom
+ded8  a5 50         lda state_v6
+deda  d0 02         bne .sprite_chosen
+                .sprite_normal
+dedc  a9 86         lda #$86
+                .sprite_chosen
+dede  18            clc
+dedf  7d ed dd      adc moufs_sprite_offset_table,x
+dee2  99 01 02      sta oam_ram_spr,y
+dee5  18            clc
+dee6  69 01         adc #$01
+dee8  99 05 02      sta oam_ram_spr+$04,y
+deeb  69 01         adc #$01
+deed  99 09 02      sta oam_ram_spr+$08,y
+                    ; x
+                    ; a = x pos
+                    ; y = oam ram offset
+def0  a5 4e         lda state_v4
+def2  99 03 02      sta oam_ram_x,y
+def5  18            clc
+def6  69 08         adc #$08
+def8  99 07 02      sta oam_ram_x+$04,y
+defb  69 08         adc #$08
+defd  99 0b 02      sta oam_ram_x+$08,y
+df00  69 08         adc #$08
+df02  99 0f 02      sta oam_ram_x+$0c,y
+                    ; y
+                    ; a = y pos
+                    ; y = oam ram offset
+df05  a5 4f         lda state_v5
+df07  18            clc
+df08  7d f1 dd      adc moufs_y_offset_table,x
+df0b  e0 02         cpx #$02
+df0d  90 0a         bcc .no_y_adjustments
+df0f  e0 03         cpx #$03
+df11  f0 04         beq .bottom_sprite
+                .almost_bottom_sprite
+df13  65 88         adc temp02
+df15  d0 02         bne .no_y_adjustments
+                .bottom_sprite
+df17  65 89         adc temp03
+                .no_y_adjustments
+df19  99 00 02      sta oam_ram_y,y
+df1c  99 04 02      sta oam_ram_y+$04,y
+df1f  99 08 02      sta oam_ram_y+$08,y
+                    ; pal / attr
+df22  a5 87         lda temp01
+df24  20 aa da      jsr sprite_4_set_palette_no_process
+                    ; check next
+df27  e8            inx
+df28  e0 04         cpx #$04
+df2a  d0 a5         bne .mouf_sprites_loop
+      
+      
+df2c  a6 76         ldx enemy_ram_offset
+      
+      
+      
+                    ; fire time?
+df2e  a5 4a         lda state_v0
+df30  c9 07         cmp #$07
+df32  d0 38         bne .done
+df34  a5 24         lda wtf
+df36  29 07         and #$07
+df38  d0 32         bne .done
+      
+                .dart_fire
+                    ; x
+df3a  a5 4e         lda state_v4
+df3c  18            clc
+df3d  69 0a         adc #$0a
+df3f  85 71         sta dart_x_origin
+                    ; y
+df41  a5 4f         lda state_v5
+df43  18            clc
+df44  69 0f         adc #$0f
+df46  85 72         sta dart_y_origin
+                    ; velocity
+df48  bd 04 03      lda enemy_ram_pc,x
+df4b  e9 80         sbc #$80
+df4d  4a            lsr
+df4e  4a            lsr
+df4f  4a            lsr
+df50  4a            lsr
+df51  85 73         sta dart_velocity
+                    ; sprite
+df53  a9 fe         lda #$fe
+                    ;lda #$00
+df55  85 74         sta dart_sprite
+                    ; dir adjustor
+df57  a9 00         lda #$00
+df59  85 75         sta dart_dir_adjust
+df5b  20 a8 e7      jsr dart_spawn
+df5e  a9 ff         lda #$ff
+df60  85 75         sta dart_dir_adjust
+df62  20 a8 e7      jsr dart_spawn
+df65  a9 01         lda #$01
+df67  85 75         sta dart_dir_adjust
+df69  20 a8 e7      jsr dart_spawn
+      
+                .done
+      
+      
+df6c  4c 92 db      jmp update_enemies_handler_next

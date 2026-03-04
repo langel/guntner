@@ -1,0 +1,163 @@
+      
+      
+                sine_table:
+fe00  hex           808386898c8f9295
+fe08  hex           989b9ea2a5a7aaad
+fe10  hex           b0b3b6b9bcbec1c4
+fe18  hex           c6c9cbced0d3d5d7
+fe20  hex           dadcdee0e2e4e6e8
+fe28  hex           eaebedeef0f1f3f4
+fe30  hex           f5f6f8f9fafafbfc
+fe38  hex           fdfdfefefeffffff
+fe40  hex           fffffffffefefefd
+fe48  hex           fdfcfbfafaf9f8f6
+fe50  hex           f5f4f3f1f0eeedeb
+fe58  hex           eae8e6e4e2e0dedc
+fe60  hex           dad7d5d3d0cecbc9
+fe68  hex           c6c4c1bebcb9b6b3
+fe70  hex           b0adaaa7a5a29e9b
+fe78  hex           9895928f8c898683
+fe80  hex           807c797673706d6a
+fe88  hex           6764615d5a585552
+fe90  hex           4f4c494643413e3b
+fe98  hex           393634312f2c2a28
+fea0  hex           2523211f1d1b1917
+fea8  hex           151412110f0e0c0b
+feb0  hex           0a09070605050403
+feb8  hex           0202010101000000
+fec0  hex           0000000001010102
+fec8  hex           0203040505060709
+fed0  hex           0a0b0c0e0f111214
+fed8  hex           1517191b1d1f2123
+fee0  hex           25282a2c2f313436
+fee8  hex           393b3e414346494c
+fef0  hex           4f5255585a5d6164
+fef8  hex           676a6d707376797c
+      
+      
+                    ;  0 = right
+                    ;  6 = up
+                    ; 12 = left
+                    ; 18 = down
+      
+                ARCTANG_TRANSLATION_LOOKUP_TABLE:
+ff00  byte          9, 3,15,21
+ff04  byte          10, 2,14,22
+ff08  byte          11, 1,13,23
+ff0c  byte          12, 0,12, 0
+ff10  byte          9, 3,15,21
+ff14  byte          8, 4,16,20
+ff18  byte          7, 5,17,19
+ff1c  byte          6, 6,18,18
+      
+      
+                    ;     reduce cycle counts by keeping these
+                    ;     tables on the same page
+                ARCTANG_REGION_TO_X_VELOCITY_TABLE:
+ff20  byte          0, 1, 2, 3, 4, 5
+ff26  byte          6, 5, 4, 3, 2, 1
+ff2c  byte          0, 1, 2, 3, 4, 5
+ff32  byte          6, 5, 4, 3, 2, 1
+                ARCTANG_REGION_TO_Y_VELOCITY_TABLE:
+ff38  byte          6, 5, 4, 3, 2, 1
+ff3e  byte          0, 1, 2, 3, 4, 5
+ff44  byte          6, 5, 4, 3, 2, 1
+ff4a  byte          0, 1, 2, 3, 4, 5
+                ARCTANG_REGION_X_PLUS_OR_MINUS_TABLE:
+                    ; 1 = plus
+                    ; 0 = minus
+ff50  byte          1, 1, 1, 1, 1, 1
+ff56  byte          0, 0, 0, 0, 0, 0
+ff5c  byte          0, 0, 0, 0, 0, 0
+ff62  byte          1, 1, 1, 1, 1, 1
+                ARCTANG_REGION_Y_PLUS_OR_MINUS_TABLE:
+                    ; 1 = plus
+                    ; 0 = minus
+ff68  byte          0, 0, 0, 0, 0, 0
+ff6e  byte          0, 0, 0, 0, 0, 0
+ff74  byte          1, 1, 1, 1, 1, 1
+ff7a  byte          1, 1, 1, 1, 1, 1
+      
+      
+                arctang_velocity_tables:
+                    ; region id angle degrees
+                    ; 0 0
+                    ; 1 15
+                    ; 2 30
+                    ; 3 45
+                    ; 4 60
+                    ; 5 75
+                    ; 6 90
+                arctang_velocity_6.66:
+ff80  byte          168, 6
+ff82  byte          109, 6
+ff84  byte          193, 5
+ff86  byte          119, 4
+ff88  byte          84, 3
+ff8a  byte          183, 1
+ff8c  byte          0, 0
+                arctang_velocity_4.5:
+ff8e  byte          127, 4
+ff90  byte          88, 4
+ff92  byte          229, 3
+ff94  byte          46, 3
+ff96  byte          64, 2
+ff98  byte          42, 1
+ff9a  byte          0, 0
+                arctang_velocity_3.33:
+ff9c  byte          85, 3
+ff9e  byte          56, 3
+ffa0  byte          227, 2
+ffa2  byte          91, 2
+ffa4  byte          171, 1
+ffa6  byte          221, 0
+ffa8  byte          0, 0
+                arctang_velocity_2.5:
+ffaa  byte          127, 2
+ffac  byte          104, 2
+ffae  byte          43, 2
+ffb0  byte          197, 1
+ffb2  byte          64, 1
+ffb4  byte          166, 0
+ffb6  byte          0, 0
+                arctang_velocity_1.75:
+ffb8  byte          191, 1
+ffba  byte          176, 1
+ffbc  byte          131, 1
+ffbe  byte          61, 1
+ffc0  byte          223, 0
+ffc2  byte          115, 0
+ffc4  byte          0, 0
+                arctang_velocity_1.25:
+ffc6  byte          64, 1
+ffc8  byte          53, 1
+ffca  byte          20, 1
+ffcc  byte          225, 0
+ffce  byte          161, 0
+ffd0  byte          81, 0
+ffd2  byte          0, 0
+                arctang_velocity_0.75:
+ffd4  byte          191, 0
+ffd6  byte          184, 0
+ffd8  byte          166, 0
+ffda  byte          135, 0
+ffdc  byte          96, 0
+ffde  byte          49, 0
+ffe0  byte          0, 0
+                arctang_velocity_0.33:
+ffe2  byte          84, 0
+ffe4  byte          81, 0
+ffe6  byte          73, 0
+ffe8  byte          59, 0
+ffea  byte          42, 0
+ffec  byte          22, 0
+ffee  byte          0, 0
+                arctang_velocities_lo:
+fff0  byte          #<arctang_velocity_6.66
+fff1  byte          #<arctang_velocity_4.5
+fff2  byte          #<arctang_velocity_3.33
+fff3  byte          #<arctang_velocity_2.5
+fff4  byte          #<arctang_velocity_1.75
+fff5  byte          #<arctang_velocity_1.25
+fff6  byte          #<arctang_velocity_0.75
+fff7  byte          #<arctang_velocity_0.33

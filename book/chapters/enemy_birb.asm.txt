@@ -1,0 +1,82 @@
+      
+      
+      
+                birb_spawn: subroutine
+                    ; x is set by enemy spawner
+e6b6  a5 27         lda rng1
+e6b8  9d 04 03      sta enemy_ram_pc,x ; pattern counter
+e6bb  a5 28         lda rng2
+e6bd  9d 05 03      sta enemy_ram_ac,x ; animation counter
+e6c0  20 52 c1      jsr get_next_random
+e6c3  4a            lsr
+e6c4  18            clc
+e6c5  69 0c         adc #$0c
+e6c7  9d 03 03      sta enemy_ram_y,x ; y pos
+e6ca  60            rts
+      
+      
+      
+      
+                    ;;;; HANDLING BIRB
+      
+                birb_cycle: subroutine
+e6cb  a9 08         lda #$08
+e6cd  85 3d         sta collision_0_w
+e6cf  a9 05         lda #$05
+e6d1  85 3e         sta collision_0_h
+e6d3  20 eb db      jsr enemy_handle_damage_and_death
+      
+                    ; update pattern
+e6d6  fe 04 03      inc enemy_ram_pc,x
+e6d9  fe 04 03      inc enemy_ram_pc,x
+      
+                    ; set x position
+                    ; get x pattern position
+                    ; add it to base x position
+e6dc  bd 04 03      lda enemy_ram_pc,x
+e6df  aa            tax
+e6e0  bd 00 fe      lda sine_table,x
+e6e3  4a            lsr
+e6e4  4a            lsr
+e6e5  4a            lsr
+e6e6  a6 76         ldx enemy_ram_offset
+e6e8  fe 02 03      inc enemy_ram_x,x
+e6eb  18            clc
+e6ec  7d 02 03      adc enemy_ram_x,x
+e6ef  99 03 02      sta oam_ram_x,y
+      
+                    ; set y position
+e6f2  bd 04 03      lda enemy_ram_pc,x
+e6f5  18            clc
+e6f6  69 40         adc #$40
+e6f8  aa            tax
+e6f9  bd 00 fe      lda sine_table,x
+e6fc  4a            lsr
+e6fd  4a            lsr
+e6fe  4a            lsr
+e6ff  a6 76         ldx enemy_ram_offset
+e701  18            clc
+e702  7d 03 03      adc enemy_ram_y,x
+e705  99 00 02      sta oam_ram_y,y
+      
+                    ; current sprite
+e708  bd 05 03      lda enemy_ram_ac,x
+e70b  18            clc
+e70c  69 14         adc #$14
+e70e  9d 05 03      sta enemy_ram_ac,x
+e711  4a            lsr
+e712  4a            lsr
+e713  4a            lsr
+e714  4a            lsr
+e715  4a            lsr
+e716  4a            lsr
+e717  18            clc
+e718  69 2c         adc #$2c
+e71a  99 01 02      sta oam_ram_spr,y
+                .frame_done
+e71d  a9 01         lda #$01
+e71f  20 39 dc      jsr enemy_set_palette
+                .done
+e722  4c 92 db      jmp update_enemies_handler_next
+      
+      

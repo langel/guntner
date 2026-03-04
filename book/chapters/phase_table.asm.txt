@@ -1,0 +1,167 @@
+                    ; phase type constants
+                    phase_zero_id		EQM	#$00	; "good luck" / "congration"
+                    phase_galger_id		EQM	#$01
+                    phase_spawns_id		EQM	#$02
+                    phase_longspawn_id	EQM	#$03
+                    phase_bossfight_id	EQM	#$04
+      
+                phase_type_table:
+d9d1  byte          #phase_zero_id ; 0
+d9d2  byte          #phase_galger_id ; 1
+d9d3  byte          #phase_spawns_id ; 2
+d9d4  byte          #phase_galger_id ; 3
+d9d5  byte          #phase_spawns_id ; 4
+d9d6  byte          #phase_galger_id ; 5
+d9d7  byte          #phase_longspawn_id ; 6
+d9d8  byte          #phase_galger_id ; 7
+d9d9  byte          #phase_spawns_id ; 8
+d9da  byte          #phase_galger_id ; 9
+d9db  byte          #phase_galger_id ; a
+d9dc  byte          #phase_spawns_id ; b
+d9dd  byte          #phase_galger_id ; c
+d9de  byte          #phase_longspawn_id ; d
+d9df  byte          #phase_galger_id ; e
+d9e0  byte          #phase_bossfight_id ; f
+      
+      
+      
+      
+                    ; OLD DEMO PHASES
+                    ; 1: 1 birb
+                    ; 2: 2 maggs
+                    ; 3: 2 starglasses
+                    ; 4: 1 skully
+                    ; 5: 2 starglasses, 2 maggs, 4 birbs
+                    ; 6: 8 birbs, 4 maggs
+                    ; 7: 12 birbs, 3 skullys
+                    ; 8: 12 birbs, 1 skully, 2 maggs
+                    ; 9: 16 birbs, 6 skullys, 4 maggs, 2 starglasses
+      
+                level_intervals_lo:
+d9e1  byte          #<level_0_interval_spawn_table
+d9e2  byte          #<level_1_interval_spawn_table
+d9e3  byte          #<level_2_interval_spawn_table
+d9e4  byte          #<level_3_interval_spawn_table
+                level_intervals_hi:
+d9e5  byte          #>level_0_interval_spawn_table
+d9e6  byte          #>level_1_interval_spawn_table
+d9e7  byte          #>level_2_interval_spawn_table
+d9e8  byte          #>level_3_interval_spawn_table
+      
+      
+                level_0_interval_spawn_table:
+                    ; spawn count = 5
+                    ; starglasses = 2
+d9e9  byte          starglasses_id, spark_id
+d9eb  byte          starglasses_id, spark_id
+d9ed  byte          dumbface_id
+d9ee  byte          0
+                level_1_interval_spawn_table:
+                    ; spawn count = 7
+                    ; starglasses = 2
+d9ef  byte          birb_id, starglasses_id, ant_id, zigzag_id
+d9f3  byte          starglasses_id, zigzag_id, dumbface_id
+d9f6  byte          0
+                level_2_interval_spawn_table:
+                    ; spawn count = 14
+                    ; starglasses = 2
+d9f7  byte          maggs_id, skeet_id, starglasses_id
+d9fa  byte          ant_id, dumbface_id, ant_id, starglasses_id
+d9fe  byte          skeet_id, lasso_id, starglasses_id
+da01  byte          chomps_id, skeet_id, muya_id, starglasses_id
+da05  byte          0
+                level_3_interval_spawn_table:
+                    ; spawn count = 14
+                    ; starglasses = 2
+da06  byte          chomps_id, muya_id, muya_id, starglasses_id
+da0a  byte          lasso_id, ant_id, uzi_id, lasso_id, ant_id, uzi_id
+da10  byte          muya_id, skully_id, throber_id, starglasses_id
+da14  byte          0
+      
+                level_boss_table:
+da15  byte          boss_moufs_id
+da16  byte          boss_vamp_id
+da17  byte          boss_scarab_id
+da18  byte          boss_swordtner_id
+      
+      
+                phase_enemy_table:
+                    ; === LEVEL 00 =========
+                    ; phase 02
+da19  byte          birb_id, 4
+da1b  byte          0
+                    ; phase 04
+da1c  byte          maggs_id, 2
+da1e  byte          0
+                    ; phase 08
+da1f  byte          birb_id, 3
+da21  byte          maggs_id, 3
+da23  byte          birb_id, 6
+da25  byte          0
+                    ; phase 0b
+da26  byte          maggs_id, 3
+da28  byte          birb_id, 8
+da2a  byte          maggs_id, 4
+da2c  byte          skully_id, 1
+da2e  byte          birb_id, 12
+da30  byte          0
+                    ; === LEVEL 01 =========
+                    ; phase 12
+da31  byte          birb_id, 1
+da33  byte          0
+                    ; phase 14
+da34  byte          chomps_id, 4
+da36  byte          0
+                    ; phase 18
+da37  byte          skully_id, 2
+da39  byte          0
+                    ; phase 1b
+da3a  byte          birb_id, 8
+da3c  byte          skully_id, 2
+da3e  byte          birb_id, 12
+da40  byte          chomps_id, 6
+da42  byte          throber_id, 2
+da44  byte          0
+                    ; === LEVEL 02 =========
+                    ; phase 22
+da45  byte          0
+da46  byte          maggs_id, 2
+da48  byte          throber_id, 1
+                    ; phase 24
+da4a  byte          0
+da4b  byte          chomps_id, 2
+da4d  byte          throber_id, 1
+                    ; phase 28
+da4f  byte          0
+da50  byte          maggs_id, 2
+da52  byte          birb_id, 6
+da54  byte          chomps_id, 2
+da56  byte          birb_id, 6
+da58  byte          maggs_id, 2
+da5a  byte          birb_id, 6
+da5c  byte          chomps_id, 2
+da5e  byte          birb_id, 6
+                    ; phase 2b
+da60  byte          birb_id, 8
+da62  byte          throber_id, 2
+da64  byte          birb_id, 12
+da66  byte          0
+                    ; === LEVEL 03 =========
+                    ; phase 32
+da67  byte          birb_id, 32
+da69  byte          0
+                    ; phase 34
+da6a  byte          throber_id, 4
+da6c  byte          0
+                    ; phase 38
+da6d  byte          birb_id, 4
+da6f  byte          0
+                    ; phase 3b
+da70  byte          uzi_id, 1
+da72  byte          birb_id, 24
+da74  byte          throber_id, 2
+da76  byte          0
+      
+      
+      
+      

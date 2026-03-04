@@ -1,0 +1,74 @@
+      
+      
+      
+      
+                maggs_spawn: subroutine
+ed89  20 52 c1      jsr get_next_random
+ed8c  9d 04 03      sta enemy_ram_pc,x ; pattern counter
+ed8f  20 d1 db      jsr enemy_spawn_random_y_pos
+ed92  9d 03 03      sta enemy_ram_y,x ; y pos
+ed95  60            rts
+      
+      
+      
+                    ;;;; HANDLING maggs
+                maggs_cycle: subroutine
+ed96  a9 10         lda #$10
+ed98  85 3d         sta collision_0_w
+ed9a  a9 05         lda #$05
+ed9c  85 3e         sta collision_0_h
+ed9e  20 eb db      jsr enemy_handle_damage_and_death
+      
+                    ; sprite
+eda1  bd 05 03      lda enemy_ram_ac,x
+eda4  4a            lsr
+eda5  4a            lsr
+eda6  4a            lsr
+eda7  4a            lsr
+eda8  0a            asl
+eda9  18            clc
+edaa  69 3c         adc #$3c
+edac  a4 77         ldy enemy_oam_offset
+edae  99 01 02      sta oam_ram_spr,y
+edb1  69 01         adc #$01
+edb3  99 05 02      sta oam_ram_spr+4,y
+      
+                    ; x pos
+edb6  bd 02 03      lda enemy_ram_x,x
+edb9  99 03 02      sta oam_ram_x,y
+edbc  18            clc
+edbd  69 08         adc #$08
+edbf  99 07 02      sta oam_ram_x+4,y
+      
+                    ; y pos
+edc2  a6 76         ldx enemy_ram_offset
+edc4  bd 04 03      lda enemy_ram_pc,x
+edc7  4a            lsr
+edc8  a8            tay
+edc9  b9 00 06      lda sine_4bits,y
+edcc  18            clc
+edcd  7d 03 03      adc enemy_ram_y,x
+edd0  a4 77         ldy enemy_oam_offset
+edd2  99 00 02      sta oam_ram_y,y
+edd5  99 04 02      sta oam_ram_y+4,y
+      
+                    ; update pattern
+edd8  fe 04 03      inc enemy_ram_pc,x
+eddb  fe 04 03      inc enemy_ram_pc,x
+                    ; move forward
+edde  fe 02 03      inc enemy_ram_x,x
+                    ; update animation
+ede1  bd 05 03      lda enemy_ram_ac,x
+ede4  c9 00         cmp #$00
+ede6  d0 05         bne .maggs_frame
+ede8  a9 20         lda #$20
+edea  9d 05 03      sta enemy_ram_ac,x
+                .maggs_frame
+eded  de 05 03      dec enemy_ram_ac,x
+      
+edf0  a9 02         lda #$02
+edf2  20 39 dc      jsr enemy_set_palette
+edf5  99 06 02      sta oam_ram_att+4,y
+                .done
+edf8  4c 92 db      jmp update_enemies_handler_next
+      

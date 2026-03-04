@@ -1,0 +1,119 @@
+      
+                    ; set velocity after calling spawn with :
+                    ; lda #<arctang_velocity_3.33
+                    ; sta enemy_ram_pc,x
+      
+                    ; spawn settings go in:
+                    ;   dart_velocity
+                    ;   dart_x_origin
+                    ;   dart_y_origin
+                    ;   dart_dir_adjust
+                    ;   dart_sprite
+      
+                dart_spawn: subroutine
+                    ; put x,y origin in:
+                    ; collision_0_x
+                    ; collision_0_y
+                .checks
+                    ; dart_frame_max is set at top of enemy_handler
+e7a8  a5 70         lda dart_frame_max
+e7aa  f0 5f         beq .done
+e7ac  c6 70         dec dart_frame_max
+e7ae  20 5f dc      jsr get_enemy_slot_next
+e7b1  90 58         bcc .done
+                .spawn
+e7b3  a9 0a         lda #dart_id
+e7b5  9d 00 03      sta enemy_ram_type,x
+e7b8  a9 00         lda #0
+e7ba  9d 02 03      sta enemy_ram_x,x ; sub pixel pos
+e7bd  9d 03 03      sta enemy_ram_y,x ; sub pixel pos
+                    ; velocity
+e7c0  a4 73         ldy dart_velocity
+e7c2  b9 f0 ff      lda arctang_velocities_lo,y
+e7c5  9d 04 03      sta enemy_ram_pc,x
+                    ; get y register and set origin
+e7c8  20 52 dc      jsr get_oam_offset_from_ram_offset
+e7cb  a5 71         lda dart_x_origin
+e7cd  99 03 02      sta oam_ram_x,y
+e7d0  a5 72         lda dart_y_origin
+e7d2  99 00 02      sta oam_ram_y,y
+                    ; direction
+e7d5  20 12 ce      jsr enemy_get_direction_of_player
+e7d8  18            clc
+e7d9  65 75         adc dart_dir_adjust
+e7db  20 ae ce      jsr arctang_bound_dir
+e7de  9d 07 03      sta enemy_ram_ex,x
+                    ; sprite
+e7e1  a5 74         lda dart_sprite
+e7e3  d0 17         bne .sprite_custom
+e7e5  bd 07 03      lda enemy_ram_ex,x
+e7e8  aa            tax
+e7e9  bd 0c e8      lda dart_direction_to_sprite_table,x
+e7ec  18            clc
+e7ed  69 b9         adc #$b9
+e7ef  99 01 02      sta oam_ram_spr,y
+                    ; attributes
+e7f2  bd 24 e8      lda dart_direction_to_attribute_table,x
+e7f5  09 01         ora #$01
+e7f7  99 02 02      sta oam_ram_att,y
+e7fa  d0 08         bne .sprite_done
+                .sprite_custom
+e7fc  99 01 02      sta oam_ram_spr,y
+e7ff  a9 01         lda #$01
+e801  99 02 02      sta oam_ram_att,y
+                .sprite_done
+                    ; sfx
+e804  20 41 fa      jsr sfx_shoot_dart
+                    ; register happy town
+e807  a6 76         ldx enemy_ram_offset
+e809  a4 77         ldy enemy_oam_offset
+                .done
+e80b  60            rts
+      
+      
+                dart_direction_to_sprite_table:
+e80c  byte          0,1,2,3,4,5,6,5,4,3,2,1
+e818  byte          0,1,2,3,4,5,6,5,4,3,2,1
+                dart_direction_to_attribute_table:
+e824  byte          $00,$00,$00,$00,$00,$00
+e82a  byte          $40,$40,$40,$40,$40,$40
+e830  byte          $c0,$c0,$c0,$c0,$c0,$c0
+e836  byte          $80,$80,$80,$80,$80,$80
+      
+      
+                dart_cycle: subroutine
+                    ; check for x despawn
+e83c  b9 03 02      lda oam_ram_x,y
+e83f  c9 03         cmp #$03
+e841  90 21         bcc .despawn
+e843  c9 fc         cmp #$fc
+e845  b0 1d         bcs .despawn
+                    ; check for player collision
+e847  a9 04         lda #$04
+e849  85 3d         sta collision_0_w
+e84b  85 3e         sta collision_0_h
+e84d  b9 03 02      lda oam_ram_x,y
+e850  18            clc
+e851  69 02         adc #$02
+e853  85 3b         sta collision_0_x
+e855  b9 00 02      lda oam_ram_y,y
+e858  69 02         adc #$02
+e85a  85 3c         sta collision_0_y
+e85c  20 35 cf      jsr player_collision_detect
+e85f  f0 09         beq .no_collision
+e861  20 dd db      jsr enemy_gives_damage
+                .despawn
+e864  20 47 dd      jsr enemy_clear
+e867  4c 79 e8      jmp .done
+                .no_collision
+                    ; handle direction movement
+e86a  bd 04 03      lda enemy_ram_pc,x
+e86d  85 84         sta arctang_velocity_lo
+e86f  20 f6 ce      jsr arctang_enemy_update
+                    ; check for y despawn
+e872  b9 00 02      lda oam_ram_y,y
+e875  c9 06         cmp #$06
+e877  90 eb         bcc .despawn
+                .done
+e879  4c 92 db      jmp update_enemies_handler_next
+      

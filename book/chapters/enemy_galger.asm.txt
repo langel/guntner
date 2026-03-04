@@ -1,0 +1,365 @@
+      
+      
+                    ; flight path built on sine table circles
+      
+                    ; quadrants clockwise : x val , y val
+                    ; 0 or 12-3 : $00-$40 , $c0-$00
+                    ; 1 or 3-6  : $40-$80 , $00-$40
+                    ; 2 or 6-9  : $80-$c0 , $40-$80
+                    ; 3 or 9-12 : $c0-$00 , $80-$c0
+      
+                    ; state sequence -- comes in from top
+                    ;   ; x,y origin ; quandrant(s) ; diameter x,y ; x,y origin diff
+                    ; state1 ;  88,-48    ;       1      ; 96, 96      ;
+                    ; state2 ; 124, 32    ;     2-3      ; 24, 16      ; +38, +80
+                    ; state3 ; 120, 32    ;     0-1      ; 32, 32      ; -4, 0
+                    ; state4 ; 104, 16    ;     2-3      ; 64, 48      ; -16, -16
+                    ; state5 ; 104, 16    ;     0-1      ; 64, 60      ;  0, 0
+                    ; state6 ;  88, 76    ; 3 in reverse ; 96, 52      ; -16, +60
+                    ; state7 resets the pattern...   -8, 56      ; -96, -20
+      
+                    ; enemy_ram_pc = current arc position
+                    ; enemy_ram_ac = arc position high byte
+                    ; enemy_ram_ex = current arc sequence leg
+      
+                    ; before 1st leg translation === saves stuff in enemy ram
+                    ; x, y origin: 184, 228  <-- saved in x, y
+                    ; how many legs : 6  <-- saved in ex
+                    ; initial arc position: $c0 <-- saved in pattern counter
+      
+      
+      04 00         arc_leg_x_offset	EQU	$400
+      04 01         arc_leg_y_offset	EQU	$401
+      04 02         arc_leg_x_scale EQU $402
+      04 03         arc_leg_y_scale EQU $403
+      04 04         arc_leg_arc_start EQU $404
+      04 05         arc_leg_arc_target EQU $405
+      04 06         arc_leg_speed_inc EQU $406
+      04 07         arc_leg_speed_dec EQU $407
+      
+                    ; height of playfield = 182px
+      
+                    ; 16 sequences with 46 steps total
+                arc_sequence_begin:
+e8d9  byte          $00, $05, $0b, $0f, $11, $13, $15, $1a, $1e, $21, $22, $23, $25, $27, $29, $2b
+                arc_sequence_lengths:
+e8e9  byte          $05, $06, $04, $02, $02, $02, $05, $04, $03, $01, $01, $02, $02, $02, $02, $03
+                arc_sequence_x_origin:
+e8f9  byte          $00, $a0, $80, $cd, $98, $35, $be, $d8, $22, $f8, $00, $cf, $ba, $e2, $c4, $80
+                arc_sequence_y_origin:
+e909  byte          $96, $ec, $2a, $10, $ac, $76, $9e, $a0, $a8, $5e, $32, $84, $78, $70, $8c, $34
+                arc_sequences:
+                    ; sequence 0 : Spiral Young Buck
+e919  byte          $d2, $a0, $60, $60, $80, $40, $00, $02
+e921  byte          $60, $10, $40, $40, $c0, $78, $04, $00
+e929  byte          $10, $10, $30, $30, $80, $f8, $05, $00
+e931  byte          $00, $00, $20, $20, $00, $78, $07, $00
+e939  byte          $10, $10, $08, $08, $80, $f0, $10, $00
+                    ; sequence 1 : Spiral O.G.
+e941  byte          $a0, $ec, $60, $60, $40, $80, $03, $00
+e949  byte          $26, $50, $18, $10, $80, $00, $07, $00
+e951  byte          $fc, $00, $20, $20, $00, $80, $06, $00
+e959  byte          $f0, $f0, $40, $30, $80, $00, $05, $00
+e961  byte          $00, $00, $40, $3c, $00, $80, $04, $00
+e969  byte          $f0, $3c, $60, $34, $00, $c0, $00, $03
+                    ; sequence 2 : Big S
+e971  byte          $80, $60, $70, $14, $bc, $80, $00, $04
+e979  byte          $1c, $d2, $3c, $40, $7d, $03, $00, $04
+e981  byte          $00, $c0, $3c, $40, $80, $fa, $04, $00
+e989  byte          $dc, $00, $80, $c8, $00, $40, $02, $00
+                    ; sequence 3 : Arc and Loop from Behind
+e991  byte          $a8, $00, $ff, $eb, $00, $c0, $00, $01
+e999  byte          $00, $5a, $40, $40, $c0, $06, $00, $04
+                    ; sequence 4 : Butt Planet
+e9a1  byte          $28, $b6, $de, $a4, $40, $05, $00, $01
+e9a9  byte          $60, $f0, $20, $12, $80, $c0, $05, $00
+                    ; sequence 5 : Loop Up from Below
+e9b1  byte          $00, $c0, $40, $80, $80, $fa, $02, $00
+e9b9  byte          $00, $00, $40, $40, $00, $7d, $03, $00
+                    ; sequence 6 : Loop de Loop
+e9c1  byte          $00, $00, $80, $10, $80, $c0, $03, $00
+e9c9  byte          $80, $fc, $80, $10, $40, $02, $00, $03
+e9d1  byte          $00, $81, $80, $80, $80, $7e, $02, $00
+e9d9  byte          $00, $81, $80, $10, $00, $c0, $00, $03
+e9e1  byte          $80, $00, $80, $10, $40, $80, $03, $00
+                    ; sequence 7 : Wide Ying Yang
+e9e9  byte          $c8, $c0, $c0, $40, $80, $40, $00, $02
+e9f1  byte          $c0, $00, $40, $40, $c3, $80, $04, $00
+e9f9  byte          $bc, $00, $c0, $40, $80, $c0, $02, $00
+ea01  byte          $00, $00, $40, $40, $c3, $00, $04, $00
+                    ; sequence 8 : Horse Shoe Loop
+ea09  byte          $00, $00, $40, $f2, $ca, $80, $00, $02
+ea11  byte          $d4, $a0, $a0, $50, $80, $02, $00, $02
+ea19  byte          $30, $00, $40, $f2, $00, $c8, $00, $02
+                    ; sequence 9 : Circle LeftDownReverse
+ea21  byte          $08, $f8, $60, $60, $00, $f9, $06, $00
+                    ; sequence 10 : Tunnel Going Right
+ea29  byte          $08, $00, $29, $50, $80, $87, $00, $07
+                    ; sequence 11 : Wide S Short
+ea31  byte          $00, $d8, $64, $28, $80, $40, $00, $02
+ea39  byte          $64, $00, $64, $28, $c0, $00, $02, $00
+                    ; sequence 12 : Wide S Medium
+ea41  byte          $00, $b4, $a0, $50, $80, $40, $00, $02
+ea49  byte          $a4, $00, $a0, $50, $c0, $00, $02, $00
+                    ; sequence 13 : Stair Step Small
+ea51  byte          $00, $c8, $3c, $3c, $80, $40, $00, $04
+ea59  byte          $3c, $f8, $3c, $3c, $c0, $00, $04, $00
+                    ; sequence 14 : Stair Step Big
+ea61  byte          $00, $8c, $78, $78, $80, $40, $00, $03
+ea69  byte          $78, $f2, $78, $78, $c0, $00, $03, $00
+                    ; sequence 15 : W
+ea71  byte          $80, $d8, $40, $78, $c0, $40, $00, $03
+ea79  byte          $40, $00, $40, $78, $ba, $40, $00, $03
+ea81  byte          $40, $28, $80, $28, $c3, $3d, $03, $00
+      
+      
+                    arc_sequence_set: subroutine
+                    ; x holds which sequence
+ea89  86 80         stx arc_sequence_id
+ea8b  a9 e9         lda #>arc_sequences
+ea8d  85 82         sta arc_sequence_hi
+ea8f  bd d9 e8      lda arc_sequence_begin,x
+ea92  0a            asl
+ea93  0a            asl
+ea94  0a            asl
+ea95  90 02         bcc .hi_byte_perfect
+                .hi_byte_increase
+ea97  e6 82         inc arc_sequence_hi
+                .hi_byte_perfect
+ea99  18            clc
+ea9a  69 19         adc #<arc_sequences
+ea9c  85 81         sta arc_sequence_lo
+ea9e  90 02         bcc .hi_byte_still_perfect
+eaa0  e6 82         inc arc_sequence_hi
+                .hi_byte_still_perfect
+eaa2  bd e9 e8      lda arc_sequence_lengths,x
+eaa5  85 83         sta arc_sequence_length
+eaa7  60            rts
+      
+      
+                galger_spawn: subroutine
+                    ; x is set by enemy spawner
+eaa8  a9 08         lda #galger_id
+eaaa  9d 00 03      sta enemy_ram_type,x
+eaad  a8            tay
+eaae  b9 c5 dc      lda enemy_hitpoints_table,y
+eab1  9d 01 03      sta enemy_ram_hp,x
+                    ; arc system setup
+eab4  a9 00         lda #0
+eab6  9d 05 03      sta enemy_ram_ac,x
+eab9  9d 07 03      sta enemy_ram_ex,x
+eabc  a4 80         ldy arc_sequence_id
+eabe  b9 f9 e8      lda arc_sequence_x_origin,y
+eac1  9d 02 03      sta enemy_ram_x,x
+eac4  b9 09 e9      lda arc_sequence_y_origin,y
+eac7  9d 03 03      sta enemy_ram_y,x
+                    ; angle / pc set in leg init
+eaca  20 b0 eb      jsr arc_leg_init
+eacd  60            rts
+      
+                galger_cycle: subroutine
+eace  a9 08         lda #$08
+ead0  85 3d         sta collision_0_w
+ead2  85 3e         sta collision_0_h
+ead4  20 eb db      jsr enemy_handle_damage_and_death
+      
+                    ; time to shoot a dart?
+ead7  a5 26         lda rng0
+ead9  4a            lsr
+eada  29 3f         and #$3f
+eadc  d0 19         bne .dont_fire
+                .dart_fire
+eade  b9 03 02      lda oam_ram_x,y
+eae1  85 71         sta dart_x_origin
+eae3  b9 00 02      lda oam_ram_y,y
+eae6  85 72         sta dart_y_origin
+eae8  a9 04         lda #$04
+eaea  85 73         sta dart_velocity
+eaec  a9 00         lda #$00
+eaee  85 74         sta dart_sprite
+eaf0  85 75         sta dart_dir_adjust
+eaf2  20 a8 e7      jsr dart_spawn
+eaf5  a4 77         ldy enemy_oam_offset
+                .dont_fire
+eaf7  a6 76         ldx enemy_ram_offset
+      
+eaf9  20 0e eb      jsr arc_leg
+                    ; current sprite
+eafc  a9 7f         lda #$7f
+eafe  99 01 02      sta oam_ram_spr,y
+                    ; do palette
+eb01  bd 04 03      lda enemy_ram_pc,x
+eb04  29 c0         and #$c0
+eb06  09 01         ora #$01
+eb08  20 39 dc      jsr enemy_set_palette
+                .done
+eb0b  4c 92 db      jmp update_enemies_handler_next
+      
+      
+      
+      
+                arc_leg: subroutine
+                    ; set x position
+      
+eb0e  bd 04 03      lda enemy_ram_pc,x
+eb11  85 86         sta temp00
+eb13  bd 02 04      lda arc_leg_x_scale,x
+eb16  a6 86         ldx temp00
+eb18  20 ad d4      jsr sine_of_scale
+      
+eb1b  a6 76         ldx enemy_ram_offset
+eb1d  18            clc
+eb1e  7d 02 03      adc enemy_ram_x,x
+eb21  99 03 02      sta oam_ram_x,y
+      
+                    ; set y position
+eb24  bd 04 03      lda enemy_ram_pc,x
+eb27  18            clc
+eb28  69 c0         adc #$c0
+eb2a  85 86         sta temp00
+eb2c  bd 03 04      lda arc_leg_y_scale,x
+eb2f  a6 86         ldx temp00
+eb31  20 ad d4      jsr sine_of_scale
+      
+eb34  a6 76         ldx enemy_ram_offset
+eb36  18            clc
+eb37  7d 03 03      adc enemy_ram_y,x
+eb3a  99 00 02      sta oam_ram_y,y
+      
+eb3d  c9 f0         cmp #240
+eb3f  90 11         bcc .y_under_240
+eb41  38            sec
+eb42  e9 4a         sbc #sprite_0_y_diff
+eb44  99 00 02      sta oam_ram_y,y
+eb47  bd 03 03      lda enemy_ram_y,x
+eb4a  38            sec
+eb4b  e9 4a         sbc #sprite_0_y_diff
+eb4d  9d 03 03      sta enemy_ram_y,x
+eb50  b0 13         bcs .y_check_done
+                .y_under_240
+eb52  c9 b6         cmp #sprite_0_y
+eb54  90 0f         bcc .y_check_done
+eb56  18            clc
+eb57  69 4a         adc #sprite_0_y_diff
+eb59  99 00 02      sta oam_ram_y,y
+eb5c  bd 03 03      lda enemy_ram_y,x
+eb5f  18            clc
+eb60  69 4a         adc #sprite_0_y_diff
+eb62  9d 03 03      sta enemy_ram_y,x
+                .y_check_done
+      
+                    ; forward arc position
+eb65  bd 05 03      lda enemy_ram_ac,x
+eb68  f0 22         beq .speed_handle_normal
+                .speed_handle_abnormal
+eb6a  bd 06 04      lda arc_leg_speed_inc,x
+eb6d  c9 00         cmp #$00
+eb6f  f0 0b         beq .speed_ab_dec
+                .speed_ab_inc
+eb71  18            clc
+eb72  7d 04 03      adc enemy_ram_pc,x
+eb75  9d 04 03      sta enemy_ram_pc,x
+eb78  90 11         bcc .speed_ab_done
+eb7a  b0 0c         bcs .speed_dec_ac
+                .speed_ab_dec
+eb7c  bd 04 03      lda enemy_ram_pc,x
+eb7f  38            sec
+eb80  fd 07 04      sbc arc_leg_speed_dec,x
+eb83  9d 04 03      sta enemy_ram_pc,x
+eb86  b0 03         bcs .speed_ab_done
+                .speed_dec_ac
+eb88  de 05 03      dec enemy_ram_ac,x
+                .speed_ab_done
+eb8b  60            rts
+      
+      
+                .speed_handle_normal
+eb8c  bd 06 04      lda arc_leg_speed_inc,x
+eb8f  c9 00         cmp #$00
+eb91  f0 0d         beq .speed_dec
+                .speed_inc
+eb93  18            clc
+eb94  7d 04 03      adc enemy_ram_pc,x
+eb97  9d 04 03      sta enemy_ram_pc,x
+eb9a  dd 05 04      cmp arc_leg_arc_target,x
+eb9d  b0 11         bcs .next_leg
+eb9f  60            rts
+                .speed_dec
+eba0  bd 04 03      lda enemy_ram_pc,x
+eba3  38            sec
+eba4  fd 07 04      sbc arc_leg_speed_dec,x
+eba7  9d 04 03      sta enemy_ram_pc,x
+ebaa  dd 05 04      cmp arc_leg_arc_target,x
+ebad  90 01         bcc .next_leg
+ebaf  60            rts
+      
+                .next_leg
+                arc_leg_init:
+ebb0  bd 07 03      lda enemy_ram_ex,x
+                    ; update arc data in enemy slot
+ebb3  0a            asl
+ebb4  0a            asl
+ebb5  0a            asl
+ebb6  a8            tay
+ebb7  b1 81         lda (arc_sequence_lo),y
+ebb9  9d 00 04      sta arc_leg_x_offset,x
+ebbc  c8            iny
+ebbd  b1 81         lda (arc_sequence_lo),y
+ebbf  9d 01 04      sta arc_leg_y_offset,x
+ebc2  c8            iny
+ebc3  b1 81         lda (arc_sequence_lo),y
+ebc5  9d 02 04      sta arc_leg_x_scale,x
+ebc8  c8            iny
+ebc9  b1 81         lda (arc_sequence_lo),y
+ebcb  9d 03 04      sta arc_leg_y_scale,x
+ebce  c8            iny
+ebcf  b1 81         lda (arc_sequence_lo),y
+ebd1  9d 04 04      sta arc_leg_arc_start,x
+ebd4  9d 04 03      sta enemy_ram_pc,x
+ebd7  c8            iny
+ebd8  b1 81         lda (arc_sequence_lo),y
+ebda  9d 05 04      sta arc_leg_arc_target,x
+ebdd  c8            iny
+ebde  b1 81         lda (arc_sequence_lo),y
+ebe0  9d 06 04      sta arc_leg_speed_inc,x
+ebe3  c8            iny
+ebe4  b1 81         lda (arc_sequence_lo),y
+ebe6  9d 07 04      sta arc_leg_speed_dec,x
+ebe9  a4 77         ldy enemy_oam_offset
+                    ; update x origin
+ebeb  bd 02 03      lda enemy_ram_x,x
+ebee  18            clc
+ebef  7d 00 04      adc arc_leg_x_offset,x
+ebf2  9d 02 03      sta enemy_ram_x,x
+                    ; update y origin
+ebf5  bd 03 03      lda enemy_ram_y,x
+ebf8  18            clc
+ebf9  7d 01 04      adc arc_leg_y_offset,x
+ebfc  9d 03 03      sta enemy_ram_y,x
+                    ; update arc origin
+ebff  bd 04 04      lda arc_leg_arc_start,x
+ec02  9d 04 03      sta enemy_ram_pc,x
+ec05  bd 06 04      lda arc_leg_speed_inc,x
+ec08  c9 00         cmp #$00
+ec0a  f0 0d         beq .check_speed_dec_count
+                .check_speed_inc_count
+ec0c  bd 04 04      lda arc_leg_arc_start,x
+ec0f  dd 05 04      cmp arc_leg_arc_target,x
+ec12  90 10         bcc .arc_leg_done
+ec14  fe 05 03      inc enemy_ram_ac,x
+ec17  d0 0b         bne .arc_leg_done
+                .check_speed_dec_count
+ec19  bd 04 04      lda arc_leg_arc_start,x
+ec1c  dd 05 04      cmp arc_leg_arc_target,x
+ec1f  b0 03         bcs .arc_leg_done
+ec21  fe 05 03      inc enemy_ram_ac,x
+                .arc_leg_done
+ec24  fe 07 03      inc enemy_ram_ex,x
+ec27  a5 83         lda arc_sequence_length
+ec29  dd 07 03      cmp enemy_ram_ex,x
+ec2c  d0 05         bne .dont_wrap_sequence
+ec2e  a9 00         lda #0
+ec30  9d 07 03      sta enemy_ram_ex,x
+                .dont_wrap_sequence
+ec33  60            rts
+      

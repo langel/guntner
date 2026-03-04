@@ -1,0 +1,222 @@
+      
+      
+                game_init_generic: subroutine
+      
+ccc4  20 43 c1      jsr render_disable
+ccc7  20 71 c1      jsr nametables_clear
+      
+ccca  a9 b3         lda #scroll_speed_lo_default
+cccc  85 05         sta scroll_speed_lo
+ccce  a9 02         lda #scroll_speed_hi_default
+ccd0  85 06         sta scroll_speed_hi
+      
+ccd2  a9 83         lda #state_render_jump_table_offset+2
+ccd4  85 55         sta state_render_addr
+      
+ccd6  20 95 d6      jsr timer_reset
+ccd9  20 17 f2      jsr player_game_reset
+ccdc  20 65 cf      jsr dashboard_init
+ccdf  20 ff d4      jsr starfield_init
+cce2  20 ea d4      jsr starfield_twinkle_reset
+cce5  20 dd d5      jsr starfield_draw_dash_top_bar_nametable0
+cce8  20 c2 d0      jsr dashboard_update
+cceb  20 75 d0      jsr dashboard_render
+      
+ccee  20 31 c6      jsr state_sprite0_enable
+ccf1  60            rts
+      
+      
+      
+                game_init:
+ccf2  20 c4 cc      jsr game_init_generic
+ccf5  a9 8c         lda #state_update_jump_table_offset+6
+ccf7  85 56         sta state_update_addr
+ccf9  a9 00         lda #$00
+ccfb  85 0e         sta attract_true
+ccfd  20 32 dd      jsr clear_all_enemies
+cd00  20 38 c1      jsr render_enable
+cd03  20 4e d2      jsr palette_fade_in_init
+cd06  a9 04         lda #iframe_game_length
+cd08  85 54         sta state_iframe_length
+cd0a  a9 02         lda #2
+cd0c  20 4b fb      jsr song_start
+cd0f  a5 4b         lda state_v1
+cd11  f0 04         beq .no_super_secret_code
+cd13  a9 20         lda #$20
+cd15  85 0c         sta player_lives
+                .no_super_secret_code
+cd17  60            rts
+      
+      
+      
+                game_update_generic: subroutine
+cd18  a5 0b         lda player_health
+cd1a  d0 7d         bne .player_not_dead
+                .player_dead_anim
+cd1c  a5 65         lda player_death_flag
+cd1e  d0 39         bne .death_already_set
+cd20  e6 65         inc player_death_flag
+cd22  20 7c fb      jsr song_stop
+cd25  a5 06         lda scroll_speed_hi
+cd27  85 08         sta scroll_cache_hi
+cd29  a5 05         lda scroll_speed_lo
+cd2b  85 07         sta scroll_cache_lo
+cd2d  c6 0c         dec player_lives
+cd2f  d0 1d         bne .youdead
+                    ; attract mode has different behaviour
+cd31  a5 0e         lda attract_true
+cd33  c9 ff         cmp #$ff
+cd35  f0 17         beq .youdead
+                    ; set to grayscale
+cd37  a9 01         lda #%00000001
+cd39  85 09         sta ppu_mask_emph
+                    ; cinematics
+cd3b  85 06         sta scroll_speed_hi
+cd3d  a9 05         lda #song_game_over
+cd3f  20 4b fb      jsr song_start
+cd42  a9 79         lda #121
+cd44  85 67         sta you_dead_counter
+                    ; "GAME OVER"
+cd46  a0 10         ldy #$10
+cd48  20 66 d0      jsr dashboard_message_set
+cd4b  4c b8 cd      jmp .done
+                .youdead
+cd4e  20 85 f8      jsr sfx_player_death
+                    ; "YOU DEAD"
+cd51  a0 00         ldy #$00
+cd53  20 66 d0      jsr dashboard_message_set
+cd56  4c b8 cd      jmp .done
+                .death_already_set
+cd59  20 c5 d5      jsr death_scroll_speed
+cd5c  e6 67         inc you_dead_counter
+cd5e  a5 67         lda you_dead_counter
+cd60  c9 50         cmp #80
+cd62  f0 0a         beq .trigger_fadeout
+cd64  c9 78         cmp #120
+cd66  d0 50         bne .done
+                    ; next life
+cd68  a5 0c         lda player_lives
+cd6a  d0 14         bne .next_life
+                    ; no lives left game over
+                    ; GO BACK TO TITLE SCREEN AFTER DEATH SEQUENCE
+cd6c  f0 4a         beq .done
+                .trigger_fadeout
+                    ; demo mode has different behaviour
+cd6e  a5 0e         lda attract_true
+cd70  c9 ff         cmp #$ff
+cd72  f0 04         beq .return_to_title_screen
+                    ; do not return to title if game is not over
+cd74  a5 0c         lda player_lives
+cd76  d0 40         bne .done
+                .return_to_title_screen
+                    ; GO BACK TO TITLE SCREEN
+                    ; AFTER DEATH SEQUENCE
+cd78  a9 7c         lda #state_init_jump_table_offset+0
+cd7a  20 82 d2      jsr palette_fade_out_init
+cd7d  4c b8 cd      jmp .done
+                .next_life
+cd80  20 81 fb      jsr song_unstop
+                    ; reset health
+cd83  a9 ff         lda #$ff
+cd85  85 0b         sta player_health
+                    ; turn on iframes
+cd87  a9 78         lda #120
+cd89  85 53         sta state_iframes
+                    ; reset death sequence timers
+cd8b  a9 00         lda #$00
+cd8d  85 65         sta player_death_flag
+cd8f  85 67         sta you_dead_counter
+                    ; revert scroll speed
+cd91  a5 08         lda scroll_cache_hi
+cd93  85 06         sta scroll_speed_hi
+cd95  a5 07         lda scroll_cache_lo
+cd97  85 05         sta scroll_speed_lo
+      
+                .player_not_dead
+      
+                .healing_with_time
+cd99  a5 0b         lda player_health
+cd9b  c9 ff         cmp #$ff
+cd9d  f0 0b         beq .no_heal
+cd9f  a5 0d         lda player_heal_c
+cda1  18            clc
+cda2  69 23         adc #$23 ; speed of heal counter increment
+cda4  85 0d         sta player_heal_c
+cda6  90 02         bcc .no_heal
+                .reset_heal_counter
+cda8  e6 0b         inc player_health
+                .no_heal
+      
+                player_change_speed:
+cdaa  a5 1d         lda player_controls_debounced
+cdac  29 20         and #BUTTON_SELECT
+cdae  f0 08         beq .read_select_done
+                    ; update speed
+cdb0  e6 1a         inc player_speed
+cdb2  a5 1a         lda player_speed
+cdb4  29 03         and #$03
+cdb6  85 1a         sta player_speed
+                .read_select_done
+      
+      
+                .done
+                    ; player collision update
+cdb8  a6 13         ldx player_x_hi
+cdba  e8            inx
+cdbb  e8            inx
+cdbc  86 17         stx player_coll_x
+cdbe  a6 15         ldx player_y_hi
+cdc0  e8            inx
+cdc1  e8            inx
+cdc2  86 18         stx player_coll_y
+      
+cdc4  20 56 db      jsr enemies_update_all
+cdc7  20 98 f2      jsr set_player_sprite
+cdca  60            rts
+      
+      
+      
+      
+      
+                game_update: subroutine
+                    ; check for (un)pausings
+cdcb  a5 63         lda phase_end_game
+cdcd  c9 01         cmp #$01
+cdcf  f0 28         beq .read_start_done
+cdd1  a5 1d         lda player_controls_debounced
+cdd3  29 10         and #BUTTON_START
+cdd5  f0 22         beq .read_start_done
+cdd7  a5 1b         lda player_paused
+cdd9  c9 00         cmp #$00
+cddb  f0 0e         beq .pause
+                .unpause
+cddd  a9 00         lda #$00
+cddf  85 1b         sta player_paused
+cde1  a9 ff         lda #$ff
+cde3  85 43         sta dashboard_message
+cde5  20 81 fb      jsr song_unstop
+cde8  4c f9 cd      jmp .read_start_done
+                .pause
+cdeb  a9 ff         lda #$ff
+cded  85 1b         sta player_paused
+cdef  a9 30         lda #$30
+cdf1  85 43         sta dashboard_message
+cdf3  20 7c fb      jsr song_stop
+cdf6  20 76 fa      jsr sfx_rng_chord
+                .read_start_done
+                    ; test for paused
+cdf9  a5 1b         lda player_paused
+cdfb  d0 12         bne .done_and_paused
+      
+cdfd  20 a4 d6      jsr phase_handler
+ce00  20 18 cd      jsr game_update_generic
+      
+ce03  a5 0b         lda player_health
+ce05  c9 00         cmp #$00
+ce07  f0 06         beq .done_and_paused
+      
+ce09  20 be f4      jsr player_move_position
+ce0c  20 b8 f3      jsr player_bullets_check_controls
+                .done_and_paused
+ce0f  4c a7 c0      jmp state_update_done
+      

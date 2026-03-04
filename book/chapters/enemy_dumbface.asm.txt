@@ -1,0 +1,53 @@
+      
+      
+                dumbface_spawn: subroutine
+                    ; x is set by enemy spawner
+e87c  a5 26         lda rng0
+e87e  9d 05 03      sta enemy_ram_ac,x ; animation counter
+e881  20 d1 db      jsr enemy_spawn_random_y_pos
+e884  9d 03 03      sta enemy_ram_y,x ; y pos
+e887  60            rts
+      
+      
+                dumbface_cycle: subroutine
+e888  a9 10         lda #$10
+e88a  85 3d         sta collision_0_w
+e88c  85 3e         sta collision_0_h
+e88e  20 eb db      jsr enemy_handle_damage_and_death
+      
+e891  fe 02 03      inc enemy_ram_x,x
+e894  bd 02 03      lda enemy_ram_x,x
+e897  20 df da      jsr sprite_4_set_x
+      
+e89a  bd 07 03      lda enemy_ram_ex,x
+e89d  29 01         and #$01
+e89f  d0 0b         bne .going_down
+                .going_up
+e8a1  de 03 03      dec enemy_ram_y,x
+e8a4  d0 13         bne .updown_done
+e8a6  fe 07 03      inc enemy_ram_ex,x
+e8a9  4c b9 e8      jmp .updown_done
+                .going_down
+e8ac  fe 03 03      inc enemy_ram_y,x
+e8af  bd 03 03      lda enemy_ram_y,x
+e8b2  c9 ad         cmp #$ad
+e8b4  d0 03         bne .updown_done
+e8b6  fe 07 03      inc enemy_ram_ex,x
+                .updown_done
+e8b9  bd 03 03      lda enemy_ram_y,x
+e8bc  20 ef da      jsr sprite_4_set_y
+      
+e8bf  fe 05 03      inc enemy_ram_ac,x
+e8c2  bd 05 03      lda enemy_ram_ac,x
+e8c5  4a            lsr
+e8c6  4a            lsr
+e8c7  4a            lsr
+e8c8  29 03         and #$03
+e8ca  0a            asl
+e8cb  18            clc
+e8cc  69 c8         adc #$c8
+e8ce  20 b7 da      jsr sprite_4_set_sprite
+e8d1  a9 02         lda #$02
+e8d3  20 9d da      jsr sprite_4_set_palette
+                .done
+e8d6  4c 92 db      jmp update_enemies_handler_next

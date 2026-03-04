@@ -1,0 +1,206 @@
+      
+      
+      
+                    ; playfield = 256 x 192
+                    ; player coordinates should be bound from 16 x 16 to 240 x 176
+                player_move_position: subroutine
+      
+f4be  20 f5 f4      jsr player_direction_handler
+                    ; check for boundless
+f4c1  a5 1e         lda player_boundless
+f4c3  d0 28         bne .done
+      
+f4c5  a5 13         lda player_x_hi
+f4c7  c9 12         cmp #18
+f4c9  b0 04         bcs .right_enuff
+f4cb  a9 12         lda #18
+f4cd  85 13         sta player_x_hi
+                .right_enuff
+      
+f4cf  a5 13         lda player_x_hi
+f4d1  c9 dd         cmp #221
+f4d3  90 04         bcc .left_enuff
+f4d5  a9 dd         lda #221
+f4d7  85 13         sta player_x_hi
+                .left_enuff
+      
+f4d9  a5 15         lda player_y_hi
+f4db  c9 08         cmp #8
+f4dd  b0 04         bcs .down_enuff
+f4df  a9 08         lda #8
+f4e1  85 15         sta player_y_hi
+                .down_enuff
+      
+f4e3  a5 15         lda player_y_hi
+f4e5  c9 ae         cmp #174
+f4e7  90 04         bcc .up_enuff
+f4e9  a9 ae         lda #174
+f4eb  85 15         sta player_y_hi
+                .up_enuff
+                .done
+f4ed  a5 15         lda player_y_hi
+f4ef  20 ff da      jsr enemy_fix_y_visible
+f4f2  85 15         sta player_y_hi
+f4f4  60            rts
+      
+      
+      
+      
+      
+                player_direction_handler: subroutine
+                    ; shroom handling
+f4f5  a5 6c         lda shroom_counter
+f4f7  f0 20         beq .not_shrooming
+                    ; shroom right
+f4f9  a9 10         lda #%0010000
+f4fb  24 6d         bit shroom_mod
+f4fd  d0 02         bne .shroom_not_right
+f4ff  c6 13         dec player_x_hi
+                .shroom_not_right
+                    ; shroom left
+f501  a9 08         lda #%0001000
+f503  24 6d         bit shroom_mod
+f505  d0 02         bne .shroom_not_left
+f507  e6 13         inc player_x_hi
+                .shroom_not_left
+                    ; shroom up
+f509  a9 02         lda #%0000010
+f50b  24 6d         bit shroom_mod
+f50d  d0 02         bne .shroom_not_up
+f50f  c6 15         dec player_y_hi
+                .shroom_not_up
+                    ; shroom down
+f511  a9 04         lda #%0000100
+f513  24 6d         bit shroom_mod
+f515  d0 02         bne .shroom_not_down
+f517  e6 15         inc player_y_hi
+                .shroom_not_down
+                .not_shrooming
+                    ; get diagonal or not
+f519  a9 00         lda #$00
+f51b  85 86         sta temp00
+f51d  a5 1c         lda player_controls
+f51f  29 03         and #BUTTON_LEFT|BUTTON_RIGHT
+f521  f0 02         beq .not_left_or_right
+f523  e6 86         inc temp00
+                .not_left_or_right
+f525  a5 1c         lda player_controls
+f527  29 0c         and #BUTTON_UP|BUTTON_DOWN
+f529  f0 02         beq .not_up_or_down
+f52b  e6 86         inc temp00
+                .not_up_or_down
+f52d  a5 86         lda temp00
+f52f  d0 01         bne .direction_found
+f531  60            rts
+                .direction_found
+f532  38            sec
+f533  e9 01         sbc #1 ; 1 for diagonal detection
+f535  0a            asl
+f536  0a            asl
+                    ; get speed
+f537  18            clc
+f538  65 1a         adc player_speed
+f53a  aa            tax
+                    ; get add/sub for each axis
+                    ; LEFT
+f53b  a5 1c         lda player_controls
+f53d  29 02         and #BUTTON_LEFT
+f53f  f0 0f         beq .not_left
+f541  a5 14         lda player_x_lo
+f543  38            sec
+f544  fd 98 f5      sbc player_direction_speed_table_lo,x
+f547  85 14         sta player_x_lo
+f549  a5 13         lda player_x_hi
+f54b  fd 90 f5      sbc player_direction_speed_table_hi,x
+f54e  85 13         sta player_x_hi
+                .not_left
+                    ; RIGHT
+f550  a5 1c         lda player_controls
+f552  29 01         and #BUTTON_RIGHT
+f554  f0 0f         beq .not_right
+f556  a5 14         lda player_x_lo
+f558  18            clc
+f559  7d 98 f5      adc player_direction_speed_table_lo,x
+f55c  85 14         sta player_x_lo
+f55e  a5 13         lda player_x_hi
+f560  7d 90 f5      adc player_direction_speed_table_hi,x
+f563  85 13         sta player_x_hi
+                .not_right
+                    ; UP
+f565  a5 1c         lda player_controls
+f567  29 08         and #BUTTON_UP
+f569  f0 0f         beq .not_up
+f56b  a5 16         lda player_y_lo
+f56d  38            sec
+f56e  fd 98 f5      sbc player_direction_speed_table_lo,x
+f571  85 16         sta player_y_lo
+f573  a5 15         lda player_y_hi
+f575  fd 90 f5      sbc player_direction_speed_table_hi,x
+f578  85 15         sta player_y_hi
+                .not_up
+                    ; DOWN
+f57a  a5 1c         lda player_controls
+f57c  29 04         and #BUTTON_DOWN
+f57e  f0 0f         beq .not_down
+f580  a5 16         lda player_y_lo
+f582  18            clc
+f583  7d 98 f5      adc player_direction_speed_table_lo,x
+f586  85 16         sta player_y_lo
+f588  a5 15         lda player_y_hi
+f58a  7d 90 f5      adc player_direction_speed_table_hi,x
+f58d  85 15         sta player_y_hi
+                .not_down
+f58f  60            rts
+      
+      
+      
+      
+      
+                    ; speed - straight / diag
+                    ;speed 1  0.75 / 0.53
+                    ;speed 2  1.00 / 0.7071
+                    ;speed 3  1.75 / 1.2374
+                    ;speed 4  2.50 / 1.7677
+                    ; 1 192 - 1.75
+                    ; 2 223 - 2.87
+                    ; 3 128 - 3.5 / 2 121 - 2.475
+                    ; 4  51 - 4.2 / 2 248 - 2.97
+      
+                    ;; calc diagonal by dividing straight by 1.414
+      
+                    ; speeds 1 .. 4
+                player_direction_speed_table_hi:
+                    ; straight values
+f590  byte          #1, #2, #3, #4
+                    ; diagonal values
+f594  byte          #1, #2, #2, #2
+                player_direction_speed_table_lo:
+                    ; straight values
+f598  byte          #192, #223, #128, #51
+                    ; diagonal values
+f59c  byte          #61, #8, #121, #248
+      
+      
+      
+                    ; old version
+                    ; straight/ diag
+                    ;speed 1  0.75 / 0.53
+                    ;speed 2  1.00 / 0.7071
+                    ;speed 3  1.75 / 1.2374
+                    ;speed 4  2.50 / 1.7677
+      
+                    ; old old version
+                    ;speed 3  2.25 / 1.5909
+                    ;speed 4  3.50 / 2.4748
+      
+                    ; OG speeds
+      
+                    ; speed 1
+                    ;byte #191,#0,#135,#0
+                    ; speed 2
+                    ;byte #0,#1,#181,#0
+                    ; speed 3
+                    ;byte #192,#1,#61,#1
+                    ; speed 4
+                    ;byte #128,#2,#197,#1
+      

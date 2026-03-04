@@ -1,0 +1,516 @@
+      
+                    ; zp vars
+      
+                    ;sfx_phase_next_counter
+                    ; counters to mask other channel audio
+                    ;sfx_pu1_counter
+                    ;sfx_pu2_counter
+                    ;sfx_noi_counter
+                    ; table offsets for update subroutines
+                    ;sfx_pu2_update_type
+                    ;sfx_noi_update_type
+      
+                    ; these should only use Pulse 2 and Noise channels
+                    ; unless its a non-music moment (like player death)
+      
+      
+      
+      
+                sfx_test_delegator: subroutine
+                    ; a = sound effect id
+f846  18            clc
+f847  69 52         adc #sfx_test_jump_table_offset
+f849  4c f1 c4      jmp jump_to_subroutine
+      
+      
+      
+                    ; sound test 00
+                sfx_pewpew: subroutine
+f84c  a5 bc         lda sfx_pu2_counter
+f84e  d0 1e         bne .no
+                    ; pulse 2
+f850  a9 8f         lda #%10001111
+f852  8d 04 40      sta $4004
+f855  a9 82         lda #%10000010
+f857  8d 05 40      sta $4005
+f85a  a5 26         lda rng0
+f85c  29 3f         and #$3f
+f85e  09 08         ora #$08
+f860  8d 06 40      sta $4006
+f863  a9 10         lda #%00010000
+f865  8d 07 40      sta $4007
+f868  a9 00         lda #0
+f86a  85 b0         sta apu_pu2_counter
+f86c  85 be         sta sfx_pu2_update_type
+                .no
+f86e  60            rts
+      
+                    ; sound test 01
+                sfx_player_damage: subroutine
+                    ; noise
+f86f  a5 26         lda rng0
+f871  29 8f         and #$8f
+f873  09 0c         ora #$0c
+f875  8d 4e 01      sta apu_cache+$e
+f878  a9 10         lda #$10
+f87a  85 b3         sta apu_noi_counter
+f87c  a9 01         lda #$01
+f87e  85 b4         sta apu_noi_envelope
+f880  a9 10         lda #$10
+f882  85 bd         sta sfx_noi_counter
+f884  60            rts
+      
+                    ; sound test 02
+                sfx_player_death: subroutine
+                    ; setup pulse 1
+f885  a9 8f         lda #%10001111
+f887  8d 00 40      sta $4000
+f88a  a9 87         lda #%10000111
+f88c  8d 01 40      sta $4001
+f88f  a9 fc         lda #$fc
+f891  8d 02 40      sta $4002
+f894  a9 0a         lda #%00001010
+f896  8d 03 40      sta $4003
+                    ; setup pulse 2
+f899  a9 8f         lda #%10001111
+f89b  8d 04 40      sta $4004
+f89e  a9 87         lda #%10000111
+f8a0  8d 05 40      sta $4005
+f8a3  a9 fb         lda #$fb
+f8a5  8d 06 40      sta $4006
+f8a8  a9 09         lda #%00001001
+f8aa  8d 07 40      sta $4007
+                    ; setup noise handler
+f8ad  a9 01         lda #$01
+f8af  85 bf         sta sfx_noi_update_type
+f8b1  a9 00         lda #$00
+f8b3  85 be         sta sfx_pu2_update_type
+f8b5  a9 00         lda #$00
+f8b7  85 b8         sta sfx_temp00 ; volume
+f8b9  a9 80         lda #$80
+f8bb  85 b9         sta sfx_temp01 ; pitch
+                    ;sta sfx_noi_counter
+f8bd  60            rts
+      
+                sfx_player_death_update: subroutine
+f8be  a5 b8         lda sfx_temp00 ; vol
+f8c0  4a            lsr
+f8c1  4a            lsr
+f8c2  4a            lsr
+f8c3  4a            lsr
+f8c4  29 10         and #%00010000
+f8c6  8d 4c 01      sta apu_cache+$c
+f8c9  a5 b9         lda sfx_temp01 ; pitch
+f8cb  4a            lsr
+f8cc  4a            lsr
+f8cd  4a            lsr
+f8ce  8d 4e 01      sta apu_cache+$e
+f8d1  e6 b9         inc sfx_temp01 ; pitch
+f8d3  e6 b8         inc sfx_temp00 ; vol
+f8d5  e6 b8         inc sfx_temp00 ; vol
+f8d7  d0 09         bne .dont_kill_player_death_sound
+f8d9  a9 10         lda #$10
+f8db  8d 4c 01      sta apu_cache+$c
+f8de  a9 00         lda #$00
+f8e0  85 bf         sta sfx_noi_update_type
+                .dont_kill_player_death_sound
+f8e2  60            rts
+      
+      
+      
+                    ; sound test 03
+                sfx_kick:
+                sfx_enemy_damage: subroutine
+f8e3  a5 bc         lda sfx_pu2_counter
+f8e5  d0 1c         bne .no
+                    ; pulse 2
+f8e7  a9 8f         lda #%10001111
+f8e9  8d 04 40      sta $4004
+f8ec  a9 82         lda #%10000010
+f8ee  8d 05 40      sta $4005
+f8f1  a5 26         lda rng0
+f8f3  8d 06 40      sta $4006
+f8f6  a9 11         lda #%00010001
+f8f8  8d 07 40      sta $4007
+f8fb  a9 08         lda #$08
+f8fd  85 bc         sta sfx_pu2_counter
+f8ff  a9 00         lda #0
+f901  85 be         sta sfx_pu2_update_type
+                .no
+f903  60            rts
+      
+      
+                    ; sound test 04
+                sfx_enemy_death: subroutine
+f904  a9 1f         lda #%00011111
+f906  8d 4c 01      sta apu_cache+$c
+f909  a9 0f         lda #$0f
+f90b  8d 4e 01      sta apu_cache+$e
+f90e  a9 01         lda #$01
+f910  85 b4         sta apu_noi_envelope
+f912  a9 02         lda #$02
+f914  85 bf         sta sfx_noi_update_type
+f916  a9 10         lda #$10
+f918  85 b3         sta apu_noi_counter
+f91a  85 bd         sta sfx_noi_counter
+f91c  60            rts
+      
+                sfx_enemy_death_update: subroutine
+f91d  ad 4c 01      lda apu_cache+$c
+f920  8d 4e 01      sta apu_cache+$e
+f923  29 0f         and #%00001111
+f925  f0 01         beq sfx_noi_update_clear
+f927  60            rts
+      
+                sfx_noi_update_clear: subroutine
+f928  a9 10         lda #%00010000
+f92a  8d 4c 01      sta apu_cache+$c
+f92d  a9 00         lda #$00
+f92f  85 bf         sta sfx_noi_update_type
+f931  60            rts
+      
+      
+      
+      
+                    ; sound test 05
+                sfx_powerup_hit: subroutine
+f932  a9 82         lda #$82
+f934  8d 4e 01      sta apu_cache+$e
+f937  a9 20         lda #$20
+f939  85 b3         sta apu_noi_counter
+f93b  a9 03         lda #$03
+f93d  85 b4         sta apu_noi_envelope
+f93f  a9 16         lda #$16
+f941  85 bd         sta sfx_noi_counter
+f943  60            rts
+      
+      
+                    ; sound test 06
+                sfx_powerup_bomb: subroutine
+f944  a9 2c         lda #44
+f946  85 6a         sta bomb_counter
+f948  85 bd         sta sfx_noi_counter
+f94a  a9 04         lda #$04
+f94c  85 bf         sta sfx_noi_update_type
+f94e  60            rts
+      
+                sfx_powerup_bomb_update: subroutine
+f94f  a9 1f         lda #%00011111
+f951  8d 4c 01      sta apu_cache+$c
+f954  a5 6a         lda bomb_counter
+f956  29 0f         and #%00001111
+f958  09 03         ora #%00000011
+f95a  8d 4e 01      sta apu_cache+$e
+                    ; set powerup counter
+f95d  a5 6a         lda bomb_counter
+f95f  f0 c7         beq sfx_noi_update_clear
+f961  60            rts
+      
+                    ; sound test 07
+                sfx_powerup_mushroom: subroutine
+                    ; set powerup counter
+f962  a9 7f         lda #$7f
+f964  85 6c         sta shroom_counter
+                    ; slow pu2 sweep up
+f966  a9 8f         lda #%10001111
+f968  8d 04 40      sta $4004
+f96b  a9 aa         lda #%10101010
+f96d  8d 05 40      sta $4005
+f970  a5 c2         lda audio_root_tone
+f972  aa            tax
+f973  bd b9 f6      lda periodTableLo,x
+f976  8d 06 40      sta $4006
+f979  bd f8 f6      lda periodTableHi,x
+f97c  09 40         ora #%01000000
+f97e  8d 07 40      sta $4007
+f981  a9 10         lda #$10
+f983  85 bc         sta sfx_pu2_counter
+f985  60            rts
+      
+                    ; sound test 08
+                sfx_powerup_mask: subroutine
+                    ; fast pu2 sweep up
+f986  a9 8f         lda #%10001111
+f988  8d 04 40      sta $4004
+f98b  a9 f9         lda #%11111001
+f98d  8d 05 40      sta $4005
+f990  a5 26         lda rng0
+f992  29 3f         and #$3f
+f994  09 08         ora #$08
+f996  8d 06 40      sta $4006
+f999  a9 14         lda #%00010100
+f99b  8d 07 40      sta $4007
+f99e  a9 10         lda #$10
+f9a0  85 bc         sta sfx_pu2_counter
+f9a2  60            rts
+      
+                    ; sound test 09
+                sfx_powerup_1up: subroutine
+                    ; imperial jingle
+                    ; root note -- x - x x X
+f9a3  a9 00         lda #$00
+f9a5  85 b8         sta sfx_temp00
+f9a7  a9 05         lda #$05
+f9a9  85 be         sta sfx_pu2_update_type
+f9ab  60            rts
+                sfx_powerup_1up_update: subroutine
+f9ac  a5 b8         lda sfx_temp00
+f9ae  f0 0e         beq .trigger_lower_note
+f9b0  c9 10         cmp #$10
+f9b2  f0 0a         beq .trigger_lower_note
+f9b4  c9 18         cmp #$18
+f9b6  f0 06         beq .trigger_lower_note
+f9b8  c9 20         cmp #$20
+f9ba  f0 09         beq .trigger_higher_note
+f9bc  d0 2d         bne .done
+                .trigger_lower_note
+f9be  a5 c2         lda audio_root_tone
+f9c0  18            clc
+f9c1  69 18         adc #$18
+f9c3  d0 09         bne .trigger_note
+                .trigger_higher_note
+f9c5  a9 00         lda #$00
+f9c7  85 be         sta sfx_pu2_update_type
+f9c9  a5 c2         lda audio_root_tone
+f9cb  18            clc
+f9cc  69 24         adc #$24
+                .trigger_note
+f9ce  aa            tax
+f9cf  a9 83         lda #%10000011
+f9d1  8d 04 40      sta $4004
+f9d4  a9 00         lda #$00
+f9d6  8d 05 40      sta $4005
+f9d9  bd b9 f6      lda periodTableLo,x
+f9dc  8d 06 40      sta $4006
+f9df  bd f8 f6      lda periodTableHi,x
+f9e2  09 40         ora #%01000000
+f9e4  8d 07 40      sta $4007
+f9e7  a9 10         lda #$10
+f9e9  85 bc         sta sfx_pu2_counter
+                .done
+f9eb  e6 b8         inc sfx_temp00
+f9ed  60            rts
+      
+      
+                    ; sound test 0a
+                sfx_powerup_battery_25: subroutine
+f9ee  a9 08         lda #$08
+f9f0  85 b8         sta sfx_temp00 ; counter
+f9f2  d0 0a         bne sfx_powerup_battery_set_update_type
+                    ; sound test 0b
+                sfx_powerup_battery_50: subroutine
+f9f4  a9 04         lda #$04
+f9f6  85 b8         sta sfx_temp00 ; counter
+f9f8  d0 04         bne sfx_powerup_battery_set_update_type
+                    ; sound test 0c
+                sfx_powerup_battery_100: subroutine
+f9fa  a9 00         lda #$00
+f9fc  85 b8         sta sfx_temp00 ; counter
+                sfx_powerup_battery_set_update_type:
+f9fe  a9 03         lda #$03
+fa00  85 be         sta sfx_pu2_update_type
+fa02  60            rts
+      
+                sfx_powerup_battery_arp:
+fa03  byte          #$18, #$1c, #$1f, #$24
+      
+                sfx_powerup_battery_update: subroutine
+fa07  a5 b8         lda sfx_temp00
+fa09  29 03         and #%00000011
+fa0b  d0 2c         bne .dont_trigger
+fa0d  a5 b8         lda sfx_temp00
+fa0f  4a            lsr
+fa10  4a            lsr
+fa11  c9 04         cmp #$04
+fa13  f0 27         beq .end_sound
+fa15  aa            tax
+fa16  a5 c2         lda audio_root_tone
+fa18  18            clc
+fa19  7d 03 fa      adc sfx_powerup_battery_arp,x
+fa1c  aa            tax
+fa1d  a9 83         lda #%10000011
+fa1f  8d 04 40      sta $4004
+fa22  a9 00         lda #$00
+fa24  8d 05 40      sta $4005
+fa27  bd b9 f6      lda periodTableLo,x
+fa2a  8d 06 40      sta $4006
+fa2d  bd f8 f6      lda periodTableHi,x
+fa30  09 40         ora #%01000000
+fa32  8d 07 40      sta $4007
+fa35  a9 10         lda #$10
+fa37  85 bc         sta sfx_pu2_counter
+                .dont_trigger
+fa39  e6 b8         inc sfx_temp00 ; counter
+fa3b  60            rts
+                .end_sound
+fa3c  a9 00         lda #$00
+fa3e  85 be         sta sfx_pu2_update_type
+fa40  60            rts
+      
+                    ; sound test 0d
+                sfx_shoot_dart: subroutine
+                    ; pulse 1
+fa41  a9 0f         lda #%00001111
+fa43  8d 00 40      sta $4000
+fa46  a9 83         lda #%10000011
+fa48  8d 01 40      sta $4001
+fa4b  a5 26         lda rng0
+fa4d  29 3f         and #$3f
+fa4f  09 08         ora #$08
+fa51  8d 02 40      sta $4002
+fa54  a9 08         lda #%00001000
+fa56  8d 03 40      sta $4003
+fa59  a9 10         lda #$10
+fa5b  85 bb         sta sfx_pu1_counter
+fa5d  60            rts
+      
+                    ; sound test 0e
+                sfx_shoot_bullet: subroutine
+fa5e  a9 1f         lda #%00011111
+fa60  8d 4c 01      sta apu_cache+$c
+fa63  a5 24         lda wtf
+fa65  29 03         and #$03
+fa67  18            clc
+fa68  69 09         adc #$09
+fa6a  8d 4e 01      sta apu_cache+$e
+fa6d  a9 03         lda #$03
+fa6f  85 b4         sta apu_noi_envelope
+fa71  a9 20         lda #$20
+fa73  85 b3         sta apu_noi_counter
+fa75  60            rts
+      
+      
+                    ; sound test 0f
+                sfx_rng_chord: subroutine
+                    ; used hardware enevelope was 1 second
+                    ; ~ 64 frame fade
+                    ; triangle cuts off at 32 frames
+                    ; setup pulse 1 + 2
+fa76  a9 40         lda #$40
+fa78  85 ac         sta apu_pu1_counter
+fa7a  85 b0         sta apu_pu2_counter
+fa7c  a9 00         lda #$00
+fa7e  85 ad         sta apu_pu1_envelope
+fa80  85 b1         sta apu_pu2_envelope
+                    ; pulse 1 pitch
+fa82  a5 26         lda rng0
+fa84  29 0f         and #%00001111
+fa86  18            clc
+fa87  69 10         adc #$10
+fa89  aa            tax
+fa8a  a0 02         ldy #$02
+fa8c  20 37 f7      jsr apu_set_pitch
+                    ; pulse 2 pitch
+fa8f  a5 27         lda rng1
+fa91  29 0f         and #%00001111
+fa93  18            clc
+fa94  69 08         adc #$08
+fa96  aa            tax
+fa97  a0 06         ldy #$06
+fa99  20 37 f7      jsr apu_set_pitch
+                    ; setup triangle
+fa9c  a9 20         lda #$20
+fa9e  85 af         sta apu_tri_counter
+faa0  a5 28         lda rng2
+faa2  29 0f         and #%00001111
+faa4  18            clc
+faa5  69 08         adc #$08
+faa7  aa            tax
+faa8  a0 0a         ldy #$0a
+faaa  20 37 f7      jsr apu_set_pitch
+faad  60            rts
+      
+      
+      
+                    ; sound test 10
+                sfx_phase_next: subroutine
+faae  a9 00         lda #$00
+fab0  85 ba         sta sfx_phase_next_counter
+fab2  a9 06         lda #$06
+fab4  85 be         sta sfx_pu2_update_type
+fab6  60            rts
+      
+                sfx_phase_next_update: subroutine
+fab7  a5 ba         lda sfx_phase_next_counter
+fab9  f0 06         beq .trigger_first
+fabb  c9 04         cmp #$04
+fabd  f0 1b         beq .trigger_last
+fabf  d0 46         bne .done
+                .trigger_first
+fac1  a9 40         lda #$40
+fac3  85 b0         sta apu_pu2_counter
+fac5  a9 20         lda #$20
+fac7  85 bc         sta sfx_pu2_counter
+fac9  a9 02         lda #2
+facb  85 b1         sta apu_pu2_envelope
+facd  a5 c2         lda audio_root_tone
+facf  18            clc
+fad0  69 18         adc #24 ; two octaves
+fad2  aa            tax
+fad3  a0 06         ldy #6
+fad5  20 37 f7      jsr apu_set_pitch
+fad8  d0 2d         bne .done
+                .trigger_last
+fada  a9 40         lda #$40
+fadc  85 ac         sta apu_pu1_counter
+fade  85 b0         sta apu_pu2_counter
+fae0  a9 20         lda #$20
+fae2  85 bc         sta sfx_pu2_counter
+fae4  a9 02         lda #2
+fae6  85 ad         sta apu_pu1_envelope
+fae8  85 b1         sta apu_pu2_envelope
+faea  a5 c2         lda audio_root_tone
+faec  18            clc
+faed  69 1f         adc #31 ; two octaves + 5th
+faef  aa            tax
+faf0  a0 02         ldy #2
+faf2  20 37 f7      jsr apu_set_pitch
+faf5  a0 06         ldy #6
+faf7  20 37 f7      jsr apu_set_pitch
+fafa  ee 46 01      inc apu_cache+6
+fafd  ee 46 01      inc apu_cache+6
+fb00  ee 46 01      inc apu_cache+6
+                    ; trigger next phase and kill sfx
+fb03  a9 00         lda #$00
+fb05  85 be         sta sfx_pu2_update_type
+                .done
+fb07  e6 ba         inc sfx_phase_next_counter
+fb09  60            rts
+      
+      
+                    ; sound test 11
+                sfx_snare: subroutine
+fb0a  a9 0a         lda #$a
+fb0c  8d 4e 01      sta apu_cache+$e
+fb0f  a9 06         lda #$06
+fb11  85 b3         sta apu_noi_counter
+fb13  a9 05         lda #$05
+fb15  85 b4         sta apu_noi_envelope
+fb17  60            rts
+      
+                    ; sound test 12
+                sfx_hat: subroutine
+fb18  a5 bd         lda sfx_noi_counter
+fb1a  d0 0f         bne .no
+fb1c  a5 b6         lda apu_rng1
+fb1e  29 03         and #3
+fb20  8d 4e 01      sta apu_cache+$e
+fb23  a9 0e         lda #$e
+fb25  85 b3         sta apu_noi_counter
+fb27  a9 04         lda #$04
+fb29  85 b4         sta apu_noi_envelope
+                .no
+fb2b  60            rts
+      
+      
+                    ; sound test 13
+                sfx_ghost_snare: subroutine
+fb2c  a5 28         lda rng2
+fb2e  29 01         and #$01
+fb30  69 0b         adc #$0b
+fb32  8d 4e 01      sta apu_cache+$e
+fb35  a9 04         lda #$04
+fb37  85 b3         sta apu_noi_counter
+fb39  a9 05         lda #$05
+fb3b  85 b4         sta apu_noi_envelope
+fb3d  60            rts

@@ -1,0 +1,283 @@
+      
+      
+                cut_scene_update_generic: subroutine
+ca6e  a5 63         lda phase_end_game
+ca70  f0 0a         beq .start_game
+ca72  a5 1d         lda player_controls_debounced
+ca74  29 30         and #BUTTON_START|#BUTTON_SELECT
+ca76  f0 12         beq .do_nothing
+                    ; game complete go back to title screen
+ca78  a9 7c         lda #state_init_jump_table_offset+0
+ca7a  d0 08         bne .trigger_fadeout
+                .start_game
+ca7c  a5 1d         lda player_controls_debounced
+ca7e  29 d0         and #BUTTON_START|BUTTON_B|BUTTON_A
+ca80  f0 08         beq .do_nothing
+ca82  a9 7e         lda #state_init_jump_table_offset+2
+                .trigger_fadeout
+ca84  20 82 d2      jsr palette_fade_out_init
+ca87  20 7c fb      jsr song_stop
+                .do_nothing
+ca8a  4c a7 c0      jmp state_update_done
+      
+      
+                cut_scene_intro_init: subroutine
+                    ; zerio everything out
+ca8d  20 43 c1      jsr render_disable
+ca90  20 b1 c1      jsr sprite_clear
+ca93  20 71 c1      jsr nametables_clear
+                    ; colors
+ca96  a2 0c         ldx #12
+ca98  a0 00         ldy #0
+ca9a  20 cf d1      jsr palette_load
+ca9d  20 cf d1      jsr palette_load
+                    ; Distressed Alien
+                    PPU_SETADDR #$2086
+caa0  a9 20         lda #>#$2086
+caa2  8d 06 20      sta PPU_ADDR
+caa5  a9 86         lda #<#$2086
+caa7  8d 06 20      sta PPU_ADDR
+caaa  20 fa ca      jsr cut_scene_alien_main_draw
+                    ; alien attributes
+caad  a2 55         ldx #%01010101
+                    PPU_SETADDR #$23c9
+caaf  a9 23         lda #>#$23c9
+cab1  8d 06 20      sta PPU_ADDR
+cab4  a9 c9         lda #<#$23c9
+cab6  8d 06 20      sta PPU_ADDR
+cab9  8e 07 20      stx PPU_DATA
+cabc  8e 07 20      stx PPU_DATA
+cabf  8e 07 20      stx PPU_DATA
+                    PPU_SETADDR #$23d1
+cac2  a9 23         lda #>#$23d1
+cac4  8d 06 20      sta PPU_ADDR
+cac7  a9 d1         lda #<#$23d1
+cac9  8d 06 20      sta PPU_ADDR
+cacc  8e 07 20      stx PPU_DATA
+cacf  8e 07 20      stx PPU_DATA
+cad2  8e 07 20      stx PPU_DATA
+                    ; put text on screen
+                    NMTP_SETADDR cut_scene_intro_tile_data
+cad5  a9 c3         lda #>cut_scene_intro_tile_data
+cad7  85 58         sta nametable_tile_planter_addr_hi
+cad9  a9 61         lda #<cut_scene_intro_tile_data
+cadb  85 57         sta nametable_tile_planter_addr_lo
+cadd  20 d1 c1      jsr nametable_tile_planter
+                    ; setup everything else
+cae0  a9 00         lda #$00
+cae2  85 04         sta scroll_page
+cae4  85 01         sta scroll_x_hi
+cae6  a9 81         lda #state_render_jump_table_offset
+cae8  85 55         sta state_render_addr
+caea  a9 8e         lda #state_update_jump_table_offset+8
+caec  85 56         sta state_update_addr
+caee  20 38 c1      jsr render_enable
+caf1  20 4e d2      jsr palette_fade_in_init
+caf4  a9 01         lda #1
+caf6  20 4b fb      jsr song_start
+caf9  60            rts
+      
+      
+      
+      
+                cut_scene_alien_main_draw: subroutine
+cafa  a9 00         lda #0
+cafc  85 86         sta temp00 ; pattern tile counter
+cafe  a2 07         ldx #7
+                .alien_tile_loop
+cb00  a0 07         ldy #7
+                .alien_tile_row_loop
+cb02  a5 86         lda temp00
+cb04  8d 07 20      sta PPU_DATA
+cb07  e6 86         inc temp00
+cb09  88            dey
+cb0a  10 f6         bpl .alien_tile_row_loop
+                    ; setup empty tile fill
+cb0c  a0 17         ldy #23
+cb0e  a9 03         lda #tile_empty
+                .alien_row_filler_loop
+cb10  8d 07 20      sta PPU_DATA
+cb13  88            dey
+cb14  10 fa         bpl .alien_row_filler_loop
+cb16  ca            dex
+cb17  10 e7         bpl .alien_tile_loop
+cb19  60            rts
+      
+                cut_scene_alien_end_draw_row: subroutine
+                    ; x = start tile id
+cb1a  a0 07         ldy #$07
+                .row_loop
+cb1c  8e 07 20      stx PPU_DATA
+cb1f  e8            inx
+cb20  88            dey
+cb21  10 f9         bpl .row_loop
+cb23  60            rts
+      
+      
+      
+                cut_scene_outro_init: subroutine
+cb24  20 43 c1      jsr render_disable
+cb27  20 b1 c1      jsr sprite_clear
+cb2a  20 71 c1      jsr nametables_clear
+      
+cb2d  a9 00         lda #$00
+cb2f  85 52         sta state_sprite0
+cb31  85 04         sta scroll_page
+cb33  85 01         sta scroll_x_hi
+      
+                    ; draw original alien
+                    PPU_SETADDR #$208c
+cb35  a9 20         lda #>#$208c
+cb37  8d 06 20      sta PPU_ADDR
+cb3a  a9 8c         lda #<#$208c
+cb3c  8d 06 20      sta PPU_ADDR
+cb3f  20 fa ca      jsr cut_scene_alien_main_draw
+                    ; update alien image
+cb42  a2 40         ldx #$40
+                    PPU_SETADDR #$208c
+cb44  a9 20         lda #>#$208c
+cb46  8d 06 20      sta PPU_ADDR
+cb49  a9 8c         lda #<#$208c
+cb4b  8d 06 20      sta PPU_ADDR
+cb4e  20 1a cb      jsr cut_scene_alien_end_draw_row
+                    PPU_SETADDR #$20ac
+cb51  a9 20         lda #>#$20ac
+cb53  8d 06 20      sta PPU_ADDR
+cb56  a9 ac         lda #<#$20ac
+cb58  8d 06 20      sta PPU_ADDR
+cb5b  20 1a cb      jsr cut_scene_alien_end_draw_row
+                    PPU_SETADDR #$20cc
+cb5e  a9 20         lda #>#$20cc
+cb60  8d 06 20      sta PPU_ADDR
+cb63  a9 cc         lda #<#$20cc
+cb65  8d 06 20      sta PPU_ADDR
+cb68  20 1a cb      jsr cut_scene_alien_end_draw_row
+                    PPU_SETADDR #$212c
+cb6b  a9 21         lda #>#$212c
+cb6d  8d 06 20      sta PPU_ADDR
+cb70  a9 2c         lda #<#$212c
+cb72  8d 06 20      sta PPU_ADDR
+cb75  20 1a cb      jsr cut_scene_alien_end_draw_row
+      
+                    ; alien attributes
+cb78  a2 55         ldx #%01010101
+                    PPU_SETADDR #$23ca
+cb7a  a9 23         lda #>#$23ca
+cb7c  8d 06 20      sta PPU_ADDR
+cb7f  a9 ca         lda #<#$23ca
+cb81  8d 06 20      sta PPU_ADDR
+cb84  8e 07 20      stx PPU_DATA
+cb87  8e 07 20      stx PPU_DATA
+cb8a  8e 07 20      stx PPU_DATA
+                    PPU_SETADDR #$23d2
+cb8d  a9 23         lda #>#$23d2
+cb8f  8d 06 20      sta PPU_ADDR
+cb92  a9 d2         lda #<#$23d2
+cb94  8d 06 20      sta PPU_ADDR
+cb97  8e 07 20      stx PPU_DATA
+cb9a  8e 07 20      stx PPU_DATA
+cb9d  8e 07 20      stx PPU_DATA
+                    ; alien colors
+cba0  a2 09         ldx #9
+cba2  a0 03         ldy #3
+cba4  20 cf d1      jsr palette_load
+      
+cba7  e6 63         inc phase_end_game
+      
+                    ; allow future plays to be boundless
+cba9  e6 1e         inc player_boundless
+      
+                    ; use timer to decide end screen
+cbab  a5 49         lda timer_minutes_10s
+cbad  c9 60         cmp ##$0+char_set_offset
+cbaf  f0 3c         beq .good
+cbb1  a5 48         lda timer_minutes_1s
+cbb3  c9 65         cmp #$5+char_set_offset
+cbb5  90 1b         bcc .ok
+                .bad
+                    ; 15+ minutes
+                    NMTP_SETADDR cut_scene_ending_bad_tile_data
+cbb7  a9 c3         lda #>cut_scene_ending_bad_tile_data
+cbb9  85 58         sta nametable_tile_planter_addr_hi
+cbbb  a9 fb         lda #<cut_scene_ending_bad_tile_data
+cbbd  85 57         sta nametable_tile_planter_addr_lo
+                    ; palette
+cbbf  a9 06         lda #$06
+cbc1  85 90         sta pal_uni_bg
+cbc3  a2 00         ldx #0
+cbc5  a0 00         ldy #0
+cbc7  20 cf d1      jsr palette_load
+cbca  a9 06         lda #song_end_bad
+cbcc  20 4b fb      jsr song_start
+cbcf  4c 05 cc      jmp .plot_screen
+                .ok
+                    ; 10+ minutes
+                    NMTP_SETADDR cut_scene_ending_ok_tile_data
+cbd2  a9 c4         lda #>cut_scene_ending_ok_tile_data
+cbd4  85 58         sta nametable_tile_planter_addr_hi
+cbd6  a9 39         lda #<cut_scene_ending_ok_tile_data
+cbd8  85 57         sta nametable_tile_planter_addr_lo
+                    ; palette
+cbda  a9 07         lda #$07
+cbdc  85 90         sta pal_uni_bg
+cbde  a2 03         ldx #3
+cbe0  a0 00         ldy #0
+cbe2  20 cf d1      jsr palette_load
+cbe5  a9 07         lda #song_end_ok
+cbe7  20 4b fb      jsr song_start
+cbea  4c 05 cc      jmp .plot_screen
+                .good
+                    ; under 10 minutes
+                    NMTP_SETADDR cut_scene_ending_good_tile_data
+cbed  a9 c4         lda #>cut_scene_ending_good_tile_data
+cbef  85 58         sta nametable_tile_planter_addr_hi
+cbf1  a9 89         lda #<cut_scene_ending_good_tile_data
+cbf3  85 57         sta nametable_tile_planter_addr_lo
+                    ; palette
+cbf5  a9 01         lda #$01
+cbf7  85 90         sta pal_uni_bg
+cbf9  a2 06         ldx #6
+cbfb  a0 00         ldy #0
+cbfd  20 cf d1      jsr palette_load
+cc00  a9 08         lda #song_end_good
+cc02  20 4b fb      jsr song_start
+      
+      
+                .plot_screen
+cc05  20 d1 c1      jsr nametable_tile_planter
+                    ; DEATHLESS!! display
+                    ; XXX needs some work
+cc08  a5 66         lda player_death_counter
+                    ; final time display
+                    NMTP_SETADDR cut_scene_ending_time_tile_data
+cc0a  a9 c4         lda #>cut_scene_ending_time_tile_data
+cc0c  85 58         sta nametable_tile_planter_addr_hi
+cc0e  a9 df         lda #<cut_scene_ending_time_tile_data
+cc10  85 57         sta nametable_tile_planter_addr_lo
+cc12  20 d1 c1      jsr nametable_tile_planter
+cc15  a5 49         lda timer_minutes_10s
+cc17  8d 07 20      sta PPU_DATA
+cc1a  a5 48         lda timer_minutes_1s
+cc1c  8d 07 20      sta PPU_DATA
+cc1f  a9 ac         lda #char_set_colon
+cc21  8d 07 20      sta PPU_DATA
+cc24  a5 47         lda timer_seconds_10s
+cc26  8d 07 20      sta PPU_DATA
+cc29  a5 46         lda timer_seconds_1s
+cc2b  8d 07 20      sta PPU_DATA
+cc2e  a9 99         lda #char_set_period
+cc30  8d 07 20      sta PPU_DATA
+cc33  a5 45         lda timer_frames_10s
+cc35  8d 07 20      sta PPU_DATA
+cc38  a5 44         lda timer_frames_1s
+cc3a  8d 07 20      sta PPU_DATA
+      
+cc3d  a9 81         lda #state_render_jump_table_offset
+cc3f  85 55         sta state_render_addr
+cc41  a9 8e         lda #state_update_jump_table_offset+8
+cc43  85 56         sta state_update_addr
+cc45  20 38 c1      jsr render_enable
+cc48  20 4e d2      jsr palette_fade_in_init
+cc4b  60            rts
+      
+      

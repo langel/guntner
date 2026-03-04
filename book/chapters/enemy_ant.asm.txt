@@ -1,0 +1,113 @@
+      
+                ant_spawn: subroutine
+                    ; x is set by enemy spawner
+e5f9  a9 fc         lda #$fc
+e5fb  9d 02 03      sta enemy_ram_x,x ; x pos
+e5fe  a9 00         lda #$00
+e600  9d 05 03      sta enemy_ram_ac,x ; animation counter
+e603  8a            txa
+e604  4a            lsr
+e605  4a            lsr
+e606  4a            lsr
+e607  29 01         and #1
+e609  f0 0e         beq .dash_ant
+                .ceiling_ant
+e60b  9d 07 03      sta enemy_ram_ex,x
+e60e  a9 03         lda #$03
+e610  9d 03 03      sta enemy_ram_y,x ; y ant pos
+e613  a9 0c         lda #$0c
+e615  9d 04 03      sta enemy_ram_pc,x ; y dart origin
+e618  60            rts
+                .dash_ant
+e619  9d 07 03      sta enemy_ram_ex,x
+e61c  a9 ad         lda #$ad
+e61e  9d 03 03      sta enemy_ram_y,x ; y ant pos
+e621  9d 04 03      sta enemy_ram_pc,x ; y dart origin
+e624  60            rts
+      
+      
+                ant_cycle: subroutine
+e625  a9 10         lda #$10
+e627  85 3d         sta collision_0_w
+e629  a9 10         lda #$10
+e62b  85 3e         sta collision_0_h
+e62d  20 eb db      jsr enemy_handle_damage_and_death
+      
+e630  a5 24         lda wtf
+e632  4a            lsr
+e633  4a            lsr
+e634  29 3f         and #$3f
+e636  c9 37         cmp #$37
+e638  90 41         bcc .normal_walking
+                .stop_and_shoot
+                    ; frames default to spazzing
+                    ; frames f0-f8 butt up
+                    ; frame f8 shoot dart
+                    ; frames f9-ff butt down
+e63a  a5 24         lda wtf
+e63c  c9 f9         cmp #$f9
+e63e  b0 34         bcs .butt_down
+e640  c9 f8         cmp #$f8
+e642  b0 17         bcs .dart_fire
+e644  c9 f0         cmp #$f0
+e646  b0 0c         bcs .butt_up
+                .butt_shake
+e648  4a            lsr
+e649  29 01         and #$01
+e64b  0a            asl
+e64c  18            clc
+e64d  69 e8         adc #$e8
+e64f  9d 05 03      sta enemy_ram_ac,x
+e652  d0 39         bne .dont_advance
+                .butt_up
+e654  a9 ea         lda #$ea
+e656  9d 05 03      sta enemy_ram_ac,x
+e659  d0 32         bne .dont_advance
+                .dart_fire
+e65b  bd 02 03      lda enemy_ram_x,x
+e65e  85 71         sta dart_x_origin
+e660  bd 04 03      lda enemy_ram_pc,x
+e663  85 72         sta dart_y_origin
+e665  a9 03         lda #$03
+e667  85 73         sta dart_velocity
+e669  a9 00         lda #$00
+e66b  85 74         sta dart_sprite
+e66d  85 75         sta dart_dir_adjust
+e66f  20 a8 e7      jsr dart_spawn
+e672  d0 19         bne .dont_advance
+                .butt_down
+e674  a9 e8         lda #$e8
+e676  9d 05 03      sta enemy_ram_ac,x
+e679  d0 12         bne .dont_advance
+      
+                .normal_walking
+e67b  29 03         and #$03
+e67d  0a            asl
+e67e  18            clc
+e67f  69 e0         adc #$e0
+e681  9d 05 03      sta enemy_ram_ac,x
+e684  a5 24         lda wtf
+e686  29 03         and #$03
+e688  d0 03         bne .dont_advance
+e68a  fe 02 03      inc enemy_ram_x,x
+                .dont_advance
+e68d  bd 02 03      lda enemy_ram_x,x
+e690  20 df da      jsr sprite_4_set_x
+e693  bd 03 03      lda enemy_ram_y,x
+e696  20 ef da      jsr sprite_4_set_y
+e699  bd 07 03      lda enemy_ram_ex,x
+e69c  d0 0a         bne .ceiling_ant
+                .dash_ant
+e69e  bd 05 03      lda enemy_ram_ac,x
+e6a1  20 b7 da      jsr sprite_4_set_sprite
+e6a4  a9 01         lda #$01
+e6a6  d0 08         bne .ant_pos_done
+                .ceiling_ant
+e6a8  bd 05 03      lda enemy_ram_ac,x
+e6ab  20 cb da      jsr sprite_4_set_sprite_flip
+e6ae  a9 81         lda #$81
+                .ant_pos_done
+e6b0  20 9d da      jsr sprite_4_set_palette
+                .done
+e6b3  4c 92 db      jmp update_enemies_handler_next
+      

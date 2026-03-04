@@ -1,0 +1,364 @@
+      
+                    ; PULSE CHANNELS
+                    ;$4000 / $4004 DDLC VVVV Duty (D), envelope loop / length counter halt (L), constant volume (C), volume/envelope (V)
+                    ;$4001 / $4005 EPPP NSSS Sweep unit: enabled (E), period (P), negate (N), shift (S)
+                    ;$4002 / $4006 TTTT TTTT Timer low (T)
+                    ;$4003 / $4007 LLLL LTTT Length counter load (L), timer high (T)
+      
+      40 00         APU_PULSE1_VOL		= $4000
+      40 01         APU_PULSE1_SWEEP	= $4001
+      40 02         APU_PULSE1_TIMER_LO	= $4002
+      40 03         APU_PULSE1_TIMER_HI	= $4003
+      40 04         APU_PULSE2_VOL		= $4004
+      40 05         APU_PULSE2_SWEEP	= $4005
+      40 06         APU_PULSE2_TIMER_LO	= $4006
+      40 07         APU_PULSE2_TIMER_HI	= $4007
+      
+                    ; TRIANGLE CHANNEL
+                    ;$4008  CRRR RRRR Length counter halt / linear counter control (C), linear counter load (R)
+                    ;$4009  ---- ---- Unused
+                    ;$400A  TTTT TTTT Timer low (T)
+                    ;$400B  LLLL LTTT Length counter load (L), timer high (T)
+      
+      40 08         APU_TRI_CONTROL		= $4008
+      40 09         APU_TRI_UNUSED		= $4009
+      40 0a         APU_TRI_TIMER_LO	= $400a
+      40 0b         APU_TRI_TIMER_HI	= $400b
+      
+                    ; NOISE CHANNEL
+                    ;$400C --LC VVVV Envelope loop / length counter halt (L), constant volume (C), volume/envelope (V)
+                    ;$400D ---- ---- Unused
+                    ;$400E L--- PPPP Loop noise (L), noise period (P)
+                    ;$400F LLLL L--- Length counter load (L)
+      
+      40 0c         APU_NOISE_VOL   	= $400C
+      40 0e         APU_NOISE_FREQ 		= $400E
+      40 0f         APU_NOISE_TIMER		= $400F
+      
+      40 10         DMC_FREQ		= $4010
+      40 15         APU_STATUS		= $4015
+      40 10         APU_DMC_CTRL    	= $4010
+      40 15         APU_CHAN_CTRL   	= $4015
+      40 17         APU_FRAME       	= $4017
+      
+      01 40         apu_cache		= $0140
+      
+      
+                apu_init: subroutine
+                    ; Init $4000-4013
+f65b  a0 13         ldy #$13
+                .loop
+f65d  b9 7c f6      lda apu_init_register_values,y
+f660  99 40 01      sta apu_cache,y
+f663  99 00 40      sta $4000,y
+f666  88            dey
+f667  10 f4         bpl .loop
+                    ; We have to skip over $4014 (OAMDMA)
+f669  a9 0f         lda #$0f
+f66b  8d 15 40      sta $4015
+f66e  a9 40         lda #$40
+f670  8d 17 40      sta $4017
+                apu_rng_reset:
+                    ; seed rng
+f673  a9 11         lda #$11
+f675  85 b5         sta apu_rng0
+f677  a9 7f         lda #$7f
+f679  85 b6         sta apu_rng1
+f67b  60            rts
+      
+      
+                apu_init_register_values:
+f67c  byte          $30,$08,$00,$00
+f680  byte          $30,$08,$00,$00
+f684  byte          $80,$00,$00,$00
+f688  byte          $30,$00,$00,$00
+f68c  byte          $00,$00,$00,$00
+      
+                octoscale:
+f690  byte          $00,$02,$03,$05,$06,$08,$09,$0b
+f698  byte          $0c,$0e,$0f,$11,$12,$14,$15,$17
+f6a0  byte          $18,$1a ; ,$1b,$1d,$1e,$20,$21,$23
+      
+                majpentscale:
+f6a2  byte          #0, #2, #4, #7, #9
+f6a7  byte          #12,#14,#16,#19,#21
+f6ac  byte          #24,#26,#28,#31,#33
+f6b1  byte          #36,#38,#40,#43,#45
+f6b6  byte          #38,#40,#19
+      
+                periodTableLo:
+                    ;     A   A#  B   C   C#  D   D#  E   F   F#  G   G#
+f6b9  byte          $f1,$7f,$13,$ad,$4d,$f3,$9d,$4c,$00,$b8,$74,$34 ; 12
+f6c5  byte          $f8,$bf,$89,$56,$26,$f9,$ce,$a6,$80,$5c,$3a,$1a ; 24
+f6d1  byte          $fb,$df,$c4,$ab,$93,$7c,$67,$52,$3f,$2d,$1c,$0c ; 36
+f6dd  byte          $fd,$ef,$e1,$d5,$c9,$bd,$b3,$a9,$9f,$96,$8e,$86 ; 48
+f6e9  byte          $7e,$77,$70,$6a,$64,$5e,$59,$54,$4f,$4b,$46,$42 ; 60
+f6f5  byte          $3f,$3b,$38 ;,$34,$31,$2f,$2c,$29,$27,$25,$23,$21 ; 72
+                    ; byte $1f,$1d,$1b,$1a,$18,$17,$15,$14
+                periodTableHi:
+f6f8  byte          $07,$07,$07,$06,$06,$05,$05,$05,$05,$04,$04,$04
+f704  byte          $03,$03,$03,$03,$03,$02,$02,$02,$02,$02,$02,$02
+f710  byte          $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01
+f71c  byte          $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+f728  byte          $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+f734  byte          $00,$00,$00 ;,$00,$00,$00,$00,$00,$00,$00,$00,$00
+                    ; byte $00,$00,$00,$00,$00,$00,$00,$00
+      
+      
+                apu_set_pitch: subroutine
+                    ; x = pitch table offset
+                    ; y = channel low byte offset
+f737  bd b9 f6      lda periodTableLo,x
+f73a  99 40 01      sta apu_cache+0,y
+f73d  bd f8 f6      lda periodTableHi,x
+f740  09 f8         ora #%11111000
+f742  99 41 01      sta apu_cache+1,y
+                    ; make sure counter resets in engine
+f745  a9 ff         lda #$ff
+                    ;sta apu_pu1_last_hi-2,y
+                    ; this makes "sick dingle" work
+f747  85 ae         sta apu_pu1_last_hi
+f749  85 b2         sta apu_pu2_last_hi
+f74b  60            rts
+      
+      
+                apu_bend_down: subroutine
+f74c  ee 42 01      inc $142
+f74f  ee 46 01      inc $146
+f752  ee 4a 01      inc $14a
+f755  60            rts
+      
+      
+      
+      
+                apu_env_run: subroutine
+                    ; x = channel counter offset
+                    ;     envelope type is byte after
+                    ; #$00 = pu1
+                    ; #$04 = pu2
+                    ; #$07 = noise
+                    ; returns 4-bit volume in a
+f756  b5 ad         lda apu_pu1_envelope,x
+f758  18            clc
+f759  69 66         adc #apu_env_jump_table_offset
+f75b  4c f1 c4      jmp jump_to_subroutine
+      
+                apu_env_lin_long: subroutine
+                    ; #$40 counter = 63 frames / 1 second
+f75e  b5 ac         lda apu_pu1_counter,x
+f760  4a            lsr
+f761  4a            lsr
+f762  29 0f         and #%00001111
+f764  60            rts
+                    ;apu_env_lin_short: subroutine
+                    ; #$20 counter = 31 frames / 0.5 second
+                    ;lda apu_pu1_counter,x
+                    ;lsr
+                    ;and #%00001111
+                    ;rts
+                apu_env_lin_tiny: subroutine
+                    ; #$10 counter = 15 frames / 0.25 second
+f765  b5 ac         lda apu_pu1_counter,x
+f767  29 0f         and #%00001111
+f769  60            rts
+                apu_env_exp_long: subroutine
+                    ; #$40 counter =~ 54 frames / 1 second
+f76a  b4 ac         ldy apu_pu1_counter,x
+f76c  b9 c0 fe      lda sine_table+$c0,y
+f76f  4a            lsr
+f770  4a            lsr
+f771  4a            lsr
+f772  60            rts
+                apu_env_exp_short: subroutine
+                    ; #$20 counter =~ 28 frames / 0.5 second
+f773  b4 ac         ldy apu_pu1_counter,x
+f775  b9 e0 04      lda sine_7bits+$60,y
+f778  4a            lsr
+f779  4a            lsr
+f77a  60            rts
+                apu_env_exp_tiny: subroutine
+                    ; #$10 counter =~ 15 frames / 0.25 second
+f77b  b4 ac         ldy apu_pu1_counter,x
+f77d  b9 81 f7      lda apu_env_exp_tiny_table,y
+f780  60            rts
+                apu_env_exp_tiny_table:
+f781  byte          $00,$01,$01,$01,$01,$01,$02,$02,
+f78a  byte          $03,$04,$05,$07,$0a,$0c,$0f
+                apu_env_exp_pico: subroutine
+                    ; #$06 counter =~ 15 frames / 0.25 second
+f791  b4 ac         ldy apu_pu1_counter,x
+f793  b9 97 f7      lda apu_env_exp_pico_table,y
+f796  60            rts
+                apu_env_exp_pico_table:
+f797  byte          $00,$01,$04,$07,$0a,$0f
+      
+      
+                apu_update: subroutine
+                    ; MUSIC
+                    ; SFX Pulse 2
+                    ; SFX Noise
+                    ; MIX and Write to APU
+      
+                    ; SFX Update Delegator
+f79d  a5 be         lda sfx_pu2_update_type
+f79f  18            clc
+f7a0  69 6c         adc #sfx_update_jump_table_offset
+f7a2  20 f1 c4      jsr jump_to_subroutine
+f7a5  a5 bf         lda sfx_noi_update_type
+f7a7  18            clc
+f7a8  69 6c         adc #sfx_update_jump_table_offset
+f7aa  20 f1 c4      jsr jump_to_subroutine
+      
+      
+                    ; Pulse Channels Counter / Envelope
+f7ad  a2 00         ldx #$00
+                .pulse_channels_loop
+f7af  b5 ac         lda apu_pu1_counter,x
+f7b1  f0 2e         beq .pulse_skip
+f7b3  d6 ac         dec apu_pu1_counter,x
+f7b5  d0 08         bne .pulse_enabled
+                .pulse_disabled
+f7b7  a9 30         lda #$30
+f7b9  9d 00 40      sta $4000,x
+f7bc  4c e1 f7      jmp .pulse_skip
+                .pulse_enabled
+f7bf  20 56 f7      jsr apu_env_run
+f7c2  09 b0         ora #%10110000
+f7c4  9d 00 40      sta $4000,x
+f7c7  a9 08         lda #$08
+f7c9  9d 01 40      sta $4001,x
+f7cc  bd 42 01      lda apu_cache+2,x
+f7cf  18            clc
+f7d0  65 6d         adc shroom_mod
+f7d2  9d 02 40      sta $4002,x
+f7d5  bd 43 01      lda apu_cache+3,x
+f7d8  d5 ae         cmp apu_pu1_last_hi,x
+f7da  f0 05         beq .pulse_skip
+f7dc  9d 03 40      sta $4003,x
+f7df  95 ae         sta apu_pu1_last_hi,x
+                .pulse_skip
+f7e1  e0 00         cpx #$00
+f7e3  d0 04         bne .pulse_channels_done
+f7e5  a2 04         ldx #$04
+f7e7  d0 c6         bne .pulse_channels_loop
+                .pulse_channels_done
+                    ; Triangle Counter
+f7e9  a5 af         lda apu_tri_counter
+f7eb  f0 1a         beq .triangle_skip
+f7ed  c6 af         dec apu_tri_counter
+f7ef  d0 08         bne .triangle_enabled
+                .triangle_disabled
+f7f1  a9 00         lda #$00
+f7f3  8d 08 40      sta $4008
+f7f6  4c 07 f8      jmp .triangle_skip
+                .triangle_enabled
+f7f9  a9 7f         lda #$7f
+f7fb  8d 08 40      sta $4008
+f7fe  ad 4a 01      lda apu_cache+$a
+f801  18            clc
+f802  65 6d         adc shroom_mod
+f804  8d 0a 40      sta $400a
+                .triangle_skip
+                    ; Noise Counter
+f807  a5 b3         lda apu_noi_counter
+f809  f0 16         beq .noise_skip
+f80b  c6 b3         dec apu_noi_counter
+f80d  d0 08         bne .noise_enabled
+                .noise_disabled
+f80f  a9 10         lda #%00010000
+f811  8d 4c 01      sta apu_cache+12
+f814  4c 21 f8      jmp .noise_skip
+                .noise_enabled
+f817  a2 07         ldx #$07
+f819  20 56 f7      jsr apu_env_run
+f81c  09 10         ora #%00010000
+f81e  8d 4c 01      sta apu_cache+12
+                .noise_skip
+                    ; copy cache to apu
+f821  a0 05         ldy #$05
+                .cache_to_apu_loop
+f823  b9 4b 01      lda apu_cache+$b,y
+f826  99 0b 40      sta $4000+$b,y
+f829  88            dey
+f82a  10 f7         bpl .cache_to_apu_loop
+                    ; RNG updates
+f82c  a5 b5         lda apu_rng0
+f82e  20 5a c1      jsr NextRandom
+f831  85 b5         sta apu_rng0
+f833  a5 b6         lda apu_rng1
+f835  20 60 c1      jsr PrevRandom
+f838  85 b6         sta apu_rng1
+                    ; SFX counter updates
+f83a  a2 02         ldx #2
+                .sfx_counter_update
+f83c  b5 bb         lda sfx_pu1_counter,x
+f83e  f0 02         beq .skip_sfx_counter
+f840  d6 bb         dec sfx_pu1_counter,x
+                .skip_sfx_counter
+f842  ca            dex
+f843  10 f7         bpl .sfx_counter_update
+f845  60            rts
+      
+      
+      
+      
+      
+      
+      
+      
+                    ;$400C --LC VVVV Envelope loop / length counter halt (L), constant volume (C), volume/envelope (V)
+                    ;$400D ---- ---- Unused
+                    ;$400E L--- PPPP Loop noise (L), noise period (P)
+                    ;$400F LLLL L--- Length counter load (L)
+      
+      
+                    ;$4000 / $4004 DDLC VVVV Duty (D), envelope loop / length counter halt (L), constant volume (C), volume/envelope (V)
+                    ;$4001 / $4005 EPPP NSSS Sweep unit: enabled (E), period (P), negate (N), shift (S)
+                    ;$4002 / $4006 TTTT TTTT Timer low (T)
+                    ;$4003 / $4007 LLLL LTTT Length counter load (L), timer high (T)
+      
+      
+                    ; envelope lengths
+                    ;     |  0   1   2   3   4   5   6   7    8   9   A   B   C   D   E   F
+                    ;-----+----------------------------------------------------------------
+                    ;00-0F  10,254, 20,  2, 40,  4, 80,  6, 160,  8, 60, 10, 14, 12, 26, 14,
+                    ;10-1F  12, 16, 24, 18, 48, 20, 96, 22, 192, 24, 72, 26, 16, 28, 32, 30
+      
+                    ; envelope length table again
+                    ; column order:
+                    ; id from table above
+                    ; duration in ticks
+                    ; actual register value
+                    ; 00  10  00
+                    ; 01 254  08
+                    ; 02  20  10
+                    ; 03 2  18
+                    ; 04  40  20
+                    ; 05 4  28
+                    ; 06  80  30
+                    ; 07 6  38
+                    ; 08 160  40
+                    ; 09 8  48
+                    ; 0a  60  50
+                    ; 0b  10  58
+                    ; 0c  14  60
+                    ; 0d  12  68
+                    ; 0e  26  70
+                    ; 0f  14  78
+                    ; 10  12  80
+                    ; 11  16  88
+                    ; 12  24  90
+                    ; 13  18  98
+                    ; 14  48  a0
+                    ; 15  20  a8
+                    ; 16  96  b0
+                    ; 17  22  b8
+                    ; 18 192  c0
+                    ; 19  24  c8
+                    ; 1a  72  d0
+                    ; 1b  26  d8
+                    ; 1c  16  e0
+                    ; 1d  28  e8
+                    ; 1e  32  f0
+                    ; 1f  30  f8
+      

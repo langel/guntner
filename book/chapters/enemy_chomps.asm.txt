@@ -1,0 +1,83 @@
+      
+      
+                chomps_spawn: subroutine
+                    ; x is set by enemy spawner
+e725  a9 c1         lda #$c1
+e727  9d 05 03      sta enemy_ram_ac,x
+e72a  20 52 dc      jsr get_oam_offset_from_ram_offset
+e72d  a9 00         lda #$00
+e72f  99 03 02      sta oam_ram_x,y
+e732  60            rts
+      
+      
+                chomps_cycle: subroutine
+e733  a9 08         lda #$08
+e735  85 3d         sta collision_0_w
+e737  85 3e         sta collision_0_h
+e739  20 eb db      jsr enemy_handle_damage_and_death
+      
+e73c  b9 03 02      lda oam_ram_x,y
+e73f  c9 01         cmp #$01
+e741  b0 09         bcs .dont_reset_y
+                    ; y
+e743  20 d1 db      jsr enemy_spawn_random_y_pos
+e746  99 00 02      sta oam_ram_y,y
+e749  99 04 02      sta oam_ram_y+4,y
+                .dont_reset_y
+      
+                    ; x movement
+e74c  fe 04 03      inc enemy_ram_pc,x ; actual x origin position
+e74f  fe 05 03      inc enemy_ram_ac,x
+e752  fe 05 03      inc enemy_ram_ac,x
+e755  a5 24         lda wtf
+e757  29 01         and #$01
+e759  d0 03         bne .no_extra_inc
+e75b  fe 05 03      inc enemy_ram_ac,x
+                .no_extra_inc
+e75e  bd 05 03      lda enemy_ram_ac,x
+e761  aa            tax
+e762  bd 00 fe      lda sine_table,x
+e765  4a            lsr
+e766  4a            lsr
+e767  a6 76         ldx enemy_ram_offset
+e769  18            clc
+e76a  7d 04 03      adc enemy_ram_pc,x
+                    ; x
+e76d  99 03 02      sta oam_ram_x,y
+e770  18            clc
+e771  69 01         adc #$01
+e773  99 07 02      sta oam_ram_x+4,y
+      
+                    ; winder sprite
+e776  a5 24         lda wtf
+e778  4a            lsr
+e779  4a            lsr
+e77a  29 03         and #$03
+e77c  18            clc
+e77d  69 34         adc #$34
+e77f  99 01 02      sta oam_ram_spr,y
+      
+                    ; mouth sprite
+e782  bd 05 03      lda enemy_ram_ac,x
+e785  18            clc
+e786  69 d0         adc #$d0
+e788  c9 80         cmp #$80
+e78a  b0 04         bcs .not_closed
+e78c  a9 58         lda #$58
+e78e  d0 0a         bne .sprite_done
+                .not_closed
+e790  c9 a0         cmp #$a0
+e792  b0 04         bcs .half_open
+e794  a9 68         lda #$68
+e796  d0 02         bne .sprite_done
+                .half_open
+e798  a9 78         lda #$78
+                .sprite_done
+e79a  99 05 02      sta oam_ram_spr+4,y
+      
+                .frame_done
+e79d  a9 01         lda #$01
+e79f  20 39 dc      jsr enemy_set_palette
+e7a2  99 06 02      sta oam_ram_att+4,y
+                .done
+e7a5  4c 92 db      jmp update_enemies_handler_next

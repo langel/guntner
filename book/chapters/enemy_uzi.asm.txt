@@ -1,0 +1,121 @@
+      
+                uzi_spawn: subroutine
+f0c8  a9 20         lda #$20
+f0ca  9d 02 03      sta enemy_ram_x,x
+f0cd  a9 24         lda #$24
+f0cf  9d 05 03      sta enemy_ram_ac,x
+f0d2  60            rts
+      
+      
+      
+                uzi_cycle: subroutine
+f0d3  a9 10         lda #$10
+f0d5  85 3d         sta collision_0_w
+f0d7  a9 10         lda #$10
+f0d9  85 3e         sta collision_0_h
+f0db  20 eb db      jsr enemy_handle_damage_and_death
+                    ; x pos
+f0de  bd 02 03      lda enemy_ram_x,x
+f0e1  38            sec
+f0e2  fd 05 03      sbc enemy_ram_ac,x
+f0e5  20 df da      jsr sprite_4_set_x
+f0e8  bd 05 03      lda enemy_ram_ac,x
+f0eb  f0 03         beq .kickback_done
+f0ed  de 05 03      dec enemy_ram_ac,x
+                .kickback_done
+                    ; y pos
+f0f0  fe 04 03      inc enemy_ram_pc,x
+f0f3  bd 04 03      lda enemy_ram_pc,x
+f0f6  aa            tax
+f0f7  bd 00 fe      lda sine_table,x
+f0fa  4a            lsr
+f0fb  18            clc
+f0fc  69 18         adc #$18
+f0fe  a6 76         ldx enemy_ram_offset
+f100  9d 03 03      sta enemy_ram_y,x
+f103  20 ef da      jsr sprite_4_set_y
+                    ; sprite
+f106  a9 ec         lda #$ec
+f108  20 b7 da      jsr sprite_4_set_sprite
+                    ; palette
+f10b  a9 01         lda #$01
+f10d  20 9d da      jsr sprite_4_set_palette
+                .bullet_spawn
+f110  a5 26         lda rng0
+f112  4a            lsr
+f113  29 07         and #$07
+f115  d0 09         bne .dont_shoot
+f117  20 23 f1      jsr bullet_spawn
+                    ; makes for less repetitive patterns
+f11a  20 52 c1      jsr get_next_random
+f11d  20 52 c1      jsr get_next_random
+                .dont_shoot
+f120  4c 92 db      jmp update_enemies_handler_next
+      
+      
+      
+                bullet_spawn: subroutine
+f123  b9 03 02      lda oam_ram_x,y
+f126  85 88         sta temp02
+f128  b9 00 02      lda oam_ram_y,y
+f12b  85 89         sta temp03
+f12d  20 5f dc      jsr get_enemy_slot_next
+f130  90 2d         bcc .done
+                    ; sprite
+f132  a9 09         lda #bullet_id
+f134  9d 00 03      sta enemy_ram_type,x
+f137  a8            tay
+f138  b9 c5 dc      lda enemy_hitpoints_table,y
+f13b  9d 01 03      sta enemy_ram_hp,x
+                    ; load y register
+f13e  20 52 dc      jsr get_oam_offset_from_ram_offset
+                    ; x pos
+f141  a5 88         lda temp02
+f143  18            clc
+f144  69 0b         adc #$0b
+f146  99 03 02      sta oam_ram_x,y
+                    ; y pos
+f149  a5 89         lda temp03
+f14b  18            clc
+f14c  69 03         adc #$03
+f14e  99 00 02      sta oam_ram_y,y
+                    ; animate uzi kickback
+f151  a6 76         ldx enemy_ram_offset
+f153  bd 05 03      lda enemy_ram_ac,x
+f156  18            clc
+f157  69 05         adc #$05 ; kickback in pixels
+f159  9d 05 03      sta enemy_ram_ac,x
+                    ; trigger sfx
+f15c  20 5e fa      jsr sfx_shoot_bullet
+                .done
+f15f  60            rts
+      
+                bullet_cycle: subroutine
+f160  a9 08         lda #$08
+f162  85 3d         sta collision_0_w
+f164  a9 04         lda #$04
+f166  85 3e         sta collision_0_h
+f168  20 eb db      jsr enemy_handle_damage_and_death
+                    ; animate gleam
+f16b  a5 24         lda wtf
+f16d  4a            lsr
+f16e  4a            lsr
+f16f  29 01         and #$01
+f171  18            clc
+f172  69 ee         adc #$ee
+f174  99 01 02      sta oam_ram_spr,y
+                    ; move to the right
+f177  b9 03 02      lda oam_ram_x,y
+f17a  69 03         adc #$03
+                    ; despawn check
+f17c  c9 04         cmp #$04
+f17e  b0 06         bcs .dont_despawn
+                .despawn
+f180  20 47 dd      jsr enemy_clear
+f183  4c 8e f1      jmp .done
+                .dont_despawn
+f186  99 03 02      sta oam_ram_x,y
+f189  a9 01         lda #$01
+f18b  20 39 dc      jsr enemy_set_palette
+                .done
+f18e  4c 92 db      jmp update_enemies_handler_next

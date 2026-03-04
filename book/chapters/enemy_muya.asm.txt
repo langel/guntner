@@ -1,0 +1,59 @@
+      
+                    muya_spawn_y	EQM $b4
+      
+                muya_spawn: subroutine
+edfb  20 52 dc      jsr get_oam_offset_from_ram_offset
+edfe  a9 c4         lda #muya_spawn_y+$10
+ee00  99 00 02      sta oam_ram_y,y
+ee03  60            rts
+      
+      
+      
+                    ;;;; HANDLING MUYA
+                muya_cycle: subroutine
+ee04  a9 08         lda #$08
+ee06  85 3d         sta collision_0_w
+ee08  a9 10         lda #$10
+ee0a  85 3e         sta collision_0_h
+ee0c  20 eb db      jsr enemy_handle_damage_and_death
+      
+                    ; x pos
+ee0f  b9 03 02      lda oam_ram_x,y
+ee12  99 07 02      sta oam_ram_x+4,y
+      
+                    ; y pos
+ee15  20 fb dc      jsr enemy_accelerates_upwards
+ee18  b0 0b         bcs .reset_x_and_y_pos
+ee1a  99 00 02      sta oam_ram_y,y
+ee1d  18            clc
+ee1e  69 08         adc #$08
+ee20  99 04 02      sta oam_ram_y+4,y
+ee23  d0 13         bne .reset_skip
+                .reset_x_and_y_pos
+                    ; x
+ee25  20 52 c1      jsr get_next_random
+ee28  4a            lsr
+ee29  69 5c         adc #$5c
+ee2b  99 03 02      sta oam_ram_x,y
+                    ; y
+ee2e  a9 b4         lda #muya_spawn_y
+ee30  99 00 02      sta oam_ram_y,y
+                    ; reset animation counter
+ee33  a9 00         lda #$00
+ee35  9d 05 03      sta enemy_ram_ac,x
+                .reset_skip
+      
+                    ; sprite
+ee38  a9 64         lda #$64
+ee3a  99 01 02      sta oam_ram_spr,y
+ee3d  a9 74         lda #$74
+ee3f  99 05 02      sta oam_ram_spr+4,y
+      
+                    ; palette
+ee42  a9 02         lda #$02
+ee44  20 39 dc      jsr enemy_set_palette
+ee47  99 06 02      sta oam_ram_att+4,y
+      
+ee4a  4c 92 db      jmp update_enemies_handler_next
+      
+      

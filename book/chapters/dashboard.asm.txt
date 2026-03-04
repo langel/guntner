@@ -1,0 +1,319 @@
+                    ;;; constants
+      
+      22 c0         dash_page1_top_bar	= $22c0
+      26 c0         dash_page2_top_bar	= $26c0
+      
+      27 06         speed_addr		= $2706
+      27 08         life_bar_addr		= $2708
+      27 1c         lives_addr		= $271c
+      27 48         phase_addr		= $2748
+      27 4c         score_addr		= $274c
+      27 56         timer_addr		= $2756
+      
+      01 00         dash_cache		= $0100
+      
+                    dash_top_bar_tile 	EQM $ad
+      
+      
+                dashboard_init: subroutine
+      
+cf65  a9 ff         lda #$ff
+cf67  85 43         sta dashboard_message
+      
+                    ; fill nametable 2 with HUB bg color
+                    PPU_SETADDR $27c0
+cf69  a9 27         lda #>$27c0
+cf6b  8d 06 20      sta PPU_ADDR
+cf6e  a9 c0         lda #<$27c0
+cf70  8d 06 20      sta PPU_ADDR
+cf73  a9 ff         lda #%11111111
+cf75  a2 c0         ldx #$c0
+                .23f0_loop
+cf77  8d 07 20      sta PPU_DATA
+cf7a  e8            inx
+cf7b  d0 fa         bne .23f0_loop
+      
+                    ; COLOR SPLIT
+                    ; set split color attr for top row
+                    PPU_SETADDR $27e8
+cf7d  a9 27         lda #>$27e8
+cf7f  8d 06 20      sta PPU_ADDR
+cf82  a9 e8         lda #<$27e8
+cf84  8d 06 20      sta PPU_ADDR
+cf87  a9 f1         lda #%11110001
+cf89  a2 f8         ldx #$f8
+                .27e8_loop
+cf8b  8d 07 20      sta PPU_DATA
+cf8e  e8            inx
+cf8f  d0 fa         bne .27e8_loop
+      
+      
+      
+                    ; fill page 2 dashboard top row
+                    PPU_SETADDR dash_page2_top_bar
+cf91  a9 26         lda #>dash_page2_top_bar
+cf93  8d 06 20      sta PPU_ADDR
+cf96  a9 c0         lda #<dash_page2_top_bar
+cf98  8d 06 20      sta PPU_ADDR
+cf9b  a9 ad         lda #dash_top_bar_tile
+cf9d  a0 20         ldy #$20
+                .set_top_bar
+cf9f  8d 07 20      sta PPU_DATA
+cfa2  88            dey
+cfa3  d0 fa         bne .set_top_bar
+      
+                    ; fill page 2 dashboard tiles
+cfa5  a2 00         ldx #$00
+                .dashboard_fill_tiles
+cfa7  bd c6 cf      lda dashboard_bg_tiles,x
+cfaa  8d 07 20      sta PPU_DATA
+cfad  e8            inx
+cfae  e0 a0         cpx #$a0
+cfb0  d0 f5         bne .dashboard_fill_tiles
+cfb2  a2 00         ldx #$00
+                .dash_cache_fill
+cfb4  bd e6 cf      lda dashboard_bg_tiles+$20,x
+cfb7  9d 00 01      sta dash_cache,x
+cfba  bd 26 d0      lda dashboard_bg_tiles+$60,x
+cfbd  9d 20 01      sta dash_cache+$20,x
+cfc0  e8            inx
+cfc1  e0 20         cpx #$20
+cfc3  d0 ef         bne .dash_cache_fill
+cfc5  60            rts
+      
+      
+      
+                dashboard_bg_tiles:
+                    ; row 0 is top bar
+                    ; row 1 : top hud frames
+cfc6  hex           b4b4bcbcbcbcbcbe
+cfce  hex           bcbcbcbcbcbcbcbc
+cfd6  hex           bcbcbcbcbcbcbcbc
+cfde  hex           bebcbcbcbcbcbdb4
+                    ; row 2 : health, meter, lives
+cfe6  hex           b4b0
+cfe8  byte          #char_set_S
+cfe9  hex           a8a9aa
+cfec  hex           ffb3
+cfee  hex           ffffffffffffffff
+cff6  hex           ffffffffffffffff
+cffe  hex           b3aeaf
+d001  byte          #char_set_x
+d002  hex           30b1b2b6
+                    ; row 3 : middle hud frames
+d006  hex           b4b8b9b9b9b9b9b7
+d00e  hex           b9b9bfbbb9b9b9b9
+d016  hex           b9b9b9b9bfbbb9b9
+d01e  hex           b7b9b9b9b9b9bab4
+                    ; row 4 : wave, score, time
+d026  hex           b4b0
+d028  byte          #char_set_P,#char_set_H,#char_set_A
+d02b  byte          #char_set_S,#char_set_E,#tile_empty
+d02e  hex           ffffb2b6ffffffff
+d036  hex           ffffffffb2b0ffff
+d03e  hex           ffffffffffffb2b4
+                    ; row 5 : bottom hud frames
+d046  hex           b4b4b5b5b5b5b5b5
+d04e  hex           b5b5b6b4b5b5b5b5
+d056  hex           b5b5b5b5b6b4b5b5
+d05e  hex           b5b5b5b5b5b5b6b6
+      
+      
+      
+      
+                    dashboard_message_set: subroutine
+                    ; set y for message start offset
+d066  a2 00         ldx #$00
+                .loop
+d068  b9 f2 c1      lda dashboard_messages,y
+d06b  9d 08 01      sta dash_cache+$08,x
+d06e  c8            iny
+d06f  e8            inx
+d070  e0 10         cpx #$10
+d072  d0 f4         bne .loop
+d074  60            rts
+      
+      
+      
+      
+                    ; RENDER DASH STATS TO SCREEN
+                dashboard_render: subroutine
+                    ; top hud info row
+                    PPU_SETADDR $2706 ; PPU_SETADDR is 12 cycles
+d075  a9 27         lda #>$2706
+d077  8d 06 20      sta PPU_ADDR
+d07a  a9 06         lda #<$2706
+d07c  8d 06 20      sta PPU_ADDR
+d07f  a2 06         ldx #$06
+                .top_row_loop
+d081  bd 00 01      lda dash_cache,x
+d084  8d 07 20      sta PPU_DATA
+d087  e8            inx
+d088  e0 1e         cpx #$1e
+d08a  d0 f5         bne .top_row_loop
+      
+                .lives
+                    PPU_SETADDR lives_addr
+d08c  a9 27         lda #>lives_addr
+d08e  8d 06 20      sta PPU_ADDR
+d091  a9 1c         lda #<lives_addr
+d093  8d 06 20      sta PPU_ADDR
+d096  a5 0c         lda player_lives
+d098  20 c3 c1      jsr get_char_hi
+d09b  8d 07 20      sta PPU_DATA
+d09e  a5 0c         lda player_lives
+d0a0  20 cb c1      jsr get_char_lo
+d0a3  8d 07 20      sta PPU_DATA
+      
+                    ; bottom hud info row
+                    PPU_SETADDR $2748
+d0a6  a9 27         lda #>$2748
+d0a8  8d 06 20      sta PPU_ADDR
+d0ab  a9 48         lda #<$2748
+d0ad  8d 06 20      sta PPU_ADDR
+d0b0  a2 08         ldx #$08
+                .bottom_row_loop
+d0b2  bd 20 01      lda dash_cache+$20,x
+d0b5  8d 07 20      sta PPU_DATA
+d0b8  e8            inx
+d0b9  e0 1e         cpx #$1e
+d0bb  d0 f5         bne .bottom_row_loop
+d0bd  60            rts
+      
+      
+      
+                dashboard_gauges_table:
+d0be  byte          phase_kill_counter
+d0bf  byte          player_frag_counter
+d0c0  byte          player_x_hi
+d0c1  byte          player_y_hi
+      
+      
+                    ; GET DASH UPDATES READY TO RENDER
+                dashboard_update: subroutine
+      
+                    ; player speed
+d0c2  a5 1a         lda player_speed
+d0c4  18            clc
+d0c5  69 61         adc #char_set_offset+1
+d0c7  8d 06 01      sta $0100+6
+      
+                    ; LIFEBARF
+d0ca  a4 43         ldy dashboard_message
+d0cc  30 06         bmi .lifebarf_is_live
+d0ce  20 66 d0      jsr dashboard_message_set
+d0d1  4c 0c d1      jmp .no_lifebar
+      
+                .lifebarf_is_live
+                    ; 64 health lines on screen
+                    ; 16 tiles across
+                    ; 256 possible values
+                    ; displaying 1/4th the range
+      
+d0d4  a0 00         ldy #$00
+      
+d0d6  a9 3c         lda #$3c ; #60 (4 less than max)
+d0d8  85 86         sta temp00 ; life value floor for tile
+      
+d0da  a5 0b         lda player_health
+d0dc  4a            lsr
+d0dd  4a            lsr
+d0de  85 87         sta temp01 ; life / 4 aka 0..63
+                .find_top_tile
+d0e0  a5 87         lda temp01
+d0e2  c5 86         cmp temp00
+d0e4  b0 0f         bcs .top_tile_found ; life > tile floor value
+d0e6  a5 86         lda temp00
+d0e8  38            sec
+d0e9  e9 04         sbc #$04
+d0eb  85 86         sta temp00
+d0ed  a9 03         lda #tile_empty
+d0ef  99 08 01      sta dash_cache+$08,y
+d0f2  c8            iny
+d0f3  d0 eb         bne .find_top_tile
+                .top_tile_found
+d0f5  a5 87         lda temp01
+d0f7  38            sec
+d0f8  e5 86         sbc temp00
+d0fa  18            clc
+d0fb  69 a4         adc #$a4
+d0fd  99 08 01      sta dash_cache+$08,y
+                .fill_remaining_tiles
+d100  c8            iny
+d101  c0 10         cpy #$10
+d103  f0 07         beq .no_lifebar
+d105  a9 a7         lda #$a7 ; full tile
+d107  99 08 01      sta dash_cache+$08,y
+d10a  d0 f4         bne .fill_remaining_tiles
+                .no_lifebar
+      
+      
+                    ; PHASE
+d10c  a5 5a         lda phase_current
+d10e  20 c3 c1      jsr get_char_hi
+d111  8d 28 01      sta dash_cache+$28
+d114  a5 5a         lda phase_current
+d116  20 cb c1      jsr get_char_lo
+d119  8d 29 01      sta dash_cache+$29
+      
+      
+                    ; GAUGES
+                    ; used to be scoreboard
+      
+                    ; phase_kill_counter
+                    ; player_frag_counter
+                    ; player_x_hi
+                    ; player_y_hi
+      
+d11c  a2 07         ldx #$07
+d11e  a0 03         ldy #$03
+                .guages_display_loop
+d120  86 86         stx temp00
+d122  be be d0      ldx dashboard_gauges_table,y
+d125  b5 00         lda $0000,x
+d127  85 87         sta temp01
+d129  a6 86         ldx temp00
+d12b  20 cb c1      jsr get_char_lo
+d12e  9d 2c 01      sta dash_cache+$2c,x
+d131  a5 87         lda temp01
+d133  20 c3 c1      jsr get_char_hi
+d136  ca            dex
+d137  9d 2c 01      sta dash_cache+$2c,x
+d13a  ca            dex
+d13b  88            dey
+d13c  10 e2         bpl .guages_display_loop
+      
+      
+                    ; TIMER
+                .timer
+                    ; make sure player has lives / not game over
+d13e  a5 0c         lda player_lives
+d140  c9 00         cmp #$00
+d142  f0 2e         beq .timer_done
+                    ; make sure player hasn't finished the game
+d144  a5 63         lda phase_end_game
+d146  c9 01         cmp #$01
+d148  f0 28         beq .timer_done
+                    ; we good to update the visual timer
+d14a  a5 49         lda timer_minutes_10s
+d14c  8d 36 01      sta dash_cache+$36
+d14f  a5 48         lda timer_minutes_1s
+d151  8d 37 01      sta dash_cache+$37
+                    ; colon
+d154  a9 ac         lda #char_set_colon
+d156  8d 38 01      sta dash_cache+$38
+d159  a5 47         lda timer_seconds_10s
+d15b  8d 39 01      sta dash_cache+$39
+d15e  a5 46         lda timer_seconds_1s
+d160  8d 3a 01      sta dash_cache+$3a
+                    ; period
+d163  a9 99         lda #char_set_period
+d165  8d 3b 01      sta dash_cache+$3b
+d168  a5 45         lda timer_frames_10s
+d16a  8d 3c 01      sta dash_cache+$3c
+d16d  a5 44         lda timer_frames_1s
+d16f  8d 3d 01      sta dash_cache+$3d
+                .timer_done
+      
+d172  60            rts
+      

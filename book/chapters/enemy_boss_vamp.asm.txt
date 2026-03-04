@@ -1,0 +1,467 @@
+      
+      
+                    ; things the bat entities need to know
+                    ; boss_x  : center offset
+                    ; boss_y  : center offset
+                    ; state_v0 : state
+                    ; state_v1 : spawn x to target
+                    ; state_v2 : x sine position
+                    ; state_v3 : mouth position ( 0 = closed ; < 8 midframe ; > 8 open )
+                    ; state_v4 : bat circle size / other states counter
+                    ; state_v5 : bat visibility
+                    ; state_v6 : rng target
+                    ; state_v7 : mouth frame current
+                    ; enemy_ram_pc : mouth frame target
+                    ; enemy_ram_ac : idle_update counter
+                    ; enemy_ram_ex : arctang direction
+      
+      
+      
+                boss_vamp_bat_spawn: subroutine
+                    ; x = bat slot in enemy ram
+df6f  a9 0b         lda #boss_vamp_bat_id
+df71  9d 00 03      sta enemy_ram_type,x
+df74  60            rts
+      
+      
+                boss_vamp_bat_cycle: subroutine
+                    ; bats visible?
+df75  a5 4f         lda state_v5
+df77  f0 69         beq .bats_not_visible
+                    ; collision detection
+df79  a9 08         lda #$08
+df7b  85 3d         sta collision_0_w
+df7d  85 3e         sta collision_0_h
+df7f  20 eb db      jsr enemy_handle_damage_and_death
+      
+                    ; update x pos
+df82  bd 07 03      lda enemy_ram_ex,x
+df85  85 87         sta temp01 ; position on circle
+df87  a5 4e         lda state_v4
+df89  dd 05 03      cmp enemy_ram_ac,x
+df8c  90 0c         bcc .use_vamp_circle_size
+df8e  bd 05 03      lda enemy_ram_ac,x
+df91  fe 05 03      inc enemy_ram_ac,x
+df94  fe 05 03      inc enemy_ram_ac,x
+df97  fe 05 03      inc enemy_ram_ac,x
+                .use_vamp_circle_size
+df9a  85 88         sta temp02 ; size of circle
+df9c  4a            lsr
+df9d  85 89         sta temp03 ; half of circle size
+df9f  a5 88         lda temp02
+dfa1  a6 87         ldx temp01
+dfa3  20 ad d4      jsr sine_of_scale
+dfa6  18            clc
+dfa7  65 7d         adc boss_x
+dfa9  38            sec
+dfaa  e5 89         sbc temp03
+dfac  a6 76         ldx enemy_ram_offset
+dfae  99 03 02      sta oam_ram_x,y
+                    ; update y pos
+dfb1  a5 87         lda temp01
+dfb3  18            clc
+dfb4  69 40         adc #$40
+dfb6  aa            tax
+dfb7  a5 88         lda temp02
+dfb9  20 ad d4      jsr sine_of_scale
+dfbc  18            clc
+dfbd  65 7e         adc boss_y
+dfbf  38            sec
+dfc0  e5 89         sbc temp03
+dfc2  a6 76         ldx enemy_ram_offset
+dfc4  99 00 02      sta oam_ram_y,y
+                    ; interpret animation frame
+dfc7  bd 07 03      lda enemy_ram_ex,x
+dfca  4a            lsr
+dfcb  4a            lsr
+dfcc  29 03         and #%00000011
+dfce  18            clc
+dfcf  69 38         adc #$38
+dfd1  99 01 02      sta oam_ram_spr,y
+                    ; palette
+dfd4  ad be 03      lda $03be ; use vamp hc
+dfd7  9d 06 03      sta enemy_ram_hc,x
+dfda  a9 02         lda #$02
+dfdc  20 39 dc      jsr enemy_set_palette
+                .done
+dfdf  4c 92 db      jmp update_enemies_handler_next
+      
+                .bats_not_visible
+dfe2  a9 ff         lda #$ff
+dfe4  99 00 02      sta oam_ram_y,y
+dfe7  d0 f6         bne .done
+      
+      
+      
+                    ; I VANT TO
+                    ; SUCK YOUR
+                    ; BLEEDS !!
+                boss_vamp_spawn: subroutine
+                    ; claim eyeball slot
+dfe9  a9 03         lda #boss_assist_id
+dfeb  8d d8 03      sta $03d8
+                    ; clear eyeball slot sprites
+dfee  a9 f0         lda #$f0 ; y pos of metasprite
+dff0  a8            tay ; happens to match oam offset
+dff1  20 ef da      jsr sprite_4_set_y
+                    ; set eye color
+dff4  a9 02         lda #$02
+dff6  85 7f         sta boss_eyes_pal
+                    ; set spawn x
+dff8  a9 a0         lda #$a0
+dffa  85 4c         sta state_v2
+                    ; set spawn y
+dffc  a9 15         lda #$15
+dffe  9d 03 03      sta enemy_ram_y,x
+                    ; bats are visible
+e001  a9 01         lda #$01
+e003  85 4f         sta state_v5
+                    ; minimum bat circle size
+e005  a9 40         lda #$40
+e007  85 4e         sta state_v4
+                    ; rando target
+e009  a9 80         lda #$80
+e00b  85 50         sta state_v6
+                    ; target count of bat underlings;
+                    ; #$0d = 13 but we `bpl loopin`
+e00d  a0 0c         ldy #$0c
+e00f  85 86         sta temp00
+                    ; set temp counters to 0
+e011  a9 00         lda #$00
+e013  85 87         sta temp01
+e015  85 88         sta temp02
+                .bat_spawn_loop
+                    ; a = animation counter / v1
+                    ; x = slot in enemy ram
+e017  a5 87         lda temp01
+e019  a6 88         ldx temp02
+e01b  9d 07 03      sta enemy_ram_ex,x
+e01e  18            clc
+e01f  69 14         adc #$14
+e021  85 87         sta temp01
+e023  a9 08         lda #$08
+e025  65 88         adc temp02
+e027  85 88         sta temp02
+e029  88            dey
+e02a  10 eb         bpl .bat_spawn_loop
+                .done
+e02c  60            rts
+      
+      
+      
+                boss_vamp_cycle: subroutine
+e02d  a9 0d         lda #$0d
+e02f  85 3d         sta collision_0_w
+e031  a9 10         lda #$10
+e033  85 3e         sta collision_0_h
+      
+e035  e6 7a         inc boss_dmg_handle_true
+e037  20 eb db      jsr enemy_handle_damage_and_death
+e03a  c6 7a         dec boss_dmg_handle_true
+                    ; IS DEAD?
+e03c  a5 7b         lda boss_death_happening
+e03e  f0 1b         beq .not_dead
+e040  c9 02         cmp #$02
+e042  f0 17         beq .bats_spawned
+e044  e6 4f         inc state_v5 ; bats are visible
+e046  a9 56         lda #$56
+e048  85 4e         sta state_v4 ; bat circle size
+e04a  85 51         sta state_v7 ; mouf open
+                    ; track bats are gonna spawn
+e04c  e6 7b         inc boss_death_happening
+e04e  b9 03 02      lda oam_ram_x,y
+e051  85 7d         sta boss_x
+e053  b9 00 02      lda oam_ram_y,y
+e056  85 7e         sta boss_y
+                    ; reset enemy handler so bats show
+e058  4c 64 db      jmp update_enemies_reset
+                .bats_spawned
+                .not_dead
+      
+                    ; MOUTH HANDLER
+                    ; state_v7 : mouth frame current
+                    ; enemy_ram_pc : mouth frame target
+e05b  a5 51         lda state_v7
+e05d  dd 04 03      cmp enemy_ram_pc,x
+e060  f0 08         beq .mouth_is_fine
+e062  b0 04         bcs .mouth_close
+                .mouth_open
+e064  e6 51         inc state_v7
+e066  d0 02         bne .mouth_is_fine
+                .mouth_close
+e068  c6 51         dec state_v7
+                .mouth_is_fine
+      
+                    ; STATE behavior
+e06a  20 aa e0      jsr boss_vamp_update_state_delegator
+e06d  a6 76         ldx enemy_ram_offset
+      
+                    ; SPRITE tiles
+e06f  a5 51         lda state_v7
+e071  4a            lsr
+e072  4a            lsr
+e073  4a            lsr
+e074  29 03         and #$03
+e076  c9 03         cmp #$03
+e078  d0 02         bne .good_frame
+e07a  a9 02         lda #$02
+                .good_frame
+e07c  0a            asl
+e07d  18            clc
+e07e  69 9a         adc #$9a
+e080  20 b7 da      jsr sprite_4_set_sprite
+      
+                    ; palette
+e083  a9 01         lda #$01
+e085  20 9d da      jsr sprite_4_set_palette
+e088  d0 04         bne .not_hit
+e08a  a9 80         lda #$80
+e08c  85 51         sta state_v7
+                .not_hit
+      
+                    ; eyeballs
+e08e  b9 03 02      lda oam_ram_x,y
+e091  18            clc
+e092  69 03         adc #$03
+e094  85 86         sta temp00
+e096  b9 00 02      lda oam_ram_y,y
+e099  85 87         sta temp01
+e09b  b9 01 02      lda oam_ram_spr,y
+e09e  c9 9e         cmp #$9e
+e0a0  d0 02         bne .dont_adjust_for_open_mouth
+e0a2  c6 87         dec temp01
+                .dont_adjust_for_open_mouth
+e0a4  20 b6 e5      jsr enemy_boss_eyes
+      
+e0a7  4c 92 db      jmp update_enemies_handler_next
+      
+      
+      
+      
+                boss_vamp_update_state_delegator:
+e0aa  a5 4a         lda state_v0
+e0ac  18            clc
+e0ad  69 36         adc #boss_vamp_state_jump_table_offset
+e0af  85 86         sta temp00
+e0b1  4c f1 c4      jmp jump_to_subroutine
+      
+      
+      
+      
+      
+                boss_vamp_calc_boss_x_y: subroutine
+                    ; calc x
+e0b4  a5 4c         lda state_v2 ; x sine
+e0b6  4a            lsr
+e0b7  a8            tay
+e0b8  bd 02 03      lda enemy_ram_x,x
+e0bb  18            clc
+e0bc  79 00 05      adc sine_6bits,y
+e0bf  85 7d         sta boss_x
+e0c1  a4 77         ldy enemy_oam_offset
+e0c3  20 df da      jsr sprite_4_set_x
+e0c6  a5 7d         lda boss_x
+e0c8  18            clc
+e0c9  69 04         adc #$04 ; add half of vampire size and subtract half of bat size?
+e0cb  85 7d         sta boss_x
+                    ; calc y
+e0cd  bd 05 03      lda enemy_ram_ac,x
+e0d0  aa            tax
+e0d1  bd 00 fe      lda sine_table,x
+e0d4  4a            lsr
+e0d5  a6 76         ldx enemy_ram_offset
+e0d7  18            clc
+e0d8  7d 03 03      adc enemy_ram_y,x
+e0db  85 7e         sta boss_y
+e0dd  20 ef da      jsr sprite_4_set_y
+e0e0  a5 7e         lda boss_y
+e0e2  18            clc
+e0e3  69 0a         adc #$0a ; add half of vampire size and subtract half of bat size?
+e0e5  85 7e         sta boss_y
+e0e7  60            rts
+      
+      
+      
+                boss_vamp_state_idle_update: subroutine
+                    ; update x home pos
+e0e8  bd 02 03      lda enemy_ram_x,x
+e0eb  c9 40         cmp #$40
+e0ed  b0 05         bcs .dont_inc_x
+e0ef  fe 02 03      inc enemy_ram_x,x
+e0f2  e6 4b         inc state_v1
+                .dont_inc_x
+                .done_with_x
+                    ; update x pos sine offset
+e0f4  18            clc
+e0f5  a9 03         lda #$03
+e0f7  65 4c         adc state_v2
+e0f9  85 4c         sta state_v2
+e0fb  20 b4 e0      jsr boss_vamp_calc_boss_x_y
+                .next_state_check
+e0fe  fe 05 03      inc enemy_ram_ac,x
+e101  bd 05 03      lda enemy_ram_ac,x
+e104  c5 50         cmp state_v6
+e106  d0 06         bne .dont_inc_state
+                .setup_next_state
+e108  a5 26         lda rng0
+e10a  85 50         sta state_v6
+e10c  e6 4a         inc state_v0
+                .dont_inc_state
+e10e  bd 05 03      lda enemy_ram_ac,x
+e111  0a            asl
+e112  0a            asl
+e113  c9 80         cmp #$80
+e115  b0 05         bcs .shrink_bat_circle
+                .grow_bat_circle
+e117  e6 4e         inc state_v4
+e119  4c 1e e1      jmp .bat_circle_adjust_done
+                .shrink_bat_circle
+e11c  c6 4e         dec state_v4
+                .bat_circle_adjust_done
+                    ; BAT UPDATE LOOP
+e11e  a9 00         lda #$00
+e120  85 86         sta temp00
+                .bat_update_loop
+e122  a6 86         ldx temp00
+                    ; update circle position
+e124  fe 07 03      inc enemy_ram_ex,x
+                    ; respawn if slot is empty
+e127  bd 00 03      lda enemy_ram_type,x
+e12a  d0 07         bne .dont_respawn_bat
+e12c  20 6f df      jsr boss_vamp_bat_spawn
+e12f  a9 20         lda #$20
+e131  85 51         sta state_v7
+                .dont_respawn_bat
+e133  a9 08         lda #$08
+e135  18            clc
+e136  65 86         adc temp00
+e138  85 86         sta temp00
+e13a  c9 68         cmp #$68
+e13c  d0 e4         bne .bat_update_loop
+e13e  60            rts
+      
+      
+                boss_vamp_state_suck_bats: subroutine
+                    ; open mouth
+e13f  a9 40         lda #$40
+e141  9d 04 03      sta enemy_ram_pc,x
+e144  a9 10         lda #$10
+e146  85 51         sta state_v7
+e148  a5 4e         lda state_v4
+e14a  38            sec
+e14b  e9 05         sbc #$05
+e14d  85 4e         sta state_v4
+e14f  b0 12         bcs .done
+                .setup_next_state
+e151  e6 4a         inc state_v0 ; next state
+e153  a9 00         lda #$00
+e155  85 4e         sta state_v4
+e157  c6 4f         dec state_v5 ; hide bats
+e159  b9 03 02      lda oam_ram_x,y
+e15c  85 7d         sta boss_x
+e15e  b9 00 02      lda oam_ram_y,y
+e161  85 7e         sta boss_y
+                .done
+e163  60            rts
+      
+      
+                boss_vamp_state_shake: subroutine
+                    ; close mouth
+e164  a9 00         lda #$00
+e166  9d 04 03      sta enemy_ram_pc,x
+                    ; x shake
+e169  20 66 c1      jsr shake_8
+e16c  65 7d         adc boss_x
+e16e  20 df da      jsr sprite_4_set_x
+                    ; y shake
+e171  20 66 c1      jsr shake_8
+e174  65 7e         adc boss_y
+e176  20 ef da      jsr sprite_4_set_y
+                    ; counter
+e179  e6 4e         inc state_v4
+e17b  a9 0f         lda #15
+e17d  c5 4e         cmp state_v4
+e17f  b0 0c         bcs .done
+                .setup_next_state
+                    ; next state
+e181  e6 4a         inc state_v0
+                    ; reset v4 counter
+e183  a9 00         lda #$00
+e185  85 4e         sta state_v4
+                    ; load arctang dir into v6
+e187  20 12 ce      jsr enemy_get_direction_of_player
+e18a  9d 07 03      sta enemy_ram_ex,x
+                .done
+e18d  60            rts
+      
+                boss_vamp_state_lunge: subroutine
+e18e  a9 80         lda #<arctang_velocity_6.66
+e190  85 84         sta arctang_velocity_lo
+e192  20 f6 ce      jsr arctang_enemy_update
+e195  a4 77         ldy enemy_oam_offset
+e197  b9 03 02      lda oam_ram_x,y
+e19a  20 df da      jsr sprite_4_set_x
+e19d  b9 00 02      lda oam_ram_y,y
+e1a0  20 ef da      jsr sprite_4_set_y
+e1a3  e6 4e         inc state_v4
+e1a5  a9 14         lda #$14
+e1a7  c5 4e         cmp state_v4
+e1a9  b0 0f         bcs .done
+                .setup_next_state
+e1ab  bd 07 03      lda enemy_ram_ex,x
+e1ae  38            sec
+e1af  e9 0c         sbc #12
+e1b1  b0 02         bcs .valid_range
+e1b3  69 18         adc #24
+                .valid_range
+e1b5  9d 07 03      sta enemy_ram_ex,x
+e1b8  e6 4a         inc state_v0
+                .done
+e1ba  60            rts
+      
+                boss_vamp_state_retreat: subroutine
+e1bb  a9 80         lda #<arctang_velocity_6.66
+e1bd  85 84         sta arctang_velocity_lo
+e1bf  20 f6 ce      jsr arctang_enemy_update
+e1c2  a4 77         ldy enemy_oam_offset
+e1c4  b9 03 02      lda oam_ram_x,y
+e1c7  20 df da      jsr sprite_4_set_x
+e1ca  b9 00 02      lda oam_ram_y,y
+e1cd  20 ef da      jsr sprite_4_set_y
+e1d0  c6 4e         dec state_v4
+e1d2  d0 1e         bne .done
+                .setup_next_state
+e1d4  e6 4a         inc state_v0
+e1d6  a9 00         lda #$00
+e1d8  85 4e         sta state_v4
+e1da  e6 4f         inc state_v5 ; show bats
+e1dc  a5 4b         lda state_v1 ; x home on the way to #$60
+e1de  9d 02 03      sta enemy_ram_x,x
+e1e1  a9 15         lda #$15
+e1e3  9d 03 03      sta enemy_ram_y,x
+e1e6  20 b4 e0      jsr boss_vamp_calc_boss_x_y
+                    ; open mouth then close
+                    ; state_v7 : mouth frame current
+                    ; enemy_ram_pc : mouth frame target
+e1e9  a9 00         lda #$00
+e1eb  9d 04 03      sta enemy_ram_pc,x
+e1ee  a9 20         lda #$20
+e1f0  85 51         sta state_v7
+                .done
+e1f2  60            rts
+      
+      
+                boss_vamp_state_blow_bats: subroutine
+e1f3  e6 4e         inc state_v4
+e1f5  e6 4e         inc state_v4
+e1f7  e6 4e         inc state_v4
+e1f9  a9 40         lda #$40
+e1fb  c5 4e         cmp state_v4
+e1fd  b0 04         bcs .done
+                .setup_next_state
+e1ff  a9 00         lda #$00
+e201  85 4a         sta state_v0
+                .done
+e203  60            rts
+      
+      

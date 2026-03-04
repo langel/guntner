@@ -1,0 +1,70 @@
+      
+                    ;  U     R     D    L
+                spark_dir_x_table:
+ef6e  byte          #$00, #$01, #$00, #$ff
+                spark_dir_y_table:
+ef72  byte          #$ff, #$00, #$01, #$00
+      
+                spark_spawn: subroutine
+                    ; x = slot in enemy ram
+                    ; y = boss slot in enemy ram
+ef76  20 52 c1      jsr get_next_random
+ef79  9d 02 03      sta enemy_ram_x,x
+ef7c  a9 04         lda #4
+ef7e  9d 03 03      sta enemy_ram_y,x
+ef81  a9 00         lda #0
+ef83  9d 07 03      sta enemy_ram_ex,x
+ef86  60            rts
+      
+                spark_cycle: subroutine
+ef87  a9 08         lda #$08
+ef89  85 3d         sta collision_0_w
+ef8b  85 3e         sta collision_0_h
+ef8d  20 eb db      jsr enemy_handle_damage_and_death
+                    ; change direction?
+ef90  a5 24         lda wtf
+ef92  29 07         and #$07
+ef94  d0 12         bne .dont_reset_dir
+                    ; 50% chance of downward movement
+ef96  20 52 c1      jsr get_next_random
+ef99  10 04         bpl .not_hard_down
+ef9b  a9 02         lda #$02
+ef9d  d0 06         bne .set_dir
+                .not_hard_down
+                    ; otherwise random 4 directions
+ef9f  20 52 c1      jsr get_next_random
+efa2  4a            lsr
+efa3  29 03         and #%00000011
+                .set_dir
+efa5  9d 07 03      sta enemy_ram_ex,x
+                .reset_done
+                .dont_reset_dir
+                    ; apply direction
+efa8  bc 07 03      ldy enemy_ram_ex,x
+efab  b9 6e ef      lda spark_dir_x_table,y
+efae  85 86         sta temp00
+efb0  b9 72 ef      lda spark_dir_y_table,y
+efb3  85 87         sta temp01
+efb5  a4 77         ldy enemy_oam_offset
+efb7  bd 02 03      lda enemy_ram_x,x
+efba  18            clc
+efbb  65 86         adc temp00
+efbd  9d 02 03      sta enemy_ram_x,x
+efc0  99 03 02      sta oam_ram_x,y
+efc3  bd 03 03      lda enemy_ram_y,x
+efc6  18            clc
+efc7  65 87         adc temp01
+efc9  20 ff da      jsr enemy_fix_y_visible
+efcc  9d 03 03      sta enemy_ram_y,x
+efcf  99 00 02      sta oam_ram_y,y
+                    ; attributes
+efd2  20 52 c1      jsr get_next_random
+efd5  99 02 02      sta oam_ram_att,y
+                    ; sprite
+efd8  20 52 c1      jsr get_next_random
+efdb  29 03         and #$03
+efdd  18            clc
+efde  69 6c         adc #$6c
+efe0  99 01 02      sta oam_ram_spr,y
+                .done
+efe3  4c 92 db      jmp update_enemies_handler_next

@@ -1,0 +1,69 @@
+      
+                    ; counts in ranges that match numerical tiles
+      
+                timer_update: subroutine
+                    ; UPDATE TIMER DIGITS
+                    ; but not if game is over
+d644  a5 63         lda phase_end_game
+d646  d0 4c         bne .timer_done
+                    ; frames 1s
+d648  e6 44         inc timer_frames_1s
+d64a  a9 6a         lda #char_set_offset+$a
+d64c  c5 44         cmp timer_frames_1s
+d64e  d0 44         bne .timer_done
+d650  a9 60         lda #char_set_offset
+d652  85 44         sta timer_frames_1s
+                    ; frames 10s
+d654  e6 45         inc timer_frames_10s
+d656  a9 66         lda #char_set_offset+$6
+d658  c5 45         cmp timer_frames_10s
+d65a  d0 38         bne .timer_done
+d65c  a9 60         lda #char_set_offset
+d65e  85 45         sta timer_frames_10s
+                    ; seconds 1s
+d660  e6 46         inc timer_seconds_1s
+d662  a9 6a         lda #char_set_offset+$a
+d664  c5 46         cmp timer_seconds_1s
+d666  d0 2c         bne .timer_done
+d668  a9 60         lda #char_set_offset
+d66a  85 46         sta timer_seconds_1s
+                    ; seconds 10s
+d66c  e6 47         inc timer_seconds_10s
+d66e  a9 66         lda #char_set_offset+$6
+d670  c5 47         cmp timer_seconds_10s
+d672  d0 20         bne .timer_done
+d674  a9 60         lda #char_set_offset
+d676  85 47         sta timer_seconds_10s
+                    ; minutes 1s
+d678  e6 48         inc timer_minutes_1s
+d67a  a9 6a         lda #char_set_offset+$a
+d67c  c5 48         cmp timer_minutes_1s
+d67e  d0 14         bne .timer_done
+d680  a9 60         lda #char_set_offset
+d682  85 48         sta timer_minutes_1s
+                    ; minutes 10s
+                    ; we really checking this?
+                    ; let it go into tile limbo
+                    ; GAME OVER at 99:59.59 !!
+d684  e6 49         inc timer_minutes_10s
+d686  a5 47         lda timer_seconds_10s
+d688  c9 6a         cmp #char_set_offset+$a
+d68a  d0 08         bne .timer_done
+d68c  a9 00         lda #$00
+d68e  85 0b         sta player_health
+d690  a9 01         lda #$01
+d692  85 0c         sta player_lives
+                .timer_done
+d694  60            rts
+      
+      
+      
+                    timer_reset: subroutine
+d695  a9 60         lda #char_set_offset
+d697  85 44         sta timer_frames_1s
+d699  85 45         sta timer_frames_10s
+d69b  85 46         sta timer_seconds_1s
+d69d  85 47         sta timer_seconds_10s
+d69f  85 48         sta timer_minutes_1s
+d6a1  85 49         sta timer_minutes_10s
+d6a3  60            rts

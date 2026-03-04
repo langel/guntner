@@ -1,0 +1,324 @@
+      
+      00 e7         palette_cache EQU $e7
+      
+      
+                    ;Palette00:  ; 25 bytes
+      
+                    ; hex 0f  ;screen color
+                    ; hex 022830 ;background 0
+                    ;   hex 071624 ;background 1
+                    ;   hex 02113c ;background 2
+                    ;   hex 0b1a3b ;background 3
+                    ;   hex 192939 ;sprite 0 ; rudy
+                    ;   hex 132130 ;sprite 1; old birb palete
+                    ;  ;hex 051637 ; chomps
+                    ;hex 122130 ; vamp eyes & bats
+                    ;hex 071727 ;sprite 2
+                    ;   hex 150037 ; vamp head/face
+                    ;   hex 013530 ;sprite 3 ; starglasses ; crossbones
+      
+      
+                    ; bg 0 - stars bg_tiles 1 / title screen
+                    ; bg 1 - stars bg_tiles 2
+                    ; bg 2 - n/a  (bg enemies haha)
+                    ; bg 3 - dashboard / options screen
+                    ; spr 0 - player
+                    ; spr 1 - enemy / darts
+                    ; spr 2 - enemy / stars sprites 1
+                    ; spr 3 - enemy / powerups / stars sprite 2
+      
+      
+                    ; level palettes
+                    ; spr 1, 2 and 3
+                    ; boss palettes
+                    ; spr 1 and 2
+      
+      
+                palette_table:
+                    ; #00 end bad
+d173  byte          #$0f, #$30, #$27
+                    ; #03 end ok
+d176  byte          #$0f, #$10, #$30
+                    ; #06 end good
+d179  byte          #$0a, #$37, #$27
+                    ; #09 end alien
+d17c  byte          #$3c, #$1c, #$24
+                    ; #12 intro bg
+d17f  byte          #$0c, #$30, #$3c
+                    ; #15 intro alien
+d182  byte          #$04, #$1b, #$37
+                    ; #18 title screen
+d185  byte          #$02, #$27, #$34
+                    ; #21 level 0 palettes (and attract mode)
+d188  hex           13 21 30
+d18b  hex           07 17 27
+d18e  hex           01 35 30
+                    ; #30 level 1 palettes
+d191  hex           06 16 38
+d194  hex           0b 18 39
+d197  hex           08 32 20
+                    ; #39 level 2 palettes
+d19a  hex           0c 2d 32
+d19d  hex           13 25 37
+d1a0  hex           09 27 10
+                    ; #48 level 3 palettes
+d1a3  hex           2d 10 30
+d1a6  hex           12 23 37
+d1a9  hex           07 17 27
+                    ; #57 boss
+                    ; moufs palettes
+d1ac  hex           04 16 20
+d1af  hex           02 07 38
+                    ; #63 boss
+                    ; vamp+bats palettes
+d1b2  hex           15 2d 37
+d1b5  hex           02 11 30
+                    ; #69 boss
+                    ; scarab palettes
+d1b8  hex           0c 27 37
+d1bb  hex           03 1a 39
+                    ; #75 boss
+                    ; swordtner palettes
+d1be  hex           07 17 3d
+d1c1  hex           11 2d 31
+                    ; #81 bookbinder
+d1c4  hex           0f 00 37
+      
+                palette_level_offset_table:
+d1c7  byte          #21, #30, #39, #48
+                palette_boss_offset_table:
+d1cb  byte          #57, #63, #69, #75
+      
+                palette_load:
+                    ; x = palette table offset
+                    ; y = pal ram offset
+                    ; loads 1 set of 3 colors
+                    ; not used to write to main bg color
+d1cf  a9 02         lda #$02
+d1d1  85 86         sta temp00
+                .loader_loop
+d1d3  bd 73 d1      lda palette_table,x
+d1d6  99 91 00      sta pal_uni_bg+1,y
+d1d9  e8            inx
+d1da  c8            iny
+d1db  c6 86         dec temp00
+d1dd  10 f4         bpl .loader_loop
+d1df  60            rts
+      
+      
+      
+      
+      
+      
+                palette_next_rainbow_color: subroutine
+                    ; a = current and return color
+d1e0  85 86         sta temp00
+d1e2  e6 86         inc temp00
+d1e4  a5 86         lda temp00
+d1e6  29 0f         and #$0f
+d1e8  c9 0d         cmp #$0d
+d1ea  10 03         bpl .wrap
+d1ec  a5 86         lda temp00
+d1ee  60            rts
+                .wrap
+d1ef  a5 86         lda temp00
+d1f1  38            sec
+d1f2  e9 0c         sbc #$0c
+d1f4  60            rts
+      
+      
+                bomb_bg_animation_table:
+d1f5  byte          $0f,$07,$06,$05,$16,$26,$27,$28,$37,$38,$30
+      
+      
+                palette_update: subroutine
+                    ; shroom
+d200  a5 6c         lda shroom_counter
+d202  f0 14         beq .no_shroom_effect
+d204  a5 24         lda wtf
+d206  29 03         and #$03
+d208  d0 0e         bne .no_shroom_effect
+d20a  a0 0e         ldy #$0e
+                .shroom_loop
+d20c  b9 9a 00      lda pal_bg_3_1,y
+d20f  20 e0 d1      jsr palette_next_rainbow_color
+d212  99 9a 00      sta pal_bg_3_1,y
+d215  88            dey
+d216  10 f4         bpl .shroom_loop
+                .no_shroom_effect
+                    ; fade in
+d218  a5 8d         lda state_fade_in
+d21a  f0 03         beq .dont_fade_in
+d21c  4c 5b d2      jmp palette_fade_in_update
+                .dont_fade_in
+                    ; fade out
+d21f  a5 8e         lda state_fade_out
+d221  f0 03         beq .dont_fade_out
+d223  4c 91 d2      jmp palette_fade_out_update
+                .dont_fade_out
+                    ; fade from white
+d226  a5 8f         lda state_from_white
+d228  f0 03         beq .dont_fade_from_white
+d22a  4c bb d2      jmp palette_fade_from_white_update
+                .dont_fade_from_white
+                    ; bomb
+d22d  a5 6a         lda bomb_counter
+d22f  f0 08         beq .normal_bg
+d231  4a            lsr
+d232  4a            lsr
+d233  aa            tax
+d234  bd f5 d1      lda bomb_bg_animation_table,x
+d237  85 90         sta pal_uni_bg
+                .normal_bg
+                    ; do normal
+d239  a0 19         ldy #25
+                .loop
+d23b  b9 90 00      lda pal_uni_bg,y
+d23e  99 e7 00      sta palette_cache,y
+d241  88            dey
+d242  10 f7         bpl .loop
+d244  60            rts
+      
+      
+                palette_state_reset:
+d245  a9 00         lda #$00
+d247  85 8d         sta state_fade_in
+d249  85 8e         sta state_fade_out
+d24b  85 8f         sta state_from_white
+d24d  60            rts
+      
+      
+                palette_fade_in_init: subroutine
+                    ; make sure we're not already fading out
+d24e  a5 8e         lda state_fade_out
+d250  d0 08         bne .init_skip
+                .init_fade
+d252  a9 00         lda #$00
+d254  85 8a         sta pal_fade_c ; frame counter
+d256  a9 ff         lda #$ff
+d258  85 8d         sta state_fade_in
+                .init_skip
+d25a  60            rts
+      
+                palette_fade_in_update: subroutine
+d25b  a5 8a         lda pal_fade_c
+d25d  29 30         and #%00110000
+d25f  49 30         eor #%00110000
+d261  85 8b         sta pal_fade_offset
+d263  a2 17         ldx #23
+                .loop
+d265  b5 90         lda pal_uni_bg,x
+d267  38            sec
+d268  e5 8b         sbc pal_fade_offset
+d26a  10 02         bpl .dont_set_black
+d26c  a9 0f         lda #$0f
+                .dont_set_black
+d26e  95 e7         sta palette_cache,x
+d270  ca            dex
+d271  10 f2         bpl .loop
+d273  a5 8a         lda pal_fade_c
+d275  18            clc
+d276  69 03         adc #$03
+d278  c9 40         cmp #$40
+d27a  90 03         bcc .fade_mode_not_done
+d27c  20 45 d2      jsr palette_state_reset
+                .fade_mode_not_done
+d27f  85 8a         sta pal_fade_c
+d281  60            rts
+      
+      
+                    ; fade out leads to forced tansition and new state
+                palette_fade_out_init: subroutine
+                    ; a = init callback index
+d282  85 8c         sta pal_fade_target
+                    ; make sure we're not already fading out
+d284  a5 8e         lda state_fade_out
+d286  d0 08         bne .init_skip
+                .init_fade
+d288  a9 10         lda #$10
+d28a  85 8a         sta pal_fade_c ; frame counter
+d28c  a9 ff         lda #$ff
+d28e  85 8e         sta state_fade_out
+                .init_skip
+d290  60            rts
+      
+                palette_fade_out_update: subroutine
+d291  a5 8a         lda pal_fade_c
+d293  29 f0         and #%11110000
+d295  85 8b         sta pal_fade_offset
+d297  a2 19         ldx #25
+                .loop
+d299  b5 90         lda pal_uni_bg,x
+d29b  38            sec
+d29c  e5 8b         sbc pal_fade_offset
+d29e  b0 02         bcs .no_reset
+d2a0  a9 0f         lda #$0f
+                .no_reset
+d2a2  95 e7         sta palette_cache,x
+d2a4  ca            dex
+d2a5  10 f2         bpl .loop
+d2a7  a5 8a         lda pal_fade_c
+d2a9  18            clc
+d2aa  69 03         adc #$03
+d2ac  c9 60         cmp #$60
+d2ae  90 08         bcc .fade_mode_not_done
+d2b0  20 45 d2      jsr palette_state_reset
+      
+d2b3  a5 8c         lda pal_fade_target
+d2b5  4c f1 c4      jmp jump_to_subroutine
+                .fade_mode_not_done
+d2b8  85 8a         sta pal_fade_c
+d2ba  60            rts
+      
+      
+      
+                palette_fade_from_white_update: subroutine
+d2bb  a5 8a         lda pal_fade_c
+d2bd  29 f0         and #%11110000
+d2bf  85 8b         sta pal_fade_offset
+d2c1  a2 17         ldx #23
+                .loop
+d2c3  b5 90         lda pal_uni_bg,x
+d2c5  18            clc
+d2c6  65 8b         adc pal_fade_offset
+d2c8  c9 3f         cmp #$3f
+d2ca  90 02         bcc .dont_set_white
+d2cc  a9 30         lda #$30
+                .dont_set_white
+d2ce  95 e7         sta palette_cache,x
+d2d0  ca            dex
+d2d1  10 f0         bpl .loop
+d2d3  c6 8a         dec pal_fade_c
+d2d5  c6 8a         dec pal_fade_c
+d2d7  c6 8a         dec pal_fade_c
+d2d9  10 03         bpl .fade_mode_not_done
+d2db  20 45 d2      jsr palette_state_reset
+                .fade_mode_not_done
+d2de  60            rts
+      
+      
+      
+                    ; 12 + 32 x 7 = 236 cycles
+                palette_render: subroutine
+                    PPU_SETADDR $3f00
+d2df  a9 3f         lda #>$3f00
+d2e1  8d 06 20      sta PPU_ADDR
+d2e4  a9 00         lda #<$3f00
+d2e6  8d 06 20      sta PPU_ADDR
+d2e9  a2 00         ldx #0
+d2eb  a0 08         ldy #8
+                .loop
+d2ed  a5 e7         lda palette_cache
+d2ef  8d 07 20      sta PPU_DATA
+d2f2  e8            inx
+d2f3  b5 e7         lda palette_cache,x
+d2f5  8d 07 20      sta PPU_DATA
+d2f8  e8            inx
+d2f9  b5 e7         lda palette_cache,x
+d2fb  8d 07 20      sta PPU_DATA
+d2fe  e8            inx
+d2ff  b5 e7         lda palette_cache,x
+d301  8d 07 20      sta PPU_DATA
+d304  88            dey
+d305  d0 e6         bne .loop
+d307  60            rts

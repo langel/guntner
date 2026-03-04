@@ -1,0 +1,511 @@
+      
+                    song_rng_chord		EQM $00
+                    song_sick_dingle	EQM $01
+                    song_in_game		EQM $02
+                    song_boss_intro		EQM $03
+                    song_boss_fight		EQM $04
+                    song_game_over		EQM $05
+                    song_end_bad		EQM $06
+                    song_end_ok		EQM $07
+                    song_end_good		EQM $08
+      
+      
+      
+                song_update: subroutine
+fb3e  a5 2b         lda options_music_on
+fb40  d0 01         bne .music_on
+fb42  60            rts
+                .music_on
+fb43  a5 c0         lda audio_song_id
+fb45  18            clc
+fb46  69 73         adc #song_update_jump_table_offset
+fb48  4c f1 c4      jmp jump_to_subroutine
+      
+      
+                song_start: subroutine
+                    ; a = song id
+fb4b  85 c0         sta audio_song_id
+fb4d  d0 04         bne .not_rng_chords
+fb4f  20 76 fa      jsr sfx_rng_chord
+fb52  60            rts
+                .not_rng_chords
+fb53  a9 01         lda #$01
+fb55  85 2b         sta options_music_on
+fb57  c5 c0         cmp audio_song_id
+fb59  d0 15         bne .normal
+                    ; sick dingle music init
+fb5b  a9 70         lda #$70
+fb5d  85 c1         sta audio_frame_counter
+fb5f  a9 02         lda #$02
+fb61  85 c2         sta audio_root_tone
+fb63  a9 04         lda #$04
+fb65  85 c3         sta audio_pattern_pos
+fb67  a9 30         lda #$30
+fb69  85 b6         sta apu_rng1
+fb6b  a9 44         lda #$44
+fb6d  85 b5         sta apu_rng0
+fb6f  60            rts
+                .normal
+fb70  a9 00         lda #0
+fb72  85 c1         sta audio_frame_counter
+fb74  85 c2         sta audio_root_tone
+fb76  85 c3         sta audio_pattern_pos
+fb78  20 73 f6      jsr apu_rng_reset
+fb7b  60            rts
+      
+                song_stop: subroutine
+fb7c  a9 00         lda #$00
+fb7e  85 2b         sta options_music_on
+fb80  60            rts
+      
+                song_unstop: subroutine
+fb81  a9 01         lda #$01
+fb83  85 2b         sta options_music_on
+fb85  60            rts
+      
+      
+      
+                song_01_lda_note: subroutine
+                    ; x = note offset
+                    ; returns note id in a
+fb86  a5 b7         lda apu_temp
+fb88  f0 04         beq .octoscale
+                .majorpentscale
+fb8a  bd a2 f6      lda majpentscale,x
+fb8d  60            rts
+                .octoscale
+fb8e  bd 90 f6      lda octoscale,x
+fb91  60            rts
+      
+      
+                    ; sick dingle
+                song_01: subroutine
+fb92  a9 11         lda #$11
+fb94  18            clc
+fb95  65 c1         adc audio_frame_counter
+fb97  85 c1         sta audio_frame_counter
+fb99  90 6b         bcc .do_nothing
+fb9b  a9 0a         lda #$0a
+fb9d  85 c1         sta audio_frame_counter
+fb9f  a5 c3         lda audio_pattern_pos
+fba1  d0 0e         bne .trigger_note
+                    ; change the note
+fba3  a9 08         lda #$08
+fba5  85 c3         sta audio_pattern_pos
+                .update_root_note
+fba7  a5 b6         lda apu_rng1
+fba9  29 07         and #%00000111
+fbab  aa            tax
+fbac  20 86 fb      jsr song_01_lda_note
+fbaf  85 c2         sta audio_root_tone
+                .trigger_note
+                    ; pulse 1
+fbb1  a5 b6         lda apu_rng1
+fbb3  29 01         and #%0000001
+fbb5  d0 1c         bne .no_pulse_lead
+fbb7  a9 20         lda #$20
+fbb9  85 ac         sta apu_pu1_counter
+fbbb  a9 00         lda #$00
+fbbd  85 ad         sta apu_pu1_envelope
+fbbf  a5 b5         lda apu_rng0
+fbc1  29 07         and #%00000111
+fbc3  18            clc
+fbc4  65 c2         adc audio_root_tone
+fbc6  aa            tax
+fbc7  20 86 fb      jsr song_01_lda_note
+fbca  18            clc
+fbcb  69 0c         adc #12
+fbcd  aa            tax
+fbce  a0 02         ldy #$02
+fbd0  20 37 f7      jsr apu_set_pitch
+                .no_pulse_lead
+                    ; pulse 2
+fbd3  a5 bc         lda sfx_pu2_counter
+fbd5  d0 1e         bne .no_pulse_rhythm
+fbd7  a9 04         lda #$04
+fbd9  25 b6         and apu_rng1
+fbdb  24 c3         bit audio_pattern_pos
+fbdd  f0 16         beq .no_pulse_rhythm
+fbdf  a9 10         lda #$10
+fbe1  85 b0         sta apu_pu2_counter
+fbe3  a9 00         lda #$00
+fbe5  85 b1         sta apu_pu2_envelope
+fbe7  a6 c2         ldx audio_root_tone
+fbe9  20 86 fb      jsr song_01_lda_note
+fbec  18            clc
+fbed  69 18         adc #24
+fbef  aa            tax
+fbf0  a0 06         ldy #$06
+fbf2  20 37 f7      jsr apu_set_pitch
+                .no_pulse_rhythm
+                    ; triangle
+fbf5  a9 03         lda #$03
+fbf7  85 af         sta apu_tri_counter
+fbf9  a5 c2         lda audio_root_tone
+fbfb  18            clc
+fbfc  69 18         adc #$18
+fbfe  aa            tax
+fbff  a0 0a         ldy #$0a
+fc01  20 37 f7      jsr apu_set_pitch
+fc04  c6 c3         dec audio_pattern_pos
+                .do_nothing
+fc06  a9 00         lda #$00
+fc08  85 b7         sta apu_temp
+fc0a  60            rts
+      
+      
+      
+                    ; in game
+                song_02: subroutine
+fc0b  a5 24         lda wtf
+fc0d  29 07         and #$07
+fc0f  f0 01         beq .do_this_shit
+fc11  60            rts
+                .do_this_shit
+                    ; options screen decrease player health
+fc12  a5 55         lda state_render_addr
+fc14  c9 82         cmp #state_render_jump_table_offset+1
+fc16  d0 02         bne .not_menu_screens
+fc18  c6 0b         dec player_health
+                .not_menu_screens
+                    ; triangle
+fc1a  a5 c3         lda audio_pattern_pos
+fc1c  45 27         eor rng1
+fc1e  29 07         and #7
+fc20  f0 2a         beq .no_triangle
+                    ; change note length based on health?
+fc22  a5 0b         lda player_health
+fc24  49 ff         eor #$ff
+fc26  4a            lsr
+fc27  4a            lsr
+fc28  4a            lsr
+fc29  4a            lsr
+fc2a  4a            lsr
+fc2b  69 02         adc #$02
+                    ;lda #$05 ; original length
+fc2d  85 af         sta apu_tri_counter
+fc2f  a5 c2         lda audio_root_tone
+fc31  18            clc
+fc32  69 18         adc #24
+fc34  85 b7         sta apu_temp
+fc36  a5 c3         lda audio_pattern_pos
+fc38  29 01         and #1
+fc3a  d0 06         bne .no_octave
+fc3c  a5 b7         lda apu_temp
+fc3e  69 0c         adc #12
+fc40  85 b7         sta apu_temp
+                .no_octave
+fc42  a6 b7         ldx apu_temp
+fc44  bd 90 f6      lda octoscale,x
+fc47  a0 0a         ldy #$0a
+fc49  20 37 f7      jsr apu_set_pitch
+                .no_triangle
+                    ; pulse lead
+                    ;   lda sfx_pu1_counter
+                    ;   bne .no_pulse_lead
+                    ;   lda sfx_pu2_counter
+                    ;   bne .no_pulse_lead
+                    ;   lda apu_rng0
+                    ;   and #$01
+                    ;bne .no_pulse_lead
+                    ;   lda apu_rng1
+                    ;   and #%00000001
+                    ;   beq .no_pulse_lead
+                    ;   lda #$0e
+                    ;   sta apu_pu1_counter
+                    ;   lda #$0c
+                    ;   sta apu_pu2_counter
+                    ;   lda #$05
+                    ;   sta apu_pu1_envelope
+                    ;   sta apu_pu2_envelope
+                    ;   lda apu_rng0
+                    ;   and #%00000111
+                    ;   clc
+                    ;   adc audio_root_tone
+                    ;   tax
+                    ;   lda octoscale,x
+                    ;   clc
+                    ;   adc #24
+                    ;   tax
+                    ;   ldy #$02
+                    ;   jsr apu_set_pitch
+                    ;   txa
+                    ;   adc #19
+                    ;   tax
+                    ;   ldy #$06
+                    ;   jsr apu_set_pitch
+                    ;.no_pulse_lead
+                    ; kick
+fc4c  a5 c3         lda audio_pattern_pos
+fc4e  d0 03         bne .no_kick
+fc50  20 e3 f8      jsr sfx_kick
+                .no_kick
+                    ; check for sfx noise
+fc53  a5 bd         lda sfx_noi_counter
+fc55  d0 1b         bne .no_noise
+                    ; hats
+fc57  a5 b5         lda apu_rng0
+fc59  29 06         and #6
+fc5b  f0 03         beq .no_hat
+fc5d  20 18 fb      jsr sfx_hat
+                .no_hat
+                    ; ghost snare
+fc60  a5 26         lda rng0
+fc62  29 0c         and #$c
+fc64  d0 03         bne .no_g_snare
+fc66  20 2c fb      jsr sfx_ghost_snare
+                .no_g_snare
+                    ; snare
+fc69  a5 c3         lda audio_pattern_pos
+fc6b  c9 06         cmp #6
+fc6d  d0 03         bne .no_snare
+                .do_snare
+fc6f  20 0a fb      jsr sfx_snare
+                .no_snare
+                .no_noise
+                    ; next tic
+fc72  e6 c3         inc audio_pattern_pos
+fc74  a5 c3         lda audio_pattern_pos
+fc76  c9 0c         cmp #12
+fc78  d0 19         bne .done
+fc7a  a5 b5         lda apu_rng0
+fc7c  29 07         and #$07
+fc7e  85 c2         sta audio_root_tone
+fc80  a9 00         lda #0
+fc82  85 c3         sta audio_pattern_pos
+fc84  e6 c1         inc audio_frame_counter
+fc86  a9 18         lda #24
+fc88  c5 c1         cmp audio_frame_counter
+fc8a  d0 07         bne .done
+fc8c  20 73 f6      jsr apu_rng_reset
+fc8f  a9 00         lda #0
+fc91  85 c1         sta audio_frame_counter
+                .done
+fc93  60            rts
+      
+      
+      
+                    ; boss intro
+                song_03: subroutine
+fc94  a5 24         lda wtf
+fc96  29 07         and #$07
+fc98  d0 4d         bne .done
+fc9a  a5 c3         lda audio_pattern_pos
+fc9c  c9 08         cmp #$08
+fc9e  d0 04         bne .next_step
+fca0  20 7c fb      jsr song_stop
+fca3  60            rts
+                .next_step
+fca4  e6 c3         inc audio_pattern_pos
+fca6  a9 00         lda #0
+fca8  85 ad         sta apu_pu1_envelope
+fcaa  85 b1         sta apu_pu2_envelope
+fcac  a9 40         lda #$40
+fcae  85 ac         sta apu_pu1_counter
+fcb0  85 b0         sta apu_pu2_counter
+fcb2  85 af         sta apu_tri_counter
+                .set_pitch
+fcb4  e6 c2         inc audio_root_tone
+fcb6  a5 c2         lda audio_root_tone
+fcb8  18            clc
+fcb9  69 04         adc #4
+fcbb  85 b7         sta apu_temp
+fcbd  aa            tax
+fcbe  bd 90 f6      lda octoscale,x
+fcc1  69 0c         adc #12
+fcc3  aa            tax
+fcc4  a0 02         ldy #2
+fcc6  20 37 f7      jsr apu_set_pitch
+fcc9  a5 b7         lda apu_temp
+fccb  69 0f         adc #15
+fccd  aa            tax
+fcce  a0 06         ldy #6
+fcd0  20 37 f7      jsr apu_set_pitch
+fcd3  a0 0a         ldy #10
+fcd5  20 37 f7      jsr apu_set_pitch
+                    ; set noise
+fcd8  a9 0f         lda #$f
+fcda  e5 c3         sbc audio_pattern_pos
+fcdc  8d 4e 01      sta apu_cache+$e
+fcdf  a9 00         lda #$00
+fce1  85 b4         sta apu_noi_envelope
+fce3  a9 40         lda #$40
+fce5  85 b3         sta apu_noi_counter
+                .done
+fce7  60            rts
+      
+      
+      
+                    ; boss fight
+                song_04: subroutine
+fce8  a5 c1         lda audio_frame_counter
+fcea  c9 05         cmp #5
+fcec  f0 03         beq .do_all_the_stuff
+fcee  4c 7a fd      jmp .done
+                .do_all_the_stuff
+fcf1  a9 00         lda #0
+fcf3  85 c1         sta audio_frame_counter
+fcf5  e6 c3         inc audio_pattern_pos
+fcf7  a5 c3         lda audio_pattern_pos
+fcf9  c9 12         cmp #18
+fcfb  d0 12         bne .dont_loop
+                .do_loop
+                    ; TENSION ANTI_MELODY
+fcfd  a5 c4         lda audio_pattern_num
+fcff  29 04         and #$04
+fd01  d0 04         bne .root_raise
+                .root_lower
+fd03  e6 c2         inc audio_root_tone
+fd05  d0 02         bne .root_done
+                .root_raise
+fd07  c6 c2         dec audio_root_tone
+                .root_done
+fd09  a9 00         lda #0
+fd0b  85 c3         sta audio_pattern_pos
+fd0d  e6 c4         inc audio_pattern_num
+                .dont_loop
+                    ; KICK (pulse 2)
+fd0f  a5 c3         lda audio_pattern_pos
+fd11  d0 03         bne .no_kick
+fd13  20 e3 f8      jsr sfx_kick
+                .no_kick
+                    ; SNARE
+fd16  a5 c3         lda audio_pattern_pos
+fd18  c9 0a         cmp #10
+fd1a  f0 08         beq .snare
+fd1c  a5 26         lda rng0
+fd1e  29 07         and #7
+fd20  f0 02         beq .snare
+fd22  d0 03         bne .no_snare
+                .snare
+fd24  20 0a fb      jsr sfx_snare
+                .no_snare
+                    ; TENSION ANTI_MELODY (pulse 1)
+fd27  a5 bb         lda sfx_pu1_counter
+fd29  d0 26         bne .no_melody
+fd2b  a9 05         lda #5
+fd2d  85 ad         sta apu_pu1_envelope
+fd2f  a9 05         lda #$05
+fd31  85 ac         sta apu_pu1_counter
+fd33  a6 c2         ldx audio_root_tone
+fd35  a5 b6         lda apu_rng1
+fd37  4a            lsr
+fd38  29 08         and #$08
+fd3a  f0 03         beq .change_root
+fd3c  8a            txa
+fd3d  d0 09         bne .stay_root
+                .change_root
+fd3f  a5 b5         lda apu_rng0
+fd41  29 07         and #$07
+fd43  85 86         sta temp00
+fd45  8a            txa
+fd46  65 86         adc temp00
+                .stay_root
+fd48  18            clc
+fd49  69 24         adc #36
+fd4b  aa            tax
+fd4c  a0 02         ldy #$02
+fd4e  20 37 f7      jsr apu_set_pitch
+                .no_melody
+                    ; BASSLINE
+fd51  a6 c3         ldx audio_pattern_pos
+fd53  bc 8f fd      ldy song_04_length,x
+fd56  f0 22         beq .done
+                    ; chance of staccato
+fd58  a5 b5         lda apu_rng0
+fd5a  29 0c         and #$0c
+fd5c  d0 02         bne .full_length
+fd5e  a0 02         ldy #$02
+                .full_length
+fd60  84 af         sty apu_tri_counter
+fd62  bd 7d fd      lda song_04_pitch,x
+fd65  18            clc
+fd66  69 18         adc #24
+fd68  85 b7         sta apu_temp
+fd6a  a5 c4         lda audio_pattern_num
+fd6c  29 04         and #4
+fd6e  4a            lsr
+fd6f  65 b7         adc apu_temp
+fd71  aa            tax
+fd72  a0 0a         ldy #10
+fd74  20 37 f7      jsr apu_set_pitch
+                    ; hats in unison with bassline
+fd77  20 18 fb      jsr sfx_hat
+                    ; we're done
+                .done
+fd7a  e6 c1         inc audio_frame_counter
+fd7c  60            rts
+                song_04_pitch:
+fd7d  byte          12,0,17,0,0,12,12,0,17,0,0,15,0,0,13,0,0,12
+                song_04_length:
+fd8f  byte          18,0,10,0,0, 3,18,0,10,0,0, 8,0,0, 8,0,0, 3
+      
+      
+      
+                    ; game over
+                song_05: subroutine
+fda1  a5 c1         lda audio_frame_counter
+fda3  c9 ff         cmp #$ff
+fda5  d0 05         bne .do_normal
+fda7  a9 00         lda #$00
+fda9  85 09         sta ppu_mask_emph
+fdab  60            rts
+                .do_normal
+fdac  20 4c f7      jsr apu_bend_down
+fdaf  20 4c f7      jsr apu_bend_down
+fdb2  a5 c1         lda audio_frame_counter
+fdb4  c9 70         cmp #$70
+fdb6  f0 13         beq .do_chord
+fdb8  c9 40         cmp #$40
+fdba  f0 0f         beq .do_chord
+fdbc  c9 30         cmp #$30
+fdbe  f0 0b         beq .do_chord
+fdc0  c9 10         cmp #$10
+fdc2  f0 07         beq .do_chord
+fdc4  a5 c1         lda audio_frame_counter
+fdc6  d0 0b         bne .done
+fdc8  20 0a fb      jsr sfx_snare
+                .do_chord
+fdcb  20 76 fa      jsr sfx_rng_chord
+fdce  20 bc c1      jsr ppu_mess_emph
+fdd1  e6 09         inc ppu_mask_emph
+                .done
+fdd3  e6 c1         inc audio_frame_counter
+fdd5  60            rts
+      
+      
+                    ; ending bad
+                song_06: subroutine
+                    ; rng chord about every 2 seconds (bends down)
+fdd6  20 4c f7      jsr apu_bend_down
+fdd9  20 4c f7      jsr apu_bend_down
+fddc  a5 c1         lda audio_frame_counter
+fdde  29 7d         and #$7d
+fde0  d0 03         bne .no_chord
+fde2  20 76 fa      jsr sfx_rng_chord
+                .no_chord
+fde5  e6 c1         inc audio_frame_counter
+fde7  60            rts
+      
+      
+                    ; ending ok
+                song_07: subroutine
+                    ; sick dingle but different seed and bends down
+fde8  20 4c f7      jsr apu_bend_down
+fdeb  20 92 fb      jsr song_01
+fdee  60            rts
+      
+      
+                    ; ending good
+                song_08: subroutine
+fdef  e6 b7         inc apu_temp
+fdf1  20 92 fb      jsr song_01
+fdf4  60            rts
+      
+      
+      
+      
+                WHOOPS:
+fdf5  20 4c c1      jsr WaitSync
+fdf8  20 4c c1      jsr WaitSync
+fdfb  4c 5b f6      jmp apu_init

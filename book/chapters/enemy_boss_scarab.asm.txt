@@ -1,0 +1,192 @@
+      
+                    ; things the bat entities need to know
+                    ; boss_x  : topleft offset
+                    ; boss_y  : topleft offset
+                    ; state_v2 : x sine position
+                    ; state_v3 : y sine position
+                    ; state_v4 : x body position
+                    ; state_v5 : y body position
+                    ; state_v6 : x wing position
+                    ; state_v7 : y wing position
+      
+                    ; scarab palette
+                    ; $0c, $27, $38
+      
+                boss_scarab_spawn: subroutine
+                    ; claim highest 4 sprite slot for beetle body
+                    ;ldx #boss_scarab_id
+                    ;stx $03b8
+                    ; claim 4 more slots for the wings
+e204  a9 03         lda #boss_assist_id
+e206  8d c0 03      sta $03c0
+e209  8d c8 03      sta $03c8
+e20c  8d d0 03      sta $03d0
+e20f  8d d8 03      sta $03d8
+                    ; setup initial state
+e212  a9 10         lda #$10
+e214  85 7d         sta boss_x
+e216  a9 1c         lda #$1c
+e218  85 7e         sta boss_y
+e21a  a9 00         lda #$00
+e21c  85 4d         sta state_v3
+e21e  85 50         sta state_v6
+e220  85 51         sta state_v7
+e222  a9 c0         lda #$c0
+e224  85 4c         sta state_v2
+e226  60            rts
+      
+      
+                    ;   KNOW
+                    ;  THYSELF
+                    ; DEATHLESS
+      
+                scarab_oam_offset_table:
+e227  byte          $c0, $d0, $e0, $f0
+                scarab_wing_y_offset_table:
+e22b  byte          $f4, $e4, $0c, $1c
+                scarab_wing_sprite_table:
+e22f  byte          $80, $60, $80, $60
+      
+      
+                boss_scarab_cycle: subroutine
+e233  a9 10         lda #$10
+e235  85 3d         sta collision_0_w
+e237  85 3e         sta collision_0_h
+      
+e239  e6 7a         inc boss_dmg_handle_true
+e23b  20 eb db      jsr enemy_handle_damage_and_death
+e23e  c6 7a         dec boss_dmg_handle_true
+      
+                    ; MAIN BODY
+      
+                    ; x pos
+e240  e6 4c         inc state_v2
+e242  a6 4c         ldx state_v2
+e244  bd 00 fe      lda sine_table,x
+e247  4a            lsr
+e248  4a            lsr
+e249  18            clc
+e24a  65 7d         adc boss_x
+e24c  a6 76         ldx enemy_ram_offset
+e24e  9d 02 03      sta enemy_ram_x,x
+e251  85 4e         sta state_v4
+e253  20 df da      jsr sprite_4_set_x
+      
+                    ; y pos
+e256  e6 4d         inc state_v3
+e258  e6 4d         inc state_v3
+e25a  a6 4d         ldx state_v3
+e25c  bd 00 fe      lda sine_table,x
+e25f  4a            lsr
+e260  18            clc
+e261  65 7e         adc boss_y
+e263  a6 76         ldx enemy_ram_offset
+e265  9d 03 03      sta enemy_ram_y,x
+e268  85 4f         sta state_v5
+e26a  20 ef da      jsr sprite_4_set_y
+      
+                    ; sprite
+e26d  a9 a0         lda #$a0
+e26f  20 b7 da      jsr sprite_4_set_sprite
+      
+                    ; WINGS
+                    ; twitch offset
+e272  e6 51         inc state_v7
+e274  a5 51         lda state_v7
+e276  c9 03         cmp #3
+e278  d0 04         bne .state_v7_dont_reset
+e27a  a9 00         lda #0
+e27c  85 51         sta state_v7
+                .state_v7_dont_reset
+e27e  a5 24         lda wtf
+e280  29 01         and #1
+e282  85 50         sta state_v6
+      
+      
+      
+      
+                    ; palette
+e284  a9 02         lda #$02
+e286  20 9d da      jsr sprite_4_set_palette
+e289  f0 03         beq .hit
+e28b  38            sec
+e28c  e9 01         sbc #$01
+                .hit
+e28e  85 87         sta temp01
+      
+                    ; calc x pos of wing set
+e290  a5 4e         lda state_v4
+e292  38            sec
+e293  e9 06         sbc #$6
+e295  18            clc
+e296  65 50         adc state_v6
+e298  85 86         sta temp00
+      
+      
+e29a  a2 03         ldx #$03
+                .wing_sprites_loop
+e29c  bc 27 e2      ldy scarab_oam_offset_table,x
+                    ; x
+e29f  a5 86         lda temp00
+e2a1  20 df da      jsr sprite_4_set_x
+                    ; y
+e2a4  a5 4f         lda state_v5
+e2a6  18            clc
+e2a7  7d 2b e2      adc scarab_wing_y_offset_table,x
+e2aa  20 ef da      jsr sprite_4_set_y
+                    ; sprite
+e2ad  bd 2f e2      lda scarab_wing_sprite_table,x
+                    ; flipped wing?
+e2b0  e0 02         cpx #$02
+e2b2  90 09         bcc .no_flip
+e2b4  20 cb da      jsr sprite_4_set_sprite_flip
+                    ; att flipped
+e2b7  a5 87         lda temp01
+e2b9  09 80         ora #$80
+e2bb  d0 05         bne .sprite_done
+                .no_flip
+e2bd  20 b7 da      jsr sprite_4_set_sprite
+                    ; att
+e2c0  a5 87         lda temp01
+                .sprite_done
+e2c2  20 aa da      jsr sprite_4_set_palette_no_process
+e2c5  ca            dex
+e2c6  10 d4         bpl .wing_sprites_loop
+      
+      
+                    ; SHOOT
+e2c8  a5 24         lda wtf
+e2ca  29 03         and #$03
+e2cc  d0 23         bne .done
+e2ce  a5 24         lda wtf
+e2d0  29 20         and #$20
+e2d2  d0 1d         bne .done
+      
+                .dart_fire
+e2d4  a5 4e         lda state_v4
+e2d6  18            clc
+e2d7  69 10         adc #$10
+e2d9  85 71         sta dart_x_origin
+e2db  a5 4f         lda state_v5
+e2dd  18            clc
+e2de  69 04         adc #$04
+e2e0  85 72         sta dart_y_origin
+e2e2  a9 02         lda #$02
+e2e4  85 73         sta dart_velocity
+e2e6  a9 fe         lda #$fe
+e2e8  85 74         sta dart_sprite
+e2ea  a9 00         lda #$00
+e2ec  85 75         sta dart_dir_adjust
+e2ee  20 a8 e7      jsr dart_spawn
+      
+      
+                .done
+e2f1  a5 24         lda wtf
+e2f3  29 0f         and #$0f
+e2f5  d0 08         bne .done_x_entrance
+e2f7  a5 7d         lda boss_x
+e2f9  c9 40         cmp #$40
+e2fb  f0 02         beq .done_x_entrance
+e2fd  e6 7d         inc boss_x
+                .done_x_entrance
+e2ff  4c 92 db      jmp update_enemies_handler_next

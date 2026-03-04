@@ -1,0 +1,255 @@
+                    ; powerups always spawn from starglasses
+      
+                    ; powerup juggling brought to you by sine waves
+                    ; x pos is point of origin
+                    ; only need to use rise and fall arc
+                    ; must capture max fall velocity (4px/frame)
+                    ; rise and fall needs full 8bit range
+      
+                    ; palette sprites start at $24
+                    ; 0 - skull shield
+                    ; 1 - mushroom
+                    ; 2 - plus one
+                    ; 3 - bomb
+                    ; 4 - r bag
+                    ; 5 - health 25%
+                    ; 6 - health 50%
+                    ; 7 - health full
+      
+                powerup_drop_table:
+d308  hex           04 05 00 03 06 02 01 07
+d310  hex           00 03 06 04 01 00 07 02
+      
+      
+                powerup_from_starglasses:
+d318  a9 02         lda #powerups_id
+d31a  9d 00 03      sta enemy_ram_type,x
+d31d  b9 03 02      lda oam_ram_x,y
+d320  18            clc
+d321  69 04         adc #$04
+d323  9d 02 03      sta enemy_ram_x,x
+d326  b9 00 02      lda oam_ram_y,y
+d329  9d 03 03      sta enemy_ram_y,x
+d32c  a9 40         lda #$40
+d32e  9d 04 03      sta enemy_ram_pc,x
+d331  a9 01         lda #$01
+d333  9d 01 03      sta enemy_ram_hp,x
+                    ; rng powerup type
+d336  a5 68         lda powerup_counter
+d338  29 07         and #$07
+d33a  d0 07         bne .dont_reset_powerup_offset
+d33c  20 52 c1      jsr get_next_random
+d33f  29 0f         and #$0f
+d341  85 69         sta powerup_offset
+                .dont_reset_powerup_offset
+d343  a5 69         lda powerup_offset
+d345  29 0f         and #$0f
+d347  aa            tax
+d348  bd 08 d3      lda powerup_drop_table,x
+d34b  a6 76         ldx enemy_ram_offset
+d34d  9d 07 03      sta enemy_ram_ex,x
+d350  e6 69         inc powerup_offset
+d352  e6 68         inc powerup_counter
+d354  60            rts
+      
+      
+                powerups_cycle: subroutine
+                .process_this_frame
+d355  b9 03 02      lda oam_ram_x,y
+d358  e9 03         sbc #3
+d35a  85 3b         sta collision_0_x
+d35c  bd 03 03      lda enemy_ram_y,x
+d35f  99 00 02      sta oam_ram_y,y
+d362  e9 03         sbc #3
+d364  85 3c         sta collision_0_y
+d366  a9 0d         lda #$0d
+d368  85 3d         sta collision_0_w
+d36a  85 3e         sta collision_0_h
+d36c  a9 00         lda #$00
+d36e  85 79         sta enemy_dmg_accumulator
+d370  20 04 f3      jsr player_bullet_collision_handler
+d373  a5 79         lda enemy_dmg_accumulator
+d375  d0 14         bne .reset_velocity
+d377  20 35 cf      jsr player_collision_detect
+d37a  f0 25         beq .frame
+                .despawn_powerup
+                .player_picksup_powerup
+d37c  bd 07 03      lda enemy_ram_ex,x
+d37f  18            clc
+d380  69 3f         adc #powerup_pickup_jump_table_offset
+d382  20 f1 c4      jsr jump_to_subroutine
+d385  20 47 dd      jsr enemy_clear
+d388  4c 92 db      jmp update_enemies_handler_next
+                .reset_velocity
+d38b  a9 01         lda #$01
+d38d  9d 04 03      sta enemy_ram_pc,x
+d390  b9 03 02      lda oam_ram_x,y
+d393  9d 02 03      sta enemy_ram_x,x
+                    ; will wrap to the left so add hp
+d396  fe 01 03      inc enemy_ram_hp,x
+d399  10 03         bpl .dont_max_hp
+d39b  de 01 03      dec enemy_ram_hp,x
+                .dont_max_hp
+                    ; give it sfx
+d39e  20 32 f9      jsr sfx_powerup_hit
+                .frame
+d3a1  bd 04 03      lda enemy_ram_pc,x
+d3a4  c9 80         cmp #$80
+d3a6  f0 2f         beq .max_velocity
+                .sine_arc
+d3a8  bc 04 03      ldy enemy_ram_pc,x
+d3ab  c8            iny
+d3ac  b9 00 fe      lda sine_table,y
+d3af  85 86         sta temp00
+d3b1  88            dey
+d3b2  b9 00 fe      lda sine_table,y
+d3b5  38            sec
+d3b6  e5 86         sbc temp00
+d3b8  85 86         sta temp00
+d3ba  9d 05 03      sta enemy_ram_ac,x
+d3bd  a4 77         ldy enemy_oam_offset
+d3bf  bd 02 03      lda enemy_ram_x,x
+d3c2  18            clc
+d3c3  65 86         adc temp00
+d3c5  9d 02 03      sta enemy_ram_x,x
+d3c8  99 03 02      sta oam_ram_x,y
+d3cb  a5 24         lda wtf
+d3cd  29 01         and #$01
+d3cf  f0 14         beq .move_done
+d3d1  fe 04 03      inc enemy_ram_pc,x
+d3d4  4c e5 d3      jmp .move_done
+                .max_velocity
+d3d7  b9 03 02      lda oam_ram_x,y
+d3da  18            clc
+d3db  69 04         adc #$04
+d3dd  99 03 02      sta oam_ram_x,y
+d3e0  90 03         bcc .move_done
+                    ; will fall off the right so minus hp
+d3e2  de 01 03      dec enemy_ram_hp,x
+                .move_done
+                    ; sprite
+d3e5  bd 07 03      lda enemy_ram_ex,x
+d3e8  18            clc
+d3e9  69 24         adc #$24
+d3eb  99 01 02      sta oam_ram_spr,y
+                    ; palette
+d3ee  a9 03         lda #$03
+d3f0  99 02 02      sta oam_ram_att,y
+                .despawn_check
+d3f3  bd 01 03      lda enemy_ram_hp,x
+d3f6  c9 00         cmp #$00
+d3f8  d0 03         bne .done
+                    ;; despawns to the right
+d3fa  20 47 dd      jsr enemy_clear
+                .done
+d3fd  4c 92 db      jmp update_enemies_handler_next
+      
+      
+      
+      
+      
+      
+                powerup_pickup_mask: subroutine
+d400  e6 6e         inc orbit_shield_speed
+d402  e6 6e         inc orbit_shield_speed
+d404  e6 6e         inc orbit_shield_speed
+d406  20 86 f9      jsr sfx_powerup_mask
+d409  60            rts
+      
+      
+                powerup_pickup_mushroom: subroutine
+                    ; shroom_counter set inside sfx call
+d40a  20 62 f9      jsr sfx_powerup_mushroom
+d40d  60            rts
+                powerup_mushroom_update: subroutine
+d40e  a5 6c         lda shroom_counter
+d410  f0 20         beq .shroom_done
+d412  a5 24         lda wtf
+d414  29 03         and #$03
+d416  d0 1a         bne .shroom_done
+d418  c6 6c         dec shroom_counter
+d41a  d0 0b         bne .audio_bend_up_or_down
+                .end_of_shroom
+d41c  20 39 d7      jsr phase_palette_load
+d41f  20 48 f2      jsr player_update_colors
+d422  a9 00         lda #$00
+d424  85 6d         sta shroom_mod
+d426  60            rts
+                .audio_bend_up_or_down
+d427  a5 6c         lda shroom_counter
+d429  c9 3f         cmp #$3f
+d42b  90 03         bcc .down
+                .up
+d42d  e6 6d         inc shroom_mod
+d42f  60            rts
+                .down
+d430  c6 6d         dec shroom_mod
+                .shroom_done
+d432  60            rts
+      
+      
+                powerup_pickup_plus_one: subroutine
+d433  e6 0c         inc player_lives
+d435  20 a3 f9      jsr sfx_powerup_1up
+d438  60            rts
+      
+      
+                powerup_pickup_bomb: subroutine
+                    ; bomb_counter set inside sfx call
+                    ; 1hp enemy damage every other frame
+d439  20 44 f9      jsr sfx_powerup_bomb
+d43c  60            rts
+                powerup_bomb_update: subroutine
+d43d  a5 6a         lda bomb_counter
+d43f  f0 0a         beq .bomb_done
+d441  c6 6a         dec bomb_counter
+d443  a5 bf         lda sfx_noi_update_type
+d445  d0 04         bne .bomb_done
+d447  a9 04         lda #$04
+d449  85 bf         sta sfx_noi_update_type
+                .bomb_done
+d44b  60            rts
+      
+      
+                powerup_pickup_r_bag: subroutine
+d44c  a9 ff         lda #$ff
+d44e  85 6b         sta r_bag_counter
+d450  18            clc
+d451  a9 05         lda #$05
+d453  65 20         adc player_autofire_s
+d455  85 20         sta player_autofire_s
+d457  a9 27         lda #$27
+d459  c5 20         cmp player_autofire_s
+d45b  90 02         bcc .not_maxed_out
+d45d  a5 20         lda player_autofire_s
+                .not_maxed_out
+d45f  85 20         sta player_autofire_s
+d461  60            rts
+      
+      
+                powerup_pickup_health_25: subroutine
+d462  20 ee f9      jsr sfx_powerup_battery_25
+d465  a5 0b         lda player_health
+d467  18            clc
+d468  69 40         adc #$40
+d46a  b0 13         bcs powerup_player_max_energy
+d46c  85 0b         sta player_health
+d46e  60            rts
+      
+                powerup_pickup_health_50: subroutine
+d46f  20 f4 f9      jsr sfx_powerup_battery_50
+d472  a5 0b         lda player_health
+d474  18            clc
+d475  69 80         adc #$80
+d477  b0 06         bcs powerup_player_max_energy
+d479  85 0b         sta player_health
+d47b  60            rts
+      
+                powerup_pickup_health_100: subroutine
+d47c  20 fa f9      jsr sfx_powerup_battery_100
+                powerup_player_max_energy:
+d47f  a9 ff         lda #$ff
+d481  85 0b         sta player_health
+d483  60            rts
+      
+      

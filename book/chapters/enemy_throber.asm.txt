@@ -1,0 +1,54 @@
+      
+                throber_spawn: subroutine
+                    ; x is set by enemy spawner
+f067  20 52 dc      jsr get_oam_offset_from_ram_offset
+f06a  20 d1 db      jsr enemy_spawn_random_y_pos
+f06d  99 00 02      sta oam_ram_y,y ; y pos
+f070  a9 00         lda #$00
+f072  99 03 02      sta oam_ram_x,y ; x pos
+f075  60            rts
+      
+      
+                throber_cycle: subroutine
+f076  a9 10         lda #$10
+f078  85 3d         sta collision_0_w
+f07a  85 3e         sta collision_0_h
+f07c  20 eb db      jsr enemy_handle_damage_and_death
+      
+f07f  fe 04 03      inc enemy_ram_pc,x
+f082  bd 04 03      lda enemy_ram_pc,x
+f085  4a            lsr
+f086  4a            lsr
+f087  4a            lsr
+f088  29 07         and #$07
+f08a  aa            tax
+f08b  bd f0 ff      lda arctang_velocities_lo,x
+f08e  85 84         sta arctang_velocity_lo
+f090  8a            txa
+f091  a6 76         ldx enemy_ram_offset
+f093  c9 05         cmp #$05
+f095  90 0b         bcc .do_movement
+f097  d0 06         bne .dont_change_dir
+                .update_direction
+f099  20 12 ce      jsr enemy_get_direction_of_player
+f09c  9d 07 03      sta enemy_ram_ex,x
+                .dont_change_dir
+f09f  fe 05 03      inc enemy_ram_ac,x
+                .do_movement
+f0a2  20 f6 ce      jsr arctang_enemy_update
+f0a5  bd 05 03      lda enemy_ram_ac,x
+f0a8  4a            lsr
+f0a9  4a            lsr
+f0aa  4a            lsr
+f0ab  29 03         and #$03
+f0ad  0a            asl
+f0ae  18            clc
+f0af  69 40         adc #$40
+f0b1  20 b7 da      jsr sprite_4_set_sprite
+f0b4  b9 03 02      lda oam_ram_x,y
+f0b7  20 df da      jsr sprite_4_set_x
+f0ba  b9 00 02      lda oam_ram_y,y
+f0bd  20 ef da      jsr sprite_4_set_y
+f0c0  a9 03         lda #$03
+f0c2  20 9d da      jsr sprite_4_set_palette
+f0c5  4c 92 db      jmp update_enemies_handler_next

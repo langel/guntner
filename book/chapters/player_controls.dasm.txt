@@ -1,0 +1,54 @@
+      
+                    ;;;;; CONTROLLER READING
+      
+      
+                    ; reading joypad gives us a byte
+                    ; bit 7 a button
+                    ; bit 6 b button
+                    ; bit 5 select
+                    ; bit 4 start
+                    ; bit 3 up
+                    ; bit 2 down
+                    ; bit 1 left
+                    ; bit 0 right
+      
+      
+      
+                controller_poller: subroutine
+f488  a2 01         ldx #$01
+f48a  8e 16 40      stx JOYPAD1
+f48d  ca            dex
+f48e  8e 16 40      stx JOYPAD1
+f491  a2 08         ldx #$08
+                .read_loop
+f493  ad 16 40      lda JOYPAD1
+f496  4a            lsr
+f497  26 86         rol temp00
+f499  4a            lsr
+f49a  26 87         rol temp01
+f49c  ca            dex
+f49d  d0 f4         bne .read_loop
+f49f  a5 86         lda temp00
+f4a1  05 87         ora temp01
+f4a3  85 86         sta temp00
+f4a5  60            rts
+      
+      
+      
+                player_controls_read: subroutine
+      
+f4a6  20 88 f4      jsr controller_poller
+                .checksum_loop
+f4a9  a4 86         ldy temp00
+f4ab  20 88 f4      jsr controller_poller
+f4ae  c4 86         cpy temp00
+f4b0  d0 f7         bne .checksum_loop
+f4b2  a5 86         lda temp00
+f4b4  a8            tay
+f4b5  45 1c         eor player_controls
+f4b7  25 86         and temp00
+f4b9  85 1d         sta player_controls_debounced
+f4bb  84 1c         sty player_controls
+f4bd  60            rts
+      
+      

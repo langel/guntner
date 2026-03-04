@@ -1,0 +1,457 @@
+      
+                    include "nesdefs.dasm"
+                    include "zp_vars.asm"
+      
+                    ;;;;; RAM NOTES
+                    ; $000 zero page
+                    ; $100 6502 stack
+                    ; $200 PPU OAM sprite data
+                    ; $300 entity data
+                    ; $400-7ff sine scale tables
+      
+      01 50         phase_spawn_table	= $0150
+      01 70         spare_stack		= $170
+      01 e0         top_of_stack		= $1e0
+      08 00         end_of_ram 		= $800
+      
+                    sprite_0_y	EQM	$b6 ; 182
+                    sprite_0_y_diff	EQM	$4a ; 74
+      
+      
+                    ;;;;; NES CARTRIDGE HEADER
+      
+00c5                NES_HEADER 0,1,1,NES_MIRR_VERT ; mapper 0, 1 PRGs, 1 CHR
+                    seg Header
+                    org $Bff0
+                .NES_MAPPER SET 0
+                .NES_PRG_BANKS SET 1
+                .NES_CHR_BANKS SET 1
+                .NES_MIRRORING SET NES_MIRR_VERT
+bff0  byte          $4e,$45,$53,$1a
+bff4  byte          .NES_PRG_BANKS
+bff5  byte          .NES_CHR_BANKS
+bff6  byte          .NES_MIRRORING|(.NES_MAPPER<<4)
+bff7  byte          .NES_MAPPER&$f0
+bff8  byte          0,0,0,0,0,0,0,0
+                    seg Code
+                    org $C000
+      
+      
+                    ;;;;; START OF CODE
+      
+                cart_start: subroutine
+                    NES_INIT ; set up stack pointer, turn off PPU
+c000  78            sei
+c001  d8            cld
+c002  a2 ff         ldx #$ff
+c004  9a            txs
+c005  e8            inx
+c006  8e 01 20      stx PPU_MASK
+c009  8e 10 40      stx DMC_FREQ
+c00c  8e 00 20      stx PPU_CTRL
+c00f  2c 02 20      bit PPU_STATUS
+c012  2c 15 40      bit APU_CHAN_CTRL
+c015  a9 40         lda #$40
+c017  8d 17 40      sta APU_FRAME
+c01a  a9 0f         lda #$0F
+c01c  8d 15 40      sta APU_CHAN_CTRL
+      
+                    ; CLEAR CPU RAM
+c01f  20 15 c1      jsr ClearRAM ; clear RAM
+c022  20 f5 fd      jsr WHOOPS
+      
+                    ; MY SETUP
+                    ; setup rng
+c025  a9 01         lda #$01
+c027  85 26         sta rng0
+c029  85 27         sta rng1
+c02b  a9 ff         lda #$ff
+c02d  85 28         sta rng2
+c02f  85 43         sta dashboard_message
+      
+c031  a9 e8         lda #232
+c033  85 03         sta scroll_y ; just seems right
+      
+c035  20 84 d4      jsr sine_init
+      
+c038  a9 ff         lda #>arctang_velocity_tables
+c03a  85 85         sta arctang_velocity_hi
+      
+c03c  a9 c0         lda #$c0
+c03e  85 30         sta scroll_to_counter
+      
+c040  a9 01         lda #1
+c042  85 23         sta game_difficulty
+c044  a9 01         lda #$01
+c046  85 1a         sta player_speed
+      
+                    ; set default player colors
+c048  a9 14         lda #$14
+c04a  85 a9         sta player_color0
+c04c  a9 21         lda #$21
+c04e  85 aa         sta player_color1
+c050  a9 37         lda #$37
+c052  85 ab         sta player_color2
+c054  20 48 f2      jsr player_update_colors
+      
+                    ; bookbinder colors
+c057  a2 51         ldx #81
+c059  a0 06         ldy #6
+c05b  20 cf d1      jsr palette_load
+      
+      
+                    ;============================== M O D E   I N I T   H E R E
+c05e  a9 0f         lda #$0f
+c060  85 90         sta pal_uni_bg
+      
+                    ;jsr game_init
+c062  20 54 c6      jsr menu_screens_init
+                    ;jsr attract_init
+                    ;jsr cut_scene_intro_init
+                    ;jsr cut_scene_outro_init
+      
+                    ;jsr options_screen_init
+                    ;jsr sandbox_init
+                    ;jsr sandbox2_init
+      
+      
+                .endless
+c065  4c 65 c0      jmp .endless ; endless loop
+      
+      
+      
+      
+      
+      
+      
+                    ;;;;; INTERRUPT HANDLERS
+      
+                nmi_handler: subroutine
+      
+                    ; ~2250 cycles for PPU access (PAL is 7450 cycles)
+                    ; "On NTSC, count on being able to copy 160 bytes
+                    ; to nametables or the palette using a moderately
+                    ; unrolled loop"
+                    ; write 64 tiles?
+                    ; write all palettes
+                    ; oam dma
+      
+                    SAVE_REGS ; 13 cycles
+c068  48            pha
+c069  8a            txa
+c06a  48            pha
+c06b  98            tya
+c06c  48            pha
+      
+                    ; enable NMI lockout
+c06d  a5 00         lda nmi_lockout
+c06f  c9 00         cmp #$00
+c071  f0 03         beq .no_lock
+c073  4c 0f c1      jmp .nmi_end
+                .no_lock
+c076  e6 00         inc nmi_lockout
+      
+                    ; PPU vBLANK STUFF
+                    ; RENDER va cycles
+c078  a5 55         lda state_render_addr
+c07a  4c f1 c4      jmp jump_to_subroutine
+                state_render_done:
+                    ; OAM DMA 513 cycles
+c07d  a9 02         lda #$02
+c07f  8d 14 40      sta PPU_OAM_DMA
+                    ; PALETTE 236 cycles
+c082  20 df d2      jsr palette_render
+                    ; SCROLL POS 17 cycles
+c085  2c 02 20      bit PPU_STATUS
+c088  a5 01         lda scroll_x_hi
+c08a  8d 05 20      sta PPU_SCROLL
+c08d  a5 03         lda scroll_y
+c08f  8d 05 20      sta PPU_SCROLL
+                    ; NAMETABLE++ 9 cycles
+c092  a5 04         lda scroll_page
+c094  29 01         and #$01
+c096  09 90         ora #CTRL_NMI|CTRL_BG_1000
+c098  8d 00 20      sta PPU_CTRL
+c09b  a5 09         lda ppu_mask_emph
+c09d  49 18         eor #MASK_BG|MASK_SPR
+c09f  8d 01 20      sta PPU_MASK
+      
+                    ; hope everything above was under
+                    ; ~2250 cycles!
+      
+                    ; main state logic
+c0a2  a5 56         lda state_update_addr
+c0a4  4c f1 c4      jmp jump_to_subroutine
+                state_update_done:
+      
+                sprite0_wait:
+c0a7  a5 52         lda state_sprite0
+c0a9  f0 30         beq sprite0_off
+      
+                    ; wait for Sprite 0; SPRITE 0 WAIT TIME!!!
+c0ab  2c 02 20      .wait0 bit PPU_STATUS
+c0ae  70 fb         bvs .wait0
+c0b0  a9 c0         lda #$c0
+c0b2  2c 02 20      .wait1 bit PPU_STATUS
+c0b5  f0 fb         beq .wait1
+      
+                    ; HUD POSITIONING
+                    ; Horizontal Scroll Solution
+c0b7  2c 02 20      bit PPU_STATUS
+c0ba  a9 00         lda #$00
+c0bc  8d 05 20      sta PPU_SCROLL
+c0bf  8d 05 20      sta PPU_SCROLL
+                    ; Vertical Scroll Solution
+                    ;lda #$26
+                    ;sta PPU_ADDR
+                    ;lda #$c0
+                    ;sta PPU_ADDR
+                    ;lda #$00
+                    ;sta PPU_SCROLL
+                    ;sta PPU_SCROLL
+      
+                    ; set bg pos to page 2 for dashboard
+c0c2  a9 91         lda #$01|#CTRL_NMI|CTRL_BG_1000
+c0c4  8d 00 20      sta PPU_CTRL
+c0c7  a5 09         lda ppu_mask_emph
+c0c9  49 08         eor #MASK_BG
+c0cb  8d 01 20      sta PPU_MASK
+      
+      
+      
+                    ; must be game mode
+c0ce  20 fc f3      jsr player_bullets_update
+c0d1  20 96 d5      jsr starfield_update
+      
+                    ; HUD prepare for next draw
+                    ; stop updating HUD if game over
+c0d4  a5 65         lda player_death_flag
+c0d6  d0 03         bne skip_dash_update
+c0d8  20 c2 d0      jsr dashboard_update
+                skip_dash_update:
+                sprite0_off:
+      
+      
+                    ; debug in lifebar space
+      
+                    ;lda phase_spawn_counter
+                    ;jsr get_char_hi
+                    ;sta $109
+                    ;lda phase_spawn_counter
+                    ;jsr get_char_lo
+                    ;sta $10a
+      
+                    ;lda phase_kill_counter
+                    ;jsr get_char_hi
+                    ;sta $10c
+                    ;lda phase_kill_counter
+                    ;jsr get_char_lo
+                    ;sta $10d
+      
+      
+c0db  20 3e fb      jsr song_update
+c0de  20 9d f7      jsr apu_update
+      
+c0e1  20 a6 f4      jsr player_controls_read
+c0e4  20 3d d4      jsr powerup_bomb_update
+c0e7  20 0e d4      jsr powerup_mushroom_update
+c0ea  20 00 d2      jsr palette_update
+      
+      
+c0ed  e6 24         inc wtf ; frame counter lo
+c0ef  d0 02         bne .skip_ftw
+c0f1  e6 25         inc ftw ; frame counter hi
+                .skip_ftw
+c0f3  20 44 d6      jsr timer_update ; update global time
+c0f6  a5 26         lda rng0 ; rng updates
+c0f8  20 5a c1      jsr NextRandom
+c0fb  85 26         sta rng0
+c0fd  a5 27         lda rng1
+c0ff  20 60 c1      jsr PrevRandom
+c102  85 27         sta rng1
+c104  a5 28         lda rng2
+c106  20 5a c1      jsr NextRandom
+c109  85 28         sta rng2
+      
+                    ; disable NMI lockout
+c10b  a9 00         lda #$00
+c10d  85 00         sta nmi_lockout
+      
+                .nmi_end
+                    RESTORE_REGS ; 16 cycles
+c10f  68            pla
+c110  a8            tay
+c111  68            pla
+c112  aa            tax
+c113  68            pla
+c114  40            rti
+      
+      
+                    ; all includes
+      
+c115                include "ppu_lib_and_tables.asm"
+                    ;nop ; how much prg space we using?
+      
+c621                include "state__handler.asm"
+                    ;nop ; how much prg space we using?
+c654                include "state_menu_screens.asm"
+                    ;nop ; how much prg space we using?
+ca6e                include "state_cutscenes.asm"
+                    ;nop ; how much prg space we using?
+cc4c                include "state_attract.asm"
+                    ;nop ; how much prg space we using?
+ccc4                include "state_game.asm"
+                    ;nop ; how much prg space we using?
+      
+                sandbox_init
+                sandbox_update
+                    ; include "state_sandbox.asm"
+                    ;nop ; how much prg space we using?
+                    ;include "state_sandbox2.asm"
+                    ;nop ; how much prg space we using?
+      
+ce12                include "arctang.asm"
+                    ;nop ; how much prg space we using?
+cf35                include "collision_detection.dasm"
+                    ;nop ; how much prg space we using?
+      
+cf65                include "dashboard.asm"
+                    ;nop ; how much prg space we using?
+d173                include "palette.asm"
+                    ;nop ; how much prg space we using?
+d308                include "powerups.asm"
+                    ;nop ; how much prg space we using?
+d484                include "sine.dasm"
+                    ;nop ; how much prg space we using?
+                    ;include "starfield.dasm"
+                    ;nop ; how much prg space we using?
+d4ea                include "starfield_simple.asm"
+                    ;nop ; how much prg space we using?
+      
+      
+d644                include "timer_global.dasm"
+                    ;nop ; how much prg space we using?
+      
+      
+d6a4                include "phase_handler.asm"
+                    ;nop ; how much prg space we using?
+d9d1                include "phase_table.asm"
+                    ;nop ; how much prg space we using?
+da77                include "enemy_handler.dasm"
+                    ;nop ; how much prg space we using?
+dcc5                include "enemy_tables.dasm"
+                    ;nop ; how much prg space we using?
+dcfb                include "enemy_death.asm"
+      
+      
+ddc3                include "enemy_boss_moufs.asm"
+                    ;nop
+df6f                include "enemy_boss_vamp.asm"
+                    ;nop ; how much prg space we using?
+e204                include "enemy_boss_scarab.asm"
+                    ;nop ; how much prg space we using?
+e302                include "enemy_boss_swordtner.asm"
+                    ;nop
+      
+e5b6                include "enemy_boss_eyes.asm"
+      
+      
+      
+e5f9                include "enemy_ant.asm"
+                    ;nop ; how much prg space we using?
+                    ;include "enemy_bat.asm"
+                    ;nop ; how much prg space we using?
+e6b6                include "enemy_birb.asm"
+                    ;nop ; how much prg space we using?
+e725                include "enemy_chomps.asm"
+                    ;nop ; how much prg space we using?
+e7a8                include "enemy_dart.asm"
+                    ;nop ; how much prg space we using?
+e87c                include "enemy_dumbface.asm"
+                    ;nop
+e8d9                include "enemy_galger.asm"
+                    ;nop
+ec34                include "enemy_ikes_mom.asm"
+                    ;nop
+ed04                include "enemy_lasso.asm"
+                    ;nop ; how much prg space we using?
+ed89                include "enemy_maggs.asm"
+                    ;nop ; how much prg space we using?
+edfb                include "enemy_muya.asm"
+                    ;nop
+ee4d                include "enemy_skeet.asm"
+                    ;nop ; how much prg space we using
+eede                include "enemy_skully.asm"
+                    ;nop ; how much prg space we using?
+ef6e                include "enemy_spark.asm"
+                    ;nop ; how much prg space we using?
+efe6                include "enemy_starglasses.asm"
+                    ;nop ; how much prg space we using?
+f067                include "enemy_throber.asm"
+                    ;nop ; how much prg space we using?
+f0c8                include "enemy_uzi.asm"
+                    ;nop ; how much prg space we using?
+f191                include "enemy_zigzag.asm"
+                    ;nop ; how much prg space we using?
+      
+f217                include "player_main.dasm"
+                    ;nop ; how much prg space we using?
+f2f9                include "player_bullets.dasm"
+                    ;nop ; how much prg space we using?
+f488                include "player_controls.dasm"
+                    ;nop ; how much prg space we using?
+f4be                include "player_movement.dasm"
+                    ;nop ; how much prg space we using?
+f5a0                include "player_demo.asm"
+                    ;nop ; how much prg space we using?
+      
+f65b                include "apu_engine.asm"
+                    ;nop ; how much prg space we using?
+f846                include "apu_sfx.asm"
+                    ;nop ; how much prg space we using?
+fb3e                include "apu_song.asm"
+                    ;nop ; how much prg space we using?
+      
+                    ;fd13 - bosses have 2 spawn assistants
+                    ;fd0c - boss spawn fade from white
+                    ;fcd9 - removed score system
+                    ;fd4e - conglomerated all jump tables
+                    ;fd82 - refactored scarab sprite handlings
+                    ;fdc6 - nop's used for size gauges commented out
+                    ;fdf5 - all 4 bosses and game play able
+                    ;f953 - moar optimized 1197 bytes left! \:U/
+                    ;f9ea - optimized enemy code / using arctang more
+                    ;fbb8 - all audio done
+                    ;fa5d - phase engine and all text and distress alien
+                    ;f535 - super secret code / a new song
+                    ;f3c0 - gutted superfluous enemy handling code
+                    ;f4d9 - gutted fancy starfield/msg feature
+                    ;fa82 - 1st level playable
+                    ;f7e3 - scarab boss
+                    ;f6e3 - ant/lasso/throber/uzi
+                    ;f37d - new audio engine and powerup sfx
+                    ;f162 - rewrote player movement
+                    ;f258 - powerups done except sfx
+                    ;f267 - vampire done?
+                    ;f14c - with arctang now
+                    ;e7be
+                    ;e8b6 newnewnew
+                    ;ea9f bookmark new
+                    ;e666 bookmark old
+      
+fdfe                ; LOOKUP TABLES AT TOP OF ROM
+                    org $fe00
+fe00                include "tables_at_top_of_rom.asm"
+fff8  a9 0d         lda #13 ; super secret operation
+      
+      
+fffa                ;;;;; CPU VECTORS
+                    seg Vectors ; segment "Vectors"
+                    org $fffa ; start at address $fffa
+fffa  word          nmi_handler ; $fffa vblank nmi
+fffc  word          cart_start ; $fffc reset
+fffe  word          nmi_handler ; $fffe irq / brk
+      
+                    ;;;;; GRAPHX
+                    org $010000
+                    incbin "guntner.chr"

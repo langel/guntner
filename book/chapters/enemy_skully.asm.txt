@@ -1,0 +1,97 @@
+      
+      
+                skully_spawn: subroutine
+                    ; x is set by enemy spawner
+eede  a5 26         lda rng0
+eee0  9d 05 03      sta enemy_ram_ac,x ; animation counter
+eee3  20 d1 db      jsr enemy_spawn_random_y_pos
+eee6  9d 03 03      sta enemy_ram_y,x ; y pos
+eee9  60            rts
+      
+      
+      
+                    ;;;; HANDLING SKULLY
+                skully_cycle: subroutine
+eeea  a9 10         lda #$10
+eeec  85 3d         sta collision_0_w
+eeee  85 3e         sta collision_0_h
+eef0  20 eb db      jsr enemy_handle_damage_and_death
+      
+eef3  a6 76         ldx enemy_ram_offset
+eef5  a4 77         ldy enemy_oam_offset
+eef7  a9 01         lda #$01 ; set mirror flag
+eef9  9d 07 03      sta enemy_ram_ex,x
+                    ; let's find what frame we're on
+eefc  bd 05 03      lda enemy_ram_ac,x
+eeff  4a            lsr
+ef00  4a            lsr
+ef01  4a            lsr
+ef02  4a            lsr
+ef03  4a            lsr
+ef04  0a            asl
+                    ; accumulator is now in 0..7 range except x2
+                    ; sprite
+ef05  20 b7 da      jsr sprite_4_set_sprite
+                    ; x pos
+ef08  bd 02 03      lda enemy_ram_x,x
+ef0b  20 df da      jsr sprite_4_set_x
+                    ; y pos
+ef0e  bd 03 03      lda enemy_ram_y,x
+ef11  20 ef da      jsr sprite_4_set_y
+                    ; update spinning counter
+ef14  a9 07         lda #$07
+ef16  18            clc
+ef17  7d 05 03      adc enemy_ram_ac,x
+ef1a  9d 05 03      sta enemy_ram_ac,x
+                    ; move skully
+ef1d  20 28 ef      jsr skully_handle_movement
+                    ; palette
+ef20  a9 03         lda #$03
+ef22  20 9d da      jsr sprite_4_set_palette
+                .skully_done
+ef25  4c 92 db      jmp update_enemies_handler_next
+      
+      
+                skully_handle_movement: subroutine
+ef28  a5 0e         lda attract_true
+ef2a  d0 3e         bne .demoshit
+ef2c  a9 69         lda #$69
+ef2e  bd 04 03      lda enemy_ram_pc,x
+ef31  c9 40         cmp #$40
+ef33  d0 1d         bne .not_chasing
+                    ; CHASE MODE
+ef35  de 02 03      dec enemy_ram_x,x
+ef38  a5 24         lda wtf
+ef3a  29 03         and #$03
+ef3c  d0 2f         bne .done
+ef3e  bd 03 03      lda enemy_ram_y,x
+ef41  18            clc
+ef42  69 09         adc #$09
+ef44  c5 15         cmp player_y_hi
+ef46  f0 25         beq .done
+ef48  90 04         bcc .down
+                .up
+ef4a  de 03 03      dec enemy_ram_y,x
+ef4d  60            rts
+                .down
+ef4e  fe 03 03      inc enemy_ram_y,x
+ef51  60            rts
+                .not_chasing
+                    ; ZOOM MODE
+ef52  a9 20         lda #$20
+ef54  9d 04 03      sta enemy_ram_pc,x
+ef57  a9 04         lda #$04
+ef59  18            clc
+ef5a  7d 02 03      adc enemy_ram_x,x
+ef5d  9d 02 03      sta enemy_ram_x,x
+ef60  c9 f0         cmp #240
+ef62  90 06         bcc .demoshit
+ef64  a9 40         lda #$40
+ef66  9d 04 03      sta enemy_ram_pc,x
+ef69  60            rts
+                .demoshit
+                    ; DEMO MODE
+ef6a  fe 02 03      inc enemy_ram_x,x
+                .done
+ef6d  60            rts
+      
